@@ -81,7 +81,7 @@ namespace xt
         using undecay_shape = S;
         using storage_getter = FST;
         using inner_storage_type = typename storage_getter::type;
-        using temporary_type = temporary_type_t<typename xexpression_type::value_type, S, L>;
+        using temporary_type = typename detail::xtype_for_shape<S>::template type<typename xexpression_type::value_type, L>;
         using storage_type = std::remove_reference_t<inner_storage_type>;
         static constexpr layout_type layout = L;
     };

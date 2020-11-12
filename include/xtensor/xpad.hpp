@@ -80,10 +80,7 @@ namespace xt
         XTENSOR_ASSERT(detail::check_pad_width(pad_width, e.shape()));
 
         using size_type = typename std::decay_t<E>::size_type;
-        using value_type = typename std::decay_t<E>::value_type;
-        using return_type = temporary_type_t<value_type,
-                                             typename std::decay_t<E>::shape_type,
-                                             std::decay_t<E>::static_layout>;
+        using return_type = temporary_type_t<E>;
 
         // place the original array in the center
 
@@ -239,10 +236,8 @@ namespace xt
         inline auto tile(E&& e, const S& reps)
         {
             using size_type = typename std::decay_t<E>::size_type;
-            using value_type = typename std::decay_t<E>::value_type;
-            using return_type = temporary_type_t<value_type,
-                                                 typename std::decay_t<E>::shape_type,
-                                                 std::decay_t<E>::static_layout>;
+
+            using return_type = temporary_type_t<E>;
 
             XTENSOR_ASSERT(e.shape().size() == reps.size());
 
@@ -262,7 +257,7 @@ namespace xt
 
             xt::xstrided_slice_vector svs(e.shape().size(), xt::all());
             xt::xstrided_slice_vector svt(e.shape().size(), xt::all());
-            
+
             for (size_type axis = 0; axis < e.shape().size(); ++axis)
             {
                 for (size_type i = 1; i < static_cast<size_type>(reps[axis]); ++i)

@@ -147,7 +147,7 @@ namespace xt
     template <class E>
     inline auto empty_like(const xexpression<E>& e)
     {
-        using xtype = temporary_type_t<typename E::value_type, typename E::shape_type, E::static_layout>;
+        using xtype = temporary_type_t<E>;
         auto res = xtype::from_shape(e.derived_cast().shape());
         return res;
     }
@@ -162,7 +162,7 @@ namespace xt
     template <class E>
     inline auto full_like(const xexpression<E>& e, typename E::value_type fill_value)
     {
-        using xtype = temporary_type_t<typename E::value_type, typename E::shape_type, E::static_layout>;
+        using xtype = temporary_type_t<E>;
         auto res = xtype::from_shape(e.derived_cast().shape());
         res.fill(fill_value);
         return res;
