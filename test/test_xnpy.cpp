@@ -29,6 +29,9 @@ namespace xt
         case xtl::endian::little_endian:
             endianness = ".le";
             break;
+        case xtl::endian::mixed:
+            endianness = ".unsupported";
+            break;
         }
         return npy_prefix + lts + endianness + ".npy";
     }
