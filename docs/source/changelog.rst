@@ -7,6 +7,18 @@
 Changelog
 =========
 
+0.21.10
+-------
+
+- Document chunked arrays
+  `#2102 <https://github.com/xtensor-stack/xtensor/pull/2102>`_
+- Removed ``zarray`` files
+  `#2221 <https://github.com/xtensor-stack/xtensor/pull/2221>`_
+- Improved ``xeval``
+  `#2223 <https://github.com/xtensor-stack/xtensor/pull/2223>`_
+- Fixed various warnings
+  `#2224 <https://github.com/xtensor-stack/xtensor/pull/2224>`_
+
 0.21.9
 ------
 
