@@ -230,7 +230,7 @@ namespace xt
         struct is_contiguous_view
             : std::integral_constant<bool,
                 has_data_interface<E>::value &&
-                !(E::static_layout == layout_type::column_major && static_dimension<typename E::shape_type>::value != sizeof...(S)) &&
+                !(E::static_layout == layout_type::column_major && static_cast<std::size_t>(static_dimension<typename E::shape_type>::value) != sizeof...(S)) &&
                 is_contiguous_view_impl<E::static_layout, true, false, false, xtl::mpl::vector<S...>>::value
               >
         {

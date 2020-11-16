@@ -2694,9 +2694,10 @@ namespace detail {
         // note: forcing copy of first axes argument -- is there a better solution?
         auto axes_copy = axes;
         using value_type = typename std::conditional_t<std::is_same<T, void>::value, double, T>;
+        using sum_type = typename std::conditional_t<std::is_same<T, void>::value, typename std::common_type_t<typename std::decay_t<E>::value_type, value_type>, T>;
         // sum cannot always be a double. It could be a complex number which cannot operate on
         // std::plus<double>.
-        return nansum<T>(sc, std::forward<X>(axes), es) / xt::cast<value_type>(count_nonnan(sc, std::move(axes_copy), es));
+        return nansum<sum_type>(sc, std::forward<X>(axes), es) / xt::cast<value_type>(count_nonnan(sc, std::move(axes_copy), es));
     }
 
     template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
@@ -2705,7 +2706,8 @@ namespace detail {
     {
         decltype(auto) sc = detail::shared_forward<E>(e);
         using value_type = typename std::conditional_t<std::is_same<T, void>::value, double, T>;
-        return nansum<T>(sc, es) / xt::cast<value_type>(count_nonnan(sc, es));
+        using sum_type = typename std::conditional_t<std::is_same<T, void>::value, typename std::common_type_t<typename std::decay_t<E>::value_type, value_type>, T>;
+        return nansum<sum_type>(sc, es) / xt::cast<value_type>(count_nonnan(sc, es));
     }
 
 #ifdef X_OLD_CLANG
@@ -2776,7 +2778,7 @@ namespace detail {
             keep_dim_shape[el] = 1;
         }
         auto mrv = reshape_view<XTENSOR_DEFAULT_LAYOUT>(std::move(inner_mean), std::move(keep_dim_shape));
-        return nanmean<result_type>(square(sc - std::move(mrv)), std::forward<X>(axes), es);
+        return nanmean<result_type>(square(cast<result_type>(sc) - std::move(mrv)), std::forward<X>(axes), es);
     }
 
     /**
