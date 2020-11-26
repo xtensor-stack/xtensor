@@ -1,6 +1,5 @@
 # ![xtensor](docs/source/xtensor.svg)
 
-[![Travis](https://travis-ci.org/xtensor-stack/xtensor.svg?branch=master)](https://travis-ci.org/xtensor-stack/xtensor)
 [![Appveyor](https://ci.appveyor.com/api/projects/status/dljjg79povwgncuf?svg=true)](https://ci.appveyor.com/project/xtensor-stack/xtensor)
 [![Azure](https://dev.azure.com/xtensor-stack/xtensor-stack/_apis/build/status/xtensor-stack.xtensor?branchName=master)](https://dev.azure.com/xtensor-stack/xtensor-stack/_build/latest?definitionId=4&branchName=master)
 [![Coverity](https://scan.coverity.com/projects/18335/badge.svg)](https://scan.coverity.com/projects/xtensor)
