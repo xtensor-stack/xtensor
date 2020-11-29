@@ -71,6 +71,48 @@ namespace xt
         }
     }
 
+    TEST(xsort, argsort_zero_stride)
+    {
+        {
+            xt::xtensor<double, 2> A = {{1.4, 1.3, 1.2, 1.1}};
+            xt::xtensor<size_t, 2> bsort = {{0, 0, 0, 0}};
+            xt::xtensor<size_t, 2> fsort = {{3, 2, 1, 0}};
+            EXPECT_EQ(bsort, xt::argsort(A, 0));
+            EXPECT_EQ(fsort, xt::argsort(A, 1));
+            EXPECT_EQ(fsort, xt::argsort(A));
+        }
+        {
+            xt::xtensor<double, 3> A = {{{1.4, 1.3, 1.2, 1.1}}};
+            xt::xtensor<size_t, 3> bsort = {{{0, 0, 0, 0}}};
+            xt::xtensor<size_t, 3> fsort = {{{3, 2, 1, 0}}};
+            EXPECT_EQ(bsort, xt::argsort(A, 0));
+            EXPECT_EQ(bsort, xt::argsort(A, 1));
+            EXPECT_EQ(fsort, xt::argsort(A, 2));
+            EXPECT_EQ(fsort, xt::argsort(A));
+        }
+    }
+
+    TEST(xsort, argsort_zero_stride_column_major)
+    {
+        {
+            xt::xtensor<double, 2, xt::layout_type::column_major> A = {{1.4, 1.3, 1.2, 1.1}};
+            xt::xtensor<size_t, 2, xt::layout_type::column_major> bsort = {{0, 0, 0, 0}};
+            xt::xtensor<size_t, 2, xt::layout_type::column_major> fsort = {{3, 2, 1, 0}};
+            EXPECT_EQ(bsort, xt::argsort(A, 0));
+            EXPECT_EQ(fsort, xt::argsort(A, 1));
+            EXPECT_EQ(fsort, xt::argsort(A));
+        }
+        {
+            xt::xtensor<double, 3, xt::layout_type::column_major> A = {{{1.4, 1.3, 1.2, 1.1}}};
+            xt::xtensor<size_t, 3, xt::layout_type::column_major> bsort = {{{0, 0, 0, 0}}};
+            xt::xtensor<size_t, 3, xt::layout_type::column_major> fsort = {{{3, 2, 1, 0}}};
+            EXPECT_EQ(bsort, xt::argsort(A, 0));
+            EXPECT_EQ(bsort, xt::argsort(A, 1));
+            EXPECT_EQ(fsort, xt::argsort(A, 2));
+            EXPECT_EQ(fsort, xt::argsort(A));
+        }
+    }
+
     TEST(xsort, flatten_argsort)
     {
         {
@@ -256,7 +298,7 @@ namespace xt
         auto d = unique(c);
         EXPECT_EQ(d, bx);
 
-        auto e = xt::unique(xt::where(xt::greater(b,2), 1, 0)); 
+        auto e = xt::unique(xt::where(xt::greater(b,2), 1, 0));
         xarray<double> ex = {0, 1};
         EXPECT_EQ(e, ex);
     }
