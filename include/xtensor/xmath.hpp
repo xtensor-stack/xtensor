@@ -397,6 +397,38 @@ namespace detail {
                           init_value_fct(detail::fill_init<result_type>(INIT))), std::forward<E>(e), es);         \
     }
 
+#define XTENSOR_REDUCER_FUNCTION2(NAME, FUNCTOR, RESULT_TYPE, INIT)                                                \
+    template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,                            \
+              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::negation<xtl::is_integral<X>>)>             \
+    inline auto NAME(E&& e, X&& axes, EVS es = EVS())                                                             \
+    {                                                                                                             \
+        using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
+        using functor_f = FUNCTOR;                                                                \
+        using init_value_fct = xt::const_value<result_type/*, INIT*/>;                                            \
+        return xt::reduce(make_xreducer_functor(functor_f(),                                                          \
+                          init_value_fct(detail::fill_init<result_type>(INIT))),                                  \
+                          std::forward<E>(e),                                                                     \
+                          std::forward<X>(axes), es);                                                             \
+    }                                                                                                             \
+                                                                                                                  \
+    template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,                            \
+              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::is_integral<X>)>                            \
+    inline auto NAME(E&& e, X axis, EVS es = EVS())                                                               \
+    {                                                                                                             \
+        return NAME(std::forward<E>(e), {axis}, es);                                                              \
+    }                                                                                                             \
+                                                                                                                  \
+    template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,                                     \
+              XTL_REQUIRES(is_reducer_options<EVS>)>                                                              \
+    inline auto NAME(E&& e, EVS es = EVS())                                                                       \
+    {                                                                                                             \
+        using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
+        using functor_f = FUNCTOR;                                                                \
+        using init_value_fct = xt::const_value<result_type/*, INIT*/>;                                            \
+        return xt::reduce(make_xreducer_functor(functor_f(),                                                          \
+                          init_value_fct(detail::fill_init<result_type>(INIT))), std::forward<E>(e), es);         \
+    }
+
 #define XTENSOR_OLD_CLANG_REDUCER(NAME, FUNCTOR, RESULT_TYPE, INIT)                                               \
     template <class T = void, class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>                            \
     inline auto NAME(E&& e, std::initializer_list<I> axes, EVS es = EVS())                                        \
@@ -408,6 +440,17 @@ namespace detail {
                           init_value_fct(detail::fill_init<result_type>(INIT))), std::forward<E>(e), axes, es);   \
     }
 
+#define XTENSOR_OLD_CLANG_REDUCER2(NAME, FUNCTOR, RESULT_TYPE, INIT)                                              \
+    template <class T = void, class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>                            \
+    inline auto NAME(E&& e, std::initializer_list<I> axes, EVS es = EVS())                                        \
+    {                                                                                                             \
+        using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
+        using functor_f = FUNCTOR;                                                                                \
+        using init_value_fct = xt::const_value<result_type/*, INIT*/>;                                            \
+        return xt::reduce(make_xreducer_functor(functor_t(),                                                      \
+                          init_value_fct(detail::fill_init<result_type>(INIT))), std::forward<E>(e), axes, es);   \
+    }
+
 #define XTENSOR_MODERN_CLANG_REDUCER(NAME, FUNCTOR, RESULT_TYPE, INIT)                                            \
     template <class T = void, class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>             \
     inline auto NAME(E&& e, const I (&axes)[N], EVS es = EVS())                                                   \
@@ -416,6 +459,18 @@ namespace detail {
         using functor_type = FUNCTOR<result_type>;                                                                \
         using init_value_fct = xt::const_value<result_type/*, INIT*/>;                                            \
         return xt::reduce(make_xreducer_functor(functor_type(),                                                   \
+                          init_value_fct(detail::fill_init<result_type>(INIT))), std::forward<E>(e), axes, es);   \
+    }
+
+
+#define XTENSOR_MODERN_CLANG_REDUCER2(NAME, FUNCTOR, RESULT_TYPE, INIT)                                           \
+    template <class T = void, class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>             \
+    inline auto NAME(E&& e, const I (&axes)[N], EVS es = EVS())                                                   \
+    {                                                                                                             \
+        using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
+        using functor_t = FUNCTOR;                                                                                \
+        using init_value_fct = xt::const_value<result_type/*, INIT*/>;                                            \
+        return xt::reduce(make_xreducer_functor(functor_t(),                                                      \
                           init_value_fct(detail::fill_init<result_type>(INIT))), std::forward<E>(e), axes, es);   \
     }
 
@@ -1867,11 +1922,12 @@ namespace detail {
      * @param es evaluation strategy of the reducer
      * @return an \ref xreducer
      */
-    XTENSOR_REDUCER_FUNCTION(sum, std::plus, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>, 0)
+    
+    XTENSOR_REDUCER_FUNCTION2(sum, detail::plus, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>, 0)
 #ifdef X_OLD_CLANG
-    XTENSOR_OLD_CLANG_REDUCER(sum, std::plus, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>, 0)
+    XTENSOR_OLD_CLANG_REDUCER2(sum, detail::plus, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>, 0)
 #else
-    XTENSOR_MODERN_CLANG_REDUCER(sum, std::plus, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>, 0)
+    XTENSOR_MODERN_CLANG_REDUCER2(sum, detail::plus, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>, 0)
 #endif
 
     /**
@@ -2359,7 +2415,7 @@ namespace detail {
                 return a;
             }
         };
-
+ 
         template <class T>
         struct nan_plus
         {

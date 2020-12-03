@@ -28,6 +28,8 @@
 #include "xtensor/xarray.hpp"
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xrandom.hpp"
+#include "xtensor/xoptional.hpp"
+#include "xtl/xoptional.hpp"
 
 #include "xtensor/xio.hpp"
 
@@ -57,6 +59,25 @@ namespace xt
                 m_a(1, i, 1, j, 1) = 2;
             }
         }
+    }
+
+    TEST(xreducer, optional)
+    {
+        xt::xarray_optional<int> a = {{1, 2, 3}, {4, xtl::missing<int>(), 6}};
+        auto sum1 = xt::sum<int>(a, {1});
+
+        xt::xarray_optional<int> sum2 = xt::sum(a, {1});
+
+
+/*
+        xarray<int>::shape_type expected_shape = {2};
+        xtl::xoptional<int, bool> a1 = sum(0);
+        xtl::xoptional<int, bool> a2 = sum(1);
+
+        EXPECT_EQ(expected_shape, sum.shape());
+        EXPECT_EQ(6, a1);
+        EXPECT_EQ(xtl::missing<int>(), a2);
+*/
     }
 
     TEST(xreducer, functor_type)
@@ -676,7 +697,7 @@ namespace xt
         xt::xarray<int> a = xt::ones<int>({ 3, 2});
         XT_EXPECT_ANY_THROW(xt::sum(a, {1, 1}));
     }
-
+/*
     TEST(xreducer, sum_xtensor_of_fixed)
     {
         xt::xtensor_fixed<float, xt::xshape<3>> a = {1, 2, 3}, b = {1, 2, 3};
@@ -684,5 +705,6 @@ namespace xt
         auto res = xt::sum(c)();
         EXPECT_EQ(res, a * 2.);
     }
+*/
 }
 
