@@ -2314,15 +2314,16 @@ namespace detail {
         using std::max;
         using value_type = typename std::decay_t<E>::value_type;
         using result_type = std::array<value_type, 2>;
+        using init_value_fct = xt::const_value<result_type/*, INIT*/>;
 
         auto reduce_func = [](result_type r, value_type const& v) {
             r[0] = (min)(r[0], v);
             r[1] = (max)(r[1], v);
             return r;
         };
-        auto init_func = []() {
-            return result_type{std::numeric_limits<value_type>::max(), std::numeric_limits<value_type>::lowest()};
-        };
+
+        auto init_func = init_value_fct(result_type{std::numeric_limits<value_type>::max(), std::numeric_limits<value_type>::lowest()});  
+
         auto merge_func = [](result_type r, result_type const& s) {
             r[0] = (min)(r[0], s[0]);
             r[1] = (max)(r[1], s[1]);
@@ -2556,11 +2557,11 @@ namespace detail {
 
 #define COUNT_NON_ZEROS_CONTENT                                                 \
     using result_type = std::size_t;                                            \
+    using init_value_fct = xt::const_value<result_type/*, INIT*/>;              \
     using value_type = typename std::decay_t<E>::value_type;                    \
-    auto init_fct = []() -> result_type                                         \
-    {                                                                           \
-        return 0;                                                               \
-    };                                                                          \
+                                                                                \
+    auto init_fct = init_value_fct(0);                                          \
+                                                                                \
     auto reduce_fct = [](const result_type& lhs, const value_type& rhs)         \
          -> result_type                                                         \
     {                                                                           \
