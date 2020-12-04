@@ -1944,11 +1944,11 @@ namespace detail {
      * @param es evaluation strategy of the reducer
      * @return an \ref xreducer
      */
-    XTENSOR_REDUCER_FUNCTION(prod, std::multiplies, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>, 1)
+    XTENSOR_REDUCER_FUNCTION2(prod, detail::multiplies, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>, 1)
 #ifdef X_OLD_CLANG
-    XTENSOR_OLD_CLANG_REDUCER(prod, std::multiplies, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>, 1)
+    XTENSOR_OLD_CLANG_REDUCER2(prod, detail::multiplies, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>, 1)
 #else
-    XTENSOR_MODERN_CLANG_REDUCER(prod, std::multiplies, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>, 1)
+    XTENSOR_MODERN_CLANG_REDUCER2(prod, detail::multiplies, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>, 1)
 #endif
 
     namespace detail
