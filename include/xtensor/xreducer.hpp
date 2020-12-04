@@ -1022,6 +1022,14 @@ namespace xt
             {
                 return const_value<U>(t.m_value);
             }
+        };
+
+        template <class T>
+        struct get_reducer_rtn_type
+        {
+            using return_type = T;
+
+            constexpr get_reducer_rtn_type() = default;
         };         
     }
 

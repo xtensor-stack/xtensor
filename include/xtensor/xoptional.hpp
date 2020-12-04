@@ -221,12 +221,20 @@ namespace xt
          **********************************/
 
         template <class T, class B>
-        struct const_value_rebinder<xtl::xoptional<T, B>, T>
+        struct const_value_rebinder <xtl::xoptional<T, B>, T>
         {
             static const_value<T> run(const const_value<xtl::xoptional<T, B>>& src)
             {
                 return const_value<T>(src.m_value.value());
             }
+        };
+
+        template <class T, class B>
+        struct get_reducer_rtn_type <xtl::xoptional<T, B>>
+        {
+            using return_type = typename xtl::xoptional<T, B>;
+
+            constexpr get_reducer_rtn_type() = default;
         };
     }
 
