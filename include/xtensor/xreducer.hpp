@@ -1022,7 +1022,7 @@ namespace xt
             {
                 return const_value<U>(t.m_value);
             }
-        };        
+        };         
     }
 
     /***************
@@ -1430,7 +1430,7 @@ namespace xt
     template <class T, class E>
     inline auto xreducer<F, CT, X, O>::build_reducer(E&& e) const -> rebind_t<E>
     {
-        using result_type = std::conditional_t<std::is_same<T, void>::value, T, typename E::value_type>;
+        using result_type = std::conditional_t<std::is_same<T, void>::value, typename E::value_type, T>;
 
         return rebind_t<E>(std::make_tuple(m_reduce, m_init.template rebind<result_type>(), m_merge), std::forward<E>(e), axes_type(m_axes), m_options);
     }
