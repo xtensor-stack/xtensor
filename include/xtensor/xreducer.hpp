@@ -513,6 +513,8 @@ namespace xt
     template <class T>
     struct const_value
     {
+        using value_type = T;
+
         constexpr const_value() = default;
 
         constexpr const_value(T t)
@@ -524,6 +526,12 @@ namespace xt
         {
             return m_value;
         }
+
+        template <class NT>
+        using rebind_t = const_value<NT>;
+
+        template <class NT>
+        const_value<NT> rebind() const;
 
         T m_value;
     };
@@ -537,6 +545,7 @@ namespace xt
         using reduce_functor_type = REDUCE_FUNC;
         using init_functor_type = INIT_FUNC;
         using merge_functor_type = MERGE_FUNC;
+        using result_type = typename init_functor_type::value_type;
 
         xreducer_functors()
             : base_type()
@@ -746,7 +755,7 @@ namespace xt
         template <class E, class Func = F, class Opts = O>
         using rebind_t = xreducer<Func, E, X, Opts>;
 
-        template <class E>
+        template <class T = void, class E>
         rebind_t<E> build_reducer(E&& e) const;
 
         template <class E, class Func, class Opts>
@@ -1005,7 +1014,31 @@ namespace xt
                                             fixed_shape<R...>,
                                             fixed_shape<detail::at<0, I...>::value, R...>>;
         };
+
+        template <class T, class U>
+        struct const_value_rebinder
+        {
+            static const_value<U> run(const const_value<T>& t)
+            {
+                return const_value<U>(t.m_value);
+            }
+        };        
     }
+
+    /***************
+     * const_value *
+     ***************/
+
+    template <class T>
+    template <class NT>
+    const_value<NT> const_value<T>::rebind() const
+    {
+        return detail::const_value_rebinder<T, NT>::run(*this);
+    }
+
+    /*****************************
+     * fixed_xreducer_shape_type *
+     *****************************/
 
     template <class S1, class S2>
     struct fixed_xreducer_shape_type;
@@ -1394,10 +1427,12 @@ namespace xt
     }
 
     template <class F, class CT, class X, class O>
-    template <class E>
+    template <class T, class E>
     inline auto xreducer<F, CT, X, O>::build_reducer(E&& e) const -> rebind_t<E>
     {
-        return rebind_t<E>(std::make_tuple(m_reduce, m_init, m_merge), std::forward<E>(e), axes_type(m_axes), m_options);
+        using result_type = std::conditional_t<std::is_same<T, void>::value, typename F::result_type, typename E::value_type>;
+
+        return rebind_t<E>(std::make_tuple(m_reduce, m_init.template rebind<result_type>(), m_merge), std::forward<E>(e), axes_type(m_axes), m_options);
     }
 
     template <class F, class CT, class X, class O>

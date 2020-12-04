@@ -215,6 +215,19 @@ namespace xt
                 return b1 & simd_apply_impl(b2, args...);
             }
         };
+
+        /**********************************
+         * optional init functor rebinder *
+         **********************************/
+
+        template <class T, class B>
+        struct const_value_rebinder<xtl::xoptional<T, B>, T>
+        {
+            static const_value<T> run(const const_value<xtl::xoptional<T, B>>& src)
+            {
+                return const_value<T>(src.m_value.value());
+            }
+        };
     }
 
     /**********************

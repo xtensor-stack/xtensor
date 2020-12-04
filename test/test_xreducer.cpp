@@ -35,6 +35,13 @@
 
 namespace xt
 {
+
+#define CHECK_RESULT_TYPE(EXPRESSION, EXPECTED_TYPE)                             \
+{                                                                                \
+    using result_type = typename std::decay_t<decltype(EXPRESSION)>::value_type; \
+    EXPECT_TRUE((std::is_same<result_type, EXPECTED_TYPE>::value));              \
+}
+
     struct xreducer_features
     {
         using axes_type = std::array<std::size_t, 2>;
@@ -61,12 +68,29 @@ namespace xt
         }
     }
 
+    TEST(xreducer, const_value)
+    {
+        const_value<int> c_value(10);
+
+        CHECK_RESULT_TYPE(c_value.template rebind<int>(), int);
+        CHECK_RESULT_TYPE(c_value.template rebind<float>(), float);
+        CHECK_RESULT_TYPE(c_value.template rebind<double>(), double);
+
+        using init_type = xtl::xoptional<int, bool>; 
+        const_value<init_type> c_opt_value(xtl::xoptional<int, bool>(20, true));
+
+        CHECK_RESULT_TYPE(c_opt_value, init_type);
+        CHECK_RESULT_TYPE(c_opt_value.template rebind<int>(), int);
+        CHECK_RESULT_TYPE(c_opt_value.template rebind<float>(), float);
+        CHECK_RESULT_TYPE(c_opt_value.template rebind<double>(), double);
+    }
+
     TEST(xreducer, optional)
     {
         xt::xarray_optional<int> a = {{1, 2, 3}, {4, xtl::missing<int>(), 6}};
-        auto sum1 = xt::sum<int>(a, {1});
+        auto sum1 = xt::sum(a, {1});
 
-        xt::xarray_optional<int> sum2 = xt::sum(a, {1});
+        //xt::xarray_optional<int> sum2 = xt::sum(a, {1});
 
 
 /*
