@@ -1095,7 +1095,8 @@ namespace xt
         template <class F, class CT, class X, class O>
         inline auto xreducer_optional<F, CT, X, O>::value() const -> const_value_expression
         {
-            return this->derived_cast().build_reducer(this->derived_cast().expression().value());
+        
+            return this->derived_cast().template build_reducer<typename F::result_type>(this->derived_cast().expression().value());
         }
 
         template <class F, class CT, class X, class O>
