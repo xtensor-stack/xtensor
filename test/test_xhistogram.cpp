@@ -14,8 +14,6 @@
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xhistogram.hpp"
 #include "xtensor/xrandom.hpp"
-#include "xtensor/xio.hpp"
-
 
 namespace xt
 {
@@ -29,16 +27,6 @@ namespace xt
             EXPECT_EQ(count.size(), std::size_t(2) );
             EXPECT_EQ(count(0), 2.);
             EXPECT_EQ(count(1), 2.);
-        }
-
-        {
-            xt::xtensor<double, 1> edges {0, 1.5, 3};
-            xt::xtensor<double, 1> weights {1, 1, 1, 1};
-            auto count = xt::histogram<int>(data, edges, weights, true);
-            // This is indeed a bug. If the count is the density, an integral return
-            // type should not be allowed.
-            EXPECT_EQ(count(0), 0.);
-            EXPECT_EQ(count(1), 0.);
         }
 
         {

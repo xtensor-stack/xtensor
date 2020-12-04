@@ -76,7 +76,7 @@ namespace xt
                     // left and right are not bounds of data
                     if ( v >= left & v < right )
                     {
-                        auto i_bin = static_cast<size_t>(static_cast<double>(n_bins) * (static_cast<double>(data(i)) - left) * norm);
+                        auto i_bin = static_cast<size_t>(static_cast<double>(n_bins) * (v - left) * norm);
                         count(i_bin) += weights(i);
                     }
                     else if ( v == right )
