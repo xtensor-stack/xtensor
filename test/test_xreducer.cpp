@@ -42,31 +42,64 @@ namespace xt
     EXPECT_TRUE((std::is_same<result_type, EXPECTED_TYPE>::value));              \
 }
 
-    struct xreducer_features
+    template <class T = double>
+    struct xreducer_feats
     {
         using axes_type = std::array<std::size_t, 2>;
+        using shape_type = typename xarray<T>::shape_type;
+        using func = xreducer_functors<std::plus<T>>;
+
         axes_type m_axes;
-        xarray<double> m_a;
-        using shape_type = xarray<double>::shape_type;
 
-        using func = xreducer_functors<std::plus<double>>;
-        xreducer<func, const xarray<double>&, axes_type, xt::reducer_options<double, std::tuple<xt::evaluation_strategy::lazy_type>>> m_red;
+        xarray<T> m_a;
+    
+        xreducer<func, const xarray<T>&, axes_type, xt::reducer_options<T, std::tuple<xt::evaluation_strategy::lazy_type>>> m_red;
 
-        xreducer_features();
-    };
-
-    xreducer_features::xreducer_features()
-        : m_axes({1, 3}), m_a(ones<double>({3, 2, 4, 6, 5})),
-          m_red(func(), m_a, m_axes, xt::evaluation_strategy::lazy)
-    {
-        for (std::size_t i = 0; i < 2; ++i)
+        xreducer_feats()
+            : m_axes({1, 3}), m_a(ones<T>({3, 2, 4, 6, 5})),
+            m_red(func(), m_a, m_axes, xt::evaluation_strategy::lazy)
         {
-            for (std::size_t j = 0; j < 6; ++j)
+            for (std::size_t i = 0; i < 2; ++i)
             {
-                m_a(1, i, 1, j, 1) = 2;
+                for (std::size_t j = 0; j < 6; ++j)
+                {
+                    m_a(1, i, 1, j, 1) = 2;
+                }
             }
         }
-    }
+    };
+
+    template <class T = double>
+    struct xreducer_opt_feats
+    {
+        using axes_type = std::array<std::size_t, 2>;
+        using shape_type = typename xarray<xtl::xoptional<T>>::shape_type;
+        using func = xreducer_functors<std::plus<xtl::xoptional<T>>>;
+
+        axes_type m_axes;
+
+        xarray<xtl::xoptional<T>> m_a;
+    
+        xreducer<func, const xarray<xtl::xoptional<T>>&, axes_type, xt::reducer_options<xtl::xoptional<T>, std::tuple<xt::evaluation_strategy::lazy_type>>> m_red;
+
+        xreducer_opt_feats()
+            : m_axes({1, 3}), m_a(ones<xtl::xoptional<T>>({3, 2, 4, 6, 5})),
+            m_red(func(), m_a, m_axes, xt::evaluation_strategy::lazy)
+        {
+            for (std::size_t i = 0; i < 2; ++i)
+            {
+                for (std::size_t j = 0; j < 6; ++j)
+                {
+                    m_a(1, i, 1, j, 1) = 2;
+                }
+            }
+            m_a(0, 0, 0, 0, 0) = xtl::missing<T>();
+        }
+    };
+
+    using xreducer_features = xreducer_feats<>;
+    using xreducer_opt_features = xreducer_opt_feats<>;
+
 
     TEST(xreducer, const_value)
     {
@@ -196,10 +229,19 @@ namespace xt
     TEST(xreducer, sum)
     {
         xreducer_features features;
-        xarray<double> res = sum(features.m_a, features.m_axes);
-        xarray<double> expected = 12 * ones<double>({3, 4, 5});
+        xarray<double> res = xt::sum(features.m_a, features.m_axes);
+        xarray<double> expected = 12 * xt::ones<double>({3, 4, 5});
         expected(1, 1, 1) = 24;
         EXPECT_EQ(expected, res);
+        CHECK_RESULT_TYPE(res, double);
+
+        xreducer_opt_features opt_features;
+        xarray<xtl::xoptional<double>> opt_res = xt::sum(opt_features.m_a, opt_features.m_axes);
+        xarray<xtl::xoptional<double>> opt_expected = 12 * xt::ones<double>({3, 4, 5});
+        opt_expected(1, 1, 1) = 24;
+        opt_expected(0, 0, 0) = xtl::missing<double>();
+        EXPECT_EQ(opt_expected, opt_res);
+        CHECK_RESULT_TYPE(opt_res, xtl::xoptional<double>);
     }
 
     TEST(xreducer, sum_tensor)
@@ -209,21 +251,49 @@ namespace xt
         EXPECT_EQ(res.dimension(), std::size_t(1));
         EXPECT_EQ(res(0), 4.0);
         EXPECT_EQ(res(1), 6.0);
+        CHECK_RESULT_TYPE(res, double);
+
+        xtensor<xtl::xoptional<double>, 2> opt_m = {{1, 2}, {3, 4}};
+        xarray<xtl::xoptional<double>> opt_res = xt::sum(m, {0});
+        EXPECT_EQ(opt_res.dimension(), std::size_t(1));
+        EXPECT_EQ(opt_res(0), 4.0);
+        EXPECT_EQ(opt_res(1), 6.0);
+        CHECK_RESULT_TYPE(opt_res, xtl::xoptional<double>);
     }
 
     TEST(xreducer, single_axis_sugar)
     {
         xarray<double> m = {{1, 0}, {3, 4}};
-
+/*
         xarray<std::size_t> res1 = xt::count_nonzero(m, {1});
         xarray<std::size_t> res2 = xt::count_nonzero(m, 1);
         EXPECT_EQ(res1, res2);
+        CHECK_RESULT_TYPE(res1, std::size_t);
+        CHECK_RESULT_TYPE(res2, std::size_t);
 
         xarray<double> res3 = xt::sum(m, {1});
         xarray<double> res4 = xt::sum(m, 1);
         EXPECT_EQ(res3, res4);
-    }
+        CHECK_RESULT_TYPE(res3, double);
+        CHECK_RESULT_TYPE(res4, double);
 
+        xt::xarray_optional<double> m_opt = {{1, 0}, {3, xtl::missing<double>()}};
+
+        xarray<xtl::xoptional<std::size_t>> opt_res1 = xt::count_nonzero(m_opt, {1});/*
+        xarray<std::size_t> opt_res2 = xt::count_nonzero(m_opt, 1);
+        EXPECT_EQ(opt_res1, opt_res2);
+        CHECK_RESULT_TYPE(opt_res1, double);
+        CHECK_RESULT_TYPE(opt_res2, double);
+
+        xarray<xtl::xoptional<double>> opt_res3 = xt::sum(m_opt, {1});
+        xarray<xtl::xoptional<double>> opt_res4 = xt::sum(m_opt, 1);
+        EXPECT_EQ(opt_res3, opt_res4);
+        CHECK_RESULT_TYPE(opt_res3, double);
+        CHECK_RESULT_TYPE(opt_res4, double);
+
+*/
+    }
+/*
     TEST(xreducer, sum2)
     {
         xarray<double> u = ones<double>({2, 4});
@@ -256,20 +326,41 @@ namespace xt
         xarray<uint8_t> c = ones<uint8_t>({1000});
         EXPECT_EQ(1000u, sum(c)());
     }
-
+*/
     TEST(xreducer, sum_all)
     {
         xreducer_features features;
-        auto res = sum(features.m_a);
+        auto res = xt::sum(features.m_a);
         double expected = 732;
+        CHECK_RESULT_TYPE(res, double);
         EXPECT_EQ(res(), expected);
+
+        xreducer_opt_features opt_features;
+        auto opt_res = xt::sum(opt_features.m_a);
+        auto opt_expected = xtl::missing<double>();
+        CHECK_RESULT_TYPE(opt_res, xtl::xoptional<double>);
+        EXPECT_EQ(opt_res(), opt_expected);
     }
 
     TEST(xreducer, prod)
     {
         // check that there is no overflow
-        xarray<uint8_t> c = 2 * ones<uint8_t>({34});
-        EXPECT_EQ(1ULL << 34, prod(c)());
+        xarray<uint8_t> c = 2 * xt::ones<uint8_t>({34});
+        auto res = xt::prod(c);
+        CHECK_RESULT_TYPE(res, uint8_t);  // TODO: fail, investigate
+        EXPECT_EQ(1ULL << 34, res());
+
+        xarray<double> d = 2 * xt::ones<double>({7});
+        auto res2 = xt::prod(d);
+        CHECK_RESULT_TYPE(res2, double);
+        EXPECT_EQ(128, res2());
+
+        xreducer_opt_features opt_features;
+        auto opt_res = xt::prod(opt_features.m_a);
+        auto opt_expected = xtl::missing<double>();
+        CHECK_RESULT_TYPE(opt_res, xtl::xoptional<double>);
+        EXPECT_EQ(opt_res(), opt_expected);
+
     }
 
     TEST(xreducer, mean)
@@ -721,6 +812,7 @@ namespace xt
         xt::xarray<int> a = xt::ones<int>({ 3, 2});
         XT_EXPECT_ANY_THROW(xt::sum(a, {1, 1}));
     }
+    
 /*
     TEST(xreducer, sum_xtensor_of_fixed)
     {
