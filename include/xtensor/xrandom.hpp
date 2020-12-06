@@ -14,12 +14,17 @@
 #ifndef XTENSOR_RANDOM_HPP
 #define XTENSOR_RANDOM_HPP
 
+#include <algorithm>
 #include <functional>
 #include <random>
 #include <utility>
+#include <type_traits>
+
+#include <xtl/xspan.hpp>
 
 #include "xbuilder.hpp"
 #include "xgenerator.hpp"
+#include "xindex_view.hpp"
 #include "xtensor.hpp"
 #include "xtensor_config.hpp"
 #include "xview.hpp"
@@ -179,6 +184,12 @@ namespace xt
 
         template <class T, class E = random::default_engine_type>
         xtensor<typename T::value_type, 1> choice(const xexpression<T>& e, std::size_t n, bool replace = true,
+                                                  E& engine = random::get_default_random_engine());
+
+        template <class T, class W, class E = random::default_engine_type>
+        xtensor<typename T::value_type, 1> choice(const xexpression<T>& e, std::size_t n,
+                                                  const xexpression<W>& weights,
+                                                  bool replace = true,
                                                   E& engine = random::get_default_random_engine());
     }
 
@@ -792,6 +803,83 @@ namespace xt
             }
             return result;
         }
+
+        /**
+         * Randomly select n unique elements from xexpression e using the weights distribution w.
+         *
+         * Note: this function makes a copy of your data, and only 1D data is accepted.
+         *
+         * @param e expression to sample from
+         * @param n number of elements to sample
+         * @param e expression for the weight distribution.
+         *          Weights must be positive and real-valued but need not sum to 1.
+         * @param replace whether to sample with or without replacement
+         * @param engine random number engine
+         *
+         * @return xtensor containing 1D container of sampled elements
+         */
+        template <class T, class W, class E>
+        xtensor<typename T::value_type, 1>
+        choice(const xexpression<T>& e, std::size_t n, const xexpression<W>& weights, bool replace, E& engine)
+        {
+            const auto& de = e.derived_cast();
+            const auto& dweights = weights.derived_cast();
+            if (de.dimension() != 1)
+            {
+                XTENSOR_THROW(std::runtime_error, "Sample and weight expression must be 1 dimensional");
+            }
+            if (de.size() < n && !replace)
+            {
+                XTENSOR_THROW(std::runtime_error, "If replace is false, then the sample expression's size must be > n");
+            }
+            if (de.size() != dweights.size() || de.dimension() != dweights.dimension())
+            {
+                XTENSOR_THROW(std::runtime_error, "Sample and weight expression must have the same size");
+            }
+            static_assert(std::is_floating_point<typename W::value_type>::value,
+                          "Weight expression must be of floating point type");
+            using result_type = xtensor<typename T::value_type, 1>;
+            using size_type = typename result_type::size_type;
+            using weight_type = typename W::value_type;
+            result_type result;
+            result.resize({n});
+
+            if (replace)
+            {
+                XTENSOR_THROW(std::runtime_error, "Not implemented");
+            }
+            else
+            {
+                // Algorithm from
+                // Efraimidis PS, Spirakis PG (2006). "Weighted random sampling with a reservoir."
+                // Information Processing  Letters, 97 (5), 181-185. ISSN 0020-0190.
+                // doi:10.1016/j.ipl.2005.11.003.
+                // https://www.sciencedirect.com/science/article/pii/S002001900500298X
+                //
+                // The keys computed are replaced with weight/randexp(1) instead rand()^(1/weight) as done in wrlmlR:
+                // https://web.archive.org/web/20201021162211/https://krlmlr.github.io/wrswoR/
+                // https://web.archive.org/web/20201021162520/https://github.com/krlmlr/wrswoR/blob/master/src/sample_int_crank.cpp
+                // As well as in JuliaStats:
+                // https://web.archive.org/web/20201021162949/https://github.com/JuliaStats/StatsBase.jl/blob/master/src/sampling.jl
+
+                // Compute (modified) keys as weight/randexp(1).
+                xtensor<weight_type, 1> keys;
+                keys.resize({dweights.size()});
+                std::exponential_distribution<weight_type> randexp{1.};
+                std::transform(dweights.storage().begin(), dweights.storage().end(), keys.begin(),
+                               [&randexp, &engine](auto w){ return w / randexp(engine); });
+
+                // Find indexes for the n biggest key
+                xtensor<size_type, 1> indices = arange<size_type>(0, dweights.size());
+                std::partial_sort(indices.storage().begin(), indices.storage().begin() + n, indices.storage().end(),
+                                  [&keys](auto i, auto j) { return keys[i] > keys[j]; });
+
+                // Return samples with the n biggest keys
+                result = index_view(de, xtl::span<size_type>{indices.data(), n});
+            }
+            return result;
+        }
+
     }
 }
 
