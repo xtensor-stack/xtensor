@@ -154,6 +154,27 @@ namespace xt
         CHECK_TAG_TYPE(sum3, xoptional_expression_tag);
     }
 
+    TEST(xreducer, optional)
+    {
+        // xarray<xtl::xoptional<T>>
+        xarray<xtl::xoptional<int>> a1 = {{1, 2, 3}, {4, xtl::missing<int>(), 6}};
+        auto sum1 = xt::sum(a1, {1});
+
+        CHECK_RESULT_TYPE(sum1, xtl::xoptional<int>);
+        CHECK_TYPE(xt::value(sum1)(1), int);  // is currently xtl::xoptional<int>
+        EXPECT_EQ(true, xt::has_value(sum1)(0));
+        EXPECT_EQ(false, xt::has_value(sum1)(1));  // Fail
+
+        // xarray_optional<T>
+        xarray_optional<int> a2 = {{1, 2, 3}, {4, xtl::missing<int>(), 6}};
+        auto sum2 = xt::sum(a2, {1});
+
+        CHECK_RESULT_TYPE(sum2, xtl::xoptional<int>);
+        CHECK_TYPE(xt::value(sum2)(1), int);  // is currently xtl::xoptional<int>
+        EXPECT_EQ(true, xt::has_value(sum2)(0));
+        EXPECT_EQ(false, xt::has_value(sum2)(1));
+    }
+
     TEST(xreducer, assignment)
     {
         // Nothing computed
@@ -163,7 +184,7 @@ namespace xt
 
         // Computed and assigned in xarray<xoptional<T>>
         xarray<xtl::xoptional<int>> sum12 = xt::sum(a1, {1});  // OK
-        // CHECK_RESULT_TYPE(sum12, xtl::xoptional<int>);
+        CHECK_RESULT_TYPE(sum12, xtl::xoptional<int>);
 
         // Computed and assigned in xarray_optional<T>
         // xarray_optional<int> sum13 = xt::sum(a1, {1});  // error: invalid static_cast from type 'xtl::xoptional<int, bool>' to type 'int'
