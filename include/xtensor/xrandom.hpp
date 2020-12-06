@@ -28,6 +28,7 @@
 #include "xtensor.hpp"
 #include "xtensor_config.hpp"
 #include "xview.hpp"
+#include "xmath.hpp"
 
 namespace xt
 {
@@ -846,7 +847,19 @@ namespace xt
 
             if (replace)
             {
-                XTENSOR_THROW(std::runtime_error, "Not implemented");
+                // Sample u uniformly in the range [0, sum(weights)[
+                // The index idx of the sampled element in e is the largest idx such that weight_cumul[idx] < u (given by std::upper_bound - 1).
+                const xtensor<weight_type, 1> weight_cumul = cumsum(dweights);  // 0 included as first elem
+                const auto weight_cumul_begin = weight_cumul.storage().begin();
+                std::uniform_real_distribution<weight_type> weight_dist{0, weight_cumul[weight_cumul.size() - 1]};
+                for(auto& x : result)
+                {
+                    const auto u = weight_dist(engine);
+                    const auto idx_iter = std::upper_bound(weight_cumul_begin, weight_cumul.storage().end(), u) - 1;
+                    const auto idx = static_cast<size_type>(idx_iter - weight_cumul_begin);
+                    x = de.storage()[idx];
+                }
+
             }
             else
             {

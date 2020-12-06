@@ -186,6 +186,16 @@ namespace xt
         ASSERT_TRUE(all(isin(ac1, a)));
         ASSERT_TRUE(all(equal(ac1 % 2, 1)));
 
+        xt::random::seed(42);
+        auto acr1 = xt::random::choice(a, 6, w, false);
+        auto acr2 = xt::random::choice(a, 6, w, false);
+        xt::random::seed(42);
+        auto acr3 = xt::random::choice(a, 6, w, false);
+        ASSERT_EQ(acr1, acr3);
+        ASSERT_NE(acr1, acr2);
+        ASSERT_TRUE(all(isin(acr1, a)));
+        ASSERT_TRUE(all(equal(acr1 % 2, 1)));
+
         xarray<double> b = {-1, 1};
         xarray<double> v = {1, 1};
         xt::random::seed(42);
