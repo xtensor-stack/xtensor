@@ -42,6 +42,18 @@ namespace xt
     EXPECT_TRUE((std::is_same<result_type, EXPECTED_TYPE>::value));              \
 }
 
+#define CHECK_TAG_TYPE(EXPRESSION, EXPECTED_TYPE)                                    \
+{                                                                                    \
+    using result_type = typename std::decay_t<decltype(EXPRESSION)>::expression_tag; \
+    EXPECT_TRUE((std::is_same<result_type, EXPECTED_TYPE>::value));                  \
+}
+
+#define CHECK_TYPE(VALUE, EXPECTED_TYPE)                                         \
+{                                                                                \
+    using result_type = typename std::decay_t<decltype(VALUE)>;                  \
+    EXPECT_TRUE((std::is_same<result_type, EXPECTED_TYPE>::value));              \
+}
+
     template <class T = double>
     struct xreducer_feats
     {
@@ -118,25 +130,59 @@ namespace xt
         CHECK_RESULT_TYPE(c_opt_value.template rebind<double>(), double);
     }
 
-    TEST(xreducer, optional)
+    TEST(xreducer, expression_tag)
     {
-        xt::xarray_optional<int> a = {{1, 2, 3}, {4, xtl::missing<int>(), 6}};
-        auto sum1 = xt::sum(a, {1});
+        // xarray of T
+        xarray<int> a1 = {{1, 2, 3}, {4, 5, 6}};
+        auto sum1 = xt::sum(a1, {1});
+        CHECK_RESULT_TYPE(a1, int);
+        CHECK_RESULT_TYPE(sum1, long long);
+        CHECK_TAG_TYPE(sum1, xtensor_expression_tag);
+        
+        // xarray of xoptional<T>
+        xarray<xtl::xoptional<int>> a2 = {{1, 2, 3}, {4, xtl::missing<int>(), 6}};
+        auto sum2 = xt::sum(a2, {1});
+        CHECK_RESULT_TYPE(a2, xtl::xoptional<int>);
+        CHECK_RESULT_TYPE(sum2, xtl::xoptional<int>);
+        CHECK_TAG_TYPE(sum2, xoptional_expression_tag);  // FAIL
 
-        //xt::xarray_optional<int> sum2 = xt::sum(a, {1});
-
-
-/*
-        xarray<int>::shape_type expected_shape = {2};
-        xtl::xoptional<int, bool> a1 = sum(0);
-        xtl::xoptional<int, bool> a2 = sum(1);
-
-        EXPECT_EQ(expected_shape, sum.shape());
-        EXPECT_EQ(6, a1);
-        EXPECT_EQ(xtl::missing<int>(), a2);
-*/
+        // xarray_optional of T
+        xarray_optional<int> a3 = {{1, 2, 3}, {4, xtl::missing<int>(), 6}};
+        auto sum3 = xt::sum(a3, {1});
+        CHECK_RESULT_TYPE(a3, xtl::xoptional<int>);
+        CHECK_RESULT_TYPE(sum3, xtl::xoptional<int>);
+        CHECK_TAG_TYPE(sum3, xoptional_expression_tag);
     }
 
+    TEST(xreducer, assignment)
+    {
+        // Nothing computed
+        xarray<xtl::xoptional<int>> a1 = {{1, 2, 3}, {4, xtl::missing<int>(), 6}};
+        auto sum11 = xt::sum(a1, {1});  // OK
+        CHECK_RESULT_TYPE(sum11, xtl::xoptional<int>);
+
+        // Computed and assigned in xarray<xoptional<T>>
+        xarray<xtl::xoptional<int>> sum12 = xt::sum(a1, {1});  // OK
+        // CHECK_RESULT_TYPE(sum12, xtl::xoptional<int>);
+
+        // Computed and assigned in xarray_optional<T>
+        // xarray_optional<int> sum13 = xt::sum(a1, {1});  // error: invalid static_cast from type 'xtl::xoptional<int, bool>' to type 'int'
+        // CHECK_RESULT_TYPE(sum13, xtl::xoptional<int>);
+
+        // Nothing computed
+        xarray_optional<int> a2 = {{1, 2, 3}, {4, xtl::missing<int>(), 6}};
+        auto sum21 = xt::sum(a2, {1});  // OK
+        CHECK_RESULT_TYPE(sum21, xtl::xoptional<int>);
+
+        // Computed and assigned in xarray_optional<T>
+        // xarray_optional<int> sum22 = xt::sum(a2, {1});  // error: invalid static_cast from type 'xtl::xoptional<int, bool>' to type 'int'
+        // CHECK_RESULT_TYPE(sum22, xtl::xoptional<int>);
+
+        // Computed and assigned in xarray<xoptional<T>>
+        // xarray<xtl::xoptional<int>> sum23 = xt::sum(a2, {1});  // error: assignment of read-only location
+        // CHECK_RESULT_TYPE(sum23, xtl::xoptional<int>);
+    }
+/*
     TEST(xreducer, functor_type)
     {
         auto sum = [](auto const& left, auto const& right) { return left + right; };
@@ -291,8 +337,9 @@ namespace xt
         CHECK_RESULT_TYPE(opt_res3, double);
         CHECK_RESULT_TYPE(opt_res4, double);
 
-*/
+
     }
+    */
 /*
     TEST(xreducer, sum2)
     {
@@ -327,6 +374,7 @@ namespace xt
         EXPECT_EQ(1000u, sum(c)());
     }
 */
+/*
     TEST(xreducer, sum_all)
     {
         xreducer_features features;
@@ -812,6 +860,7 @@ namespace xt
         xt::xarray<int> a = xt::ones<int>({ 3, 2});
         XT_EXPECT_ANY_THROW(xt::sum(a, {1, 1}));
     }
+*/
     
 /*
     TEST(xreducer, sum_xtensor_of_fixed)
