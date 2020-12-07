@@ -1103,8 +1103,20 @@ namespace xt
         template <class F, class CT, class X, class O>
         inline auto xreducer_optional<F, CT, X, O>::value() const -> const_value_expression
         {
-        
-            return this->derived_cast().template build_reducer<typename F::result_type>(this->derived_cast().expression().value());
+            using result_type = typename F::result_type;
+            using init_functor_type = typename F::init_functor_type;
+            using new_init_functor_type = typename init_functor_type::template rebind_t<result_type>;
+            using functor_type = xreducer_functors<typename F::reduce_functor_type, 
+                                                   new_init_functor_type,
+                                                   typename F::merge_functor_type>;
+
+            auto func = this->derived_cast().functors();
+
+            return this->derived_cast().build_reducer(this->derived_cast().expression().value(),
+                                                      make_xreducer_functor(func.get_functor(), 
+                                                                            func.get_init().template rebind<result_type>(), 
+                                                                            func.get_merge()),
+                                                      this->derived_cast().options());
         }
 
         template <class F, class CT, class X, class O>

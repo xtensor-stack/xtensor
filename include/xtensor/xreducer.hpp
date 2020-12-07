@@ -569,6 +569,21 @@ namespace xt
             : base_type(std::forward<RF>(reduce_func), std::forward<IF>(init_func), std::forward<MF>(merge_func))
         {
         }
+
+        reduce_functor_type get_reduce()
+        {
+            return get<0>(*this);
+        }
+
+        init_functor_type get_init()
+        {
+            return get<1>(*this);
+        }
+
+        merge_functor_type get_merge()
+        {
+            return get<2>(*this);
+        }
     };
 
     template <class RF>
@@ -695,6 +710,7 @@ namespace xt
         using reduce_functor_type = typename inner_types::reduce_functor_type;
         using init_functor_type = typename inner_types::init_functor_type;
         using merge_functor_type = typename inner_types::merge_functor_type;
+        using xreducer_functors_type = xreducer_functors<reduce_functor_type, init_functor_type, merge_functor_type>;
         using xexpression_type = typename inner_types::xexpression_type;
         using axes_type = X;
 
@@ -755,11 +771,16 @@ namespace xt
         template <class E, class Func = F, class Opts = O>
         using rebind_t = xreducer<Func, E, X, Opts>;
 
-        template <class T = void, class E>
+        template <class E>
         rebind_t<E> build_reducer(E&& e) const;
 
         template <class E, class Func, class Opts>
         rebind_t<E, Func, Opts> build_reducer(E&& e, Func&& func, Opts&& opts) const;
+
+        xreducer_functors_type functors() const
+        {
+            return make_xreducer_functor(m_reduce, m_init, m_merge);
+        }
 
         const O& options() const
         {
@@ -1435,12 +1456,10 @@ namespace xt
     }
 
     template <class F, class CT, class X, class O>
-    template <class T, class E>
+    template <class E>
     inline auto xreducer<F, CT, X, O>::build_reducer(E&& e) const -> rebind_t<E>
     {
-        using result_type = std::conditional_t<std::is_same<T, void>::value, typename E::value_type, T>;
-
-        return rebind_t<E>(std::make_tuple(m_reduce, m_init.template rebind<result_type>(), m_merge), std::forward<E>(e), axes_type(m_axes), m_options);
+        return rebind_t<E>(std::make_tuple(m_reduce, m_init, m_merge), std::forward<E>(e), axes_type(m_axes), m_options);
     }
 
     template <class F, class CT, class X, class O>
