@@ -32,7 +32,7 @@ steps:
       if [[ $(column_major_layout) == 1 ]]; then
         CMAKE_EXTRA_ARGS="$CMAKE_EXTRA_ARGS -DDEFAULT_COLUMN_MAJOR=ON";
       fi
-      if [[ $(disable_ximsd) == 1 ]]; then
+      if [[ $(disable_xsimd) == 1 ]]; then
         CMAKE_EXTRA_ARGS="$CMAKE_EXTRA_ARGS -DXTENSOR_USE_XSIMD=OFF";
       else
         CMAKE_EXTRA_ARGS="$CMAKE_EXTRA_ARGS -DXTENSOR_USE_XSIMD=ON";
