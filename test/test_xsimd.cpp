@@ -15,12 +15,12 @@
 #include "xtensor/xtensor_config.hpp"
 
 template <typename T>
-class alignas(XTENSOR_SELECT_ALIGN(T)) Foo
+class alignas(XTENSOR_FIXED_ALIGN) Foo
 {
 public:
 
-    using allocator_type = std::conditional_t<XTENSOR_SELECT_ALIGN(T) != 0,
-                                              xt_simd::aligned_allocator<T, XTENSOR_SELECT_ALIGN(T)>,
+    using allocator_type = std::conditional_t<XTENSOR_FIXED_ALIGN != 0,
+                                              xt_simd::aligned_allocator<T, XTENSOR_FIXED_ALIGN>,
                                               std::allocator<T>>;
 
     Foo(T fac) : m_fac(fac)
@@ -49,3 +49,4 @@ namespace xt
         EXPECT_TRUE(xt::sum(foo.get())() == fac * 10 * 10);
     }
 }
+
