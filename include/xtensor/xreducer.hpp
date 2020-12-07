@@ -584,6 +584,15 @@ namespace xt
         {
             return std::get<2>(*this);
         }
+
+        template<class NT>
+        using rebind_t = xreducer_functors<REDUCE_FUNC, const_value<NT>, MERGE_FUNC>;
+
+        template<class NT>
+        rebind_t<NT> rebind()
+        {
+            return make_xreducer_functor(get_reduce(), get_init().template rebind<NT>(), get_merge());
+        }
     };
 
     template <class RF>
@@ -779,7 +788,7 @@ namespace xt
 
         xreducer_functors_type functors() const
         {
-            return make_xreducer_functor(m_reduce, m_init, m_merge);
+            return xreducer_functors_type(m_reduce, m_init, m_merge);  // TODO: understand why make_xreducer_functor is throwing an error
         }
 
         const O& options() const

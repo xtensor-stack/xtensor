@@ -657,10 +657,17 @@ namespace xt
         public:
 
             using expression_tag = xoptional_expression_tag;
-            using value_expression = xreducer<F, xt::detail::value_expression_t<CT>, X, O>;
+            using result_type = typename F::result_type;
+
+            using rebound_result_type = typename result_type::value_type;
+            using rebound_functors_type = typename F::template rebind_t<rebound_result_type>;
+            using rebound_reduce_options_values = typename O::template rebind_t<rebound_result_type>;
+            using rebound_reduce_options_flag = typename O::template rebind_t<bool>;
+            
             using flag_reducer = xreducer_functors<xt::detail::optional_bitwise<bool>, xt::const_value<bool>>;
-            using rebound_flag_reduce_options = typename O::template rebind_t<bool>;
-            using flag_expression = xreducer<flag_reducer, xt::detail::flag_expression_t<CT>, X, rebound_flag_reduce_options>;
+            using flag_expression = xreducer<flag_reducer, xt::detail::flag_expression_t<CT>, X, rebound_reduce_options_flag>;
+            
+            using value_expression = xreducer<rebound_functors_type, xt::detail::value_expression_t<CT>, X, rebound_reduce_options_values>;
             using const_value_expression = value_expression;
             using const_flag_expression = flag_expression;
 
@@ -1103,20 +1110,12 @@ namespace xt
         template <class F, class CT, class X, class O>
         inline auto xreducer_optional<F, CT, X, O>::value() const -> const_value_expression
         {
-            using result_type = typename F::result_type;
-            using init_functor_type = typename F::init_functor_type;
-            using new_init_functor_type = typename init_functor_type::template rebind_t<result_type>;
-            using functor_type = xreducer_functors<typename F::reduce_functor_type, 
-                                                   new_init_functor_type,
-                                                   typename F::merge_functor_type>;
-
             auto func = this->derived_cast().functors();
+            auto opts = this->derived_cast().options().template rebind<rebound_result_type>(this->derived_cast().options().initial_value.value(), this->derived_cast().options());
 
             return this->derived_cast().build_reducer(this->derived_cast().expression().value(),
-                                                      make_xreducer_functor(func.get_functor(), 
-                                                                            func.get_init().template rebind<result_type>(), 
-                                                                            func.get_merge()),
-                                                      this->derived_cast().options());
+                                                      func.template rebind<rebound_result_type>(),
+                                                      std::move(opts));
         }
 
         template <class F, class CT, class X, class O>
