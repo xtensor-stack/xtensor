@@ -4,4 +4,7 @@ channels:
   - conda-forge
 
 dependencies:
-  - breathe
+  # More recent version of breathe has an
+  # annoying bug regarding resolution of
+  # template overloads
+  - breathe==4.16.0
