@@ -572,17 +572,17 @@ namespace xt
 
         reduce_functor_type get_reduce()
         {
-            return get<0>(*this);
+            return std::get<0>(*this);
         }
 
         init_functor_type get_init()
         {
-            return get<1>(*this);
+            return std::get<1>(*this);
         }
 
         merge_functor_type get_merge()
         {
-            return get<2>(*this);
+            return std::get<2>(*this);
         }
     };
 
