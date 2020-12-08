@@ -806,15 +806,27 @@ namespace xt
         }
 
         /**
-         * Randomly select n unique elements from xexpression e using the weights distribution w.
+         * Weighted random sampling.
+         *
+         * Randomly sample n unique elements from xexpression ``e`` using the discrete distribution parametrized by
+         * the weights ``w``.
+         * When sampling with replacement, this means that the probability to sample element ``e[i]`` is defined as
+         * ``w[i] / sum(w)``.
+         * Without replacement, this only describes the probability of the first sample element.
+         * In successive samples, the weight of items already sampled is assumed to be zero.
+         *
+         * For weighted random sampling with replacement, binary search with cumulative weights alogrithm is used.
+         * For weighted random sampling without replacement, the algorithm used is the exponential sort from
+         * [Efraimidis and Spirakis](https://doi.org/10.1016/j.ipl.2005.11.003) (2006) with the ``weight / randexp(1)``
+         * [trick](https://web.archive.org/web/20201021162211/https://krlmlr.github.io/wrswoR/) from Kirill Müller.
          *
          * Note: this function makes a copy of your data, and only 1D data is accepted.
          *
          * @param e expression to sample from
          * @param n number of elements to sample
-         * @param e expression for the weight distribution.
+         * @param w expression for the weight distribution.
          *          Weights must be positive and real-valued but need not sum to 1.
-         * @param replace whether to sample with or without replacement
+         * @param replace set true to sample with replacement
          * @param engine random number engine
          *
          * @return xtensor containing 1D container of sampled elements
@@ -837,6 +849,7 @@ namespace xt
             {
                 XTENSOR_THROW(std::runtime_error, "Sample and weight expression must have the same size");
             }
+            XTENSOR_ASSERT(xt::all(dweights >= 0));
             static_assert(std::is_floating_point<typename W::value_type>::value,
                           "Weight expression must be of floating point type");
             using result_type = xtensor<typename T::value_type, 1>;
@@ -848,14 +861,15 @@ namespace xt
             if (replace)
             {
                 // Sample u uniformly in the range [0, sum(weights)[
-                // The index idx of the sampled element in e is the largest idx such that weight_cumul[idx] < u (given by std::upper_bound - 1).
-                const xtensor<weight_type, 1> weight_cumul = cumsum(dweights);  // 0 included as first elem
+                // The index idx of the sampled element is such that weight_cumul[idx - 1] <= u < weight_cumul[idx].
+                // Where weight_cumul[-1] is implicitly 0, as the empty sum.
+                const auto weight_cumul = eval(cumsum(dweights));
                 const auto weight_cumul_begin = weight_cumul.storage().begin();
                 std::uniform_real_distribution<weight_type> weight_dist{0, weight_cumul[weight_cumul.size() - 1]};
                 for(auto& x : result)
                 {
                     const auto u = weight_dist(engine);
-                    const auto idx_iter = std::upper_bound(weight_cumul_begin, weight_cumul.storage().end(), u) - 1;
+                    const auto idx_iter = std::upper_bound(weight_cumul_begin, weight_cumul.storage().end(), u);
                     const auto idx = static_cast<size_type>(idx_iter - weight_cumul_begin);
                     x = de.storage()[idx];
                 }
@@ -863,22 +877,10 @@ namespace xt
             }
             else
             {
-                // Algorithm from
-                // Efraimidis PS, Spirakis PG (2006). "Weighted random sampling with a reservoir."
-                // Information Processing  Letters, 97 (5), 181-185. ISSN 0020-0190.
-                // doi:10.1016/j.ipl.2005.11.003.
-                // https://www.sciencedirect.com/science/article/pii/S002001900500298X
-                //
-                // The keys computed are replaced with weight/randexp(1) instead rand()^(1/weight) as done in wrlmlR:
-                // https://web.archive.org/web/20201021162211/https://krlmlr.github.io/wrswoR/
-                // https://web.archive.org/web/20201021162520/https://github.com/krlmlr/wrswoR/blob/master/src/sample_int_crank.cpp
-                // As well as in JuliaStats:
-                // https://web.archive.org/web/20201021162949/https://github.com/JuliaStats/StatsBase.jl/blob/master/src/sampling.jl
-
                 // Compute (modified) keys as weight/randexp(1).
                 xtensor<weight_type, 1> keys;
                 keys.resize({dweights.size()});
-                std::exponential_distribution<weight_type> randexp{1.};
+                std::exponential_distribution<weight_type> randexp{weight_type(1)};
                 std::transform(dweights.storage().begin(), dweights.storage().end(), keys.begin(),
                                [&randexp, &engine](auto w){ return w / randexp(engine); });
 
