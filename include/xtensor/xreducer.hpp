@@ -809,6 +809,26 @@ namespace xt
         friend class xreducer_stepper<F, CT, X, O>;
     };
 
+    template <class T>
+    struct xreducer_size_type
+    {
+        using type = std::size_t;
+    };
+
+    template <class T>
+    using xreducer_size_type_t = typename xreducer_size_type<T>::type;
+
+
+    template <class T>
+    struct xreducer_temporary_type
+    {
+        using type = T;
+    };
+
+    template <class T>
+    using xreducer_temporary_type_t = typename xreducer_temporary_type<T>::type;
+
+
     /*************************
      * reduce implementation *
      *************************/

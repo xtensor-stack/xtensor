@@ -2314,9 +2314,10 @@ namespace detail {
         using std::max;
         using value_type = typename std::decay_t<E>::value_type;
         using result_type = std::array<value_type, 2>;
-        using init_value_fct = xt::const_value<result_type/*, INIT*/>;
+        using init_value_fct = xt::const_value<result_type>;
 
-        auto reduce_func = [](result_type r, value_type const& v) {
+        auto reduce_func = [](auto r, const auto& v) 
+        {
             r[0] = (min)(r[0], v);
             r[1] = (max)(r[1], v);
             return r;
@@ -2324,7 +2325,8 @@ namespace detail {
 
         auto init_func = init_value_fct(result_type{std::numeric_limits<value_type>::max(), std::numeric_limits<value_type>::lowest()});  
 
-        auto merge_func = [](result_type r, result_type const& s) {
+        auto merge_func = [](auto r, const auto& s)
+        {
             r[0] = (min)(r[0], s[0]);
             r[1] = (max)(r[1], s[1]);
             return r;
@@ -2555,19 +2557,22 @@ namespace detail {
 #undef OLD_CLANG_NAN_REDUCER
 #undef MODERN_CLANG_NAN_REDUCER
 
-#define COUNT_NON_ZEROS_CONTENT                                                 \
-    using result_type = std::size_t;                                            \
-    using init_value_fct = xt::const_value<result_type/*, INIT*/>;              \
-    using value_type = typename std::decay_t<E>::value_type;                    \
-                                                                                \
-    auto init_fct = init_value_fct(0);                                          \
-                                                                                \
-    auto reduce_fct = [](const result_type& lhs, const value_type& rhs)         \
-         -> result_type                                                         \
-    {                                                                           \
-        return (rhs != value_type(0)) ? lhs + result_type(1) : lhs;             \
-    };                                                                          \
-    auto merge_func = std::plus<result_type>();                                 \
+
+#define COUNT_NON_ZEROS_CONTENT                                                    \
+    using value_type = typename std::decay_t<E>::value_type;                       \
+    using result_type = xreducer_size_type_t<value_type>;                          \
+    using init_value_fct = xt::const_value<result_type>;                           \
+                                                                                   \
+    auto init_fct = init_value_fct(0);                                             \
+                                                                                   \
+    auto reduce_fct = [](const auto& lhs, const auto& rhs)                         \
+    {                                                                              \
+        using value_t = xreducer_temporary_type_t<std::decay_t<decltype(rhs)>>;    \
+        using result_t = std::decay_t<decltype(lhs)>;                              \
+        return (rhs != value_t(0)) ? lhs + result_t(1) : lhs;                      \
+    };                                                                             \
+    auto merge_func = detail::plus();                                              \
+
 
     template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
               XTL_REQUIRES(is_reducer_options<EVS>)>
@@ -2606,7 +2611,7 @@ namespace detail {
     template <class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
     inline auto count_nonzero(E&& e, const I (&axes)[N], EVS es = EVS())
     {
-        COUNT_NON_ZEROS_CONTENT;
+        COUNT_NON_ZEROS_CONTENT;                                              
         return xt::reduce(make_xreducer_functor(std::move(reduce_fct), std::move(init_fct), std::move(merge_func)),
                       std::forward<E>(e), axes, es);
     }

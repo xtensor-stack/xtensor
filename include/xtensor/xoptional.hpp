@@ -260,6 +260,19 @@ namespace xt
         static void assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial);
     };
 
+    template <class T, class B>
+    struct xreducer_size_type<xtl::xoptional<T, B>>
+    {
+        using type = xtl::xoptional<std::size_t, bool>;
+    };
+
+    template <class T, class B>
+    struct xreducer_temporary_type<xtl::xoptional<T, B>>
+    {
+        using type = xtl::xoptional<std::decay_t<T>, bool>;;
+    };
+
+
     /**********************************
      * xscalar extension for optional *
      **********************************/
