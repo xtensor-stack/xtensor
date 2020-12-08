@@ -29,9 +29,11 @@
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xrandom.hpp"
 #include "xtensor/xoptional.hpp"
+#include "xtensor/xoptional_assembly.hpp"
+#include "xtensor/xio.hpp"
+
 #include "xtl/xoptional.hpp"
 
-#include "xtensor/xio.hpp"
 
 namespace xt
 {
@@ -88,22 +90,33 @@ namespace xt
         using shape_type = typename xarray_optional<T>::shape_type;
         using func = xreducer_functors<std::plus<xtl::xoptional<T>>>;
 
+        using xarray_of_optional_t = xarray<xtl::xoptional<T>>;
+        using xarray_optional_t = xarray_optional<T>;
+        using optional_assembly_t = xoptional_assembly<xarray<T>, xarray<bool>>;
+
         axes_type m_axes;
 
-        xarray_optional<T> m_a;
+        xarray_of_optional_t m_array_of_optional;
+
+        xarray_optional_t m_array_optional;
     
+        optional_assembly_t m_optional_assembly;
+
         xreducer_opt_feats(): 
             m_axes({1, 3}), 
-            m_a(ones<xtl::xoptional<T>>({3, 2, 4, 6, 5}))
+            m_array_optional(ones<xtl::xoptional<T>>({3, 2, 4, 6, 5}))
         {
             for (std::size_t i = 0; i < 2; ++i)
             {
                 for (std::size_t j = 0; j < 6; ++j)
                 {
-                    m_a(1, i, 1, j, 1) = 2;
+                    m_array_optional(1, i, 1, j, 1) = 2;
                 }
             }
-            m_a(0, 0, 0, 0, 0) = xtl::missing<T>();
+            m_array_optional(0, 0, 0, 0, 0) = xtl::missing<T>();
+
+            m_optional_assembly = optional_assembly_t(m_array_optional.value(), m_array_optional.has_value());
+            m_array_of_optional = m_optional_assembly.value();
         }
     };
 
@@ -137,22 +150,88 @@ namespace xt
         CHECK_RESULT_TYPE(sum1, long long);
         CHECK_TAG_TYPE(a1, xtensor_expression_tag);
         CHECK_TAG_TYPE(sum1, xtensor_expression_tag);
-        
-        // xarray of xoptional<T>
-        xarray<xtl::xoptional<int>> a2 = {{1, 2, 3}, {4, xtl::missing<int>(), 6}};
-        auto sum2 = xt::sum(a2, {1});
-        CHECK_RESULT_TYPE(a2, xtl::xoptional<int>);
-        CHECK_RESULT_TYPE(sum2, xtl::xoptional<int>);
-        // CHECK_TAG_TYPE(a2, xoptional_expression_tag);  // FAIL
-        // CHECK_TAG_TYPE(sum2, xoptional_expression_tag);  // FAIL
+    }
 
-        // xarray_optional of T
-        xarray_optional<int> a3 = {{1, 2, 3}, {4, xtl::missing<int>(), 6}};
-        auto sum3 = xt::sum(a3, {1});
-        CHECK_RESULT_TYPE(a3, xtl::xoptional<int>);
-        CHECK_RESULT_TYPE(sum3, xtl::xoptional<int>);
-        CHECK_TAG_TYPE(a3, xoptional_expression_tag);
-        CHECK_TAG_TYPE(sum3, xoptional_expression_tag);
+    TEST(xreducer_array_of_optional, expression_tag)
+    {
+        xarray<xtl::xoptional<int>> a = {{1, 2, 3}, {4, xtl::missing<int>(), 6}};
+        auto res = xt::sum(a, {1});
+        CHECK_TAG_TYPE(a, xtensor_expression_tag);
+        CHECK_TAG_TYPE(res, xtensor_expression_tag);
+    }
+
+    TEST(xreducer_array_optional, expression_tag)
+    {
+        xarray_optional<int> a = {{1, 2, 3}, {4, xtl::missing<int>(), 6}};
+        auto res = xt::sum(a, {1});
+        CHECK_TAG_TYPE(a, xoptional_expression_tag);
+        CHECK_TAG_TYPE(res, xoptional_expression_tag);
+    }
+
+    TEST(xreducer_optional_assembly, expression_tag)
+    {
+        xtensor<double, 2> v = {{1, 2, 3}, {4, 5, 6}};
+        xtensor<bool, 2> hv = {{true, true, true}, {true, false, true}};
+        xoptional_assembly<xtensor<double, 2>, xtensor<bool, 2>> a(v, hv);
+        auto res = xt::sum(a, {1});
+        CHECK_TAG_TYPE(a, xoptional_expression_tag);
+        CHECK_TAG_TYPE(res, xoptional_expression_tag);
+    }
+
+    TEST(xreducer_array_of_optional, internal_types)
+    {
+        xarray<xtl::xoptional<int>> a = {{1, 2, 3}, {4, xtl::missing<int>(), 6}};
+        auto res = xt::sum(a, {1});
+
+        CHECK_RESULT_TYPE(a, xtl::xoptional<int>);
+        CHECK_RESULT_TYPE(res, xtl::xoptional<int>);
+        CHECK_TYPE(xt::value(res)(1), xtl::xoptional<int>);
+        EXPECT_EQ(true, xt::has_value(res)(0));
+        // EXPECT_EQ(false, xt::has_value(res)(1));  // TODO: fail, mask does not reflect missing values
+
+        xarray<xtl::xoptional<int>> computed_res = res;
+        CHECK_RESULT_TYPE(computed_res, xtl::xoptional<int>);
+        CHECK_TYPE(xt::value(computed_res)(1), xtl::xoptional<int>);
+        EXPECT_EQ(true, xt::has_value(computed_res)(0));
+        // EXPECT_EQ(false, xt::has_value(computed_res)(1));  // TODO: fail, mask does not reflect missing values
+    }
+
+    TEST(xreducer_array_optional, internal_types)
+    {
+        xarray_optional<int> a = {{1, 2, 3}, {4, xtl::missing<int>(), 6}};
+        auto res = xt::sum(a, {1});
+
+        CHECK_RESULT_TYPE(a, xtl::xoptional<int>);
+        CHECK_RESULT_TYPE(res, xtl::xoptional<int>);
+        CHECK_TYPE(xt::value(res)(1), int);
+        EXPECT_EQ(true, xt::has_value(res)(0));
+        EXPECT_EQ(false, xt::has_value(res)(1));
+
+        xarray_optional<int> computed_res = res;
+        CHECK_RESULT_TYPE(computed_res, xtl::xoptional<int>);
+        CHECK_TYPE(xt::value(computed_res)(1), int);
+        EXPECT_EQ(true, xt::has_value(computed_res)(0));
+        EXPECT_EQ(false, xt::has_value(computed_res)(1));
+    }
+
+    TEST(xreducer_optional_assembly, internal_types)
+    {
+        xarray<int> v = {{1, 2, 3}, {4, 5, 6}};
+        xarray<bool> hv = {{true, true, true}, {true, false, true}};
+        xoptional_assembly<xarray<int>, xarray<bool>> a(v, hv);
+        auto res = xt::sum(a, {1});
+
+        CHECK_RESULT_TYPE(a, xtl::xoptional<int>);
+        CHECK_RESULT_TYPE(res, xtl::xoptional<int>);
+        CHECK_TYPE(xt::value(res)(1), int);
+        EXPECT_EQ(true, xt::has_value(res)(0));
+        EXPECT_EQ(false, xt::has_value(res)(1));
+
+        xoptional_assembly<xarray<int>, xarray<bool>> computed_res = res;
+        CHECK_RESULT_TYPE(computed_res, xtl::xoptional<int>);
+        CHECK_TYPE(xt::value(computed_res)(1), int);
+        EXPECT_EQ(true, xt::has_value(computed_res)(0));
+        EXPECT_EQ(false, xt::has_value(computed_res)(1));
     }
 
     TEST(xreducer, getters)
@@ -162,65 +241,7 @@ namespace xt
 
         sum1.functors();
     }
-
-    TEST(xreducer, optional)
-    {
-        // xarray<xtl::xoptional<T>>
-        xarray<xtl::xoptional<int>> a1 = {{1, 2, 3}, {4, xtl::missing<int>(), 6}};
-        auto sum1 = xt::sum(a1, {1});
-
-        CHECK_RESULT_TYPE(a1, xtl::xoptional<int>);
-        CHECK_RESULT_TYPE(sum1, xtl::xoptional<int>);
-        // CHECK_TYPE(xt::value(sum1)(1), int);  // is currently xtl::xoptional<int>
-        EXPECT_EQ(true, xt::has_value(sum1)(0));
-        // EXPECT_EQ(false, xt::has_value(sum1)(1));  // Fail
-
-        // xarray_optional<T>
-        xarray_optional<int> a2 = {{1, 2, 3}, {4, xtl::missing<int>(), 6}};
-        auto sum2 = xt::sum(a2, {1});
-
-        CHECK_RESULT_TYPE(a2, xtl::xoptional<int>);
-        CHECK_RESULT_TYPE(sum2, xtl::xoptional<int>);
-        CHECK_TYPE(xt::value(sum2)(1), int);
-        EXPECT_EQ(true, xt::has_value(sum2)(0));
-        EXPECT_EQ(false, xt::has_value(sum2)(1));
-
-        xarray_optional<int> computed_sum2 = xt::sum(a2, {1});
-        CHECK_RESULT_TYPE(computed_sum2, xtl::xoptional<int>);
-        CHECK_TYPE(xt::value(computed_sum2)(1), int);
-        EXPECT_EQ(true, xt::has_value(sum2)(0));
-        EXPECT_EQ(false, xt::has_value(sum2)(1));
-    }
     
-    TEST(xreducer, assignment)
-    {
-        // Nothing computed
-        xarray<xtl::xoptional<int>> a1 = {{1, 2, 3}, {4, xtl::missing<int>(), 6}};
-        auto sum11 = xt::sum(a1, {1});  // OK
-        CHECK_RESULT_TYPE(sum11, xtl::xoptional<int>);
-
-        // Computed and assigned in xarray<xoptional<T>>
-        xarray<xtl::xoptional<int>> sum12 = xt::sum(a1, {1});  // OK
-        CHECK_RESULT_TYPE(sum12, xtl::xoptional<int>);
-
-        // Computed and assigned in xarray_optional<T>
-        // xarray_optional<int> sum13 = xt::sum(a1, {1});  // error: invalid static_cast from type 'xtl::xoptional<int, bool>' to type 'int'
-        // CHECK_RESULT_TYPE(sum13, xtl::xoptional<int>);
-
-        // Nothing computed
-        xarray_optional<int> a2 = {{1, 2, 3}, {4, xtl::missing<int>(), 6}};
-        auto sum21 = xt::sum(a2, {1});  // OK
-        CHECK_RESULT_TYPE(sum21, xtl::xoptional<int>);
-
-        // Computed and assigned in xarray_optional<T>
-        xarray_optional<int> sum22 = xt::sum(a2, {1});
-        CHECK_RESULT_TYPE(sum22, xtl::xoptional<int>);
-
-        // Computed and assigned in xarray<xoptional<T>>
-        // xarray<xtl::xoptional<int>> sum23 = xt::sum(a2, {1});  // error: assignment of read-only location
-        // CHECK_RESULT_TYPE(sum23, xtl::xoptional<int>);
-    }
-
     TEST(xreducer, functor_type)
     {
         auto sum = [](auto const& left, auto const& right) { return left + right; };
@@ -307,6 +328,93 @@ namespace xt
         xarray<double> expected = 12 * ones<double>({3, 4, 5});
         expected(1, 1, 1) = 24;
         EXPECT_EQ(expected, res);
+        CHECK_RESULT_TYPE(res, double);
+    }
+
+    TEST(xreducer_array_of_optional, assign)
+    {
+        xarray<xtl::xoptional<int>> a = {{1, 2, 3}, {4, xtl::missing<int>(), 6}};
+        auto res1 = xt::sum(a, {1});
+        CHECK_RESULT_TYPE(res1, xtl::xoptional<int>);
+        CHECK_TYPE(xt::value(res1)(1), xtl::xoptional<int>);
+        EXPECT_EQ(true, xt::has_value(res1)(0));
+        // EXPECT_EQ(false, xt::has_value(res1)(1));  // TODO: fail, mask does not reflect missing values
+
+        xarray<xtl::xoptional<int>> res2 = xt::sum(a, {1});
+        CHECK_RESULT_TYPE(res2, xtl::xoptional<int>);
+        CHECK_TYPE(xt::value(res2)(1), xtl::xoptional<int>);
+        EXPECT_EQ(true, xt::has_value(res2)(0));
+        // EXPECT_EQ(false, xt::has_value(res2)(1));  // TODO: fail, mask does not reflect missing values
+
+        // xarray_optional<int> res3 = xt::sum(a, {1});  // TODO: error: invalid static_cast from type 'xtl::xoptional<int, bool>' to type 'int'
+        // CHECK_RESULT_TYPE(res3, xtl::xoptional<int>);
+        // CHECK_TYPE(xt::value(res3)(1), xtl::xoptional<int>);
+        // EXPECT_EQ(true, xt::has_value(res3)(0));
+        // EXPECT_EQ(false, xt::has_value(res3)(1));
+
+        // xoptional_assembly<xarray<int>, xarray<bool>> res4 = res1;  // TODO: error: invalid static_cast from type 'xtl::xoptional<int, bool>' to type 'int'
+        // CHECK_RESULT_TYPE(res4, xtl::xoptional<int>);
+        // CHECK_TYPE(xt::value(res4)(1), int);
+        // EXPECT_EQ(true, xt::has_value(res4)(0));
+        // EXPECT_EQ(false, xt::has_value(res4)(1));   
+    }
+
+    TEST(xreducer_array_optional, assign)
+    {
+        xarray_optional<int> a = {{1, 2, 3}, {4, xtl::missing<int>(), 6}};
+        auto res1 = xt::sum(a, {1});
+        CHECK_RESULT_TYPE(res1, xtl::xoptional<int>);
+        CHECK_TYPE(xt::value(res1)(1), int);
+        EXPECT_EQ(true, xt::has_value(res1)(0));
+        EXPECT_EQ(false, xt::has_value(res1)(1));
+
+        xarray_optional<int> res2 = res1;
+        CHECK_RESULT_TYPE(res2, xtl::xoptional<int>);
+        CHECK_TYPE(xt::value(res2)(1), int);
+        EXPECT_EQ(true, xt::has_value(res2)(0));
+        EXPECT_EQ(false, xt::has_value(res2)(1));
+
+        // xarray<xtl::xoptional<int>> res3 = res1;  // error: assignment of read-only location
+        // CHECK_RESULT_TYPE(res3, xtl::xoptional<int>);
+        // CHECK_TYPE(xt::value(res3)(1), xtl::xoptional<int>);
+        // EXPECT_EQ(true, xt::has_value(res3)(0));
+        // EXPECT_EQ(false, xt::has_value(res3)(1));
+
+        xoptional_assembly<xarray<int>, xarray<bool>> res4 = res1;
+        CHECK_RESULT_TYPE(res4, xtl::xoptional<int>);
+        CHECK_TYPE(xt::value(res4)(1), int);
+        EXPECT_EQ(true, xt::has_value(res4)(0));
+        EXPECT_EQ(false, xt::has_value(res4)(1));
+    }
+
+    TEST(xreducer_optional_assembly, assign)
+    {
+        xarray<int> v = {{1, 2, 3}, {4, 5, 6}};
+        xarray<bool> hv = {{true, true, true}, {true, false, true}};
+        xoptional_assembly<xarray<int>, xarray<bool>> a(v, hv);
+        auto res1 = xt::sum(a, {1});
+        CHECK_RESULT_TYPE(res1, xtl::xoptional<int>);
+        CHECK_TYPE(xt::value(res1)(1), int);
+        EXPECT_EQ(true, xt::has_value(res1)(0));
+        EXPECT_EQ(false, xt::has_value(res1)(1));
+
+        xoptional_assembly<xarray<int>, xarray<bool>> res2 = res1;
+        CHECK_RESULT_TYPE(res2, xtl::xoptional<int>);
+        CHECK_TYPE(xt::value(res2)(1), int);
+        EXPECT_EQ(true, xt::has_value(res2)(0));
+        EXPECT_EQ(false, xt::has_value(res2)(1));
+
+        xarray_optional<int> res3 = res1;
+        CHECK_RESULT_TYPE(res3, xtl::xoptional<int>);
+        CHECK_TYPE(xt::value(res3)(1), int);
+        EXPECT_EQ(true, xt::has_value(res3)(0));
+        EXPECT_EQ(false, xt::has_value(res3)(1));
+
+        // xarray<xtl::xoptional<int>> res4 = xt::sum(a, {1});  // error: assignment of read-only location
+        // CHECK_RESULT_TYPE(res4, xtl::xoptional<int>);
+        // CHECK_TYPE(xt::value(res4)(1), int);
+        // EXPECT_EQ(true, xt::has_value(res4)(0));
+        // EXPECT_EQ(false, xt::has_value(res4)(1));        
     }
 
     TEST(xreducer, sum)
@@ -317,14 +425,46 @@ namespace xt
         expected(1, 1, 1) = 24;
         EXPECT_EQ(expected, res);
         CHECK_RESULT_TYPE(res, double);
+    }
 
+    TEST(xreducer_array_of_optional, sum)
+    {
+        xtensor<xtl::xoptional<double>, 2> m = {{xtl::missing<double>(), 2}, {3, 4}};
+        xarray<xtl::xoptional<double>> res = xt::sum(m, {0});
+        EXPECT_EQ(res.dimension(), std::size_t(1));
+        EXPECT_EQ(res(0), xtl::missing<double>());
+        EXPECT_EQ(res(1), 6.0);
+        CHECK_RESULT_TYPE(res, xtl::xoptional<double>);
+        // EXPECT_FALSE(xt::has_value(res)(0));
+        EXPECT_TRUE(xt::has_value(res)(1));        
+    }
+
+    TEST(xreducer_array_optional, sum)
+    {
         xreducer_opt_features opt_features;
-        xarray_optional<double> opt_res = xt::sum(opt_features.m_a, opt_features.m_axes);
-        xarray_optional<double> opt_expected = 12 * xt::ones<double>({3, 4, 5});
-        opt_expected(1, 1, 1) = 24;
-        opt_expected(0, 0, 0) = xtl::missing<double>();
-        EXPECT_EQ(opt_expected, opt_res);
-        CHECK_RESULT_TYPE(opt_res, xtl::xoptional<double>);
+        xarray_optional<double> res = xt::sum(opt_features.m_array_optional, opt_features.m_axes);
+
+        xarray_optional<double> expected = 12 * xt::ones<double>({3, 4, 5});
+        expected(1, 1, 1) = 24;
+        expected(0, 0, 0) = xtl::missing<double>();
+
+        EXPECT_EQ(expected, res);
+        CHECK_RESULT_TYPE(res, xtl::xoptional<double>);
+    }
+
+    TEST(xreducer_optional_assembly, sum)
+    {
+        xreducer_opt_features opt_features;
+        xoptional_assembly<xarray<double>, xarray<bool>> res = xt::sum(opt_features.m_optional_assembly, opt_features.m_axes);
+
+        xarray_optional<double> expected = 12 * xt::ones<double>({3, 4, 5});
+        expected(1, 1, 1) = 24;
+        expected(0, 0, 0) = xtl::missing<double>();
+        
+        EXPECT_EQ(expected, res);
+        CHECK_RESULT_TYPE(res, xtl::xoptional<double>);
+        CHECK_TYPE(xt::value(res)(1), double);
+        EXPECT_EQ(false, xt::has_value(res)(0, 0, 0));
     }
 
     TEST(xreducer, sum_tensor)
@@ -335,19 +475,51 @@ namespace xt
         EXPECT_EQ(res(0), 4.0);
         EXPECT_EQ(res(1), 6.0);
         CHECK_RESULT_TYPE(res, double);
-
-        xtensor<xtl::xoptional<double>, 2> opt_m = {{1, 2}, {3, 4}};
-        xarray<xtl::xoptional<double>> opt_res = xt::sum(m, {0});
-        EXPECT_EQ(opt_res.dimension(), std::size_t(1));
-        EXPECT_EQ(opt_res(0), 4.0);
-        EXPECT_EQ(opt_res(1), 6.0);
-        CHECK_RESULT_TYPE(opt_res, xtl::xoptional<double>);
     }
 
-    TEST(xreducer, single_axis_sugar)
+    TEST(xreducer_array_of_optional, sum_tensor)
+    {
+        xtensor<xtl::xoptional<double>, 2> m = {{xtl::missing<double>(), 2}, {3, 4}};
+        xarray<xtl::xoptional<double>> res = xt::sum(m, {0});
+        EXPECT_EQ(res.dimension(), std::size_t(1));
+        EXPECT_EQ(res(0), xtl::missing<double>());
+        EXPECT_EQ(res(1), 6.0);
+        CHECK_RESULT_TYPE(res, xtl::xoptional<double>);
+        // EXPECT_FALSE(xt::has_value(res)(0));
+        EXPECT_TRUE(xt::has_value(res)(1));        
+    }
+
+    TEST(xreducer_array_optional, sum_tensor)
+    {
+        xtensor_optional<double, 2> m = {{xtl::missing<double>(), 2}, {3, 4}};
+        xtensor_optional<double, 1> res = xt::sum(m, {0});
+        EXPECT_EQ(res.dimension(), std::size_t(1));
+        EXPECT_EQ(res(0), xtl::missing<double>());
+        EXPECT_EQ(res(1), 6.0);
+        CHECK_RESULT_TYPE(res, xtl::xoptional<double>);
+        EXPECT_FALSE(xt::has_value(res)(0));
+        EXPECT_TRUE(xt::has_value(res)(1));        
+    }
+
+    TEST(xreducer_optional_assembly, sum_tensor)
+    {
+        xtensor<double, 2> v = {{1, 2}, {3, 4}};
+        xtensor<bool, 2> hv = {{false, true}, {true, true}};
+        xoptional_assembly<xtensor<double, 2>, xtensor<bool, 2>> m(v, hv);
+        xoptional_assembly<xtensor<double, 1>, xtensor<bool, 1>> res = xt::sum(m, {0});
+
+        EXPECT_EQ(res.dimension(), std::size_t(1));
+        EXPECT_EQ(res(0), xtl::missing<double>());
+        EXPECT_EQ(res(1), 6.0);
+        CHECK_RESULT_TYPE(res, xtl::xoptional<double>);
+        EXPECT_FALSE(xt::has_value(res)(0));
+        EXPECT_TRUE(xt::has_value(res)(1));
+    }
+
+    TEST(xreducer, count_nonzero)
     {
         xarray<double> m = {{1, 0}, {3, 4}};
-/*
+
         xarray<std::size_t> res1 = xt::count_nonzero(m, {1});
         xarray<std::size_t> res2 = xt::count_nonzero(m, 1);
         EXPECT_EQ(res1, res2);
@@ -359,24 +531,108 @@ namespace xt
         EXPECT_EQ(res3, res4);
         CHECK_RESULT_TYPE(res3, double);
         CHECK_RESULT_TYPE(res4, double);
-
-        xt::xarray_optional<double> m_opt = {{1, 0}, {3, xtl::missing<double>()}};
-
-        xarray<xtl::xoptional<std::size_t>> opt_res1 = xt::count_nonzero(m_opt, {1});/*
-        xarray<std::size_t> opt_res2 = xt::count_nonzero(m_opt, 1);
-        EXPECT_EQ(opt_res1, opt_res2);
-        CHECK_RESULT_TYPE(opt_res1, double);
-        CHECK_RESULT_TYPE(opt_res2, double);
-
-        xarray<xtl::xoptional<double>> opt_res3 = xt::sum(m_opt, {1});
-        xarray<xtl::xoptional<double>> opt_res4 = xt::sum(m_opt, 1);
-        EXPECT_EQ(opt_res3, opt_res4);
-        CHECK_RESULT_TYPE(opt_res3, double);
-        CHECK_RESULT_TYPE(opt_res4, double);
-
-*/
     }
 
+    TEST(xreducer_array_of_optional, count_nonzero)
+    {
+        xt::xarray<xtl::xoptional<double>> m = {{1, 0}, {3, xtl::missing<double>()}};
+        auto res = xt::count_nonzero(m, {1});
+        EXPECT_EQ(res.dimension(), std::size_t(1));
+
+        /*
+        xt::xarray<xtl::xoptional<std::size_t>> res1 = res;
+        EXPECT_EQ(res1(0), 1);
+        EXPECT_EQ(res1(1), xtl::missing<std::size_t>()); 
+        CHECK_RESULT_TYPE(res1, xtl::xoptional<std::size_t>);
+        EXPECT_TRUE(xt::has_value(res1)(0));
+        // EXPECT_FALSE(xt::has_value(res1)(1));  // FAIL: mask does not reflect missing values
+        */
+    }
+
+    TEST(xreducer_array_optional, count_nonzero)
+    {
+        xt::xarray_optional<double> m = {{1, 0}, {3, xtl::missing<double>()}};
+        auto res = xt::count_nonzero(m, {1});
+        EXPECT_EQ(res.dimension(), std::size_t(1));
+
+        xt::xarray_optional<std::size_t> res1 = res;
+        EXPECT_EQ(res1(0), 1);
+        EXPECT_EQ(res1(1), xtl::missing<std::size_t>()); 
+        CHECK_RESULT_TYPE(res1, xtl::xoptional<std::size_t>);
+        EXPECT_TRUE(xt::has_value(res1)(0));
+        EXPECT_FALSE(xt::has_value(res1)(1));
+    }
+
+    TEST(xreducer_optional_assembly, count_nonzero)
+    {
+        xarray<double> v = {{1, 0}, {3, 0}};
+        xarray<bool> hv = {{true, true}, {true, false}};
+        xoptional_assembly<xarray<double>, xarray<bool>> m(v, hv);
+
+        auto res = xt::count_nonzero(m, {1});
+        EXPECT_EQ(res.dimension(), std::size_t(1));
+
+        xoptional_assembly<xarray<std::size_t>, xarray<bool>> res1 = res;
+        EXPECT_EQ(res1(0), 1);
+        EXPECT_EQ(res1(1), xtl::missing<std::size_t>()); 
+        CHECK_RESULT_TYPE(res1, xtl::xoptional<std::size_t>);
+        EXPECT_TRUE(xt::has_value(res1)(0));
+        EXPECT_FALSE(xt::has_value(res1)(1));
+    }
+
+    TEST(xreducer, single_axis_sugar)
+    {
+        xarray<double> m = {{1, 0}, {3, 4}};
+
+        xarray<std::size_t> res1 = xt::count_nonzero(m, {1});
+        xarray<std::size_t> res2 = xt::count_nonzero(m, 1);
+        EXPECT_EQ(res1, res2);
+
+        xarray<double> res3 = xt::sum(m, {1});
+        xarray<double> res4 = xt::sum(m, 1);
+        EXPECT_EQ(res3, res4);
+    }
+
+    TEST(xreducer_array_of_optional, single_axis_sugar)
+    {
+        xt::xarray<xtl::xoptional<double>> m = {{1, 0}, {3, xtl::missing<double>()}};
+
+        xt::xarray<xtl::xoptional<std::size_t>> res1 = xt::count_nonzero(m, {1});
+        xt::xarray<xtl::xoptional<std::size_t>> res2 = xt::count_nonzero(m, 1);
+        EXPECT_EQ(res1, res2);
+
+        xt::xarray<xtl::xoptional<double>> res3 = xt::sum(m, {1});
+        xt::xarray<xtl::xoptional<double>> res4 = xt::sum(m, 1);
+        EXPECT_EQ(res3, res4);
+    }
+
+    TEST(xreducer_array_optional, single_axis_sugar)
+    {
+        xt::xarray_optional<double> m = {{1, 0}, {3, xtl::missing<double>()}};
+
+        xt::xarray_optional<std::size_t> res1 = xt::count_nonzero(m, {1});
+        xt::xarray_optional<std::size_t> res2 = xt::count_nonzero(m, 1);
+        EXPECT_EQ(res1, res2);
+
+        xt::xarray_optional<double> res3 = xt::sum(m, {1});
+        xt::xarray_optional<double> res4 = xt::sum(m, 1);
+        EXPECT_EQ(res3, res4);
+    }
+
+    TEST(xreducer_optional_assembly, single_axis_sugar)
+    {
+        xarray<double> v = {{1, 0}, {3, 0}};
+        xarray<bool> hv = {{true, true}, {true, false}};
+        xoptional_assembly<xarray<double>, xarray<bool>> m(v, hv);
+
+        xt::xarray_optional<std::size_t> res1 = xt::count_nonzero(m, {1});
+        xt::xarray_optional<std::size_t> res2 = xt::count_nonzero(m, 1);
+        EXPECT_EQ(res1, res2);
+
+        xt::xarray_optional<double> res3 = xt::sum(m, {1});
+        xt::xarray_optional<double> res4 = xt::sum(m, 1);
+        EXPECT_EQ(res3, res4);
+    }
 
     TEST(xreducer, sum2)
     {
@@ -418,32 +674,93 @@ namespace xt
         double expected = 732;
         CHECK_RESULT_TYPE(res, double);
         EXPECT_EQ(res(), expected);
+    }
 
+    TEST(xreducer_array_of_optional, sum_all)
+    {
         xreducer_opt_features opt_features;
-        auto opt_res = xt::sum(opt_features.m_a);
+        auto opt_res = xt::sum(opt_features.m_array_of_optional);
         auto opt_expected = xtl::missing<double>();
         CHECK_RESULT_TYPE(opt_res, xtl::xoptional<double>);
-        EXPECT_EQ(opt_res(), opt_expected);
+        // EXPECT_EQ(opt_res(), opt_expected);  // returns the actual value
+    }
+
+    TEST(xreducer_array_optional, sum_all)
+    {
+        xreducer_opt_features opt_features;
+        auto opt_res = xt::sum(opt_features.m_array_optional);
+        auto opt_expected = xtl::missing<double>();
+        CHECK_RESULT_TYPE(opt_res, xtl::xoptional<double>);
+        EXPECT_EQ(opt_res(), opt_expected);  
+    }
+
+    TEST(xreducer_optional_assembly, sum_all)
+    {
+        xreducer_opt_features opt_features;
+        auto opt_res = xt::sum(opt_features.m_optional_assembly);
+        auto opt_expected = xtl::missing<double>();
+        CHECK_RESULT_TYPE(opt_res, xtl::xoptional<double>);
+        EXPECT_EQ(opt_res(), opt_expected);  // returns the actual value
     }
 
     TEST(xreducer, prod)
     {
+        xreducer_features features;
+        auto res = xt::prod(features.m_a, {1, 3});
+
+        xarray<double> expected = xt::ones<double>({3, 4, 5});
+        expected(1, 1, 1) = 4096.;
+
+        CHECK_RESULT_TYPE(res, double);
+        EXPECT_EQ(res, expected);
+
         // check that there is no overflow
         xarray<uint8_t> c = 2 * xt::ones<uint8_t>({34});
-        auto res = xt::prod(c);
-        CHECK_RESULT_TYPE(res, unsigned long long);  // Should be uint8_t ?
-        EXPECT_EQ(1ULL << 34, res());
+        auto res2 = xt::prod(c);
+        CHECK_RESULT_TYPE(res2, unsigned long long);  // Should be uint8_t ?
+        EXPECT_EQ(1ULL << 34, res2());
+    }
 
-        xarray<double> d = 2 * xt::ones<double>({7});
-        auto res2 = xt::prod(d);
-        CHECK_RESULT_TYPE(res2, double);
-        EXPECT_EQ(128, res2());
-
+    TEST(xreducer_array_of_optional, prod)
+    {
         xreducer_opt_features opt_features;
-        auto opt_res = xt::prod(opt_features.m_a);
-        auto opt_expected = xtl::missing<double>();
+        auto opt_res = xt::prod(opt_features.m_array_of_optional, {1, 3});
+
+        xarray<xtl::xoptional<double>> opt_expected = xt::ones<double>({3, 4, 5});
+        // opt_expected(0, 0, 0) = xtl::missing<double>();  // FAIL: no mask applied on return
+        opt_expected(0, 0, 0) = 0.;  // missing value acts as an undefined value
+        opt_expected(1, 1, 1) = 4096.;
+
         CHECK_RESULT_TYPE(opt_res, xtl::xoptional<double>);
-        EXPECT_EQ(opt_res(), opt_expected);
+        EXPECT_EQ(opt_res, opt_expected);
+    }
+
+    TEST(xreducer_array_optional, prod)
+    {
+        xreducer_opt_features opt_features;
+        auto opt_res = xt::prod(opt_features.m_array_optional, {1, 3});
+
+        xarray_optional<double> opt_expected = xt::ones<double>({3, 4, 5});
+        opt_expected(0, 0, 0) = xtl::missing<double>();        
+        opt_expected(1, 1, 1) = 4096.;
+
+        CHECK_RESULT_TYPE(opt_res, xtl::xoptional<double>);
+        EXPECT_EQ(opt_res, opt_expected);
+    }
+
+    TEST(xreducer_optional_assembly, prod)
+    {
+        xreducer_opt_features opt_features;
+        auto opt_res = xt::prod(opt_features.m_optional_assembly, {1, 3});
+
+        xarray<double> v = xt::ones<double>({3, 4, 5});
+        xarray<bool> hv = xt::full_like(v, true);
+        hv(0, 0, 0) = false;
+        v(1, 1, 1) = 4096.;
+        xoptional_assembly<xarray<double>, xarray<bool>> opt_expected(v, hv);
+
+        CHECK_RESULT_TYPE(opt_res, xtl::xoptional<double>);
+        EXPECT_EQ(opt_res, opt_expected);
     }
 
     TEST(xreducer, mean)
@@ -466,6 +783,80 @@ namespace xt
         EXPECT_EQ(mean(c)(), 1.5);
 
         const auto rvalue_xarray = [] () { return xtensor<double, 1>({1, 2}); };
+        EXPECT_EQ(mean(rvalue_xarray(), {0})(), 1.5);
+    }
+
+    TEST(xreducer_array_of_optional, mean)
+    {
+        xtensor<xtl::xoptional<double>, 2> a {{-1.0, xtl::missing<double>()}, {1.0, 0.0}};
+        auto mean_all = mean(a);
+        auto mean0 = mean(a, {0});
+        auto mean1 = mean(a, {1});
+
+        xtensor<xtl::xoptional<double>, 0> expect_all = xtl::missing<double>();
+        xtensor<xtl::xoptional<double>, 1> expect0 = {0.0, xtl::missing<double>()};
+        xtensor<xtl::xoptional<double>, 1> expect1 = {xtl::missing<double>(), 0.5};
+
+        // EXPECT_EQ(mean_all(), expect_all());  // TODO: fail, currently 0.
+        EXPECT_TRUE(all(equal(mean_all, expect_all)));
+        EXPECT_TRUE(all(equal(mean0, expect0)));
+        EXPECT_TRUE(all(equal(mean1, expect1)));
+
+        xarray<xtl::xoptional<uint8_t>> c = {1, 2};
+        EXPECT_EQ(mean(c)(), 1.5);
+
+        const auto rvalue_xarray = [] () { return xtensor<xtl::xoptional<double>, 1>({1, 2}); };
+        EXPECT_EQ(mean(rvalue_xarray(), {0})(), 1.5);
+    }
+
+    TEST(xreducer_array_optional, mean)
+    {
+        xarray_optional<double> a {{-1.0, xtl::missing<double>()}, {1.0, 0.0}};
+        auto mean_all = mean(a);
+        auto mean0 = mean(a, {0});
+        auto mean1 = mean(a, {1});
+
+        xarray_optional<double> expect_all = xtl::missing<double>();
+        xarray_optional<double> expect0 = {0.0, xtl::missing<double>()};
+        xarray_optional<double> expect1 = {xtl::missing<double>(), 0.5};
+
+        EXPECT_EQ(mean_all(), expect_all());
+        EXPECT_TRUE(all(equal(mean_all, expect_all)));
+        EXPECT_TRUE(all(equal(mean0, expect0)));
+        EXPECT_TRUE(all(equal(mean1, expect1)));
+
+        xarray_optional<uint8_t> c = {1, 2};
+        EXPECT_EQ(mean(c)(), 1.5);
+
+        const auto rvalue_xarray = [] () { return xarray_optional<double>({1, 2}); };
+        EXPECT_EQ(mean(rvalue_xarray(), {0})(), 1.5);
+    }
+
+    TEST(xreducer_optional_assembly, mean)
+    {
+        xarray<double> v = {{-1, 0}, {1, 0}};
+        xarray<bool> hv = {{true, false}, {true, true}};
+        xoptional_assembly<xarray<double>, xarray<bool>> a(v, hv);
+
+        auto mean_all = mean(a);
+        auto mean0 = mean(a, {0});
+        auto mean1 = mean(a, {1});
+
+        xoptional_assembly<xarray<double>, xarray<bool>> expect_all(xarray<double>({0.}), xarray<bool>({false}));
+        xoptional_assembly<xarray<double>, xarray<bool>> expect0(xarray<double>({0., 0.}), xarray<bool>({true, false}));
+        xoptional_assembly<xarray<double>, xarray<bool>> expect1(xarray<double>({0., 0.5}), xarray<bool>({false, true}));
+
+        EXPECT_EQ(mean_all(), expect_all());
+        EXPECT_TRUE(all(equal(mean_all, expect_all)));
+        EXPECT_TRUE(all(equal(mean0, expect0)));
+        EXPECT_TRUE(all(equal(mean1, expect1)));
+
+        xoptional_assembly<xarray<uint8_t>, xarray<bool>> c(xarray<uint8_t>({1, 2}), xarray<bool>({true, true}));
+        EXPECT_EQ(mean(c)(), 1.5);
+
+        const auto rvalue_xarray = [] () { return xoptional_assembly<xarray<double>, 
+                                                                     xarray<bool>>(xarray<double>({1., 2.}), 
+                                                                                   xarray<bool>({true, true})); };
         EXPECT_EQ(mean(rvalue_xarray(), {0})(), 1.5);
     }
 
@@ -497,11 +888,37 @@ namespace xt
     {
         using A = std::array<double, 2>;
 
-        xtensor<double, 2> input
-            {{-1.0, 0.0}, {1.0, 0.0}};
-        EXPECT_EQ(minmax(input)(), (A{-1.0, 1.0}));
+        xtensor<double, 2> a = {{-1., 0.}, {1., 0.}};
+        EXPECT_EQ(minmax(a)(), (A{-1., 1.}));
     }
 
+    TEST(xreducer_array_of_optional, minmax)
+    {
+        using A = std::array<double, 2>;
+
+        xtensor<xtl::xoptional<double>, 2> a {{-1., 0.}, {1., 0.}};
+        EXPECT_EQ(minmax(a)(), (A{-1., 1.}));
+
+        xtensor<xtl::xoptional<double>, 2> b {{-1., xtl::missing<double>()}, {1., 0.}};
+        EXPECT_EQ(minmax(a)(), (A{-1., 1.}));
+    }
+/*
+    TEST(xreducer_array_optional, minmax)
+    {
+        using A = std::array<double, 2>;
+
+        xarray_optional<double> a {{-1.0, xtl::missing<double>()}, {1.0, 0.0}};
+        EXPECT_EQ(minmax(a)(), (A{-1., 1.}));
+    }
+
+    TEST(xreducer_optional_assembly, minmax)
+    {
+        using A = std::array<double, 2>;
+
+        xtensor<double, 2> input {{-1.0, 0.0}, {1.0, 0.0}};
+        EXPECT_EQ(minmax(a)(), (A{-1.0, 1.0}));
+    }
+*/
     TEST(xreducer, immediate)
     {
         xarray<double> a = xt::arange(27);
