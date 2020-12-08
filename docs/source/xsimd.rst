@@ -18,19 +18,19 @@ Alignment of fixed-size members
 
 If you define a structure having members of fixed-size xtensor types,
 you must ensure that the buffers properly aligned.
-For this you can use the macro ``XTENSOR_SELECT_ALIGN`` available in
+For this you can use the macro ``XTENSOR_FIXED_ALIGN`` available in
 ``xtensor/xtensor_config.hpp``.
 Consider the following example:
 
 .. code-block:: cpp
 
     template <typename T>
-    class alignas(XTENSOR_SELECT_ALIGN(T)) Foo
+    class alignas(XTENSOR_FIXED_ALIGN) Foo
     {
     public:
 
-        using allocator_type = std::conditional_t<XTENSOR_SELECT_ALIGN(T) != 0,
-                                                  xt_simd::aligned_allocator<T, XTENSOR_SELECT_ALIGN(T)>,
+        using allocator_type = std::conditional_t<XTENSOR_FIXED_ALIGN != 0,
+                                                  xt_simd::aligned_allocator<T, XTENSOR_FIXED_ALIGN>,
                                                   std::allocator<T>>;
 
         Foo(T fac) : m_fac(fac)

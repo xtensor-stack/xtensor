@@ -14,6 +14,9 @@ jobs:
           llvm_version: '8'
         clang_9:
           llvm_version: '9'
+        clang_10:
+          llvm_version: '10'
+          disable_xsimd: 1
     pool:
       vmImage: ubuntu-16.04
     variables:
