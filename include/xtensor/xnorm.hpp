@@ -348,17 +348,6 @@ namespace xt
      * norm functions for xexpressions *
      ***********************************/
 
-#ifdef X_OLD_CLANG
-#define XTENSOR_NORM_FUNCTION_AXES(NAME)                                              \
-    template <class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>                \
-    inline auto NAME(E&& e, std::initializer_list<I> axes, EVS es = EVS()) noexcept   \
-    {                                                                                 \
-        using axes_type = std::vector<typename std::decay_t<E>::size_type>;           \
-        return NAME(std::forward<E>(e),                                               \
-                xtl::forward_sequence<axes_type, decltype(axes)>(axes), es);          \
-    }
-
-#else
 #define XTENSOR_NORM_FUNCTION_AXES(NAME)                                              \
     template <class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS> \
     inline auto NAME(E&& e, const I(&axes)[N], EVS es = EVS()) noexcept               \
@@ -367,7 +356,6 @@ namespace xt
         return NAME(std::forward<E>(e),                                               \
                 xtl::forward_sequence<axes_type, decltype(axes)>(axes), es);          \
     }
-#endif
 
     namespace detail
     {
@@ -503,21 +491,12 @@ namespace xt
         return sqrt(norm_sq(std::forward<E>(e), std::forward<X>(axes), es));
     }
 
-#ifdef X_OLD_CLANG
-    template <class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>
-    inline auto norm_l2(E&& e, std::initializer_list<I> axes, EVS es = EVS()) noexcept
-    {
-        using axes_type = std::vector<typename std::decay_t<E>::size_type>;
-        return sqrt(norm_sq(std::forward<E>(e), xtl::forward_sequence<axes_type, decltype(axes)>(axes), es));
-    }
-#else
     template <class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
     inline auto norm_l2(E&& e, const I (&axes)[N], EVS es = EVS()) noexcept
     {
         using axes_type = std::array<typename std::decay_t<E>::size_type, N>;
         return sqrt(norm_sq(std::forward<E>(e), xtl::forward_sequence<axes_type, decltype(axes)>(axes), es));
     }
-#endif
 
     /**
      * @ingroup red_functions
@@ -567,21 +546,12 @@ namespace xt
         return norm_lp_to_p(std::forward<E>(e), p, arange(e.dimension()), es);
     }
 
-#ifdef X_OLD_CLANG
-    template <class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>
-    inline auto norm_lp_to_p(E&& e, double p, std::initializer_list<I> axes, EVS es = EVS()) noexcept
-    {
-        using axes_type = std::vector<typename std::decay_t<E>::size_type>;
-        return norm_lp_to_p(std::forward<E>(e), p, xtl::forward_sequence<axes_type, decltype(axes)>(axes), es);
-    }
-#else
     template <class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
     inline auto norm_lp_to_p(E&& e, double p, const I (&axes)[N], EVS es = EVS()) noexcept
     {
         using axes_type = std::array<typename std::decay_t<E>::size_type, N>;
         return norm_lp_to_p(std::forward<E>(e), p, xtl::forward_sequence<axes_type, decltype(axes)>(axes), es);
     }
-#endif
 
     /**
      * @ingroup red_functions
@@ -612,21 +582,12 @@ namespace xt
         return norm_lp(std::forward<E>(e), p, arange(e.dimension()), es);
     }
 
-#ifdef X_OLD_CLANG
-    template <class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>
-    inline auto norm_lp(E&& e, double p, std::initializer_list<I> axes, EVS es = EVS())
-    {
-        using axes_type = std::vector<typename std::decay_t<E>::size_type>;
-        return norm_lp(std::forward<E>(e), p, xtl::forward_sequence<axes_type, decltype(axes)>(axes), es);
-    }
-#else
     template <class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
     inline auto norm_lp(E&& e, double p, const I (&axes)[N], EVS es = EVS())
     {
         using axes_type = std::array<typename std::decay_t<E>::size_type, N>;
         return norm_lp(std::forward<E>(e), p, xtl::forward_sequence<axes_type, decltype(axes)>(axes), es);
     }
-#endif
 
     /**
      * @ingroup red_functions

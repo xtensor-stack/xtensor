@@ -238,20 +238,11 @@ namespace xt
     }
 
     /// @cond DOXYGEN_INCLUDE_SFINAE
-#ifdef X_OLD_CLANG
-    template <class E, class I, class Tag = check_policy::none>
-    inline auto transpose(E&& e, std::initializer_list<I> permutation, Tag check_policy = Tag())
-    {
-        dynamic_shape<I> perm(permutation);
-        return detail::transpose_impl(std::forward<E>(e), std::move(perm), check_policy);
-    }
-#else
     template <class E, class I, std::size_t N, class Tag = check_policy::none>
     inline auto transpose(E&& e, const I(&permutation)[N], Tag check_policy = Tag())
     {
         return detail::transpose_impl(std::forward<E>(e), permutation, check_policy);
     }
-#endif
     /// @endcond
 
     /************************************
@@ -449,21 +440,12 @@ namespace xt
     }
 
     /// @cond DOXYGEN_INCLUDE_SFINAE
-#ifdef X_OLD_CLANG
-    template <class E, class I, class Tag = check_policy::none>
-    inline auto squeeze(E&& e, std::initializer_list<I> axis, Tag check_policy = Tag())
-    {
-        dynamic_shape<I> ax(axis);
-        return detail::squeeze_impl(std::forward<E>(e), std::move(ax), check_policy);
-    }
-#else
     template <class E, class I, std::size_t N, class Tag = check_policy::none>
     inline auto squeeze(E&& e, const I(&axis)[N], Tag check_policy = Tag())
     {
         using arr_t = std::array<I, N>;
         return detail::squeeze_impl(std::forward<E>(e), xtl::forward_sequence<arr_t, decltype(axis)>(axis), check_policy);
     }
-#endif
 
     template <class E, class Tag = check_policy::none>
     inline auto squeeze(E&& e, std::size_t axis, Tag check_policy = Tag())

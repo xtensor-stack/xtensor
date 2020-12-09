@@ -753,26 +753,13 @@ namespace xt
         using view_type = xindex_view<xclosure_t<E>, std::decay_t<I>>;
         return view_type(std::forward<E>(e), std::forward<I>(indices));
     }
-#ifdef X_OLD_CLANG
-    template <class E, class I>
-    inline auto index_view(E&& e, std::initializer_list<std::initializer_list<I>> indices) noexcept
-    {
-        std::vector<xindex> idx;
-        for (auto it = indices.begin(); it != indices.end(); ++it)
-        {
-            idx.emplace_back(xindex(it->begin(), it->end()));
-        }
-        using view_type = xindex_view<xclosure_t<E>, std::vector<xindex>>;
-        return view_type(std::forward<E>(e), std::move(idx));
-    }
-#else
+
     template <class E, std::size_t L>
     inline auto index_view(E&& e, const xindex (&indices)[L]) noexcept
     {
         using view_type = xindex_view<xclosure_t<E>, std::array<xindex, L>>;
         return view_type(std::forward<E>(e), to_array(indices));
     }
-#endif
 
     /**
      * @brief creates a view into \a e filtered by \a condition.

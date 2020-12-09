@@ -373,9 +373,7 @@ namespace xt
             return istrue;
         };
 
-    #ifndef X_OLD_CLANG
         EXPECT_TRUE(is_arr(xa.shape()));
-    #endif
 
         xtensor<double, 3> a;
         a.resize({3, 3, 3});
@@ -394,10 +392,8 @@ namespace xt
         auto a_gd_2 = sum(a, {0, 2}, evaluation_strategy::immediate);
         EXPECT_EQ(a_lz, a_gd_2);
 
-    #ifndef X_OLD_CLANG
         EXPECT_TRUE(is_arr(a_gd_1.shape()));
         EXPECT_TRUE(is_arr(a_gd_2.shape()));
-    #endif
 
         a_lz = sum(a, {1, 2});
         a_gd_2 = sum(a, {1, 2}, evaluation_strategy::immediate);
@@ -438,10 +434,8 @@ namespace xt
         EXPECT_EQ(b_gd_2, a_gd_2);
         EXPECT_EQ(a_gd_2.dimension(), std::size_t(1));
 
-    #ifndef X_OLD_CLANG
         // EXPECT_TRUE(is_arr(a_gd_1.shape()));
         EXPECT_TRUE(is_arr(a_gd_2.shape()));
-    #endif
 
         a_lz = sum(a, {1, 2});
         a_gd_2 = sum(a, {1, 2}, evaluation_strategy::immediate);
@@ -551,17 +545,10 @@ namespace xt
     {
         xt::xtensor<double, 4> a = xt::reshape_view(xt::arange<double>(5 * 5 * 5 * 5), {5, 5, 5, 5});
 
-    #ifndef X_OLD_CLANG
         auto res = xt::sum(a, {0, 1}, xt::keep_dims | xt::evaluation_strategy::immediate);   
         EXPECT_EQ(res.shape(), (std::array<std::size_t, 4>{1, 1, 5, 5}));
         auto res2 = xt::sum(a, {0, 1}, xt::keep_dims);   
         EXPECT_EQ(res2.shape(), (std::array<std::size_t, 4>{1, 1, 5, 5}));
-    #else
-        auto res = xt::sum(a, {0, 1}, xt::keep_dims | xt::evaluation_strategy::immediate);   
-        EXPECT_EQ(res.shape(), (xt::dynamic_shape<std::size_t>{1, 1, 5, 5}));
-        auto res2 = xt::sum(a, {0, 1}, xt::keep_dims);   
-        EXPECT_EQ(res2.shape(), (xt::dynamic_shape<std::size_t>{1, 1, 5, 5}));
-    #endif
 
         xt::xarray<double> b = a;
         auto res3 = xt::sum(b, {0, 1}, xt::keep_dims | xt::evaluation_strategy::immediate);   

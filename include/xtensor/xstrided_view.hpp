@@ -698,7 +698,6 @@ namespace xt
         return reshape_view<L>(std::forward<E>(e), std::forward<S>(shape));
     }
 
-#if !defined(X_OLD_CLANG)
     template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E, class I, std::size_t N>
     inline auto reshape_view(E&& e, const I(&shape)[N], layout_type order)
     {
@@ -712,21 +711,6 @@ namespace xt
         using shape_type = std::array<std::size_t, N>;
         return reshape_view<L>(std::forward<E>(e), xtl::forward_sequence<shape_type, decltype(shape)>(shape));
     }
-#else
-    template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E, class I>
-    inline auto reshape_view(E&& e, const std::initializer_list<I>& shape)
-    {
-        using shape_type = xt::dynamic_shape<std::size_t>;
-        return reshape_view<L>(std::forward<E>(e), xtl::forward_sequence<shape_type, decltype(shape)>(shape));
-    }
-
-    template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E, class I>
-    inline auto reshape_view(E&& e, const std::initializer_list<I>& shape, layout_type order)
-    {
-        using shape_type = xt::dynamic_shape<std::size_t>;
-        return reshape_view<L>(std::forward<E>(e), xtl::forward_sequence<shape_type, decltype(shape)>(shape), order);
-    }
-#endif
 }
 
 #endif
