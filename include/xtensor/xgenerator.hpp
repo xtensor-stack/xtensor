@@ -484,15 +484,6 @@ namespace xt
 
     namespace detail
     {
-#ifdef X_OLD_CLANG
-        template <class Functor, class I>
-        inline auto make_xgenerator(Functor&& f, std::initializer_list<I> shape) noexcept
-        {
-            using shape_type = std::vector<std::size_t>;
-            using type = xgenerator<Functor, typename Functor::value_type, shape_type>;
-            return type(std::forward<Functor>(f), xtl::forward_sequence<shape_type, decltype(shape)>(shape));
-        }
-#else
         template <class Functor, class I, std::size_t L>
         inline auto make_xgenerator(Functor&& f, const I (&shape)[L]) noexcept
         {
@@ -500,7 +491,6 @@ namespace xt
             using type = xgenerator<Functor, typename Functor::value_type, shape_type>;
             return type(std::forward<Functor>(f), xtl::forward_sequence<shape_type, decltype(shape)>(shape));
         }
-#endif
 
         template <class Functor, class S>
         inline auto make_xgenerator(Functor&& f, S&& shape) noexcept

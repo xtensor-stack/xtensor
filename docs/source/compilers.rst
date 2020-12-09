@@ -70,6 +70,8 @@ Workarounds for this compiler bug arise in various files of the code base.
 Everywhere, the handling of `Clang < 3.8` is wrapped with checks for the
 ``X_OLD_CLANG`` macro.
 
+The support of `Clang < 4.0` is dropped in xtensor 0.22.
+
 GCC < 5.1 and ``std::is_trivially_default_constructible``
 ---------------------------------------------------------
 

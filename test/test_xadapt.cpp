@@ -385,15 +385,11 @@ namespace xt
     TEST(xtensor_adaptor, nice_syntax)
     {
         std::vector<int> a({1,2,3,4,5,6,7,8});
-#ifndef X_OLD_CLANG
+
         auto xa = adapt(&a[0], {2, 4});
         bool truthy = std::is_same<decltype(xa)::shape_type, std::array<std::size_t, 2>>::value;
         EXPECT_TRUE(truthy);
-#else
-        auto xa = adapt(&a[0], {2, 4});
-        bool truthy = std::is_same<decltype(xa)::shape_type, xt::dynamic_shape<size_t>>::value;
-        EXPECT_TRUE(truthy);
-#endif
+
         xa(0, 0) = 100;
         xa(1, 3) = 1000;
         EXPECT_EQ(a[0], 100);
@@ -466,7 +462,6 @@ namespace xt
         }
     }
 
-#ifndef X_OLD_CLANG
     TEST(xtensor_adaptor, smart_ptr)
     {
         auto data = std::vector<double>{1,2,3,4,5,6,7,8};
@@ -501,5 +496,4 @@ namespace xt
             auto obj = adapt_smart_ptr(unique_buf.get()->buf.data(), {2, 4}, std::move(unique_buf));
         }
     }
-#endif
 }

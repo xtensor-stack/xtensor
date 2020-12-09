@@ -395,20 +395,8 @@ namespace detail {
         using init_value_fct = xt::const_value<result_type/*, INIT*/>;                                            \
         return xt::reduce(make_xreducer_functor(functor_type(),                                                   \
                           init_value_fct(detail::fill_init<result_type>(INIT))), std::forward<E>(e), es);         \
-    }
-
-#define XTENSOR_OLD_CLANG_REDUCER(NAME, FUNCTOR, RESULT_TYPE, INIT)                                               \
-    template <class T = void, class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>                            \
-    inline auto NAME(E&& e, std::initializer_list<I> axes, EVS es = EVS())                                        \
-    {                                                                                                             \
-        using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
-        using functor_type = FUNCTOR<result_type>;                                                                \
-        using init_value_fct = xt::const_value<result_type/*, INIT*/>;                                            \
-        return xt::reduce(make_xreducer_functor(functor_type(),                                                   \
-                          init_value_fct(detail::fill_init<result_type>(INIT))), std::forward<E>(e), axes, es);   \
-    }
-
-#define XTENSOR_MODERN_CLANG_REDUCER(NAME, FUNCTOR, RESULT_TYPE, INIT)                                            \
+    }                                                                                                             \
+                                                                                                                  \
     template <class T = void, class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>             \
     inline auto NAME(E&& e, const I (&axes)[N], EVS es = EVS())                                                   \
     {                                                                                                             \
@@ -781,13 +769,6 @@ namespace detail {
      */
     XTENSOR_REDUCER_FUNCTION(amax, math::maximum, typename std::decay_t<E>::value_type,
                              std::numeric_limits<xvalue_type_t<std::decay_t<E>>>::lowest())
-#ifdef X_OLD_CLANG
-    XTENSOR_OLD_CLANG_REDUCER(amax, math::maximum, typename std::decay_t<E>::value_type,
-                              std::numeric_limits<xvalue_type_t<std::decay_t<E>>>::lowest())
-#else
-    XTENSOR_MODERN_CLANG_REDUCER(amax, math::maximum, typename std::decay_t<E>::value_type,
-                                 std::numeric_limits<xvalue_type_t<std::decay_t<E>>>::lowest())
-#endif
 
     /**
      * @ingroup basic_functions
@@ -802,13 +783,6 @@ namespace detail {
      */
     XTENSOR_REDUCER_FUNCTION(amin, math::minimum, typename std::decay_t<E>::value_type,
                              std::numeric_limits<xvalue_type_t<std::decay_t<E>>>::max())
-#ifdef X_OLD_CLANG
-    XTENSOR_OLD_CLANG_REDUCER(amin, math::minimum, typename std::decay_t<E>::value_type,
-                              std::numeric_limits<xvalue_type_t<std::decay_t<E>>>::max())
-#else
-    XTENSOR_MODERN_CLANG_REDUCER(amin, math::minimum, typename std::decay_t<E>::value_type,
-                                 std::numeric_limits<xvalue_type_t<std::decay_t<E>>>::max())
-#endif
 
     /**
      * @ingroup basic_functions
@@ -1868,11 +1842,6 @@ namespace detail {
      * @return an \ref xreducer
      */
     XTENSOR_REDUCER_FUNCTION(sum, std::plus, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>, 0)
-#ifdef X_OLD_CLANG
-    XTENSOR_OLD_CLANG_REDUCER(sum, std::plus, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>, 0)
-#else
-    XTENSOR_MODERN_CLANG_REDUCER(sum, std::plus, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>, 0)
-#endif
 
     /**
      * @ingroup red_functions
@@ -1889,11 +1858,6 @@ namespace detail {
      * @return an \ref xreducer
      */
     XTENSOR_REDUCER_FUNCTION(prod, std::multiplies, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>, 1)
-#ifdef X_OLD_CLANG
-    XTENSOR_OLD_CLANG_REDUCER(prod, std::multiplies, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>, 1)
-#else
-    XTENSOR_MODERN_CLANG_REDUCER(prod, std::multiplies, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>, 1)
-#endif
 
     namespace detail
     {
@@ -1919,17 +1883,6 @@ namespace detail {
             return mean_division<T>(std::move(s), size - static_cast<size_type>(ddof));
         }
 
-#ifdef X_OLD_CLANG
-        template <class T, class E, class I, class D, class EVS>
-        inline auto mean(E&& e, std::initializer_list<I> axes, const D& ddof, EVS es)
-        {
-            using size_type = typename std::decay_t<E>::size_type;
-            const size_type size = e.size();
-            XTENSOR_ASSERT(static_cast<size_type>(ddof) <= size);
-            auto s = sum<T>(std::forward<E>(e), axes, es);
-            return detail::mean_division<T>(std::move(s), size - static_cast<size_type>(ddof));
-        }
-#else
         template <class T, class E, class I, std::size_t N, class D, class EVS>
         inline auto mean(E&& e, const I (&axes)[N], const D& ddof, EVS es)
         {
@@ -1939,7 +1892,6 @@ namespace detail {
             auto s = sum<T>(std::forward<E>(e), axes, es);
             return detail::mean_division<T>(std::move(s), size - static_cast<size_type>(ddof));
         }
-#endif
 
         template <class T, class E, class D, class EVS,
                   XTL_REQUIRES(is_reducer_options<EVS>, xtl::is_integral<D>)>
@@ -1976,19 +1928,11 @@ namespace detail {
         return detail::mean_noaxis<T>(std::forward<E>(e), 0u, es);
     }
 
-#ifdef X_OLD_CLANG
-    template <class T = void, class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>
-    inline auto mean(E&& e, std::initializer_list<I> axes, EVS es = EVS())
-    {
-        return detail::mean<T>(std::move(s), e.size());
-    }
-#else
     template <class T = void, class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
     inline auto mean(E&& e, const I (&axes)[N], EVS es = EVS())
     {
         return detail::mean<T>(std::forward<E>(e), axes, 0u, es);
     }
-#endif
 
     /**
      * @ingroup red_functions
@@ -2036,7 +1980,6 @@ namespace detail {
         return sum(std::forward<E>(e) * std::move(weights_view), std::move(ax), ev) / std::move(scl);
     }
 
-#ifndef X_OLD_CLANG
     template <class E, class W, class X, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
     inline auto average(E&& e, W&& weights, const X(&axes)[N], EVS ev = EVS())
     {
@@ -2044,14 +1987,6 @@ namespace detail {
         using ax_t = std::array<std::size_t, N>;
         return average(std::forward<E>(e), std::forward<W>(weights), xt::forward_normalize<ax_t>(e, axes), ev);
     }
-#else
-    template <class E, class W, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>
-    inline auto average(E&& e, W&& weights, std::initializer_list<I> axes, EVS ev = EVS())
-    {
-        using ax_t = dynamic_shape<std::size_t>;
-        return average(std::forward<E>(e), std::forward<W>(weights), xt::forward_normalize<ax_t>(e, axes), ev);
-    }
-#endif
 
     template <class E, class W, class EVS = DEFAULT_STRATEGY_REDUCERS,
               XTL_REQUIRES(is_reducer_options<EVS>)>
@@ -2186,7 +2121,6 @@ namespace detail {
         return cast<result_type>(sqrt(variance<T>(std::forward<E>(e), std::forward<X>(axes), es)));
     }
 
-#ifndef X_OLD_CLANG
     template <class T = void, class E, class A, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
     inline auto stddev(E&& e, const A (&axes)[N], EVS es = EVS())
     {
@@ -2212,33 +2146,6 @@ namespace detail {
                          ddof,
                          es);
     }
-#else
-    template <class T = void, class E, class A, class EVS = DEFAULT_STRATEGY_REDUCERS>
-    inline auto stddev(E&& e, std::initializer_list<A> axes, EVS es = EVS())
-    {
-        return stddev<T>(std::forward<E>(e),
-                         xtl::forward_sequence<dynamic_shape<std::size_t>, decltype(axes)>(axes),
-                         es);
-    }
-
-    template <class T = void, class E, class A, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTL_REQUIRES(is_reducer_options<EVS>)>
-    inline auto variance(E&& e, std::initializer_list<A> axes, EVS es = EVS())
-    {
-        return variance<T>(std::forward<E>(e),
-                           xtl::forward_sequence<dynamic_shape<std::size_t>, decltype(axes)>(axes),
-                           es);
-    }
-
-    template <class T = void, class E, class A, class D, class EVS = DEFAULT_STRATEGY_REDUCERS>
-    inline auto variance(E&& e, std::initializer_list<A> axes, D const& ddof, EVS es = EVS())
-    {
-        return variance<T>(std::forward<E>(e),
-                           xtl::forward_sequence<dynamic_shape<std::size_t>, decltype(axes)>(axes),
-                           ddof,
-                           es);
-    }
-#endif
 
     /**
      * @ingroup red_functions
@@ -2436,19 +2343,8 @@ namespace detail {
         using functor_type = FUNCTOR<result_type>;                                                                \
         using init_functor_type = detail::nan_init<result_type, NAN>;                                             \
         return xt::reduce(make_xreducer_functor(functor_type(), init_functor_type()), std::forward<E>(e), es);    \
-    }
-
-#define OLD_CLANG_NAN_REDUCER(NAME, FUNCTOR, RESULT_TYPE, NAN)                                                       \
-    template <class T = void, class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>                               \
-        inline auto NAME(E&& e, std::initializer_list<I> axes, EVS es = EVS())                                       \
-        {                                                                                                            \
-            using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                    \
-            using functor_type = FUNCTOR<result_type>;                                                               \
-            using init_functor_type = detail::nan_init<result_type, NAN>;                                            \
-            return xt::reduce(make_xreducer_functor(functor_type(), init_functor_type()), std::forward<E>(e), axes, es); \
-        }
-
-#define MODERN_CLANG_NAN_REDUCER(NAME, FUNCTOR, RESULT_TYPE, NAN)                                                 \
+    }                                                                                                             \
+                                                                                                                  \
     template <class T = void, class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>             \
     inline auto NAME(E&& e, const I (&axes)[N], EVS es = EVS())                                                   \
     {                                                                                                             \
@@ -2470,11 +2366,6 @@ namespace detail {
      * @return an \ref xreducer
      */
     XTENSOR_REDUCER_FUNCTION(nansum, detail::nan_plus, typename std::decay_t<E>::value_type, 0)
-#ifdef X_OLD_CLANG
-    XTENSOR_OLD_CLANG_REDUCER(nansum, detail::nan_plus, typename std::decay_t<E>::value_type, 0)
-#else
-    XTENSOR_MODERN_CLANG_REDUCER(nansum, detail::nan_plus, typename std::decay_t<E>::value_type, 0)
-#endif
 
     /**
      * @ingroup nan_functions
@@ -2488,15 +2379,8 @@ namespace detail {
      * @return an \ref xreducer
      */
     XTENSOR_REDUCER_FUNCTION(nanprod, detail::nan_multiplies, typename std::decay_t<E>::value_type, 1)
-#ifdef X_OLD_CLANG
-    XTENSOR_OLD_CLANG_REDUCER(nanprod, detail::nan_multiplies, typename std::decay_t<E>::value_type, 1)
-#else
-    XTENSOR_MODERN_CLANG_REDUCER(nanprod, detail::nan_multiplies, typename std::decay_t<E>::value_type, 1)
-#endif
 
 #undef XTENSOR_NAN_REDUCER_FUNCTION
-#undef OLD_CLANG_NAN_REDUCER
-#undef MODERN_CLANG_NAN_REDUCER
 
 #define COUNT_NON_ZEROS_CONTENT                                                 \
     using result_type = std::size_t;                                            \
@@ -2537,15 +2421,7 @@ namespace detail {
         return count_nonzero(std::forward<E>(e), {axis}, es);
     }
 
-#ifdef X_OLD_CLANG
-    template <class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>
-    inline auto count_nonzero(E&& e, std::initializer_list<I> axes, EVS es = EVS())
-    {
-        COUNT_NON_ZEROS_CONTENT;
-        return xt::reduce(make_xreducer_functor(std::move(reduce_fct), std::move(init_fct), std::move(merge_func)),
-                      std::forward<E>(e), axes, es);
-    }
-#else
+
     template <class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
     inline auto count_nonzero(E&& e, const I (&axes)[N], EVS es = EVS())
     {
@@ -2553,7 +2429,6 @@ namespace detail {
         return xt::reduce(make_xreducer_functor(std::move(reduce_fct), std::move(init_fct), std::move(merge_func)),
                       std::forward<E>(e), axes, es);
     }
-#endif
 
 #undef COUNT_NON_ZEROS_CONTENT
 
@@ -2578,19 +2453,11 @@ namespace detail {
         return xt::count_nonzero(!xt::isnan(std::forward<E>(e)), {axes}, es);
     }
 
-#ifdef X_OLD_CLANG
-    template <class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>
-    inline auto count_nonnan(E&& e, std::initializer_list<I> axes, EVS es = EVS())
-    {
-        return xt::count_nonzero(!xt::isnan(std::forward<E>(e)), axes, es);
-    }
-#else
     template <class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
     inline auto count_nonnan(E&& e, const I (&axes)[N], EVS es = EVS())
     {
         return xt::count_nonzero(!xt::isnan(std::forward<E>(e)), axes, es);
     }
-#endif
 
     /**
      * @ingroup nan_functions
@@ -2710,15 +2577,6 @@ namespace detail {
         return nansum<sum_type>(sc, es) / xt::cast<value_type>(count_nonnan(sc, es));
     }
 
-#ifdef X_OLD_CLANG
-    template <class T = void, class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>
-    inline auto nanmean(E&& e, std::initializer_list<I> axes, EVS es = EVS())
-    {
-        return nanmean<T>(std::forward<E>(e),
-                          xtl::forward_sequence<dynamic_shape<std::size_t>, decltype(axes)>(axes),
-                          es);
-    }
-#else
     template <class T = void, class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
     inline auto nanmean(E&& e, const I (&axes)[N], EVS es = EVS())
     {
@@ -2726,7 +2584,6 @@ namespace detail {
                           xtl::forward_sequence<std::array<std::size_t, N>, decltype(axes)>(axes),
                           es);
     }
-#endif
 
     template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
               XTL_REQUIRES(is_reducer_options<EVS>)>
@@ -2806,7 +2663,6 @@ namespace detail {
         return cast<result_type>(sqrt(nanvar<T>(std::forward<E>(e), std::forward<X>(axes), es)));
     }
 
-#ifndef X_OLD_CLANG
     template <class T = void, class E, class A, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
     inline auto nanstd(E&& e, const A (&axes)[N], EVS es = EVS())
     {
@@ -2822,23 +2678,6 @@ namespace detail {
                          xtl::forward_sequence<std::array<std::size_t, N>, decltype(axes)>(axes),
                          es);
     }
-#else
-    template <class T = void, class E, class A, class EVS = DEFAULT_STRATEGY_REDUCERS>
-    inline auto nanstd(E&& e, std::initializer_list<A> axes, EVS es = EVS())
-    {
-        return nanstd<T>(std::forward<E>(e),
-                         xtl::forward_sequence<dynamic_shape<std::size_t>, decltype(axes)>(axes),
-                         es);
-    }
-
-    template <class T = void, class E, class A, class EVS = DEFAULT_STRATEGY_REDUCERS>
-    inline auto nanvar(E&& e, std::initializer_list<A> axes, EVS es = EVS())
-    {
-        return nanvar<T>(std::forward<E>(e),
-                         xtl::forward_sequence<dynamic_shape<std::size_t>, decltype(axes)>(axes),
-                         es);
-    }
-#endif
 
     /**
      * @ingroup red_functions

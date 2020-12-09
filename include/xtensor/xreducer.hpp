@@ -18,9 +18,6 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
-#ifdef X_OLD_CLANG
-#include <vector>
-#endif
 
 #include <xtl/xfunctional.hpp>
 #include <xtl/xsequence.hpp>
@@ -883,24 +880,6 @@ namespace xt
         return reduce(make_xreducer_functor(std::forward<F>(f)), std::forward<E>(e), std::forward<EVS>(options));
     }
 
-#ifdef X_OLD_CLANG
-    template <class F, class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTL_REQUIRES(detail::is_xreducer_functors<F>)>
-    inline auto reduce(F&& f, E&& e, std::initializer_list<I> axes, EVS options = EVS())
-    {
-        using axes_type = std::vector<std::size_t>;
-        auto ax = xt::forward_normalize<axes_type>(e, axes);
-        return detail::reduce_impl(std::forward<F>(f), std::forward<E>(e), std::move(ax),
-                                   typename reducer_options<int, EVS>::evaluation_strategy{},
-                                   options);
-    }
-    template <class F, class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTL_REQUIRES(xtl::negation<detail::is_xreducer_functors<F>>)>
-    inline auto reduce(F&& f, E&& e, std::initializer_list<I> axes, EVS options = EVS())
-    {
-        return reduce(make_xreducer_functor(std::forward<F>(f)), std::forward<E>(e), axes, options);
-    }
-#else
     template <class F, class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS,
               XTL_REQUIRES(detail::is_xreducer_functors<F>)>
     inline auto reduce(F&& f, E&& e, const I (&axes)[N], EVS options = EVS())
@@ -917,7 +896,6 @@ namespace xt
     {
         return reduce(make_xreducer_functor(std::forward<F>(f)), std::forward<E>(e), axes, options);
     }
-#endif
 
     /********************
      * xreducer_stepper *

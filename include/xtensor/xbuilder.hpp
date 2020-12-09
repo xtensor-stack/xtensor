@@ -21,9 +21,6 @@
 #include <functional>
 #include <utility>
 #include <vector>
-#ifdef X_OLD_CLANG
-    #include <initializer_list>
-#endif
 
 #include <xtl/xclosure.hpp>
 #include <xtl/xsequence.hpp>
@@ -51,19 +48,11 @@ namespace xt
         return broadcast(T(1), std::forward<S>(shape));
     }
 
-#ifdef X_OLD_CLANG
-    template <class T, class I>
-    inline auto ones(std::initializer_list<I> shape) noexcept
-    {
-        return broadcast(T(1), shape);
-    }
-#else
     template <class T, class I, std::size_t L>
     inline auto ones(const I (&shape)[L]) noexcept
     {
         return broadcast(T(1), shape);
     }
-#endif
 
     /*********
      * zeros *
@@ -79,19 +68,11 @@ namespace xt
         return broadcast(T(0), std::forward<S>(shape));
     }
 
-#ifdef X_OLD_CLANG
-    template <class T, class I>
-    inline auto zeros(std::initializer_list<I> shape) noexcept
-    {
-        return broadcast(T(0), shape);
-    }
-#else
     template <class T, class I, std::size_t L>
     inline auto zeros(const I (&shape)[L]) noexcept
     {
         return broadcast(T(0), shape);
     }
-#endif
 
     /**
      * Create a xcontainer (xarray, xtensor or xtensor_fixed) with uninitialized values of
@@ -117,20 +98,12 @@ namespace xt
         return xtensor<T, N, L>(xtl::forward_sequence<shape_type, decltype(shape)>(shape));
     }
 
-#ifndef X_OLD_CLANG
     template <class T, layout_type L = XTENSOR_DEFAULT_LAYOUT, class I, std::size_t N>
     inline xtensor<T, N, L> empty(const I(&shape)[N])
     {
         using shape_type = typename xtensor<T, N>::shape_type;
         return xtensor<T, N, L>(xtl::forward_sequence<shape_type, decltype(shape)>(shape));
     }
-#else
-    template <class T, layout_type L = XTENSOR_DEFAULT_LAYOUT, class I>
-    inline xarray<T, L> empty(const std::initializer_list<I>& init)
-    {
-        return xarray<T, L>::from_shape(init);
-    }
-#endif
 
     template <class T, layout_type L = XTENSOR_DEFAULT_LAYOUT, std::size_t... N>
     inline xtensor_fixed<T, fixed_shape<N...>, L> empty(const fixed_shape<N...>& /*shape*/)
@@ -900,7 +873,7 @@ namespace xt
         template <std::size_t... I, class... E>
         inline auto meshgrid_impl(std::index_sequence<I...>, E&&... e) noexcept
         {
-#if defined X_OLD_CLANG || defined _MSC_VER
+#if defined _MSC_VER
             const std::array<std::size_t, sizeof...(E)> shape = {e.shape()[0]...};
             return std::make_tuple(
                 detail::make_xgenerator(

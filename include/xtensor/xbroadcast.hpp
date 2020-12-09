@@ -38,13 +38,8 @@ namespace xt
     template <class E, class S>
     auto broadcast(E&& e, const S& s);
 
-#ifdef X_OLD_CLANG
-    template <class E, class I>
-    auto broadcast(E&& e, std::initializer_list<I> s);
-#else
     template <class E, class I, std::size_t L>
     auto broadcast(E&& e, const I (&s)[L]);
-#endif
 
     /*************************
      * xbroadcast extensions *
@@ -243,15 +238,6 @@ namespace xt
         return broadcast_type(std::forward<E>(e), xtl::forward_sequence<shape_type, decltype(s)>(s));
     }
 
-#ifdef X_OLD_CLANG
-    template <class E, class I>
-    inline auto broadcast(E&& e, std::initializer_list<I> s)
-    {
-        using broadcast_type = xbroadcast<const_xclosure_t<E>, std::vector<std::size_t>>;
-        using shape_type = typename broadcast_type::shape_type;
-        return broadcast_type(std::forward<E>(e), xtl::forward_sequence<shape_type, decltype(s)>(s));
-    }
-#else
     template <class E, class I, std::size_t L>
     inline auto broadcast(E&& e, const I (&s)[L])
     {
@@ -259,7 +245,6 @@ namespace xt
         using shape_type = typename broadcast_type::shape_type;
         return broadcast_type(std::forward<E>(e), xtl::forward_sequence<shape_type, decltype(s)>(s));
     }
-#endif
 
     /*****************************
      * xbroadcast implementation *

@@ -651,14 +651,13 @@ namespace xt
     {
 
         bool b = false;
-    #ifndef X_OLD_CLANG
+
         auto e1 = empty<double>({3, 4, 1});
         b = std::is_same<decltype(e1), xtensor<double, 3>>::value;
         EXPECT_TRUE(b);
         b = std::is_same<decltype(empty<int, layout_type::column_major>({3,3,3})),
                          xtensor<int, 3, layout_type::column_major>>::value;
         EXPECT_TRUE(b);
-    #endif
 
         auto es = empty<double>(std::array<std::size_t, 3>{3, 4, 1});
         b = std::is_same<decltype(es), xtensor<double, 3>>::value;

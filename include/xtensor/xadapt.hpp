@@ -396,21 +396,12 @@ namespace xt
         return return_type(buffer_type(pointer, detail::fixed_compute_size<fixed_shape<X...>>::value));
     }
 
-#ifndef X_OLD_CLANG
     template <layout_type L = XTENSOR_DEFAULT_LAYOUT, class C, class T,  std::size_t N>
     inline auto adapt(C&& ptr, const T(&shape)[N])
     {
         using shape_type = std::array<std::size_t, N>;
         return adapt(std::forward<C>(ptr), xtl::forward_sequence<shape_type, decltype(shape)>(shape));
     }
-#else
-    template <layout_type L = XTENSOR_DEFAULT_LAYOUT, class C>
-    inline auto adapt(C&& ptr, std::initializer_list<std::size_t> shape)
-    {
-        using shape_type = xt::dynamic_shape<std::size_t>;
-        return adapt(std::forward<C>(ptr), xtl::forward_sequence<shape_type, decltype(shape)>(shape));
-    }
-#endif
 
     /*****************************
      * smart_ptr adapter builder *
@@ -514,7 +505,6 @@ namespace xt
         );
     }
 
-#ifndef X_OLD_CLANG
     /**
      * Adapt a smart pointer to a typed memory block (unique_ptr or shared_ptr)
      *
@@ -608,7 +598,6 @@ namespace xt
             l
         );
     }
-#endif
 }
 
 #endif
