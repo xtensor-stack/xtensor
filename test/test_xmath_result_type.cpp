@@ -241,8 +241,6 @@ namespace xt
         CHECK_RESULT_TYPE(adouble + aint, double);
         CHECK_RESULT_TYPE(adouble + adcomplex, std::complex<double>);
         CHECK_RESULT_TYPE(aulong + adouble, double);
+        CHECK_RESULT_TYPE(afcomplex + adcomplex, std::complex<double>);
     }
-
-
 }
-
