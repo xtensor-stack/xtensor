@@ -585,19 +585,19 @@ namespace xt
         {
         }
 
-        reduce_functor_type get_reduce()
+        reduce_functor_type get_reduce() const
         {
-            return std::get<0>(*this);
+            return std::get<0>(upcast());
         }
 
-        init_functor_type get_init()
+        init_functor_type get_init() const
         {
-            return std::get<1>(*this);
+            return std::get<1>(upcast());
         }
 
-        merge_functor_type get_merge()
+        merge_functor_type get_merge() const
         {
-            return std::get<2>(*this);
+            return std::get<2>(upcast());
         }
 
         template<class NT>
@@ -607,6 +607,14 @@ namespace xt
         rebind_t<NT> rebind()
         {
             return make_xreducer_functor(get_reduce(), get_init().template rebind<NT>(), get_merge());
+        }
+
+    private:
+        
+        // Workaround for clang-cl
+        const base_type& upcast() const
+        {
+            return static_cast<const base_type&>(*this);
         }
     };
 
