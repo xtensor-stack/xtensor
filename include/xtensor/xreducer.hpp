@@ -510,6 +510,8 @@ namespace xt
     template <class T>
     struct const_value
     {
+        using value_type = T;
+
         constexpr const_value() = default;
 
         constexpr const_value(T t)
@@ -522,8 +524,32 @@ namespace xt
             return m_value;
         }
 
+        template <class NT>
+        using rebind_t = const_value<NT>;
+
+        template <class NT>
+        const_value<NT> rebind() const;
+
         T m_value;
     };
+
+    namespace detail
+    {
+        template <class T, bool B>
+        struct evaluated_value_type
+        {
+            using type = T;
+        };
+
+        template <class T>
+        struct evaluated_value_type<T, true>
+        {
+            using type = typename std::decay_t<decltype(xt::eval(std::declval<T>()))>;
+        };
+
+        template <class T, bool B>
+        using evaluated_value_type_t = typename evaluated_value_type<T, B>::type;
+    }
 
     template <class REDUCE_FUNC, class INIT_FUNC = const_value<long int>, class MERGE_FUNC = REDUCE_FUNC>
     struct xreducer_functors
@@ -534,6 +560,7 @@ namespace xt
         using reduce_functor_type = REDUCE_FUNC;
         using init_functor_type = INIT_FUNC;
         using merge_functor_type = MERGE_FUNC;
+        using init_value_type = typename init_functor_type::value_type;
 
         xreducer_functors()
             : base_type()
@@ -556,6 +583,38 @@ namespace xt
         xreducer_functors(RF&& reduce_func, IF&& init_func, MF&& merge_func)
             : base_type(std::forward<RF>(reduce_func), std::forward<IF>(init_func), std::forward<MF>(merge_func))
         {
+        }
+
+        reduce_functor_type get_reduce() const
+        {
+            return std::get<0>(upcast());
+        }
+
+        init_functor_type get_init() const
+        {
+            return std::get<1>(upcast());
+        }
+
+        merge_functor_type get_merge() const
+        {
+            return std::get<2>(upcast());
+        }
+
+        template<class NT>
+        using rebind_t = xreducer_functors<REDUCE_FUNC, const_value<NT>, MERGE_FUNC>;
+
+        template<class NT>
+        rebind_t<NT> rebind()
+        {
+            return make_xreducer_functor(get_reduce(), get_init().template rebind<NT>(), get_merge());
+        }
+
+    private:
+        
+        // Workaround for clang-cl
+        const base_type& upcast() const
+        {
+            return static_cast<const base_type&>(*this);
         }
     };
 
@@ -634,8 +693,12 @@ namespace xt
         using init_functor_type = typename std::decay_t<F>::init_functor_type;
         using merge_functor_type = typename std::decay_t<F>::merge_functor_type;
         using substepper_type = typename xexpression_type::const_stepper;
-        using value_type = std::decay_t<decltype(std::declval<reduce_functor_type>()(
-            std::declval<init_functor_type>()(), *std::declval<substepper_type>()))>;
+        using raw_value_type = std::decay_t<decltype(std::declval<reduce_functor_type>()(
+                                                            std::declval<init_functor_type>()(), 
+                                                            *std::declval<substepper_type>())
+                                                    )>;
+        using value_type = typename detail::evaluated_value_type_t<raw_value_type, is_xexpression<raw_value_type>::value>;
+
         using reference = value_type;
         using const_reference = value_type;
         using size_type = typename xexpression_type::size_type;
@@ -680,9 +743,12 @@ namespace xt
 
         using self_type = xreducer<F, CT, X, O>;
         using inner_types = xcontainer_inner_types<self_type>;
+
         using reduce_functor_type = typename inner_types::reduce_functor_type;
         using init_functor_type = typename inner_types::init_functor_type;
         using merge_functor_type = typename inner_types::merge_functor_type;
+        using xreducer_functors_type = xreducer_functors<reduce_functor_type, init_functor_type, merge_functor_type>;
+
         using xexpression_type = typename inner_types::xexpression_type;
         using axes_type = X;
 
@@ -749,6 +815,11 @@ namespace xt
         template <class E, class Func, class Opts>
         rebind_t<E, Func, Opts> build_reducer(E&& e, Func&& func, Opts&& opts) const;
 
+        xreducer_functors_type functors() const
+        {
+            return xreducer_functors_type(m_reduce, m_init, m_merge);  // TODO: understand why make_xreducer_functor is throwing an error
+        }
+
         const O& options() const
         {
             return m_options;
@@ -780,11 +851,13 @@ namespace xt
 
             using reduce_functor_type = typename std::decay_t<F>::reduce_functor_type;
             using init_functor_type = typename std::decay_t<F>::init_functor_type;
+            using init_value_type = typename init_functor_type::value_type;
             using value_type = std::decay_t<decltype(std::declval<reduce_functor_type>()(
                 std::declval<init_functor_type>()(),
                 *std::declval<typename std::decay_t<E>::const_stepper>()))>;
-
-            using reducer_type = xreducer<F, const_xclosure_t<E>, xtl::const_closure_type_t<decltype(normalized_axes)>, reducer_options<value_type, std::decay_t<O>>>;
+            using evaluated_value_type = evaluated_value_type_t<value_type, is_xexpression<value_type>::value>;
+            
+            using reducer_type = xreducer<F, const_xclosure_t<E>, xtl::const_closure_type_t<decltype(normalized_axes)>, reducer_options<evaluated_value_type, std::decay_t<O>>>;
             return reducer_type(std::forward<F>(f), std::forward<E>(e), std::forward<decltype(normalized_axes)>(normalized_axes), std::forward<O>(options));
         }
 
@@ -983,7 +1056,58 @@ namespace xt
                                             fixed_shape<R...>,
                                             fixed_shape<detail::at<0, I...>::value, R...>>;
         };
+
+        /***************************
+         * helper for return types *
+         ***************************/
+
+        template <class T>
+        struct xreducer_size_type
+        {
+            using type = std::size_t;
+        };
+
+        template <class T>
+        using xreducer_size_type_t = typename xreducer_size_type<T>::type;
+
+
+        template <class T>
+        struct xreducer_temporary_type
+        {
+            using type = T;
+        };
+
+        template <class T>
+        using xreducer_temporary_type_t = typename xreducer_temporary_type<T>::type;
+
+        /********************************
+         * Default const_value rebinder *
+         ********************************/
+
+        template <class T, class U>
+        struct const_value_rebinder
+        {
+            static const_value<U> run(const const_value<T>& t)
+            {
+                return const_value<U>(t.m_value);
+            }
+        };        
     }
+
+    /*******************************************
+     * Init functor const_value implementation *
+     *******************************************/
+
+    template <class T>
+    template <class NT>
+    const_value<NT> const_value<T>::rebind() const
+    {
+        return detail::const_value_rebinder<T, NT>::run(*this);
+    }
+
+    /*****************************
+     * fixed_xreducer_shape_type *
+     *****************************/
 
     template <class S1, class S2>
     struct fixed_xreducer_shape_type;

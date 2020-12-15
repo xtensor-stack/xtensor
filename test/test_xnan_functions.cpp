@@ -21,6 +21,8 @@
 #include "xtensor/xmath.hpp"
 #include "xtensor/xstrided_view.hpp"
 
+#include "xtl/xtype_traits.hpp"
+
 namespace xt
 {
     using namespace std::complex_literals;
@@ -219,64 +221,80 @@ namespace xt
         xarray<float> afloat(shape);
         xarray<double> adouble(shape);
 
-#define CHECK_RESULT_TYPE_FOR_ALL(INPUT, RESULT_TYPE)                               \
-        CHECK_RESULT_TYPE(nansum(INPUT, {1, 2}), RESULT_TYPE);                      \
-        CHECK_RESULT_TYPE(nanmean(INPUT, {1, 2}), double);                          \
-        CHECK_RESULT_TYPE(nanvar(INPUT, {1, 2}), double);                           \
+#define CHECK_RESULT_TYPE_FOR_ALL(INPUT, RESULT_TYPE)             \
+        CHECK_RESULT_TYPE(nansum(INPUT, {1, 2}), RESULT_TYPE);    \
+        CHECK_RESULT_TYPE(nanmean(INPUT, {1, 2}), double);        \
+        CHECK_RESULT_TYPE(nanvar(INPUT, {1, 2}), double);         \
         CHECK_RESULT_TYPE(nanstd(INPUT, {1, 2}), double);
 
-#define CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(INPUT, RESULT_TYPE)                     \
-        CHECK_RESULT_TYPE(nansum<RESULT_TYPE>(INPUT, {1, 2}), RESULT_TYPE)          \
-        CHECK_RESULT_TYPE(nanmean<RESULT_TYPE>(INPUT, {1, 2}), RESULT_TYPE)         \
-        CHECK_RESULT_TYPE(nanvar<RESULT_TYPE>(INPUT, {1, 2}), RESULT_TYPE)          \
-        CHECK_RESULT_TYPE(nanstd<RESULT_TYPE>(INPUT, {1, 2}), RESULT_TYPE)
+#define CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(INPUT, TEMPLATE_TYPE, RESULT_TYPE, STD_TYPE)  \
+        CHECK_RESULT_TYPE(nansum<TEMPLATE_TYPE>(INPUT, {1, 2}), RESULT_TYPE)              \
+        CHECK_RESULT_TYPE(nanmean<TEMPLATE_TYPE>(INPUT, {1, 2}), RESULT_TYPE)             \
+        CHECK_RESULT_TYPE(nanvar<TEMPLATE_TYPE>(INPUT, {1, 2}), RESULT_TYPE)              \
+        CHECK_RESULT_TYPE(nanstd<TEMPLATE_TYPE>(INPUT, {1, 2}), STD_TYPE)
 
         /*********
          * short *
          *********/
-        CHECK_RESULT_TYPE_FOR_ALL(ashort, short);
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(ashort, int);
+        CHECK_RESULT_TYPE_FOR_ALL(ashort, int);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(ashort, short, int, double);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(ashort, int, int, double);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(ashort, double, double, double);
 
         /******************
          * unsigned short *
          ******************/
-        CHECK_RESULT_TYPE_FOR_ALL(aushort, unsigned short);
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aushort, unsigned int);
+        CHECK_RESULT_TYPE_FOR_ALL(aushort, int);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aushort, unsigned short, int, double);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aushort, int, int, double);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aushort, double, double, double);
 
         /*********
          * int *
          *********/
         CHECK_RESULT_TYPE_FOR_ALL(aint, int);
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aint, int);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aint, unsigned short, int, double);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aint, int, int, double);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aint, double, double, double);
 
         /****************
          * unsigned int *
          ****************/
         CHECK_RESULT_TYPE_FOR_ALL(auint, unsigned int);
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(auint, unsigned int);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(auint, unsigned int, unsigned int, double);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(auint, unsigned int, unsigned int, double);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(auint, double, double, double);
 
         /**********************
          * long long *
          **********************/
         CHECK_RESULT_TYPE_FOR_ALL(along, signed long long);
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(along, signed long long);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(along, int, signed long long, double);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(along, long, signed long long, double);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(along, signed long long, signed long long, double);
 
         /**********************
          * unsigned long long *
          **********************/
         CHECK_RESULT_TYPE_FOR_ALL(aulong, unsigned long long);
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aulong, unsigned long long);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aulong, unsigned int, unsigned long long, double);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aulong, unsigned long, unsigned long long, double);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aulong, unsigned long long, unsigned long long, double);
 
         /*********
          * float *
          *********/
         CHECK_RESULT_TYPE_FOR_ALL(afloat, float);
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(afloat, float);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(afloat, int, float, float);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(afloat, float, float, float);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(afloat, double, double, double);
 
         /**********
          * double *
          **********/
         CHECK_RESULT_TYPE_FOR_ALL(adouble, double);
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(adouble, double);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(adouble, float, double, double);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(adouble, double, double, double);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(adouble, long double, long double, long double);
     }
 }
