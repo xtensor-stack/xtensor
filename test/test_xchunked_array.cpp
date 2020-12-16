@@ -12,6 +12,7 @@
 #include "xtensor/xbroadcast.hpp"
 #include "xtensor/xchunked_array.hpp"
 #include "xtensor/xcsv.hpp"
+#include "xtensor/xnoalias.hpp"
 
 namespace xt
 {
@@ -111,5 +112,17 @@ namespace xt
         {
             EXPECT_EQ(v, 3);
         }
+    }
+
+    TEST(xchunked_array, noalias)
+    {
+        std::vector<std::size_t> shape = {10, 10, 10};
+        std::vector<std::size_t> chunk_shape = {2, 2, 2};
+        auto a = chunked_array<double>(shape, chunk_shape);
+        xt::xarray<double> b = arange(1000).reshape({10, 10, 10});
+
+        noalias(a) = b;
+
+        EXPECT_EQ(a, b);
     }
 }

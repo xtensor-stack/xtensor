@@ -142,9 +142,6 @@ namespace xt
         template <class E>
         xchunked_array& operator=(const xexpression<E>& e);
 
-        template <class E>
-        void assign(const xexpression<E>& e);
-
         const shape_type& shape() const noexcept;
         layout_type layout() const noexcept;
         bool is_contiguous() const noexcept;
