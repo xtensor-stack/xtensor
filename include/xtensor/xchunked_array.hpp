@@ -234,6 +234,9 @@ namespace xt
     template <class T, layout_type L = XTENSOR_DEFAULT_LAYOUT, class EXT = empty_extension, class S>
     xchunked_array<xarray<xarray<T>>, EXT> chunked_array(S&& shape, S&& chunk_shape, layout_type chunk_memory_layout = XTENSOR_DEFAULT_LAYOUT);
 
+    template <class T, layout_type L = XTENSOR_DEFAULT_LAYOUT, class EXT = empty_extension, class S>
+    xchunked_array<xarray<xarray<T>>, EXT> chunked_array(std::initializer_list<S> shape, std::initializer_list<S> chunk_shape, layout_type chunk_memory_layout = XTENSOR_DEFAULT_LAYOUT);
+
     /**
      * Creates an in-memory chunked array.
      * This function returns a ``xchunked_array<xarray<T>>`` initialized from an expression.
@@ -329,6 +332,18 @@ namespace xt
     {
         using chunk_storage = xarray<xarray<T, L>>;
         return xchunked_array<chunk_storage, EXT>(chunk_storage(), std::forward<S>(shape), std::forward<S>(chunk_shape), chunk_memory_layout);
+    }
+
+    template <class T, layout_type L, class EXT, class S>
+    xchunked_array<xarray<xarray<T>>, EXT> chunked_array(std::initializer_list<S> shape, std::initializer_list<S> chunk_shape, layout_type chunk_memory_layout)
+    {
+        using sh_type = std::vector<std::size_t>;
+        sh_type sh = xtl::make_sequence<sh_type>(shape.size());
+        std::copy(shape.begin(), shape.end(), sh.begin());
+        sh_type ch_sh = xtl::make_sequence<sh_type>(chunk_shape.size());
+        std::copy(chunk_shape.begin(), chunk_shape.end(), ch_sh.begin());
+        using chunk_storage = xarray<xarray<T, L>>;
+        return xchunked_array<chunk_storage, EXT>(chunk_storage(), std::move(sh), std::move(ch_sh), chunk_memory_layout);
     }
 
     template <layout_type L, class EXT, class E, class S>

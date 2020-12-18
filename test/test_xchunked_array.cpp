@@ -20,9 +20,7 @@ namespace xt
 
     TEST(xchunked_array, indexed_access)
     {
-        std::vector<size_t> shape = {10, 10, 10};
-        std::vector<size_t> chunk_shape = {2, 3, 4};
-        auto a = chunked_array<double>(shape, chunk_shape);
+        auto a = chunked_array<double>({10, 10, 10}, {2, 3, 4});
 
         std::vector<size_t> idx = {3, 9, 8};
         double val;
