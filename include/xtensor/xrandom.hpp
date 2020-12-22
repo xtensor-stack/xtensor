@@ -767,14 +767,8 @@ namespace xt
         xtensor<typename T::value_type, 1> choice(const xexpression<T>& e, std::size_t n, bool replace, E& engine)
         {
             const auto& de = e.derived_cast();
-            if (de.dimension() != 1)
-            {
-                XTENSOR_THROW(std::runtime_error, "Sample expression must be 1 dimensional");
-            }
-            if (de.size() < n && !replace)
-            {
-                XTENSOR_THROW(std::runtime_error, "If replace is false, then the sample expression's size must be > n");
-            }
+            XTENSOR_ASSERT((de.dimension() == 1));
+            XTENSOR_ASSERT((replace || n <= de.size()));
             using result_type = xtensor<typename T::value_type, 1>;
             using size_type = typename result_type::size_type;
             result_type result;
@@ -837,18 +831,10 @@ namespace xt
         {
             const auto& de = e.derived_cast();
             const auto& dweights = weights.derived_cast();
-            if (de.dimension() != 1)
-            {
-                XTENSOR_THROW(std::runtime_error, "Sample and weight expression must be 1 dimensional");
-            }
-            if (de.size() < n && !replace)
-            {
-                XTENSOR_THROW(std::runtime_error, "If replace is false, then the sample expression's size must be > n");
-            }
-            if (de.size() != dweights.size() || de.dimension() != dweights.dimension())
-            {
-                XTENSOR_THROW(std::runtime_error, "Sample and weight expression must have the same size");
-            }
+            XTENSOR_ASSERT((de.dimension() == 1));
+            XTENSOR_ASSERT((replace || n <= de.size()));
+            XTENSOR_ASSERT((de.size() == dweights.size()));
+            XTENSOR_ASSERT((de.dimension() == dweights.dimension()));
             XTENSOR_ASSERT(xt::all(dweights >= 0));
             static_assert(std::is_floating_point<typename W::value_type>::value,
                           "Weight expression must be of floating point type");

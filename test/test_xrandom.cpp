@@ -161,13 +161,6 @@ namespace xt
         auto acr3 = xt::random::choice(a, 5, true);
         ASSERT_EQ(acr1, acr3);
         ASSERT_NE(acr1, acr2);
-
-        xarray<double> b = {-1, 1};
-        xt::random::seed(42);
-        XT_ASSERT_THROW(xt::random::choice(b, 5, false), std::runtime_error);
-        XT_ASSERT_NO_THROW(xt::random::choice(b, 5, true));
-        xarray<double> multidim_input = { {1,2,3}, {3,4,5} };
-        XT_ASSERT_THROW(xt::random::choice(multidim_input, 5, true), std::runtime_error);
     }
 
     TEST(xrandom, weighted_choice)
@@ -188,16 +181,6 @@ namespace xt
             ASSERT_TRUE(all(isin(ac1, a)));
             ASSERT_TRUE(all(equal(ac1 % 2, 1)));
         }
-
-        xarray<double> b = {-1, 1};
-        xarray<double> v = {1, 1};
-        xt::random::seed(42);
-        XT_ASSERT_THROW(xt::random::choice(b, 5, v, false), std::runtime_error);
-        XT_ASSERT_NO_THROW(xt::random::choice(b, 5, v, true));
-        xarray<double> multidim_input = { {1,2,3}, {3,4,5} };
-        XT_ASSERT_THROW(xt::random::choice(multidim_input, 5, v, true), std::runtime_error);
-        xarray<double> bad_count_weights = {1, 1, 4};
-        XT_ASSERT_THROW(xt::random::choice(b, 5, bad_count_weights, true), std::runtime_error);
     }
 
     TEST(xrandom, shuffle)
