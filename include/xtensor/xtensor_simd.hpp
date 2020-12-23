@@ -11,7 +11,7 @@
 #define XTENSOR_SIMD_HPP
 
 #include <vector>
-#include <xtl/xdynamic_bitset.hpp>
+#include "xtl/xdynamic_bitset.hpp"
 
 #include "xutils.hpp"
 

@@ -18,8 +18,8 @@
 #include <type_traits>
 #include <utility>
 
-#include <xtl/xsequence.hpp>
-#include <xtl/xtype_traits.hpp>
+#include "xtl/xsequence.hpp"
+#include "xtl/xtype_traits.hpp"
 
 #include "xaccessible.hpp"
 #include "xexpression_traits.hpp"

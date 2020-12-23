@@ -20,8 +20,8 @@
 #include <complex>
 #include <type_traits>
 
-#include <xtl/xcomplex.hpp>
-#include <xtl/xtype_traits.hpp>
+#include "xtl/xcomplex.hpp"
+#include "xtl/xtype_traits.hpp"
 
 #include "xaccumulator.hpp"
 #include "xeval.hpp"

@@ -14,7 +14,7 @@
 #include <initializer_list>
 #include <utility>
 
-#include <xtl/xsequence.hpp>
+#include "xtl/xsequence.hpp"
 
 #include "xbuffer_adaptor.hpp"
 #include "xcontainer.hpp"

@@ -22,9 +22,9 @@
 #include <utility>
 #include <vector>
 
-#include <xtl/xclosure.hpp>
-#include <xtl/xsequence.hpp>
-#include <xtl/xtype_traits.hpp>
+#include "xtl/xclosure.hpp"
+#include "xtl/xsequence.hpp"
+#include "xtl/xtype_traits.hpp"
 
 #include "xbroadcast.hpp"
 #include "xfunction.hpp"

@@ -23,10 +23,10 @@
 #include <utility>
 #include <vector>
 
-#include <xtl/xfunctional.hpp>
-#include <xtl/xsequence.hpp>
-#include <xtl/xmeta_utils.hpp>
-#include <xtl/xtype_traits.hpp>
+#include "xtl/xfunctional.hpp"
+#include "xtl/xsequence.hpp"
+#include "xtl/xmeta_utils.hpp"
+#include "xtl/xtype_traits.hpp"
 
 #include "xtensor_config.hpp"
 

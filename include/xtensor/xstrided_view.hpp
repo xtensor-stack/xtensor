@@ -16,8 +16,8 @@
 #include <type_traits>
 #include <utility>
 
-#include <xtl/xsequence.hpp>
-#include <xtl/xvariant.hpp>
+#include "xtl/xsequence.hpp"
+#include "xtl/xvariant.hpp"
 
 #include "xexpression.hpp"
 #include "xiterable.hpp"

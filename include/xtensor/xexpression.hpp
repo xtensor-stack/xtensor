@@ -14,9 +14,9 @@
 #include <type_traits>
 #include <vector>
 
-#include <xtl/xclosure.hpp>
-#include <xtl/xmeta_utils.hpp>
-#include <xtl/xtype_traits.hpp>
+#include "xtl/xclosure.hpp"
+#include "xtl/xmeta_utils.hpp"
+#include "xtl/xtype_traits.hpp"
 
 #include "xlayout.hpp"
 #include "xshape.hpp"

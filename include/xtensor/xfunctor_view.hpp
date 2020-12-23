@@ -16,7 +16,7 @@
 #include <type_traits>
 #include <utility>
 
-#include <xtl/xproxy_wrapper.hpp>
+#include "xtl/xproxy_wrapper.hpp"
 
 #include "xaccessible.hpp"
 #include "xexpression.hpp"

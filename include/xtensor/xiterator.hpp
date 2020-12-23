@@ -17,9 +17,9 @@
 #include <numeric>
 #include <vector>
 
-#include <xtl/xiterator_base.hpp>
-#include <xtl/xmeta_utils.hpp>
-#include <xtl/xsequence.hpp>
+#include "xtl/xiterator_base.hpp"
+#include "xtl/xmeta_utils.hpp"
+#include "xtl/xsequence.hpp"
 
 #include "xexception.hpp"
 #include "xlayout.hpp"

@@ -16,7 +16,7 @@
 #include <memory>
 #include <stdexcept>
 
-#include <xtl/xclosure.hpp>
+#include "xtl/xclosure.hpp"
 
 #include "xtensor_config.hpp"
 #include "xstorage.hpp"

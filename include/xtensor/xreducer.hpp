@@ -19,8 +19,8 @@
 #include <type_traits>
 #include <utility>
 
-#include <xtl/xfunctional.hpp>
-#include <xtl/xsequence.hpp>
+#include "xtl/xfunctional.hpp"
+#include "xtl/xsequence.hpp"
 
 #include "xaccessible.hpp"
 #include "xbuilder.hpp"

@@ -12,7 +12,7 @@
 
 #include <type_traits>
 
-#include <xtl/xsequence.hpp>
+#include "xtl/xsequence.hpp"
 
 #include "xaccessible.hpp"
 #include "xtensor_forward.hpp"

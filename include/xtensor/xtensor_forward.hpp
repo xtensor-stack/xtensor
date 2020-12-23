@@ -25,7 +25,7 @@
 #include <memory>
 #include <vector>
 
-#include <xtl/xoptional_sequence.hpp>
+#include "xtl/xoptional_sequence.hpp"
 
 #include "xlayout.hpp"
 #include "xtensor_config.hpp"

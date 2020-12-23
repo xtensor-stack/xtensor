@@ -16,7 +16,7 @@
 #include <complex>
 #include <cstdlib>
 
-#include <xtl/xtype_traits.hpp>
+#include "xtl/xtype_traits.hpp"
 
 #include "xmath.hpp"
 #include "xoperation.hpp"

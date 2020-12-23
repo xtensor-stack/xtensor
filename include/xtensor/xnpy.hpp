@@ -14,8 +14,8 @@
 // Derived from https://github.com/llohse/libnpy by Leon Merten Lohse,
 // relicensed from MIT License with permission
 
-#include <xtl/xsequence.hpp>
-#include <xtl/xplatform.hpp>
+#include "xtl/xsequence.hpp"
+#include "xtl/xplatform.hpp"
 
 #include <algorithm>
 #include <complex>

@@ -15,7 +15,7 @@
 #include <limits>
 #include <numeric>
 
-#include <xtl/xsequence.hpp>
+#include "xtl/xsequence.hpp"
 
 #include "xexception.hpp"
 #include "xshape.hpp"

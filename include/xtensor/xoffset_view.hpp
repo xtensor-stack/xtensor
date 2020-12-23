@@ -10,7 +10,7 @@
 #ifndef XTENSOR_OFFSET_VIEW_HPP
 #define XTENSOR_OFFSET_VIEW_HPP
 
-#include <xtl/xcomplex.hpp>
+#include "xtl/xcomplex.hpp"
 
 #include "xtensor/xfunctor_view.hpp"
 

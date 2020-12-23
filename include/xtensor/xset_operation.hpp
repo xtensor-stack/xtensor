@@ -14,7 +14,7 @@
 #include <functional>
 #include <type_traits>
 
-#include <xtl/xsequence.hpp>
+#include "xtl/xsequence.hpp"
 
 #include "xfunction.hpp"
 #include "xutils.hpp"

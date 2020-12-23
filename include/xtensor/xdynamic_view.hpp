@@ -9,8 +9,8 @@
 #ifndef XTENSOR_DYNAMIC_VIEW_HPP
 #define XTENSOR_DYNAMIC_VIEW_HPP
 
-#include <xtl/xsequence.hpp>
-#include <xtl/xvariant.hpp>
+#include "xtl/xsequence.hpp"
+#include "xtl/xvariant.hpp"
 
 #include "xexpression.hpp"
 #include "xiterable.hpp"

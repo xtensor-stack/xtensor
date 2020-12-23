@@ -15,7 +15,7 @@
 #include <utility>
 #include <map>
 
-#include <xtl/xtype_traits.hpp>
+#include "xtl/xtype_traits.hpp"
 
 #include "xstorage.hpp"
 #include "xtensor_config.hpp"

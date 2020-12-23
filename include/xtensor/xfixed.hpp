@@ -16,7 +16,7 @@
 #include <utility>
 #include <vector>
 
-#include <xtl/xsequence.hpp>
+#include "xtl/xsequence.hpp"
 
 #include "xcontainer.hpp"
 #include "xstrides.hpp"

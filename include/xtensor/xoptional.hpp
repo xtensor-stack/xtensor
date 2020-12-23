@@ -13,8 +13,8 @@
 #include <type_traits>
 #include <utility>
 
-#include <xtl/xoptional.hpp>
-#include <xtl/xoptional_sequence.hpp>
+#include "xtl/xoptional.hpp"
+#include "xtl/xoptional_sequence.hpp"
 
 #include "xarray.hpp"
 #include "xbroadcast.hpp"

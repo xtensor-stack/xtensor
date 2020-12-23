@@ -14,8 +14,8 @@
 #include <type_traits>
 #include <utility>
 
-#include <xtl/xcomplex.hpp>
-#include <xtl/xsequence.hpp>
+#include "xtl/xcomplex.hpp"
+#include "xtl/xsequence.hpp"
 
 #include "xexpression.hpp"
 #include "xiterator.hpp"
