@@ -176,10 +176,8 @@ namespace xt
 
         auto n = data.size();
 
-        auto bin_edges = histogram_bin_edges(data, xt::ones<value_type>({ n }), bins);
-
         return detail::histogram_imp(std::forward<E1>(data),
-                                     std::forward<E1>(bin_edges),
+                                     histogram_bin_edges(data, xt::ones<value_type>({ n }), bins),
                                      xt::ones<value_type>({ n }),
                                      density,
                                      true);
@@ -198,10 +196,8 @@ namespace xt
     template <class E1, class E2>
     inline auto histogram(E1&& data, std::size_t bins, E2&& weights, bool density = false)
     {
-        auto bin_edges = histogram_bin_edges(data, weights, bins);
-
         return detail::histogram_imp(std::forward<E1>(data),
-                                     std::forward<E1>(bin_edges),
+                                     histogram_bin_edges(data, weights, bins),
                                      std::forward<E2>(weights),
                                      density,
                                      true);
