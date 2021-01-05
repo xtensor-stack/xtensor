@@ -38,6 +38,15 @@ namespace xt
             EXPECT_EQ(count(0), 2.);
             EXPECT_EQ(count(1), 2.);
         }
+
+        {
+            xt::xarray<double> arr = {1., 1., 2., 2.};
+            xt::xtensor<double, 1> count = xt::histogram(arr, std::size_t(2));
+
+            EXPECT_EQ(count.size(), std::size_t(2) );
+            EXPECT_EQ(count(0), 2.);
+            EXPECT_EQ(count(1), 2.);
+        }
     }
 
     TEST(xhistogram, bincount)
