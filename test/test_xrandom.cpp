@@ -7,6 +7,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
+#include <type_traits>
+
 #include "gtest/gtest.h"
 #include "test_common_macros.hpp"
 #if (defined(__GNUC__) && !defined(__clang__))
@@ -19,6 +21,7 @@
 #endif
 #include "xtensor/xarray.hpp"
 #include "xtensor/xview.hpp"
+#include "xtensor/xset_operation.hpp"
 
 namespace xt
 {
@@ -158,13 +161,26 @@ namespace xt
         auto acr3 = xt::random::choice(a, 5, true);
         ASSERT_EQ(acr1, acr3);
         ASSERT_NE(acr1, acr2);
+    }
 
-        xarray<double> b = {-1, 1};
-        xt::random::seed(42);
-        XT_ASSERT_THROW(xt::random::choice(b, 5, false), std::runtime_error);
-        XT_ASSERT_NO_THROW(xt::random::choice(b, 5, true));
-        xarray<double> multidim_input = { {1,2,3}, {3,4,5} };
-        XT_ASSERT_THROW(xt::random::choice(multidim_input, 5, true), std::runtime_error);
+    TEST(xrandom, weighted_choice)
+    {
+        xarray<int> a = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        xarray<double> w = {1, 0, 2, 0, 1, 0, 1, 0, 2, 0, 1, 0};
+
+        for(bool replace : {true, false}) {
+            xt::random::seed(42);
+            auto ac1 = xt::random::choice(a, 6, w, replace);
+            auto ac2 = xt::random::choice(a, 6, w, replace);
+            xt::random::seed(42);
+            auto ac3 = xt::random::choice(a, 6, w, replace);
+            static_assert(std::is_same<decltype(a)::value_type, decltype(ac1)::value_type>::value,
+                          "Elements must be same type");
+            ASSERT_EQ(ac1, ac3);
+            ASSERT_NE(ac1, ac2);
+            ASSERT_TRUE(all(isin(ac1, a)));
+            ASSERT_TRUE(all(equal(ac1 % 2, 1)));
+        }
     }
 
     TEST(xrandom, shuffle)

@@ -80,7 +80,9 @@ Defined in ``xtensor/xrandom.hpp``
    :project: xtensor
 
 .. _random-choice-function-reference:
-.. doxygenfunction:: xt::random::choice
+.. doxygenfunction:: xt::random::choice(const xexpression<T>&, std::size_t, bool, E&)
+   :project: xtensor
+.. doxygenfunction:: xt::random::choice(const xexpression<T>&, std::size_t, const xexpression<W>&, bool, E&)
    :project: xtensor
 
 .. _random-shuffle-function-reference:

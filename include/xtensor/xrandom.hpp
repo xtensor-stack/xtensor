@@ -14,15 +14,21 @@
 #ifndef XTENSOR_RANDOM_HPP
 #define XTENSOR_RANDOM_HPP
 
+#include <algorithm>
 #include <functional>
 #include <random>
 #include <utility>
+#include <type_traits>
+
+#include <xtl/xspan.hpp>
 
 #include "xbuilder.hpp"
 #include "xgenerator.hpp"
+#include "xindex_view.hpp"
 #include "xtensor.hpp"
 #include "xtensor_config.hpp"
 #include "xview.hpp"
+#include "xmath.hpp"
 
 namespace xt
 {
@@ -179,6 +185,12 @@ namespace xt
 
         template <class T, class E = random::default_engine_type>
         xtensor<typename T::value_type, 1> choice(const xexpression<T>& e, std::size_t n, bool replace = true,
+                                                  E& engine = random::get_default_random_engine());
+
+        template <class T, class W, class E = random::default_engine_type>
+        xtensor<typename T::value_type, 1> choice(const xexpression<T>& e, std::size_t n,
+                                                  const xexpression<W>& weights,
+                                                  bool replace = true,
                                                   E& engine = random::get_default_random_engine());
     }
 
@@ -755,14 +767,8 @@ namespace xt
         xtensor<typename T::value_type, 1> choice(const xexpression<T>& e, std::size_t n, bool replace, E& engine)
         {
             const auto& de = e.derived_cast();
-            if (de.dimension() != 1)
-            {
-                XTENSOR_THROW(std::runtime_error, "Sample expression must be 1 dimensional");
-            }
-            if (de.size() < n && !replace)
-            {
-                XTENSOR_THROW(std::runtime_error, "If replace is false, then the sample expression's size must be > n");
-            }
+            XTENSOR_ASSERT((de.dimension() == 1));
+            XTENSOR_ASSERT((replace || n <= de.size()));
             using result_type = xtensor<typename T::value_type, 1>;
             using size_type = typename result_type::size_type;
             result_type result;
@@ -792,6 +798,87 @@ namespace xt
             }
             return result;
         }
+
+        /**
+         * Weighted random sampling.
+         *
+         * Randomly sample n unique elements from xexpression ``e`` using the discrete distribution parametrized by
+         * the weights ``w``.
+         * When sampling with replacement, this means that the probability to sample element ``e[i]`` is defined as
+         * ``w[i] / sum(w)``.
+         * Without replacement, this only describes the probability of the first sample element.
+         * In successive samples, the weight of items already sampled is assumed to be zero.
+         *
+         * For weighted random sampling with replacement, binary search with cumulative weights alogrithm is used.
+         * For weighted random sampling without replacement, the algorithm used is the exponential sort from
+         * [Efraimidis and Spirakis](https://doi.org/10.1016/j.ipl.2005.11.003) (2006) with the ``weight / randexp(1)``
+         * [trick](https://web.archive.org/web/20201021162211/https://krlmlr.github.io/wrswoR/) from Kirill Müller.
+         *
+         * Note: this function makes a copy of your data, and only 1D data is accepted.
+         *
+         * @param e expression to sample from
+         * @param n number of elements to sample
+         * @param w expression for the weight distribution.
+         *          Weights must be positive and real-valued but need not sum to 1.
+         * @param replace set true to sample with replacement
+         * @param engine random number engine
+         *
+         * @return xtensor containing 1D container of sampled elements
+         */
+        template <class T, class W, class E>
+        xtensor<typename T::value_type, 1>
+        choice(const xexpression<T>& e, std::size_t n, const xexpression<W>& weights, bool replace, E& engine)
+        {
+            const auto& de = e.derived_cast();
+            const auto& dweights = weights.derived_cast();
+            XTENSOR_ASSERT((de.dimension() == 1));
+            XTENSOR_ASSERT((replace || n <= de.size()));
+            XTENSOR_ASSERT((de.size() == dweights.size()));
+            XTENSOR_ASSERT((de.dimension() == dweights.dimension()));
+            XTENSOR_ASSERT(xt::all(dweights >= 0));
+            static_assert(std::is_floating_point<typename W::value_type>::value,
+                          "Weight expression must be of floating point type");
+            using result_type = xtensor<typename T::value_type, 1>;
+            using size_type = typename result_type::size_type;
+            using weight_type = typename W::value_type;
+            result_type result;
+            result.resize({n});
+
+            if (replace)
+            {
+                // Sample u uniformly in the range [0, sum(weights)[
+                // The index idx of the sampled element is such that weight_cumul[idx - 1] <= u < weight_cumul[idx].
+                // Where weight_cumul[-1] is implicitly 0, as the empty sum.
+                const auto wc = eval(cumsum(dweights));
+                std::uniform_real_distribution<weight_type> weight_dist{0, wc[wc.size() - 1]};
+                for(auto& x : result)
+                {
+                    const auto u = weight_dist(engine);
+                    const auto idx = static_cast<size_type>(std::upper_bound(wc.cbegin(), wc.cend(), u) - wc.cbegin());
+                    x = de[idx];
+                }
+
+            }
+            else
+            {
+                // Compute (modified) keys as weight/randexp(1).
+                xtensor<weight_type, 1> keys;
+                keys.resize({dweights.size()});
+                std::exponential_distribution<weight_type> randexp{weight_type(1)};
+                std::transform(dweights.cbegin(), dweights.cend(), keys.begin(),
+                               [&randexp, &engine](auto w){ return w / randexp(engine); });
+
+                // Find indexes for the n biggest key
+                xtensor<size_type, 1> indices = arange<size_type>(0, dweights.size());
+                std::partial_sort(indices.begin(), indices.begin() + n, indices.end(),
+                                  [&keys](auto i, auto j) { return keys[i] > keys[j]; });
+
+                // Return samples with the n biggest keys
+                result = index_view(de, xtl::span<size_type>{indices.data(), n});
+            }
+            return result;
+        }
+
     }
 }
 
