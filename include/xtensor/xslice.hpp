@@ -1381,7 +1381,9 @@ namespace xt
     template <class T>
     inline auto xkeep_slice<T>::operator()(size_type i) const noexcept -> size_type
     {
-        return m_indices[static_cast<std::size_t>(i)];
+        return m_indices.size() == size_type(1) ?
+               m_indices.front() :
+               m_indices[static_cast<std::size_t>(i)];
     }
 
     template <class T>
@@ -1393,6 +1395,10 @@ namespace xt
     template <class T>
     inline auto xkeep_slice<T>::step_size(std::size_t i, std::size_t n) const noexcept -> size_type
     {
+        if (m_indices.size() == 1)
+        {
+            return 0;
+        }
         if (i + n >= m_indices.size())
         {
             return m_indices.back() - m_indices[i] + 1;
