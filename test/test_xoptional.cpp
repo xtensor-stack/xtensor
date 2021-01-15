@@ -474,6 +474,17 @@ namespace xt
         flag_functor_type m_flag_functor;
     };
 
+    TEST(xoptional, cast)
+    {
+        xarray_optional<double> a = {{1.2, 2.3, 3.4},
+                                     {4.5, 5.6, 6.7}};
+        a(1, 2).has_value() = false;
+        auto b = cast<xtl::xoptional<int>>(a);
+        EXPECT_TRUE(b(0,2).has_value());
+        EXPECT_EQ(b(0,2), 3);
+        EXPECT_FALSE(b(1,2).has_value());
+    }
+
     TEST(xoptional, generator)
     {
         using gen_type = xgenerator<opt_func_tester, xtl::xoptional<int, bool>, dynamic_shape<std::size_t>>;
