@@ -313,7 +313,8 @@ namespace xt
     {
         using complex_type = xtl::xcomplex<double>;
         xt::xarray<complex_type> a = xt::ones<complex_type>(std::vector<size_t>(3,7));
-    
+
         auto simd_loaded = a.template load_simd<xt_simd::aligned_mode, complex_type, xt_simd::simd_traits<complex_type>::size>(0);
+        (void)simd_loaded;
     }
 }
