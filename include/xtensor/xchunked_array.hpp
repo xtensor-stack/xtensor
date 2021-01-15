@@ -310,7 +310,7 @@ namespace xt
             }
 
             template <class S1, class S2>
-            static void resize(E& chunks, const S1& container_shape, const S2& chunk_shape, layout_type chunk_memory_layout)
+            static void resize(E& chunks, const S1& container_shape, const S2& /*chunk_shape*/, layout_type /*chunk_memory_layout*/)
             {
                 chunks.resize(container_shape);
             }
