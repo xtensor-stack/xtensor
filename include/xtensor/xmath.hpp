@@ -1890,7 +1890,7 @@ namespace detail {
             const size_type size = e.size();
             XTENSOR_ASSERT(static_cast<size_type>(ddof) <= size);
             auto s = sum<T>(std::forward<E>(e), axes, es);
-            return detail::mean_division<T>(std::move(s), size - static_cast<size_type>(ddof));
+            return mean_division<T>(std::move(s), size - static_cast<size_type>(ddof));
         }
 
         template <class T, class E, class D, class EVS,
@@ -1898,8 +1898,11 @@ namespace detail {
         inline auto mean_noaxis(E&& e, const D& ddof, EVS es)
         {
             using value_type = typename std::conditional_t<std::is_same<T, void>::value, double, T>;
-            const auto size = e.size();
-            return sum<T>(std::forward<E>(e), es) / static_cast<value_type>(size - ddof);
+            using size_type = typename std::decay_t<E>::size_type;
+            const size_type size = e.size();
+            XTENSOR_ASSERT(static_cast<size_type>(ddof) <= size);
+            auto s = sum<T>(std::forward<E>(e), es);
+            return std::move(s) / static_cast<value_type>((size - static_cast<size_type>(ddof)));
         }
     }
 
