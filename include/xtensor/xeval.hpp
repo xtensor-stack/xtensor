@@ -50,15 +50,6 @@ namespace xt
 
     namespace detail
     {
-        /************************************
-         * layout_remove_any implementation *
-         ************************************/
-
-        constexpr layout_type layout_remove_any(const layout_type layout)
-        {
-            return layout == layout_type::any ? XTENSOR_DEFAULT_LAYOUT : layout;
-        }
-
         /**********************************
          * has_same_layout implementation *
          **********************************/
@@ -102,7 +93,7 @@ namespace xt
          ****************************************/
 
         template <class E, layout_type L>
-        using as_xarray_container_t = xarray<typename std::decay_t<E>::value_type, detail::layout_remove_any(L)>;
+        using as_xarray_container_t = xarray<typename std::decay_t<E>::value_type, layout_remove_any(L)>;
 
         /*****************************************
          * as_xtensor_container_t implementation *
@@ -111,7 +102,7 @@ namespace xt
         template <class E, layout_type L>
         using as_xtensor_container_t = xtensor<typename std::decay_t<E>::value_type,
                                                std::tuple_size<typename std::decay_t<E>::shape_type>::value,
-                                               detail::layout_remove_any(L)>;
+                                               layout_remove_any(L)>;
     }
 
     /**
