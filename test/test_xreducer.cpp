@@ -544,8 +544,12 @@ namespace xt
         EXPECT_TRUE(all(equal(mean0, expect0)));
         EXPECT_TRUE(all(equal(mean1, expect1)));
 
+#ifndef SKIP_ON_WERROR
+        // may loose precision because uint8_t is casted to long for intermediate
+        // computations and then divided by a double for mean
         xarray<uint8_t> c = {1, 2};
         EXPECT_EQ(mean(c)(), 1.5);
+#endif
 
         const auto rvalue_xarray = [] () { return xtensor<double, 1>({1, 2}); };
         EXPECT_EQ(mean(rvalue_xarray(), {0})(), 1.5);
