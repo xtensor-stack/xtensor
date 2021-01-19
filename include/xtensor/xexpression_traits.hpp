@@ -180,6 +180,19 @@ namespace xt
 
     template <class... C>
     using common_tensor_type_t = typename common_tensor_type<C...>::type;
+
+    /**************************
+     * big_promote_value_type *
+     **************************/
+
+    template <class E>
+    struct big_promote_value_type
+    {
+        using type = xtl::big_promote_type_t<typename std::decay_t<E>::value_type>;
+    };
+
+    template <class E>
+    using big_promote_value_type_t = typename big_promote_value_type<E>::type;
 }
 
 #endif

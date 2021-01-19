@@ -125,7 +125,7 @@ void check_promoted_types(E&& e)
         CHECK_RESULT_TYPE(2.0 * auchar, double);
         CHECK_RESULT_TYPE(sqrt(auchar), double);
         CHECK_RESULT_TYPE(abs(auchar), unsigned char);
-        CHECK_RESULT_TYPE(sum(auchar), unsigned long long);
+        CHECK_RESULT_TYPE(sum(auchar), int);
         CHECK_RESULT_TYPE(mean(auchar), double);
         CHECK_RESULT_TYPE(minmax(auchar), ARRAY_TYPE(unsigned char));
         CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(auchar);
@@ -141,7 +141,7 @@ void check_promoted_types(E&& e)
         CHECK_RESULT_TYPE(2.0 * ashort, double);
         CHECK_RESULT_TYPE(sqrt(ashort), double);
         CHECK_RESULT_TYPE(abs(ashort), decltype(std::abs(short{})));
-        CHECK_RESULT_TYPE(sum(ashort), long long);
+        CHECK_RESULT_TYPE(sum(ashort), int);
         CHECK_RESULT_TYPE(mean(ashort), double);
         CHECK_RESULT_TYPE(minmax(ashort), ARRAY_TYPE(short));
         CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(ashort);
@@ -157,7 +157,7 @@ void check_promoted_types(E&& e)
         CHECK_RESULT_TYPE(2.0 * aushort, double);
         CHECK_RESULT_TYPE(sqrt(aushort), double);
         CHECK_RESULT_TYPE(abs(aushort), unsigned short);
-        CHECK_RESULT_TYPE(sum(aushort), unsigned long long);
+        CHECK_RESULT_TYPE(sum(aushort), int);
         CHECK_RESULT_TYPE(mean(aushort), double);
         CHECK_RESULT_TYPE(minmax(aushort), ARRAY_TYPE(unsigned short));
         CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aushort);
@@ -173,7 +173,7 @@ void check_promoted_types(E&& e)
         CHECK_RESULT_TYPE(2.0 * aint, double);
         CHECK_RESULT_TYPE(sqrt(aint), double);
         CHECK_RESULT_TYPE(abs(aint), int);
-        CHECK_RESULT_TYPE(sum(aint), long long);
+        CHECK_RESULT_TYPE(sum(aint), int);
         CHECK_RESULT_TYPE(mean(aint), double);
         CHECK_RESULT_TYPE(minmax(aint), ARRAY_TYPE(int));
         CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aint);
@@ -189,7 +189,7 @@ void check_promoted_types(E&& e)
         CHECK_RESULT_TYPE(2.0 * auint, double);
         CHECK_RESULT_TYPE(sqrt(auint), double);
         CHECK_RESULT_TYPE(abs(auint), unsigned int);
-        CHECK_RESULT_TYPE(sum(auint), unsigned long long);
+        CHECK_RESULT_TYPE(sum(auint), unsigned int);
         CHECK_RESULT_TYPE(mean(auint), double);
         CHECK_RESULT_TYPE(minmax(auint), ARRAY_TYPE(unsigned int));
         CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(auint);
@@ -237,7 +237,7 @@ void check_promoted_types(E&& e)
         CHECK_RESULT_TYPE(2.0 * afloat, double);
         CHECK_RESULT_TYPE(sqrt(afloat), float);
         CHECK_RESULT_TYPE(abs(afloat), float);
-        CHECK_RESULT_TYPE(sum(afloat), double);
+        CHECK_RESULT_TYPE(sum(afloat), float);
         CHECK_RESULT_TYPE(mean(afloat), double);
         CHECK_RESULT_TYPE(minmax(afloat), ARRAY_TYPE(float));
         CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(afloat);
@@ -268,7 +268,7 @@ void check_promoted_types(E&& e)
         CHECK_RESULT_TYPE(2.0f * afcomplex, std::complex<float>);
         CHECK_RESULT_TYPE(sqrt(afcomplex), std::complex<float>);
         CHECK_RESULT_TYPE(abs(afcomplex), float);
-        CHECK_RESULT_TYPE(sum(afcomplex), std::complex<double>);
+        CHECK_RESULT_TYPE(sum(afcomplex), std::complex<float>);
         CHECK_RESULT_TYPE(mean(afcomplex), std::complex<double>);
     }
 

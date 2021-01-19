@@ -498,7 +498,7 @@ namespace xt
     {
         // check that there is no overflow
         xarray<uint8_t> c = 2 * ones<uint8_t>({34});
-        EXPECT_EQ(1ULL << 34, prod(c)());
+        EXPECT_EQ(1ULL << 34, prod<long long>(c)());
     }
 
 #define TEST_OPT_PROD(INPUT)                     \
@@ -868,9 +868,9 @@ namespace xt
         EXPECT_TRUE(b_fx_2 == sum(c, {0, 1}));
         EXPECT_EQ(b_fx_3, sum(c, {0, 1, 2}));
 
-        truth = std::is_same<std::decay_t<decltype(b_fx_1)>, xtensor_fixed<long long, xshape<5>>>::value;
+        truth = std::is_same<std::decay_t<decltype(b_fx_1)>, xtensor_fixed<int, xshape<5>>>::value;
         EXPECT_TRUE(truth);
-        truth = std::is_same<std::decay_t<decltype(b_fx_3)>, xtensor_fixed<long long, xshape<>>>::value;
+        truth = std::is_same<std::decay_t<decltype(b_fx_3)>, xtensor_fixed<int, xshape<>>>::value;
         EXPECT_TRUE(truth);
 
         truth = std::is_same<xshape<1, 3>, typename fixed_xreducer_shape_type<xshape<1, 5, 3>, xshape<1>>::type>();
