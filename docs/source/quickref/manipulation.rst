@@ -12,7 +12,7 @@ atleast_Nd
 
 .. code::
 
-    #include "xmanipulation.hpp"
+    #include <xtensor/xmanipulation.hpp>
 
     xt::xarray<int> a0 = 123;
     auto r1 = xt::atleast_1d(a0);
@@ -27,7 +27,7 @@ expand_dims
 
 .. code::
 
-    #include "xmanipulation.hpp"
+    #include <xtensor/xmanipulation.hpp>
 
     xt::xarray<int> a = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
     auto r0 = xt::expand_dims(a, 0);
@@ -39,7 +39,7 @@ flip
 
 .. code::
 
-    #include "xmanipulation.hpp"
+    #include <xtensor/xmanipulation.hpp>
 
     xt::xarray<int> a = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
     auto f0 = xt::flip(a, 0);
@@ -50,7 +50,7 @@ repeat
 
 .. code::
 
-    #include "xmanipulation.hpp"
+    #include <xtensor/xmanipulation.hpp>
 
     xt::xarray<int> a = {{1, 2}, {3, 4}};
     auto r0 = xt::repeat(a, 3, 1);
@@ -61,7 +61,7 @@ roll
 
 .. code::
 
-    #include "xmanipulation.hpp"
+    #include <xtensor/xmanipulation.hpp>
 
     xt::xarray<int> a = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
     auto t0 = xt::roll(a, 2);
@@ -72,7 +72,7 @@ rot90
 
 .. code::
 
-    #include "xmanipulation.hpp"
+    #include <xtensor/xmanipulation.hpp>
 
     xt::xarray<int> a = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
     auto r0 = xt::rot90<1>(a);
@@ -85,7 +85,7 @@ split
 
 .. code::
 
-    #include "xmanipulation.hpp"
+    #include <xtensor/xmanipulation.hpp>
 
     xt::xarray<int> a = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
     auto s0 = xt::split(a, 3);
@@ -96,7 +96,7 @@ hsplit
 
 .. code::
 
-    #include "xmanipulation.hpp"
+    #include <xtensor/xmanipulation.hpp>
 
     xt::xarray<int> a = {{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}};
     auto res = xt::hsplit(a, 2);
@@ -106,7 +106,7 @@ vsplit
 
 .. code::
 
-    #include "xmanipulation.hpp"
+    #include <xtensor/xmanipulation.hpp>
 
     xt::xarray<int> a = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}, {10, 11, 12}};
     auto res = xt::vsplit(a, 2);
@@ -116,7 +116,7 @@ squeeze
 
 .. code::
 
-    #include "xmanipulation.hpp"
+    #include <xtensor/xmanipulation.hpp>
 
     auto b = xt::xarray<double>::from_shape({3, 3, 1, 1, 2, 1, 3});
     auto sq0 = xt::xqueeze(b);
@@ -128,7 +128,7 @@ trim_zeros
 
 .. code::
 
-    #include "xmanipulation.hpp"
+    #include <xtensor/xmanipulation.hpp>
 
     xt::xarray<int> a = {0, 0, 0, 1, 3, 0};
     auto t0 = xt::trim_zeros(a);

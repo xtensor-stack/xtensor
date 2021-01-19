@@ -27,7 +27,7 @@ Tensor with dynamic shape:
 
 .. code::
 
-    #include "xarray.hpp"
+    #include <xtensor/xarray.hpp>
 
     xt::xarray<double>::shape_type shape = {2, 3};
     xt::xarray<double> a0(shape);
@@ -39,7 +39,7 @@ Tensor with static number of dimensions:
 
 .. code::
 
-    #include "xtensor.hpp"
+    #include <xtensor/xtensor.hpp>
 
     xt::xtensor<double, 2>::shape_type shape = {2, 3};
     xt::xtensor<double, 2> a0(shape);
@@ -51,7 +51,7 @@ Tensor with fixed shape:
 
 .. code::
 
-    #include "xfixed.hpp"
+    #include <xtensor/xfixed.hpp>
 
     xt::xtensor_fixed<double, xt::xshape<2, 3>> = {{1., 2., 3.}, {4., 5., 6.}};
 
@@ -59,7 +59,7 @@ In-memory chunked tensor with dynamic shape:
 
 .. code::
 
-    #include "xtensor/xchunked_array.hpp"
+    #include <xtensor/xchunked_array.hpp>
 
     std::vector<std::size_t> shape = {10, 10, 10};
     std::vector<std::size_t> chunk_shape = {2, 3, 4};
@@ -70,10 +70,10 @@ Output
 
 .. code::
 
-    #include "xarray.hpp"
-    #include "xfixed.hpp"
-    #include "xio.hpp"
-    #include "xtensor.hpp"
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xfixed.hpp>
+    #include <xtensor/xio.hpp>
+    #include <xtensor/xtensor.hpp>
 
     xt::xarray<double> a = {{1., 2.}, {3., 4.}};
     std::cout << a << std::endl;

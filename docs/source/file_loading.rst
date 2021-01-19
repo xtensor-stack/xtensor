@@ -28,8 +28,8 @@ save data in the Comma-separated value format. The reference documentation is :d
     #include <fstream>
     #include <iostream>
 
-    #include "xtensor/xarray.hpp"
-    #include "xtensor/xcsv.hpp"
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xcsv.hpp>
 
     int main()
     {
@@ -59,8 +59,8 @@ Reference documentation for the functions used is found here :doc:`api/xnpy`.
     #include <iostream>
     #include <fstream>
 
-    #include "xtensor/xarray.hpp"
-    #include "xtensor/xnpy.hpp"
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xnpy.hpp>
 
     int main()
     {
@@ -85,8 +85,8 @@ The reference documentation is found :doc:`api/xjson`.
 
 .. code::
 
-    #include "xtensor/xjson.hpp"
-    #include "xtensor/xarray.hpp"
+    #include <xtensor/xjson.hpp>
+    #include <xtensor/xarray.hpp>
 
     int main()
     {

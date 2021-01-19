@@ -36,10 +36,10 @@ Example 1: Use an algorithm of the C++ library on a numpy array in-place
 .. code::
 
     #include <numeric>                        // Standard library import for std::accumulate
-    #include "pybind11/pybind11.h"            // Pybind11 import to define Python bindings
-    #include "xtensor/xmath.hpp"              // xtensor import for the C++ universal functions
+    #include <pybind11/pybind11.h>            // Pybind11 import to define Python bindings
+    #include <xtensor/xmath.hpp>              // xtensor import for the C++ universal functions
     #define FORCE_IMPORT_ARRAY                // numpy C api loading
-    #include "xtensor-python/pyarray.hpp"     // Numpy bindings
+    #include <xtensor-python/pyarray.hpp>     // Numpy bindings
 
     double sum_of_sines(xt::pyarray<double> &m)
     {
@@ -84,9 +84,9 @@ Example 2: Create a universal function from a C++ scalar function
 
 .. code::
 
-    #include "pybind11/pybind11.h"
+    #include <pybind11/pybind11.h>
     #define FORCE_IMPORT_ARRAY
-    #include "xtensor-python/pyvectorize.hpp"
+    #include <xtensor-python/pyvectorize.hpp>
     #include <numeric>
     #include <cmath>
 
@@ -168,8 +168,8 @@ Example 1: Use an algorithm of the C++ library with a Julia array
 
     #include <numeric>                        // Standard library import for std::accumulate
     #include <cxx_wrap.hpp>                   // CxxWrap import to define Julia bindings
-    #include "xtensor-julia/jltensor.hpp"     // Import the jltensor container definition
-    #include "xtensor/xmath.hpp"              // xtensor import for the C++ universal functions
+    #include <xtensor-julia/jltensor.hpp>     // Import the jltensor container definition
+    #include <xtensor/xmath.hpp>              // xtensor import for the C++ universal functions
 
     double sum_of_sines(xt::jltensor<double, 2> m)
     {
@@ -208,7 +208,7 @@ Example 2: Create a numpy-style universal function from a C++ scalar function
 .. code::
 
     #include <cxx_wrap.hpp>
-    #include "xtensor-julia/jlvectorize.hpp"
+    #include <xtensor-julia/jlvectorize.hpp>
 
     double scalar_func(double i, double j)
     {
@@ -280,8 +280,8 @@ Example 1: Use an algorithm of the C++ library on a R array in-place
 .. code::
 
     #include <numeric>                    // Standard library import for std::accumulate
-    #include "xtensor/xmath.hpp"          // xtensor import for the C++ universal functions
-    #include "xtensor-r/rarray.hpp"       // R bindings
+    #include <xtensor/xmath.hpp>          // xtensor import for the C++ universal functions
+    #include <xtensor-r/rarray.hpp>       // R bindings
     #include <Rcpp.h>
 
     using namespace Rcpp;
