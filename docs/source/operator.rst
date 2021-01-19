@@ -218,6 +218,39 @@ the evaluation and get the result:
     xt::xarray<double> arr = some_init_function({3, 2, 4, 6, 5});
     double res = xt::reduce([](double a, double b) { return a*a + b*b; }, arr)();
 
+The ``value_type`` of a reducer is the traditional result type of the reducing operation. For instance,
+the ``value_type`` of the reducer for the sum is:
+
+- ``int`` if the underlying expression holds ``int`` values
+- ``int`` if the underlying expression holds ``short`` values, because ``short + short`` = ``int``
+
+You can pass a template argument to the reducer functions to specify the type of the initial value of
+the reduction. This allows you to "promote" the value type of the reducer and limit overflows in
+computation:
+
+.. code::
+
+    #include "xtensor/xarray.hpp"
+    #include "xtensor/xreducer.hpp"
+
+    xt::xarray<int> arr = some_init_function({3, 2, 4, 6, 5});
+    auto s1 = xt::sum<short>(arr); // No effect, short + int = int
+    auto s2 = xt::sum<long int>(arr); // The value_type of s2 is long int
+
+When you write generic code and you want to limit overflows, you can use ``xt::big_promote_value_type_t``
+as shown below:
+
+.. code::
+
+    #include "xtensor/xarray.hpp"
+    #include "xtensor/xreducer.hpp"
+    
+    template <class E>
+    void my_computation(E&& e)
+    {
+        auto s = xt::sum<xt::big_promote_value_type_t<E>>(e);
+    }
+
 Accumulators
 ------------
 
