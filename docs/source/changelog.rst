@@ -7,6 +7,63 @@
 Changelog
 =========
 
+0.22.0
+------
+
+Breaking changes
+~~~~~~~~~~~~~~~~
+
+- Drop support of 3.* Clang versions
+  `#2251 <https://github.com/xtensor-stack/xtensor/pull/2251>`_
+- Fix reducers assignment
+  `#2254 <https://github.com/xtensor-stack/xtensor/pull/2254>`_
+- Removed reducer ``big_promote_type``
+  `#2277 <https://github.com/xtensor-stack/xtensor/pull/2277>`_
+
+Other changes
+~~~~~~~~~~~~~
+
+- Improve histogram performance with equal bin sizes
+  `#2088 <https://github.com/xtensor-stack/xtensor/pull/2088>`_
+- Added missing header in xfixed
+  `#2225 <https://github.com/xtensor-stack/xtensor/pull/2225>`_
+- Implement xt::random::choice with weights vector
+  `#2241 <https://github.com/xtensor-stack/xtensor/pull/2241>`_
+- Testing alignment
+  `#2246 <https://github.com/xtensor-stack/xtensor/pull/2246>`_
+- Add reducers tests 
+  `#2252 <https://github.com/xtensor-stack/xtensor/pull/2252>`_
+- Fix binary operators on complex
+  `#2253 <https://github.com/xtensor-stack/xtensor/pull/2253>`_
+- Removed not implemented assign method from xchunked_array
+  `#2256 <https://github.com/xtensor-stack/xtensor/pull/2256>`_
+- Support initialized list for chunked_array shapes
+  `#2258 <https://github.com/xtensor-stack/xtensor/pull/2258>`_
+- Add as_strided free function
+  `#2261 <https://github.com/xtensor-stack/xtensor/pull/2261>`_
+- Fix histogram compatibility with containers beyond xtensor
+  `#2263 <https://github.com/xtensor-stack/xtensor/pull/2263>`_
+- Fixed broadcasting with keep_slice that holds a single element
+  `#2270 <https://github.com/xtensor-stack/xtensor/pull/2270>`_
+- Make xt::cast and xtl::optional compatible
+  `#2271 <https://github.com/xtensor-stack/xtensor/pull/2271>`_
+- Fix minor warnings detected by clang
+  `#2272 <https://github.com/xtensor-stack/xtensor/pull/2272>`_
+- Extra assert in mean computation wrt. ddof
+  `#2273 <https://github.com/xtensor-stack/xtensor/pull/2273>`_
+- Provide a -Werror mode and ensure xtensor passes with it
+  `#2274 <https://github.com/xtensor-stack/xtensor/pull/2274>`_
+- Moved layout_remove_any to xlayout.hpp
+  `#2275 <https://github.com/xtensor-stack/xtensor/pull/2275>`_
+- Provide a -Werror mode and ensure xtensor passes with it
+  `#2274 <https://github.com/xtensor-stack/xtensor/pull/2274>`_
+- Slight reorganization of the documentation
+  `#2276 <https://github.com/xtensor-stack/xtensor/pull/2276>`_
+- Updated reducer docs according to recent changes
+  `#2278 <https://github.com/xtensor-stack/xtensor/pull/2278>`_
+- Added template parameter for initial value type in accumulators 
+  `#2279 <https://github.com/xtensor-stack/xtensor/pull/2279>`_
+
 0.21.10
 -------
 

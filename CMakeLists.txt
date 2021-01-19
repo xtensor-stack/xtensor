@@ -29,7 +29,7 @@ message(STATUS "Building xtensor v${${PROJECT_NAME}_VERSION}")
 # Dependencies
 # ============
 
-set(xtl_REQUIRED_VERSION 0.6.16)
+set(xtl_REQUIRED_VERSION 0.6.23)
 if(TARGET xtl)
     set(xtl_VERSION ${XTL_VERSION_MAJOR}.${XTL_VERSION_MINOR}.${XTL_VERSION_PATCH})
     # Note: This is not SEMVER compatible comparison
