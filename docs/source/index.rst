@@ -69,8 +69,7 @@ for details.
    missing
    histogram
    random
-   sfinae
-   xsimd
+   rank
    file_loading
    build-options
    pitfall
