@@ -179,7 +179,7 @@ strides based on the shape and the layout, so the implementation of the ``resize
 
 .. code::
 
-    #include "xtensor/xstrides.hpp" // for utility functions
+    #include <xtensor/xstrides.hpp> // for utility functions
 
     template <class T>
     void resize(const shape_type& shape)

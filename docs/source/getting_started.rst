@@ -16,9 +16,9 @@ First example
 .. code::
 
     #include <iostream>
-    #include "xtensor/xarray.hpp"
-    #include "xtensor/xio.hpp"
-    #include "xtensor/xview.hpp"
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xio.hpp>
+    #include <xtensor/xview.hpp>
 
     int main(int argc, char* argv[])
     {
@@ -142,8 +142,8 @@ This second example initializes a 1-dimensional array and reshapes it in-place:
 .. code::
 
     #include <iostream>
-    #include "xtensor/xarray.hpp"
-    #include "xtensor/xio.hpp"
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xio.hpp>
 
     int main(int argc, char* argv[])
     {
@@ -177,7 +177,7 @@ When compiled and run, this produces the following output:
 
   .. code-block:: cpp
 
-      std::cout << xt::adapt(arr.shape()); // with: #include "xtensor/xadapt.hpp"
+      std::cout << xt::adapt(arr.shape()); // with: #include <xtensor/xadapt.hpp>
 
 Third example: index access
 ---------------------------
@@ -185,8 +185,8 @@ Third example: index access
 .. code::
 
     #include <iostream>
-    #include "xtensor/xarray.hpp"
-    #include "xtensor/xio.hpp"
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xio.hpp>
 
     int main(int argc, char* argv[])
     {
@@ -219,9 +219,9 @@ This last example shows how to broadcast the ``xt::pow`` universal function:
 .. code::
 
     #include <iostream>
-    #include "xtensor/xarray.hpp"
-    #include "xtensor/xmath.hpp"
-    #include "xtensor/xio.hpp"
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xmath.hpp>
+    #include <xtensor/xio.hpp>
 
     int main(int argc, char* argv[])
     {

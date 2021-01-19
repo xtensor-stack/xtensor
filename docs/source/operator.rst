@@ -58,7 +58,7 @@ and an element-wise ternary function (similar to the ``: ?`` ternary operator):
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
+    #include <xtensor/xarray.hpp>
 
     xt::xarray<bool> b = { false, true, true, false };
     xt::xarray<int> a1 = { 1,   2,  3,  4 };
@@ -86,7 +86,7 @@ C++ inequality operators: they are element-wise operators returning boolean
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
+    #include <xtensor/xarray.hpp>
 
     xt::xarray<int> a1 = {  1, 12,  3, 14 };
     xt::xarray<int> a2 = { 11,  2, 13, 4  };
@@ -103,7 +103,7 @@ function.
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
+    #include <xtensor/xarray.hpp>
 
     xt::xarray<int> a1 = {  1,  2, 3, 4};
     xt::xarray<int> a2 = { 11, 12, 3, 4};
@@ -151,7 +151,7 @@ performed via ``cast``, which performs an element-wise ``static_cast``.
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
+    #include <xtensor/xarray.hpp>
 
     xt::xarray<int> a = { 3, 5, 7 };
 
@@ -171,8 +171,8 @@ axes removed.
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
-    #include "xtensor/xmath.hpp"
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xmath.hpp>
 
     xt::xarray<double> a = xt::ones<double>({3, 2, 4, 6, 5});
     xt::xarray<double> res = xt::sum(a, {1, 3});
@@ -183,8 +183,8 @@ You can also call the ``reduce`` generator with your own reducing function:
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
-    #include "xtensor/xreducer.hpp"
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xreducer.hpp>
 
     xt::xarray<double> arr = some_init_function({3, 2, 4, 6, 5});
     xt::xarray<double> res = xt::reduce([](double a, double b) { return a*a + b*b; },
@@ -197,8 +197,8 @@ build the ``xreducer_functors`` object, the last function can be omitted:
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
-    #include "xtensor/xreducer.hpp"
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xreducer.hpp>
 
     xt::xarray<double> arr = some_init_function({3, 2, 4, 6, 5});
     xt::xarray<double> res = xt::reduce(xt::make_xreducer_functor([](double a, double b) { return a*a + b*b; },
@@ -212,8 +212,8 @@ the evaluation and get the result:
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
-    #include "xtensor/xreducer.hpp"
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xreducer.hpp>
 
     xt::xarray<double> arr = some_init_function({3, 2, 4, 6, 5});
     double res = xt::reduce([](double a, double b) { return a*a + b*b; }, arr)();
@@ -230,8 +230,8 @@ computation:
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
-    #include "xtensor/xreducer.hpp"
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xreducer.hpp>
 
     xt::xarray<int> arr = some_init_function({3, 2, 4, 6, 5});
     auto s1 = xt::sum<short>(arr); // No effect, short + int = int
@@ -242,8 +242,8 @@ as shown below:
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
-    #include "xtensor/xreducer.hpp"
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xreducer.hpp>
     
     template <class E>
     void my_computation(E&& e)
@@ -262,8 +262,8 @@ or ``xtensor``.
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
-    #include "xtensor/xmath.hpp"
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xmath.hpp>
 
     xt::xarray<double> a = xt::ones<double>({5, 8, 3});
     xt::xarray<double> res = xt::cumsum(a, 1);
@@ -276,8 +276,8 @@ function. For example, the implementation of cumsum is as follows:
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
-    #include "xtensor/xaccumulator.hpp"
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xaccumulator.hpp>
 
     xt::xarray<double> arr = some_init_function({5, 5, 5});
     xt::xarray<double> res = xt::accumulate([](double a, double b) { return a + b; },
@@ -290,8 +290,8 @@ with the same rules as those for reducers:
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
-    #include "xtensor/xaccumulator.hpp"
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xaccumulator.hpp>
 
     xt::xarray<int> arr = some_init_function({5, 5, 5});
     auto r1 = xt::cumsum<short>(a, 1);
@@ -320,8 +320,8 @@ Choosing an evaluation_strategy is straightforward. For reducers:
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
-    #include "xtensor/xreducer.hpp"
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xreducer.hpp>
 
     xt::xarray<double> a = xt::ones<double>({3, 2, 4, 6, 5});
     auto res = xt::sum(a, {1, 3}, xt::evaluation_strategy::immediate);
@@ -348,8 +348,8 @@ arguments:
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
-    #include "xtensor/xvectorize.hpp"
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xvectorize.hpp>
 
     int f(int a, int b)
     {

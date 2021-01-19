@@ -33,7 +33,7 @@ An in-memory chunked array has the following type:
 
 .. code::
 
-    #include "xtensor/xchunked_array.hpp"
+    #include <xtensor/xchunked_array.hpp>
 
     using data_type = double;
     // don't use this code:
@@ -44,7 +44,7 @@ use the `chunked_array` factory function:
 
 .. code::
 
-    #include "xtensor/xchunked_array.hpp"
+    #include <xtensor/xchunked_array.hpp>
 
     std::vector<std::size_t> shape = {10, 10, 10};
     std::vector<std::size_t> chunk_shape = {2, 3, 4};

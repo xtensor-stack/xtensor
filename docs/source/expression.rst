@@ -126,7 +126,7 @@ You can access the elements of any ``xexpression`` with ``operator()``:
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
+    #include <xtensor/xarray.hpp>
 
     xt::xarray<double> a = {{1., 2., 3.}, {4., 5., 6.}};
     auto f = 2 * a;
@@ -143,7 +143,7 @@ of the expression:
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
+    #include <xtensor/xarray.hpp>
 
     xt::xarray<double> a = {{1., 2., 3.}, {4., 5., 6.}};
 
@@ -167,7 +167,7 @@ Shape
 .. code::
 
     #include <vector>
-    #include "xtensor/xarray.hpp"
+    #include <xtensor/xarray.hpp>
 
     using array_type = xt::xarray<double>;
     using shape_type = array_type::shape_type;

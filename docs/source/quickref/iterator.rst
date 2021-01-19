@@ -14,7 +14,7 @@ Default iteration
 
     #include <iostream>
     #include <iterator>
-    #include "xarray.hpp"
+    #include <xtensor/xarray.hpp>
 
     xt::xarray<int> a = {{1, 2, 3}, {4, 5, 6}};
     std::copy(a.begin(), a.end(), std::ostream_iterator<int>(std::cout, ", "));
@@ -27,7 +27,7 @@ Specified traversal order
 
     #include <iostream>
     #include <iterator>
-    #include "xarray.hpp"
+    #include <xtensor/xarray.hpp>
 
     xt::xarray<int> a = {{1, 2, 3}, {4, 5, 6}};
     std::copy(a.begin<layout_type::row_major>(),
@@ -47,7 +47,7 @@ Broacasting iteration
 
     #include <iostream>
     #include <iterator>
-    #include "xarray.hpp"
+    #include <xtensor/xarray.hpp>
 
     xt::xarray<int> a = {{1, 2, 3}, {4, 5, 6}};
     using shape_type = xt::dynamic_shape<std::size_t>;
@@ -73,9 +73,9 @@ Iterating over axis 0:
 
 .. code::
 
-    #include "xarray.hpp"
-    #include "xaxis_slice_iterator.hpp"
-    #include "xio.hpp"
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xaxis_slice_iterator.hpp>
+    #include <xtensor/xio.hpp>
 
     xarray<int> a = {{{1, 2, 3, 4},
                       {5, 6, 7, 8},
@@ -108,9 +108,9 @@ Iterating over axis 1:
 
 .. code::
 
-    #include "xarray.hpp"
-    #include "xaxis_slice_iterator.hpp"
-    #include "xio.hpp"
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xaxis_slice_iterator.hpp>
+    #include <xtensor/xio.hpp>
 
     xarray<int> a = {{{1, 2, 3, 4},
                       {5, 6, 7, 8},
@@ -139,9 +139,9 @@ Iterating over axis 2:
 
 .. code::
 
-    #include "xarray.hpp"
-    #include "xaxis_slice_iterator.hpp"
-    #include "xio.hpp"
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xaxis_slice_iterator.hpp>
+    #include <xtensor/xio.hpp>
 
     xarray<int> a = {{{1, 2, 3, 4},
                       {5, 6, 7, 8},
@@ -171,9 +171,9 @@ Iterating over axis 0:
 
 .. code::
 
-    #include "xarray.hpp"
-    #include "xaxis_iterator.hpp"
-    #include "xio.hpp"
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xaxis_iterator.hpp>
+    #include <xtensor/xio.hpp>
 
     xarray<int> a = {{{1, 2, 3, 4},
                       {5, 6, 7, 8},
@@ -200,9 +200,9 @@ Iterating over axis 1:
 
 .. code::
 
-    #include "xarray.hpp"
-    #include "xaxis_iterator.hpp"
-    #include "xio.hpp"
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xaxis_iterator.hpp>
+    #include <xtensor/xio.hpp>
 
     xarray<int> a = {{{1, 2, 3, 4},
                       {5, 6, 7, 8},
@@ -229,9 +229,9 @@ Iterating over axis 2:
 
 .. code::
 
-    #include "xarray.hpp"
-    #include "xaxis_iterator.hpp"
-    #include "xio.hpp"
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xaxis_iterator.hpp>
+    #include <xtensor/xio.hpp>
 
     xarray<int> a = {{{1, 2, 3, 4},
                       {5, 6, 7, 8},
