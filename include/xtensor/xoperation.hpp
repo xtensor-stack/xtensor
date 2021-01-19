@@ -49,6 +49,20 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const std::complex<T2>&
 {                                                                                         \
     using result_type = typename xtl::promote_type_t<std::complex<T1>, std::complex<T2>>; \
     return (result_type(arg1) OP result_type(arg2));                                      \
+}                                                                                         \
+                                                                                          \
+template <class T1, class T2, XTL_REQUIRES(xtl::negation<std::is_same<T1, T2>>)>          \
+constexpr auto operator OP(const T1& arg1, const std::complex<T2>& arg2)                  \
+{                                                                                         \
+    using result_type = typename xtl::promote_type_t<T1, std::complex<T2>>;               \
+    return (result_type(arg1) OP result_type(arg2));                                      \
+}                                                                                         \
+                                                                                          \
+template <class T1, class T2, XTL_REQUIRES(xtl::negation<std::is_same<T1, T2>>)>          \
+constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)                  \
+{                                                                                         \
+    using result_type = typename xtl::promote_type_t<std::complex<T1>, T2>;               \
+    return (result_type(arg1) OP result_type(arg2));                                      \
 }
 
 #define BINARY_OPERATOR_FUNCTOR(NAME, OP)                                        \
