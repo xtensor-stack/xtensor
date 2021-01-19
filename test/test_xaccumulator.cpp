@@ -25,7 +25,7 @@ namespace xt
         xt::xarray<int> expected = { 1, 3, 6, 10};
         auto no_axis = cumsum(a);
         auto with_axis = cumsum(a, 0);
-        bool promotion_works = std::is_same<decltype(no_axis)::value_type, short>::value;
+        bool promotion_works = std::is_same<decltype(no_axis)::value_type, int>::value;
         EXPECT_TRUE(promotion_works);
         EXPECT_TRUE(all(equal(no_axis, expected)));
 

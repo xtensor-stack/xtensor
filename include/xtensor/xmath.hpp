@@ -2357,37 +2357,6 @@ namespace detail {
         return detail::make_xfunction<detail::nan_to_num_functor>(std::forward<E>(e));
     }
 
-#define XTENSOR_NAN_REDUCER_FUNCTION(NAME, FUNCTOR, RESULT_TYPE, NAN)                                             \
-    template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,                            \
-              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>)>                                                 \
-    inline auto NAME(E&& e, X&& axes, EVS es = EVS())                                                             \
-    {                                                                                                             \
-        using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
-        using functor_type = FUNCTOR<result_type>;                                                                \
-        using init_functor_type = detail::nan_init<result_type, NAN>;                                             \
-        return xt::reduce(make_xreducer_functor(functor_type(), init_functor_type()), std::forward<E>(e),         \
-                      std::forward<X>(axes), es);                                                                 \
-    }                                                                                                             \
-                                                                                                                  \
-    template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,                                     \
-              XTL_REQUIRES(is_reducer_options<EVS>)>                                                              \
-    inline auto NAME(E&& e, EVS es = EVS())                                                                       \
-    {                                                                                                             \
-        using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
-        using functor_type = FUNCTOR<result_type>;                                                                \
-        using init_functor_type = detail::nan_init<result_type, NAN>;                                             \
-        return xt::reduce(make_xreducer_functor(functor_type(), init_functor_type()), std::forward<E>(e), es);    \
-    }                                                                                                             \
-                                                                                                                  \
-    template <class T = void, class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>             \
-    inline auto NAME(E&& e, const I (&axes)[N], EVS es = EVS())                                                   \
-    {                                                                                                             \
-        using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
-        using functor_type = FUNCTOR<result_type>;                                                                \
-        using init_functor_type = detail::nan_init<result_type, NAN>;                                             \
-        return xt::reduce(make_xreducer_functor(functor_type(), init_functor_type()), std::forward<E>(e), axes, es);  \
-    }
-
     /**
      * @ingroup nan_functions
      * @brief Sum of elements over given axes, replacing nan with 0.
@@ -2397,7 +2366,9 @@ namespace detail {
      * @param e an \ref xexpression
      * @param axes the axes along which the sum is performed (optional)
      * @param es evaluation strategy of the reducer (optional)
-     * @tparam T the result type. The default is `E::value_type`.
+     * @tparam T the value type used for internal computation. The default is
+     *           `E::value_type`. `T` is also used for determining the value type
+     *           of the result, which is the type of `T() + E::value_type()`.
      *           You can pass `big_promote_value_type_t<E>` to avoid overflow in computation.
      * @return an \ref xreducer
      */
@@ -2412,13 +2383,13 @@ namespace detail {
      * @param e an \ref xexpression
      * @param axes the axes along which the sum is performed (optional)
      * @param es evaluation strategy of the reducer (optional)
-     * @tparam T the result type. The default is `E::value_type`.
+     * @tparam T the value type used for internal computation. The default is
+     *           `E::value_type`. `T` is also used for determining the value type
+     *           of the result, which is the type of `T() * E::value_type()`.
      *           You can pass `big_promote_value_type_t<E>` to avoid overflow in computation.
      * @return an \ref xreducer
      */
     XTENSOR_REDUCER_FUNCTION(nanprod, detail::nan_multiplies, typename std::decay_t<E>::value_type, 1)
-
-#undef XTENSOR_NAN_REDUCER_FUNCTION
 
 #define COUNT_NON_ZEROS_CONTENT                                                             \
     using value_type = typename std::decay_t<E>::value_type;                                \
@@ -2507,7 +2478,9 @@ namespace detail {
      * \em axis, replacing nan with 0.
      * @param e an \ref xexpression
      * @param axis the axis along which the elements are accumulated (optional)
-     * @tparam T the result type. The default is `E::value_type`.
+     * @tparam T the value type used for internal computation. The default is
+     *           `E::value_type`. `T` is also used for determining the value type
+     *           of the result, which is the type of `T() + E::value_type()`.
      *           You can pass `big_promote_value_type_t<E>` to avoid overflow in computation.
      * @return an xaccumulator
      */
@@ -2533,7 +2506,9 @@ namespace detail {
      * \em axis, replacing nan with 1.
      * @param e an \ref xexpression
      * @param axis the axis along which the elements are accumulated (optional)
-     * @tparam T the result type. The default is `E::value_type`.
+     * @tparam T the value type used for internal computation. The default is
+     *           `E::value_type`. `T` is also used for determining the value type
+     *           of the result, which is the type of `T() * E::value_type()`.
      *           You can pass `big_promote_value_type_t<E>` to avoid overflow in computation.
      * @return an xaccumulator
      */
