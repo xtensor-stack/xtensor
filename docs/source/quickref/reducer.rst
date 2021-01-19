@@ -34,9 +34,9 @@ Sum
     // r4 holds long int values
 
     auto r5 = xt::sum<short>(a, {1});
-    // r5 hols int values
+    // r5 holds int values
 
-    auto r6 = xt::sum<xt::big_promote_value_type<decltype(a)>>(a, {1});
+    auto r6 = xt::sum<xt::big_promote_value_type_t<decltype(a)>>(a, {1});
     // r6 holds long long int values
 
 Prod
@@ -50,7 +50,7 @@ Prod
     int r2 = xt::prod(a)();
     auto r3 = xt::prod(a, {0});
     auro r4 = xt::prod<long int>(a, {0});
-    auto r5 = xt::prod<xt::big_promote_value_type<decltype(a)>>(a, {1});
+    auto r5 = xt::prod<xt::big_promote_value_type_t<decltype(a)>>(a, {1});
 
 Mean
 ----

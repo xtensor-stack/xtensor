@@ -199,7 +199,12 @@ namespace xt
         {
             using init_type = typename F::init_value_type;
             using init_functor_type = typename F::init_functor_type;
-            using return_type = std::conditional_t<std::is_same<init_type, void>::value, typename std::decay_t<E>::value_type, init_type>;
+            using accumulate_functor_type = typename F::accumulate_functor_type;
+            using expr_value_type = typename std::decay_t<E>::value_type;
+            //using return_type = std::conditional_t<std::is_same<init_type, void>::value, typename std::decay_t<E>::value_type, init_type>;
+            
+            using return_type = std::decay_t<decltype(std::declval<accumulate_functor_type>()(std::declval<init_type>(),
+                                                                                              std::declval<expr_value_type>()))>;
             using result_type = xaccumulator_return_type_t<std::decay_t<E>, return_type>;
 
             if (axis >= e.dimension())
@@ -267,7 +272,11 @@ namespace xt
         inline auto accumulator_impl(F&& f, E&& e, evaluation_strategy::immediate_type)
         {
             using init_type = typename F::init_value_type;
-            using return_type = std::conditional_t<std::is_same<init_type, void>::value, typename std::decay_t<E>::value_type, init_type>;
+            using expr_value_type = typename std::decay_t<E>::value_type;
+            using accumulate_functor_type = typename F::accumulate_functor_type;
+            using return_type = std::decay_t<decltype(std::declval<accumulate_functor_type>()(std::declval<init_type>(),
+                                                                                              std::declval<expr_value_type>()))>;
+            //using return_type = std::conditional_t<std::is_same<init_type, void>::value, typename std::decay_t<E>::value_type, init_type>;
             using result_type = xaccumulator_return_type_t<std::decay_t<E>, return_type>;
 
             std::size_t sz = e.size();

@@ -284,6 +284,21 @@ function. For example, the implementation of cumsum is as follows:
                                             arr,
                                             1);
 
+Like reducers, accumulators accept a template parameter to specify the ``value_type``
+of the initial value of the accumulation. The ``value_type`` of the result is computed
+with the same rules as those for reducers:
+
+.. code::
+
+    #include "xtensor/xarray.hpp"
+    #include "xtensor/xaccumulator.hpp"
+
+    xt::xarray<int> arr = some_init_function({5, 5, 5});
+    auto r1 = xt::cumsum<short>(a, 1);
+    // r1 holds int values
+    auto r2 = xt::cumsum<long int>(a, 1);
+    // r2 hols long int values
+
 Evaluation strategy
 -------------------
 
