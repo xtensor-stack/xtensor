@@ -7,6 +7,25 @@
 Changelog
 =========
 
+0.23.0
+------
+
+Breaking changes
+~~~~~~~~~~~~~~~~
+
+- Remove chunked array extension mechanism
+  `#2283 <https://github.com/xtensor-stack/xtensor/pull/2283>`_
+- Upgraded to xtl 0.7.0 
+  `#2284 <https://github.com/xtensor-stack/xtensor/pull/2284>`_
+
+Other changes
+~~~~~~~~~~~~~
+
+- Harmonize #include statements in doc
+  `#2280 <https://github.com/xtensor-stack/xtensor/pull/2280>`_
+- Added missing shape_type in xfunctor_stepper
+  `#2285 <https://github.com/xtensor-stack/xtensor/pull/2285>`_
+
 0.22.0
 ------
 
