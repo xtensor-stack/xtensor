@@ -68,36 +68,33 @@ namespace xt
      * xchunked_array declaration *
      ******************************/
 
-    class empty_extension {};
-
-    template <class chunk_storage, class extension = empty_extension>
+    template <class chunk_storage>
     class xchunked_array;
 
-    template <class chunk_storage, class extension>
-    struct xcontainer_inner_types<xchunked_array<chunk_storage, extension>>
+    template <class chunk_storage>
+    struct xcontainer_inner_types<xchunked_array<chunk_storage>>
     {
         using chunk_type = typename chunk_storage::value_type;
         using const_reference = typename chunk_type::const_reference;
         using reference = typename chunk_type::reference;
         using size_type = std::size_t;
         using storage_type = chunk_type;
-        using temporary_type = xchunked_array<chunk_storage, extension>;
+        using temporary_type = xchunked_array<chunk_storage>;
     };
 
-    template <class chunk_storage, class extension>
-    struct xiterable_inner_types<xchunked_array<chunk_storage, extension>>
+    template <class chunk_storage>
+    struct xiterable_inner_types<xchunked_array<chunk_storage>>
     {
         using chunk_type = typename chunk_storage::value_type;
         using inner_shape_type = typename chunk_type::shape_type;
-        using const_stepper = xindexed_stepper<xchunked_array<chunk_storage, extension>, true>;
-        using stepper = xindexed_stepper<xchunked_array<chunk_storage, extension>, false>;
+        using const_stepper = xindexed_stepper<xchunked_array<chunk_storage>, true>;
+        using stepper = xindexed_stepper<xchunked_array<chunk_storage>, false>;
     };
 
-    template <class chunk_storage, class extension>
-    class xchunked_array: public xaccessible<xchunked_array<chunk_storage, extension>>,
-                          public xiterable<xchunked_array<chunk_storage, extension>>,
-                          public xchunked_semantic<xchunked_array<chunk_storage, extension>>,
-                          public extension
+    template <class chunk_storage>
+    class xchunked_array: public xaccessible<xchunked_array<chunk_storage>>,
+                          public xiterable<xchunked_array<chunk_storage>>,
+                          public xchunked_semantic<xchunked_array<chunk_storage>>
     {
     public:
 
@@ -105,7 +102,7 @@ namespace xt
         using chunk_type = typename chunk_storage::value_type;
         using const_reference = typename chunk_type::const_reference;
         using reference = typename chunk_type::reference;
-        using self_type = xchunked_array<chunk_storage, extension>;
+        using self_type = xchunked_array<chunk_storage>;
         using semantic_base = xchunked_semantic<self_type>;
         using iterable_base = xconst_iterable<self_type>;
         using const_stepper = typename iterable_base::const_stepper;
@@ -223,7 +220,6 @@ namespace xt
      *
      * @tparam T The type of the elements (e.g. double)
      * @tparam L The layout_type of the array
-     * @tparam EXT The type of the array extension (default: empty_extension)
      *
      * @param shape The shape of the array
      * @param chunk_shape The shape of a chunk
@@ -231,18 +227,17 @@ namespace xt
      *
      * @return returns a ``xchunked_array<xarray<T>>`` with the given shape, chunk shape and memory layout.
      */
-    template <class T, layout_type L = XTENSOR_DEFAULT_LAYOUT, class EXT = empty_extension, class S>
-    xchunked_array<xarray<xarray<T>>, EXT> chunked_array(S&& shape, S&& chunk_shape, layout_type chunk_memory_layout = XTENSOR_DEFAULT_LAYOUT);
+    template <class T, layout_type L = XTENSOR_DEFAULT_LAYOUT, class S>
+    xchunked_array<xarray<xarray<T>>> chunked_array(S&& shape, S&& chunk_shape, layout_type chunk_memory_layout = XTENSOR_DEFAULT_LAYOUT);
 
-    template <class T, layout_type L = XTENSOR_DEFAULT_LAYOUT, class EXT = empty_extension, class S>
-    xchunked_array<xarray<xarray<T>>, EXT> chunked_array(std::initializer_list<S> shape, std::initializer_list<S> chunk_shape, layout_type chunk_memory_layout = XTENSOR_DEFAULT_LAYOUT);
+    template <class T, layout_type L = XTENSOR_DEFAULT_LAYOUT, class S>
+    xchunked_array<xarray<xarray<T>>> chunked_array(std::initializer_list<S> shape, std::initializer_list<S> chunk_shape, layout_type chunk_memory_layout = XTENSOR_DEFAULT_LAYOUT);
 
     /**
      * Creates an in-memory chunked array.
      * This function returns a ``xchunked_array<xarray<T>>`` initialized from an expression.
      *
      * @tparam L The layout_type of the array
-     * @tparam EXT The type of the array extension (default: empty_extension)
      *
      * @param e The expression to initialize the chunked array from
      * @param chunk_shape The shape of a chunk
@@ -250,8 +245,8 @@ namespace xt
      *
      * @return returns a ``xchunked_array<xarray<T>>`` from the given expression, with the given chunk shape and memory layout.
      */
-    template <layout_type L = XTENSOR_DEFAULT_LAYOUT, class EXT = empty_extension, class E, class S>
-    xchunked_array<xarray<xarray<typename E::value_type>>, EXT>
+    template <layout_type L = XTENSOR_DEFAULT_LAYOUT, class E, class S>
+    xchunked_array<xarray<xarray<typename E::value_type>>>
     chunked_array(const xexpression<E>& e, S&& chunk_shape, layout_type chunk_memory_layout = XTENSOR_DEFAULT_LAYOUT);
 
     /**
@@ -259,15 +254,14 @@ namespace xt
      * This function returns a ``xchunked_array<xarray<T>>`` initialized from an expression.
      *
      * @tparam L The layout_type of the array
-     * @tparam EXT The type of the array extension (default: empty_extension)
      *
      * @param e The expression to initialize the chunked array from
      * @param chunk_memory_layout The layout of each chunk (default: XTENSOR_DEFAULT_LAYOUT)
      *
      * @return returns a ``xchunked_array<xarray<T>>`` from the given expression, with the expression's chunk shape and the given memory layout.
      */
-    template <layout_type L = XTENSOR_DEFAULT_LAYOUT, class EXT = empty_extension, class E>
-    xchunked_array<xarray<xarray<typename E::value_type>>, EXT>
+    template <layout_type L = XTENSOR_DEFAULT_LAYOUT, class E>
+    xchunked_array<xarray<xarray<typename E::value_type>>>
     chunked_array(const xexpression<E>&e, layout_type chunk_memory_layout = XTENSOR_DEFAULT_LAYOUT);
 
     /*******************************
@@ -327,36 +321,36 @@ namespace xt
         return return_type::value;
     }
 
-    template <class T, layout_type L, class EXT, class S>
-    inline xchunked_array<xarray<xarray<T>>, EXT> chunked_array(S&& shape, S&& chunk_shape, layout_type chunk_memory_layout)
+    template <class T, layout_type L, class S>
+    inline xchunked_array<xarray<xarray<T>>> chunked_array(S&& shape, S&& chunk_shape, layout_type chunk_memory_layout)
     {
         using chunk_storage = xarray<xarray<T, L>>;
-        return xchunked_array<chunk_storage, EXT>(chunk_storage(), std::forward<S>(shape), std::forward<S>(chunk_shape), chunk_memory_layout);
+        return xchunked_array<chunk_storage>(chunk_storage(), std::forward<S>(shape), std::forward<S>(chunk_shape), chunk_memory_layout);
     }
 
-    template <class T, layout_type L, class EXT, class S>
-    xchunked_array<xarray<xarray<T>>, EXT> chunked_array(std::initializer_list<S> shape, std::initializer_list<S> chunk_shape, layout_type chunk_memory_layout)
+    template <class T, layout_type L, class S>
+    xchunked_array<xarray<xarray<T>>> chunked_array(std::initializer_list<S> shape, std::initializer_list<S> chunk_shape, layout_type chunk_memory_layout)
     {
         using sh_type = std::vector<std::size_t>;
         auto sh = xtl::forward_sequence<sh_type, std::initializer_list<S>>(shape);
         auto ch_sh = xtl::forward_sequence<sh_type, std::initializer_list<S>>(chunk_shape);
-        return chunked_array<T, L, EXT, sh_type>(std::move(sh), std::move(ch_sh), chunk_memory_layout);
+        return chunked_array<T, L, sh_type>(std::move(sh), std::move(ch_sh), chunk_memory_layout);
     }
 
-    template <layout_type L, class EXT, class E, class S>
-    inline xchunked_array<xarray<xarray<typename E::value_type>>, EXT>
+    template <layout_type L, class E, class S>
+    inline xchunked_array<xarray<xarray<typename E::value_type>>>
     chunked_array(const xexpression<E>& e, S&& chunk_shape, layout_type chunk_memory_layout)
     {
         using chunk_storage = xarray<xarray<typename E::value_type, L>>;
-        return xchunked_array<chunk_storage, EXT>(e, chunk_storage(), std::forward<S>(chunk_shape), chunk_memory_layout);
+        return xchunked_array<chunk_storage>(e, chunk_storage(), std::forward<S>(chunk_shape), chunk_memory_layout);
     }
 
-    template <layout_type L, class EXT, class E>
-    inline xchunked_array<xarray<xarray<typename E::value_type>>, EXT>
+    template <layout_type L, class E>
+    inline xchunked_array<xarray<xarray<typename E::value_type>>>
     chunked_array(const xexpression<E>& e, layout_type chunk_memory_layout)
     {
         using chunk_storage = xarray<xarray<typename E::value_type, L>>;
-        return xchunked_array<chunk_storage, EXT>(e, chunk_storage(), chunk_memory_layout);
+        return xchunked_array<chunk_storage>(e, chunk_storage(), chunk_memory_layout);
     }
 
     /************************************
@@ -467,158 +461,158 @@ namespace xt
      * xchunked_array implementation *
      *********************************/
 
-    template <class CS, class EX>
+    template <class CS>
     template <class S>
-    inline xchunked_array<CS, EX>::xchunked_array(CS&& chunks, S&& shape, S&& chunk_shape, layout_type chunk_memory_layout)
+    inline xchunked_array<CS>::xchunked_array(CS&& chunks, S&& shape, S&& chunk_shape, layout_type chunk_memory_layout)
         : m_chunks(std::move(chunks))
     {
         resize(std::forward<S>(shape), std::forward<S>(chunk_shape), chunk_memory_layout);
     }
 
-    template <class CS, class EX>
+    template <class CS>
     template <class E>
-    inline xchunked_array<CS, EX>::xchunked_array(const xexpression<E>& e, CS&& chunks, layout_type chunk_memory_layout)
+    inline xchunked_array<CS>::xchunked_array(const xexpression<E>& e, CS&& chunks, layout_type chunk_memory_layout)
         : xchunked_array(e, std::move(chunks), detail::chunk_helper<E>::chunk_shape(e), chunk_memory_layout)
     {
     }
 
-    template <class CS, class EX>
+    template <class CS>
     template <class E, class S>
-    inline xchunked_array<CS, EX>::xchunked_array(const xexpression<E>& e, CS&& chunks, S&& chunk_shape, layout_type chunk_memory_layout)
+    inline xchunked_array<CS>::xchunked_array(const xexpression<E>& e, CS&& chunks, S&& chunk_shape, layout_type chunk_memory_layout)
         : m_chunks(std::move(chunks))
     {
         resize(e.derived_cast().shape(), std::forward<S>(chunk_shape), chunk_memory_layout);
         semantic_base::assign_xexpression(e);
     }
 
-    template <class CS, class EX>
+    template <class CS>
     template <class E>
-    inline auto xchunked_array<CS, EX>::operator=(const xexpression<E>& e) -> self_type&
+    inline auto xchunked_array<CS>::operator=(const xexpression<E>& e) -> self_type&
     {
         return semantic_base::operator=(e);
     }
 
-    template <class CS, class EX>
-    inline auto xchunked_array<CS, EX>::shape() const noexcept -> const shape_type&
+    template <class CS>
+    inline auto xchunked_array<CS>::shape() const noexcept -> const shape_type&
     {
         return m_shape;
     }
 
-    template <class CS, class EX>
-    inline auto xchunked_array<CS, EX>::layout() const noexcept -> layout_type
+    template <class CS>
+    inline auto xchunked_array<CS>::layout() const noexcept -> layout_type
     {
         return static_layout;
     }
 
-    template <class CS, class EX>
-    inline bool xchunked_array<CS, EX>::is_contiguous() const noexcept
+    template <class CS>
+    inline bool xchunked_array<CS>::is_contiguous() const noexcept
     {
         return false;
     }
 
-    template <class CS, class EX>
+    template <class CS>
     template <class... Idxs>
-    inline auto xchunked_array<CS, EX>::operator()(Idxs... idxs) -> reference
+    inline auto xchunked_array<CS>::operator()(Idxs... idxs) -> reference
     {
         auto ii = get_indexes(idxs...);
         auto& chunk = m_chunks.element(ii.first.cbegin(), ii.first.cend());
         return chunk.element(ii.second.cbegin(), ii.second.cend());
     }
 
-    template <class CS, class EX>
+    template <class CS>
     template <class... Idxs>
-    inline auto xchunked_array<CS, EX>::operator()(Idxs... idxs) const -> const_reference
+    inline auto xchunked_array<CS>::operator()(Idxs... idxs) const -> const_reference
     {
         auto ii = get_indexes(idxs...);
         auto& chunk = m_chunks.element(ii.first.cbegin(), ii.first.cend());
         return chunk.element(ii.second.cbegin(), ii.second.cend());
     }
 
-    template <class CS, class EX>
+    template <class CS>
     template <class It>
-    inline auto xchunked_array<CS, EX>::element(It first, It last) -> reference
+    inline auto xchunked_array<CS>::element(It first, It last) -> reference
     {
         auto ii = get_indexes_dynamic(first, last);
         auto& chunk = m_chunks.element(ii.first.begin(), ii.first.end());
         return chunk.element(ii.second.begin(), ii.second.end());
     }
 
-    template <class CS, class EX>
+    template <class CS>
     template <class It>
-    inline auto xchunked_array<CS, EX>::element(It first, It last) const -> const_reference
+    inline auto xchunked_array<CS>::element(It first, It last) const -> const_reference
     {
         auto ii = get_indexes_dynamic(first, last);
         auto& chunk = m_chunks.element(ii.first.begin(), ii.first.end());
         return chunk.element(ii.second.begin(), ii.second.end());
     }
 
-    template <class CS, class EX>
+    template <class CS>
     template <class S>
-    inline bool xchunked_array<CS, EX>::broadcast_shape(S& s, bool) const
+    inline bool xchunked_array<CS>::broadcast_shape(S& s, bool) const
     {
         return xt::broadcast_shape(shape(), s);
     }
 
-    template <class CS, class EX>
+    template <class CS>
     template <class S>
-    inline bool xchunked_array<CS, EX>::has_linear_assign(const S&) const noexcept
+    inline bool xchunked_array<CS>::has_linear_assign(const S&) const noexcept
     {
         return false;
     }
 
-    template <class CS, class EX>
+    template <class CS>
     template <class S>
-    inline auto xchunked_array<CS, EX>::stepper_begin(const S& shape) noexcept -> stepper
+    inline auto xchunked_array<CS>::stepper_begin(const S& shape) noexcept -> stepper
     {
         size_type offset = shape.size() - this->dimension();
         return stepper(this, offset);
     }
 
-    template <class CS, class EX>
+    template <class CS>
     template <class S>
-    inline auto xchunked_array<CS, EX>::stepper_end(const S& shape, layout_type) noexcept -> stepper
+    inline auto xchunked_array<CS>::stepper_end(const S& shape, layout_type) noexcept -> stepper
     {
         size_type offset = shape.size() - this->dimension();
         return stepper(this, offset, true);
     }
 
-    template <class CS, class EX>
+    template <class CS>
     template <class S>
-    inline auto xchunked_array<CS, EX>::stepper_begin(const S& shape) const noexcept -> const_stepper
+    inline auto xchunked_array<CS>::stepper_begin(const S& shape) const noexcept -> const_stepper
     {
         size_type offset = shape.size() - this->dimension();
         return const_stepper(this, offset);
     }
 
-    template <class CS, class EX>
+    template <class CS>
     template <class S>
-    inline auto xchunked_array<CS, EX>::stepper_end(const S& shape, layout_type) const noexcept -> const_stepper
+    inline auto xchunked_array<CS>::stepper_end(const S& shape, layout_type) const noexcept -> const_stepper
     {
         size_type offset = shape.size() - this->dimension();
         return const_stepper(this, offset, true);
     }
 
-    template <class CS, class EX>
-    inline auto xchunked_array<CS, EX>::chunks() -> chunk_storage_type&
+    template <class CS>
+    inline auto xchunked_array<CS>::chunks() -> chunk_storage_type&
     {
         return m_chunks;
     }
 
-    template <class CS, class EX>
-    inline auto xchunked_array<CS, EX>::chunks() const -> const chunk_storage_type&
+    template <class CS>
+    inline auto xchunked_array<CS>::chunks() const -> const chunk_storage_type&
     {
         return m_chunks;
     }
 
-    template <class CS, class EX>
-    inline auto xchunked_array<CS, EX>::chunk_shape() const -> const shape_type&
+    template <class CS>
+    inline auto xchunked_array<CS>::chunk_shape() const -> const shape_type&
     {
         return m_chunk_shape;
     }
 
-    template <class CS, class EX>
+    template <class CS>
     template <class S1, class S2>
-    inline void xchunked_array<CS, EX>::resize(S1&& shape, S2&& chunk_shape, layout_type chunk_memory_layout)
+    inline void xchunked_array<CS>::resize(S1&& shape, S2&& chunk_shape, layout_type chunk_memory_layout)
     {
         // compute chunk number in each dimension (shape_of_chunks)
         std::vector<std::size_t> shape_of_chunks(shape.size());
@@ -642,35 +636,35 @@ namespace xt
         m_chunk_shape = xtl::forward_sequence<shape_type, S2>(chunk_shape);
     }
 
-    template <class CS, class EX>
+    template <class CS>
     template <class... Idxs>
-    inline auto xchunked_array<CS, EX>::get_indexes(Idxs... idxs) const -> indexes_type<Idxs...>
+    inline auto xchunked_array<CS>::get_indexes(Idxs... idxs) const -> indexes_type<Idxs...>
     {
         auto chunk_indexes_packed = get_chunk_indexes(std::make_index_sequence<sizeof...(Idxs)>(), idxs...);
         return unpack(chunk_indexes_packed);
     }
 
-    template <class CS, class EX>
+    template <class CS>
     template <class Idx>
-    inline std::pair<std::size_t, std::size_t> xchunked_array<CS, EX>::get_chunk_indexes_in_dimension(std::size_t dim, Idx idx) const
+    inline std::pair<std::size_t, std::size_t> xchunked_array<CS>::get_chunk_indexes_in_dimension(std::size_t dim, Idx idx) const
     {
         std::size_t index_of_chunk = static_cast<size_t>(idx) / m_chunk_shape[dim];
         std::size_t index_in_chunk = static_cast<size_t>(idx) - index_of_chunk * m_chunk_shape[dim];
         return std::make_pair(index_of_chunk, index_in_chunk);
     }
 
-    template <class CS, class EX>
+    template <class CS>
     template <std::size_t... dims, class... Idxs>
-    inline auto xchunked_array<CS, EX>::get_chunk_indexes(std::index_sequence<dims...>, Idxs... idxs) const
+    inline auto xchunked_array<CS>::get_chunk_indexes(std::index_sequence<dims...>, Idxs... idxs) const
         -> chunk_indexes_type<Idxs...>
     {
         chunk_indexes_type<Idxs...> chunk_indexes = {{get_chunk_indexes_in_dimension(dims, idxs)...}};
         return chunk_indexes;
     }
 
-    template <class CS, class EX>
+    template <class CS>
     template <class T, std::size_t N>
-    inline auto xchunked_array<CS, EX>::unpack(const std::array<T, N> &arr) const -> static_indexes_type<N>
+    inline auto xchunked_array<CS>::unpack(const std::array<T, N> &arr) const -> static_indexes_type<N>
     {
         std::array<std::size_t, N> arr0;
         std::array<std::size_t, N> arr1;
@@ -682,9 +676,9 @@ namespace xt
         return std::make_pair(arr0, arr1);
     }
 
-    template <class CS, class EX>
+    template <class CS>
     template <class It>
-    inline auto xchunked_array<CS, EX>::get_indexes_dynamic(It first, It last) const -> dynamic_indexes_type
+    inline auto xchunked_array<CS>::get_indexes_dynamic(It first, It last) const -> dynamic_indexes_type
     {
         auto size = static_cast<std::size_t>(std::distance(first, last));
         std::vector<std::size_t> indexes_of_chunk(size);
