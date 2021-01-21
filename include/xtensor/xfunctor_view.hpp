@@ -594,6 +594,8 @@ namespace xt
         using size_type = typename ST::size_type;
         using difference_type = typename ST::difference_type;
 
+        using shape_type = typename ST::shape_type;
+
         xfunctor_stepper() = default;
         xfunctor_stepper(const ST&, functor_type*);
 
