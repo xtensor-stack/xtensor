@@ -47,7 +47,7 @@ array argument is a 0-D argument:
 Meshgrid
 --------
 
-Numpy's version of meshgrid supports two modes: the 'xy' indexing and the 'ij' indexing.
+:any:`numpy.meshgrid` supports two modes: the 'xy' indexing and the 'ij' indexing.
 
 The following code
 
@@ -101,4 +101,4 @@ The reason is an optimization in xtensor, which is to set the strides to ``0`` i
 Array indices
 -------------
 
-Array indices are in xtensor stored as a ``std::vector`` of array indices, whereby each entry corresponds to the array indices of one item. This results in a slightly different usage of ``xt::ravel_indices`` than of ``np.ravel_multi_index``.
+Array indices are in xtensor stored as a ``std::vector`` of array indices, whereby each entry corresponds to the array indices of one item. This results in a slightly different usage of ``xt::ravel_indices`` than of :any:`numpy.ravel_multi_index`.
