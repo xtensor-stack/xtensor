@@ -51,6 +51,10 @@ From numpy to xtensor
        border-left: none;
    }
 
+   .rst-content table.docutils td > p {
+       overflow: auto;
+   }
+
    .rst-content table.docutils tr:hover {
        background-color: #d0e0e0;
    }
