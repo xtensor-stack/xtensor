@@ -67,7 +67,7 @@ and an element-wise ternary function (similar to the ``: ?`` ternary operator):
     xt::xarray<int> res = xt::where(b, a1, a2);
     // => res = { 11, 2, 3, 14 }
 
-Unlike in ``numpy.where``, ``xt::where`` takes full advantage of the lazyness
+Unlike in :any:`numpy.where`, ``xt::where`` takes full advantage of the lazyness
 of `xtensor`.
 
 Comparison operators
