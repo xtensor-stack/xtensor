@@ -137,6 +137,34 @@ namespace xt
         EXPECT_EQ(iter, view.end());
     }
 
+    TEST(xmanipulation, flatten_simd_linear_assign_trait)
+    {
+        xtensor<double, 3> a = linspace<double>(1., 100., 100).reshape({2, 5, 10});
+        auto v = view(a, range(0, 2), range(0, 3), range(0, 3));
+
+        {
+            auto e = flatten<XTENSOR_DEFAULT_LAYOUT>(a);
+            xtensor<double, 1> fl = e;
+            using assign_traits = xassign_traits<decltype(fl), decltype(e)>;
+        
+        #if XTENSOR_USE_XSIMD
+            EXPECT_TRUE(assign_traits::simd_linear_assign());
+            EXPECT_TRUE(assign_traits::simd_linear_assign(fl, e));
+        #else
+            EXPECT_FALSE(assign_traits::simd_linear_assign());
+            EXPECT_FALSE(assign_traits::simd_linear_assign(fl, e));
+        #endif
+        }
+
+        {
+            auto e = flatten<XTENSOR_DEFAULT_LAYOUT>(v);
+            xtensor<double, 1> fl = e;
+            using assign_traits = xassign_traits<decltype(fl), decltype(e)>;
+            EXPECT_FALSE(assign_traits::simd_linear_assign());
+            EXPECT_FALSE(assign_traits::simd_linear_assign(fl, e));
+        }
+    }
+
     TEST(xmanipulation, flatnonzero)
     {
         xt::xtensor<int, 1> a = arange(-2, 3);
