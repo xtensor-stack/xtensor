@@ -610,7 +610,7 @@ namespace xt
         }
 
     private:
-        
+
         // Workaround for clang-cl
         const base_type& upcast() const
         {
@@ -694,7 +694,7 @@ namespace xt
         using merge_functor_type = typename std::decay_t<F>::merge_functor_type;
         using substepper_type = typename xexpression_type::const_stepper;
         using raw_value_type = std::decay_t<decltype(std::declval<reduce_functor_type>()(
-                                                            std::declval<init_functor_type>()(), 
+                                                            std::declval<init_functor_type>()(),
                                                             *std::declval<substepper_type>())
                                                     )>;
         using value_type = typename detail::evaluated_value_type_t<raw_value_type, is_xexpression<raw_value_type>::value>;
@@ -851,12 +851,11 @@ namespace xt
 
             using reduce_functor_type = typename std::decay_t<F>::reduce_functor_type;
             using init_functor_type = typename std::decay_t<F>::init_functor_type;
-            using init_value_type = typename init_functor_type::value_type;
             using value_type = std::decay_t<decltype(std::declval<reduce_functor_type>()(
                 std::declval<init_functor_type>()(),
                 *std::declval<typename std::decay_t<E>::const_stepper>()))>;
             using evaluated_value_type = evaluated_value_type_t<value_type, is_xexpression<value_type>::value>;
-            
+
             using reducer_type = xreducer<F, const_xclosure_t<E>, xtl::const_closure_type_t<decltype(normalized_axes)>, reducer_options<evaluated_value_type, std::decay_t<O>>>;
             return reducer_type(std::forward<F>(f), std::forward<E>(e), std::forward<decltype(normalized_axes)>(normalized_axes), std::forward<O>(options));
         }
@@ -1091,7 +1090,7 @@ namespace xt
             {
                 return const_value<U>(t.m_value);
             }
-        };        
+        };
     }
 
     /*******************************************

@@ -198,11 +198,10 @@ namespace xt
         inline auto accumulator_impl(F&& f, E&& e, std::size_t axis, evaluation_strategy::immediate_type)
         {
             using init_type = typename F::init_value_type;
-            using init_functor_type = typename F::init_functor_type;
             using accumulate_functor_type = typename F::accumulate_functor_type;
             using expr_value_type = typename std::decay_t<E>::value_type;
             //using return_type = std::conditional_t<std::is_same<init_type, void>::value, typename std::decay_t<E>::value_type, init_type>;
-            
+
             using return_type = std::decay_t<decltype(std::declval<accumulate_functor_type>()(std::declval<init_type>(),
                                                                                               std::declval<expr_value_type>()))>;
             using result_type = xaccumulator_return_type_t<std::decay_t<E>, return_type>;
@@ -247,7 +246,7 @@ namespace xt
                 inner_loop_size = inner_loop_size - inner_stride;
 
                 // activate the init loop if we have an init function other than identity
-                if (!std::is_same<std::decay_t<typename F::init_functor_type>, 
+                if (!std::is_same<std::decay_t<typename F::init_functor_type>,
                                   typename detail::accumulator_identity<init_type>>::value)
                 {
                     accumulator_init_with_f(xt::get<1>(f), result, axis);

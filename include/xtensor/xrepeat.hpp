@@ -263,8 +263,8 @@ namespace xt
         , m_repeats(std::forward<R>(repeats))
         , m_shape(e.shape())
     {
-        using value_type = typename shape_type::value_type;
-        m_shape[axis] = static_cast<value_type>(std::accumulate(m_repeats.begin(), m_repeats.end(), 0));
+        using shape_value_type = typename shape_type::value_type;
+        m_shape[axis] = static_cast<shape_value_type>(std::accumulate(m_repeats.begin(), m_repeats.end(), 0));
     }
 
     /**
