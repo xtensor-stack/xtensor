@@ -375,7 +375,7 @@ namespace xt
         using traits = xassign_traits<E1, E2>;
 
         bool linear_assign = traits::linear_assign(de1, de2, trivial);
-        constexpr bool simd_assign = traits::simd_linear_assign();
+        constexpr bool simd_assign = traits::simd_assign();
         constexpr bool simd_linear_assign = traits::simd_linear_assign();
         constexpr bool simd_strided_assign = traits::simd_strided_assign();
         if (linear_assign)

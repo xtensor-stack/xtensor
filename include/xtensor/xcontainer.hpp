@@ -912,14 +912,12 @@ namespace xt
         std::size_t dim = shape.size();
         if (m_shape.size() != dim || !std::equal(std::begin(shape), std::end(shape), std::begin(m_shape)) || force)
         {
-            if (D::static_layout == layout_type::dynamic && m_layout == layout_type::dynamic)
-            {
-                m_layout = XTENSOR_DEFAULT_LAYOUT;  // fall back to default layout
-            }
+            layout_type layout = (D::static_layout == layout_type::dynamic && m_layout == layout_type::dynamic) ? XTENSOR_DEFAULT_LAYOUT : m_layout;
             m_shape = xtl::forward_sequence<shape_type, S>(shape);
+
             resize_container(m_strides, dim);
             resize_container(m_backstrides, dim);
-            size_type data_size = compute_strides<D::static_layout>(m_shape, m_layout, m_strides, m_backstrides);
+            size_type data_size = compute_strides<D::static_layout>(m_shape, layout, m_strides, m_backstrides);
             detail::resize_data_container(this->storage(), data_size);
         }
     }
