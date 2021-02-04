@@ -13,7 +13,6 @@
 #include <algorithm>
 #include <type_traits>
 #include <utility>
-#include <functional>
 
 #include <xtl/xcomplex.hpp>
 #include <xtl/xsequence.hpp>
@@ -247,7 +246,7 @@ namespace xt
         inline auto is_linear_assign(const E1& e1, const E2& e2) -> std::enable_if_t<has_strides<E1>::value, bool>
         {
             return (E1::contiguous_layout && E2::contiguous_layout && linear_static_layout<E1, E2>()) ||
-                   (e1.is_contiguous() && e2.has_linear_assign(e1.strides()));
+                   (e1.layout() != layout_type::dynamic && e2.has_linear_assign(e1.strides()));
         }
 
         template <class E1, class E2>
@@ -343,7 +342,7 @@ namespace xt
         template <class T>
         static constexpr bool simd_size_impl() { return xt_simd::simd_traits<T>::size > 1 || (is_bool<T>::value && use_xsimd()); }
         static constexpr bool simd_size() { return simd_size_impl<e1_value_type>() && simd_size_impl<e2_value_type>(); }
-        static constexpr bool simd_interface() { return has_simd_interface<E1, requested_value_type>() &&
+        static constexpr bool simd_interface() { return has_simd_interface<E1, requested_value_type>() && 
                                                         has_simd_interface<E2, requested_value_type>(); }
 
     public:
@@ -395,7 +394,7 @@ namespace xt
                 linear_assigner<false>::run(de1, de2);
             }
         }
-        else if (simd_strided_assign && de1.layout() == de2.layout())
+        else if (simd_strided_assign)
         {
             strided_loop_assigner<simd_strided_assign>::run(de1, de2);
         }
@@ -419,20 +418,16 @@ namespace xt
     inline void xexpression_assigner<Tag>::computed_assign(xexpression<E1>& e1, const xexpression<E2>& e2)
     {
         using shape_type = typename E1::shape_type;
-        using comperator_type = std::greater<typename shape_type::value_type>;
-
         using size_type = typename E1::size_type;
 
         E1& de1 = e1.derived_cast();
         const E2& de2 = e2.derived_cast();
 
-        size_type dim2 = de2.dimension();
-        shape_type shape = uninitialized_shape<shape_type>(dim2);
-
+        size_type dim = de2.dimension();
+        shape_type shape = uninitialized_shape<shape_type>(dim);
         bool trivial_broadcast = de2.broadcast_shape(shape, true);
 
-        auto && de1_shape = de1.shape();
-        if (dim2 > de1.dimension() || std::lexicographical_compare(shape.begin(), shape.end(), de1_shape.begin(), de1_shape.end(), comperator_type()))
+        if (dim > de1.dimension() || shape > de1.shape())
         {
             typename E1::temporary_type tmp(shape);
             base_type::assign_data(tmp, e2, trivial_broadcast);
@@ -620,7 +615,6 @@ namespace xt
     template <class E1, class E2>
     inline void linear_assigner<simd_assign>::run(E1& e1, const E2& e2)
     {
-// 		std::cout << "lin" << std::endl;
         using lhs_align_mode = xt_simd::container_alignment_t<E1>;
         constexpr bool is_aligned = std::is_same<lhs_align_mode, aligned_mode>::value;
         using rhs_align_mode = std::conditional_t<is_aligned, inner_aligned_mode, unaligned_mode>;
@@ -642,37 +636,27 @@ namespace xt
         }
 
 #if defined(XTENSOR_USE_TBB)
-        if (size >= XTENSOR_TBB_THRESHOLD)
+        tbb::parallel_for(align_begin, align_end, simd_size, [&e1, &e2](size_t i)
         {
-            tbb::parallel_for(align_begin, align_end, simd_size, [&e1, &e2](size_t i)
-            {
-                e1.template store_simd<lhs_align_mode>(i, e2.template load_simd<rhs_align_mode, value_type>(i));
-            });
-        }
-        else
-        {
-            for (size_type i = align_begin; i < align_end; i += simd_size)
-            {
-                e1.template store_simd<lhs_align_mode>(i, e2.template load_simd<rhs_align_mode, value_type>(i));
-            }
-        }
+            e1.template store_simd<lhs_align_mode>(i, e2.template load_simd<rhs_align_mode, value_type>(i));
+        });
 #elif defined(XTENSOR_USE_OPENMP)
-        if (size >= size_type(XTENSOR_OPENMP_TRESHOLD))
+        if (size >= XTENSOR_OPENMP_TRESHOLD)
         {
-#pragma omp parallel for default(none) shared(align_begin, align_end, e1, e2)
-#ifndef _WIN32
+            #pragma omp parallel for default(none) shared(align_begin, align_end, e1, e2)
+    #ifndef _WIN32
             for (size_type i = align_begin; i < align_end; i += simd_size)
             {
                 e1.template store_simd<lhs_align_mode>(i, e2.template load_simd<rhs_align_mode, value_type>(i));
             }
-#else
+    #else
             for(auto i = static_cast<std::ptrdiff_t>(align_begin); i < static_cast<std::ptrdiff_t>(align_end);
                 i += static_cast<std::ptrdiff_t>(simd_size))
             {
                 size_type ui = static_cast<size_type>(i);
                 e1.template store_simd<lhs_align_mode>(ui, e2.template load_simd<rhs_align_mode, value_type>(ui));
             }
-#endif
+    #endif
         }
         else
         {
@@ -712,28 +696,17 @@ namespace xt
         auto src = linear_begin(e2);
         auto dst = linear_begin(e1);
         size_type n = e1.size();
-// 		std::cout << "Linear assigner LOOP SIZE is " << n <<std::endl;
+
 #if defined(XTENSOR_USE_TBB)
         tbb::parallel_for(std::ptrdiff_t(0), static_cast<std::ptrdiff_t>(n), [&](std::ptrdiff_t i)
         {
             *(dst + i) = static_cast<value_type>(*(src + i));
         });
 #elif defined(XTENSOR_USE_OPENMP)
-        if (n >= XTENSOR_OPENMP_TRESHOLD)
+        #pragma omp parallel for default(none) shared(src, dst, n)
+        for (std::ptrdiff_t i = std::ptrdiff_t(0); i < static_cast<std::ptrdiff_t>(n) ; i++)
         {
-#pragma omp parallel for default(none) shared(src, dst, n)
-            for (std::ptrdiff_t i = std::ptrdiff_t(0); i < static_cast<std::ptrdiff_t>(n) ; i++)
-            {
-                *(dst + i) = static_cast<value_type>(*(src + i));
-            }
-        }
-        else {
-            for (; n > size_type(0); --n)
-            {
-                *dst = static_cast<value_type>(*src);
-                ++src;
-                ++dst;
-            }  
+            *(dst + i) = static_cast<value_type>(*(src + i));
         }
 #else
         for (; n > size_type(0); --n)
@@ -783,29 +756,75 @@ namespace xt
                 }
             }
                      
-			template <class T>
-            static void nth_idx(size_t n, T& outer_index, const T& outer_shape)
+            template <class T>
+            static void nth_next_idx(size_t n, T&outer_index, T& outer_shape)
 			{
+				auto i = outer_index.size()-1;
+				auto stride_sizes = full_like(outer_shape,0);
+				stride_sizes[i] = 1;
+				// fill up dimensions in the outer_idx as required
+				for (; i >= 0; i--)
+                {
+					auto d_idx = n/stride_sizes[i];
+					if (d_idx<(outer_shape[i]-outer_index[i]-1)) {
+						outer_index[i] += d_idx;
+						n-=d_idx * stride_sizes[i];
+						// we filled up all dimensions required
+						break;
+					}
+					else if (outer_index[i] !=0) {
+						outer_index[i] = 0;
+						n-=(outer_shape[i]-outer_index[i]-1) * stride_sizes[i];
+						if (i>0) {
+							outer_index[i-1]++;
+							// compute stride sizes on the fly ...
+							stride_sizes[i-1] = stride_sizes[i] * outer_shape[i];
+						}
+					}
+					else {
+						if (i>0) {
+							// compute stride sizes on the fly ...
+							stride_sizes[i-1] = stride_sizes[i] * outer_shape[i];
+						}
+					}
+                }
+                i++;
+				// add remaining iterations
+				for (; i < outer_index.size(); i++)
+                {
+					auto d_idx = n/stride_sizes[i];
+					if (d_idx<(outer_shape[i]-outer_index[i])) {
+						outer_index[i] += d_idx;
+						n-=d_idx * stride_sizes[i];
+					}
+					else {
+						// that may not happen
+					}
+                }
+			}
+			
+			template <class T>
+            static void nth_idx(size_t n, T& outer_index, T& outer_shape)
+			{
+				// assume outer_index is filled with 0
+				auto stride_sizes = full_like(outer_shape,0);
 				
-				dynamic_shape<std::size_t> stride_sizes;
-				xt::resize_container(stride_sizes, outer_shape.size());
+				auto i = outer_index.size()-1;
+				stride_sizes[i] = 1;
+				i--
 				// compute strides
-				using size_type = typename T::size_type;
-				for ( size_type i = outer_shape.size(); i>0; i--) {
-					stride_sizes[i-1] = (i==outer_shape.size()) ? 1 : stride_sizes[i] * outer_shape[i];
-				}
+				for (; i >= 0; i--) { stride_sizes[i] = stride_sizes[i+1] * outer_shape[i+1]; }
 				
 				// compute index
-				for (size_type i=0; i < outer_shape.size(); i++)
+				for (i=0; i < outer_index.size(); i++)
                 {
 					auto d_idx = n/stride_sizes[i];
 					if (d_idx < outer_shape[i]) {
-						outer_index[i] = d_idx;
+						outer_index[i] += d_idx;
 						n -= d_idx * stride_sizes[i];
 					}
 					else {
 						// that may not happen
-						outer_index[i] = 0;
 					}
                 }
 			}
@@ -835,27 +854,80 @@ namespace xt
                 }
             }
             
-			template <class T>
-            static void nth_idx(size_t n, T& outer_index, const T& outer_shape)
+            			template <class T>
+            static void nth_next_idx(size_t n, T& outer_index, T& outer_shape)
 			{
-				dynamic_shape<std::size_t> stride_sizes;
-				xt::resize_container(stride_sizes, outer_shape.size());
-				
 				using size_type = typename T::size_type;
-				
-				// compute required strides
-				for (size_type i = 0; i < outer_shape.size(); i++) { stride_sizes[i] = (i==0) ? 1 : stride_sizes[i-1] * outer_shape[i-1]; }
-				
-				// compute index
-				for (size_type i = outer_shape.size(); i>0;)
-				{
-					i--;
+				size_type i = 0;
+				auto stride_sizes = outer_shape;
+				stride_sizes[i] = 1;
+				// fill up dimensions in the outer_idx as required
+				for (; i < outer_index.size(); i++)
+                {
 					auto d_idx = n/stride_sizes[i];
-					if (d_idx<(outer_shape[i]-1)) {
-						outer_index[i] = d_idx;
+					if (d_idx<(outer_shape[i]-outer_index[i])) {
+						outer_index[i] += d_idx;
+						n-=d_idx * stride_sizes[i];
+						// we filled up all dimensions required
+						break;
+					}
+					else if (outer_index[i] != 0) {
+						outer_index[i] = 0;
+						n-=(outer_shape[i]-outer_index[i]-1) * stride_sizes[i];
+						
+						if (i+1<outer_index.size()) {
+							// compute stride sizes on the fly ...
+							outer_index[i+1]++;
+							stride_sizes[i+1] = stride_sizes[i] * outer_shape[i];
+						}
+					}
+					else {
+						if (i+1<outer_index.size()) {
+							// compute stride sizes on the fly ...
+							stride_sizes[i+1] = stride_sizes[i] * outer_shape[i];
+						}
+					}
+                }
+                i--;
+				// add remaining iterations
+				for (; i >= 0; i--)
+                {
+					auto d_idx = n/stride_sizes[i];
+					if (d_idx<(outer_shape[i]-outer_index[i]-1)) {
+						outer_index[i] += d_idx;
 						n -= d_idx * stride_sizes[i];
 					}
-// 					else {}   // that may not happen
+					else {
+						// that may not happen
+					}
+                }
+			}
+			
+			template <class T>
+            static void nth_idx(size_t n, T& outer_index, T& outer_shape)
+			{
+				// assume outer_index is filled with 0
+				using size_type = typename T::size_type;
+				auto stride_sizes = outer_shape;
+				size_type i = 0;
+				stride_sizes[i] = 1;
+				i++;
+				
+				// compute required strides
+				for (; i < outer_shape.size(); i++) { stride_sizes[i] = stride_sizes[i-1] * outer_shape[i-1]; }
+				
+				// compute index
+                i = outer_shape.size()-1;
+				for (; i >= 0; i--)
+                {
+					auto d_idx = n/stride_sizes[i];
+					if (d_idx<(outer_shape[i]-1)) {
+						outer_index[i] += d_idx;
+						n -= d_idx * stride_sizes[i];
+					}
+					else {
+						// that may not happen
+					}
                 }
 			}
         };
@@ -924,13 +996,11 @@ namespace xt
             {
                 auto csf = check_strides_functor<layout_type::row_major, decltype(e1.strides())>(e1.strides());
                 cut = csf(e2);
-				if (cut<e1.strides().size()-1) cut = e1.strides().size()-1;
             }
             else if (E1::static_layout == layout_type::column_major || !is_row_major)
             {
                 auto csf = check_strides_functor<layout_type::column_major, decltype(e1.strides())>(e1.strides());
                 cut = csf(e2);
-				if (cut>1) cut = 1;
             } // can't reach here because this would have already triggered the fallback
 
             using shape_value_type = typename E1::shape_type::value_type;
@@ -950,6 +1020,7 @@ namespace xt
         }
     }
 
+#define strided_row_major_fallback
 #define strided_parallel_assign
     template <bool simd>
     template <class E1, class E2>
@@ -957,10 +1028,10 @@ namespace xt
     {
         bool is_row_major = true;
         using fallback_assigner = stepper_assigner<E1, E2, default_assignable_layout(E1::static_layout)>;
+
         if (E1::static_layout == layout_type::dynamic)
         {
             layout_type dynamic_layout = e1.layout();
-
             switch (dynamic_layout)
             {
                 case layout_type::row_major:
@@ -970,7 +1041,11 @@ namespace xt
                     is_row_major = false;
                     break;
                 default:
+#ifdef strided_row_major_fallback
+					is_row_major = true;
+#else
                     return fallback_assigner(e1, e2).run();
+#endif
             }
         }
         else if (E1::static_layout == layout_type::row_major)
@@ -1031,55 +1106,75 @@ namespace xt
         {
             step_dim = cut;
         }
-// 		std::cout << "OUTER LOOP size is " << outer_loop_size << " INNER LOOP size is " << inner_loop_size <<std::endl;
 #if defined(XTENSOR_USE_OPENMP) && defined(strided_parallel_assign)
-		if (outer_loop_size>20) {
-			std::size_t first_step = true;
-#pragma omp parallel for schedule(static) firstprivate(first_step, fct_stepper, res_stepper, idx)
-			for (std::size_t ox = 0; ox < outer_loop_size; ++ox)
-			{
-				if (first_step) {
-					is_row_major ?
-						strided_assign_detail::idx_tools<layout_type::row_major>::nth_idx(ox,idx, max_shape) :
-						strided_assign_detail::idx_tools<layout_type::column_major>::nth_idx(ox,idx, max_shape);
-					
-					for (std::size_t i = 0; i < idx.size(); ++i)
-					{
-						fct_stepper.step(i + step_dim, idx[i]);
-						res_stepper.step(i + step_dim, idx[i]);
-					}
-					first_step = false;
-				}
-
-				for (std::size_t i = 0; i < simd_size; ++i)
-				{
-					res_stepper.template store_simd<simd_type>(fct_stepper.template step_simd<value_type>());
-				}
-				for (std::size_t i = 0; i < simd_rest; ++i)
-				{
-					*(res_stepper) = conditional_cast<needs_cast, e1_value_type>(*(fct_stepper));
-					res_stepper.step_leading();
-					fct_stepper.step_leading();
-				}
-				
-				// next unaligned index
-				is_row_major ?
-					strided_assign_detail::idx_tools<layout_type::row_major>::next_idx(idx, max_shape) :
-					strided_assign_detail::idx_tools<layout_type::column_major>::next_idx(idx, max_shape);
-					
-				// need to step E1 as well if not contigous assign (e.g. view)
-				fct_stepper.to_begin();
-				res_stepper.to_begin();
-				for (std::size_t i = 0; i < idx.size(); ++i)
-				{
-					fct_stepper.step(i + step_dim, idx[i]);
-					res_stepper.step(i + step_dim, idx[i]);
-				}
-			}
+		static bool reported = false;
+		if (!reported) {
+			std::cout << "SIMD size is " << simd_type::size << " step_dim " << step_dim << std::endl;
+			reported = true;
 		}
-		else {
-		
-#endif
+		std::cout << "+";
+		std::size_t first_step = true;
+// #define old_parallel
+#pragma omp parallel for schedule(static) firstprivate(first_step, fct_stepper, res_stepper, idx)
+        for (std::size_t ox = 0; ox < outer_loop_size; ++ox)
+        {
+			if (first_step) {
+				is_row_major ?
+					strided_assign_detail::idx_tools<layout_type::row_major>::nth_next_idx(ox,idx, max_shape) :
+					strided_assign_detail::idx_tools<layout_type::column_major>::nth_next_idx(ox,idx, max_shape);
+				for (std::size_t i = 0; i < idx.size(); ++i)
+                {
+                    fct_stepper.step(i + step_dim, idx[i]);
+                    res_stepper.step(i + step_dim, idx[i]);
+                }
+                first_step = false;
+			}
+			else {
+				// next unaligned index
+				if (is_row_major) {
+					auto i = max_shape.size()-1;
+// 					fct_stepper.step_back(i+1,inner_loop_size);
+// 					res_stepper.step_back(i+1,inner_loop_size);
+					fct_stepper.reset(i+1);
+					res_stepper.reset(i+1);
+					fct_stepper.step_back(i+1,1);
+					res_stepper.step_back(i+1,1);
+					
+			
+					for (; i >= 0; --i)
+					{
+						if (idx[i] + 1 >= max_shape[i])
+						{
+							idx[i] = 0;
+							fct_stepper.reset(i);
+							res_stepper.reset(i);
+						}
+						else
+						{
+							idx[i]++;
+							fct_stepper.step(i, 1);
+							res_stepper.step(i, 1);
+							break;
+						}
+					}
+				}
+				else {
+					std::cout << "oops" << std::endl;
+				}
+// 				std:: cout << "Next index is " << idx[0] << "," << idx[1] << ","<<idx.size() << "," << cut << std::endl;
+			}
+			for (std::size_t i = 0; i < simd_size; ++i)
+			{
+				res_stepper.template store_simd<simd_type>(fct_stepper.template step_simd<value_type>());
+			}
+			for (std::size_t i = 0; i < simd_rest; ++i)
+			{
+				*(res_stepper) = conditional_cast<needs_cast, e1_value_type>(*(fct_stepper));
+				res_stepper.step_leading();
+				fct_stepper.step_leading();
+			}
+        }
+#else
         for (std::size_t ox = 0; ox < outer_loop_size; ++ox)
         {
             for (std::size_t i = 0; i < simd_size; ++i)
@@ -1117,8 +1212,7 @@ namespace xt
                 }
             }
         }
-#if defined(XTENSOR_USE_OPENMP) && defined(strided_parallel_assign)
-		}
+
 #endif
 	}
 
