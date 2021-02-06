@@ -494,10 +494,12 @@ namespace xt
             return n;
         }
 
+        #ifdef XTENSOR_ENABLE_ASSERT
         using value_type = typename std::decay_t<E>::value_type;
 
         XTENSOR_ASSERT(xt::all(weights >= static_cast<value_type>(0)));
         XTENSOR_ASSERT(xt::sum(weights)() > static_cast<value_type>(0));
+        #endif
 
         xt::xtensor<double, 1> P = xt::cast<double>(weights) / static_cast<double>(xt::sum(weights)());
         xt::xtensor<size_t, 1> n = xt::ceil(static_cast<double>(N) * P);
