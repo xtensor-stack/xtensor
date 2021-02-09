@@ -7,6 +7,20 @@
 Changelog
 =========
 
+0.23.1
+------
+
+- Fix compilation warnings on unused local typedefs
+  `#2295 https://github.com/xtensor-stack/xtensor/pull/2295`
+- Disable a failing shuffle test for clang
+  `#2294 https://github.com/xtensor-stack/xtensor/pull/2294`
+- Fix simd assign_data
+  `#2292 https://github.com/xtensor-stack/xtensor/pull/2292`
+- Fix -Wshadow and -Wunused-local-typedef warning
+  `#2293 https://github.com/xtensor-stack/xtensor/pull/2293`
+- Documentation improvement Part #B
+  `#2287 https://github.com/xtensor-stack/xtensor/pull/2287`
+
 0.23.0
 ------
 
