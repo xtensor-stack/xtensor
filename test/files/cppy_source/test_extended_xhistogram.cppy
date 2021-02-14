@@ -45,4 +45,26 @@ namespace xt
 
         EXPECT_EQ(prob, py_prob);
     }
+
+    /*py
+
+    a = (np.random.random(1000) * 51).astype(np.int)
+
+    count, bin_edges  = np.histogram(a, 30, (10, 40))
+
+    */
+    TEST(xtest_extended_histogram, histogram_with_range)
+    {
+        // py_a
+        // py_bin_edges
+        // py_count
+
+        auto bin_edges = xt::histogram_bin_edges(py_a, 10, 40, std::size_t(30));
+
+        auto count = xt::histogram(py_a, bin_edges);
+
+        EXPECT_EQ(xt::cast<double>(bin_edges), py_bin_edges);
+
+        EXPECT_EQ(count, xt::cast<double>(py_count));
+    }
 }
