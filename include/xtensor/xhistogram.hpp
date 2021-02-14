@@ -58,8 +58,6 @@ namespace xt
             XTENSOR_ASSERT(weights.size() == data.size());
             XTENSOR_ASSERT(bin_edges.size() >= 2);
             XTENSOR_ASSERT(std::is_sorted(bin_edges.cbegin(), bin_edges.cend()));
-            XTENSOR_ASSERT(xt::amin(data)[0] >= bin_edges[0]);
-            XTENSOR_ASSERT(xt::amax(data)[0] <= bin_edges[bin_edges.size() - 1]);
 
             size_t n_bins = bin_edges.size() - 1;
             xt::xtensor<value_type, 1> count = xt::zeros<value_type>({ n_bins });
@@ -93,10 +91,23 @@ namespace xt
 
                 for (auto& idx : sorter)
                 {
-                    while (data[idx] >= bin_edges[ibin + 1] && ibin < bin_edges.size() - 2)
+                    auto item = data[idx];
+
+                    if (item < bin_edges[0])
+                    {
+                        continue;
+                    }
+
+                    if (item > bin_edges[n_bins])
+                    {
+                        break;
+                    }
+
+                    while (item >= bin_edges[ibin + 1] && ibin < n_bins - 1)
                     {
                         ++ibin;
                     }
+
                     count[ibin] += weights[idx];
                 }
             }
@@ -247,8 +258,7 @@ namespace xt
         // - size
         XTENSOR_ASSERT(weights.size() == data.size());
         // - bounds
-        XTENSOR_ASSERT(left <= xt::amin(data)[0]);
-        XTENSOR_ASSERT(right >= xt::amax(data)[0]);
+        XTENSOR_ASSERT(left <= right);
         // - non-empty
         XTENSOR_ASSERT(bins > std::size_t(0));
 
