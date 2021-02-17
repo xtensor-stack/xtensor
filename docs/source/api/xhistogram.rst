@@ -36,7 +36,13 @@ Further overloads
 .. doxygenfunction:: xt::histogram(E1&&, std::size_t, bool)
    :project: xtensor
 
+.. doxygenfunction:: xt::histogram(E1&&, std::size_t, E2, E2, bool)
+   :project: xtensor
+
 .. doxygenfunction:: xt::histogram(E1&&, std::size_t, E2&&, bool)
+   :project: xtensor
+
+.. doxygenfunction:: xt::histogram(E1&&, std::size_t, E2&&, E3, E3, bool)
    :project: xtensor
 
 .. doxygenfunction:: xt::histogram_bin_edges(E1&&, E2, E2, std::size_t, histogram_algorithm)
