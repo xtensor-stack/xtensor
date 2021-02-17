@@ -40,6 +40,27 @@ namespace xt
         }
 
         {
+            xt::xtensor<double, 1> count = xt::histogram(data, size_t(2), 0.5, 1.5);
+
+            EXPECT_EQ(count.size(), std::size_t(2));
+            EXPECT_EQ(count(0), 0.);
+            EXPECT_EQ(count(1), 2.);
+        }
+
+        {
+            // test specifying return type as well
+            auto count = xt::histogram<float>(
+                    data, size_t(2), xt::xtensor<double, 1>({1., 2., 1., 1.}), 0.5, 1.5);
+
+            EXPECT_EQ(count.size(), std::size_t(2));
+            EXPECT_EQ(count(0), 0.f);
+            EXPECT_EQ(count(1), 3.f);
+            bool is_same_type = std::is_same<decltype(count)::value_type, float>::value;
+            EXPECT_TRUE(is_same_type);
+        }
+
+        {
+            // test input being a container other than xtensor
             xt::xarray<double> arr = {1., 1., 2., 2.};
             xt::xtensor<double, 1> count = xt::histogram(arr, std::size_t(2));
 
