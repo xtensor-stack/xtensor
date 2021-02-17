@@ -271,6 +271,13 @@ namespace xt
         ASSERT_EQ(m_assigned(3), at_3);
     }
 
+    TEST(xbuilder, linspace_endpoint)
+    {
+        double at_end = 99.78730976641236;
+        xt::xtensor<double, 1> ls = linspace<double>(0., at_end, 100);
+        ASSERT_EQ(ls(99), at_end);
+    }
+
     TEST(xbuilder, linspace_integer)
     {
         xarray<int> ls = linspace<int>(0, 10, 13);
@@ -686,8 +693,10 @@ namespace xt
 
     TEST(xbuilder, linspace_double)
     {
-        xt::xarray<double> a = xt::linspace(0., 100.);
-        auto b = xt::linspace(0., 100.);
+        // access_imp will also be tested here
+        double at_end = 99.78730976641236;
+        xt::xarray<double> a = xt::linspace(0., at_end, 100);
+        auto b = xt::linspace(0., at_end, 100);
         EXPECT_EQ(a, b);
     }
 }
