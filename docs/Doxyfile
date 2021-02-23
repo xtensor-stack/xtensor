@@ -1,15 +1,23 @@
-PROJECT_NAME      = "xtensor"
-XML_OUTPUT        = xml
-INPUT             = missing_macro.hpp ../include
-GENERATE_LATEX    = NO
-GENERATE_MAN      = NO
-GENERATE_RTF      = NO
-CASE_SENSE_NAMES  = NO
-GENERATE_HTML     = NO
-GENERATE_XML      = YES
-RECURSIVE         = YES
-QUIET             = YES
+PROJECT_NAME = "xtensor"
+XML_OUTPUT = xml
+INPUT = missing_macro.hpp ../include
+GENERATE_LATEX = NO
+GENERATE_MAN = NO
+GENERATE_RTF = NO
+CASE_SENSE_NAMES = NO
+GENERATE_HTML = YES
+GENERATE_XML = YES
+RECURSIVE = YES
+QUIET = YES
 JAVADOC_AUTOBRIEF = YES
 WARN_IF_UNDOCUMENTED = NO
 MACRO_EXPANSION = YES
 PREDEFINED = IN_DOXYGEN
+EXCLUDE_SYMBOLS = detail
+GENERATE_TREEVIEW = YES
+SOURCE_BROWSER = YES
+# WARN_IF_UNDOCUMENTED = YES
+
+# Allow for rst directives and advanced functions e.g. grid tables
+ALIASES  = "rst=\verbatim embed:rst:leading-asterisk"
+ALIASES += "endrst=\endverbatim"
