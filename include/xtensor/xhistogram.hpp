@@ -157,18 +157,18 @@ namespace xt
      * @param density If true the resulting integral is normalized to 1. [default: false]
      * @return An one-dimensional xarray<double>, length: bin_edges.size()-1.
      */
-    template <class E1, class E2>
+    template <class R = double, class E1, class E2>
     inline auto histogram(E1&& data, E2&& bin_edges, bool density = false)
     {
         using value_type = typename std::decay_t<E1>::value_type;
 
         auto n = data.size();
 
-        return detail::histogram_imp(std::forward<E1>(data),
-                                     std::forward<E2>(bin_edges),
-                                     xt::ones<value_type>({ n }),
-                                     density,
-                                     false);
+        return detail::histogram_imp<R>(std::forward<E1>(data),
+                                        std::forward<E2>(bin_edges),
+                                        xt::ones<value_type>({ n }),
+                                        density,
+                                        false);
     }
 
     /**
@@ -180,18 +180,18 @@ namespace xt
      * @param density If true the resulting integral is normalized to 1. [default: false]
      * @return An one-dimensional xarray<double>, length: bin_edges.size()-1.
      */
-    template <class E1>
+    template <class R = double, class E1>
     inline auto histogram(E1&& data, std::size_t bins = 10, bool density = false)
     {
         using value_type = typename std::decay_t<E1>::value_type;
 
         auto n = data.size();
 
-        return detail::histogram_imp(std::forward<E1>(data),
-                                     histogram_bin_edges(data, xt::ones<value_type>({ n }), bins),
-                                     xt::ones<value_type>({ n }),
-                                     density,
-                                     true);
+        return detail::histogram_imp<R>(std::forward<E1>(data),
+                                        histogram_bin_edges(data, xt::ones<value_type>({ n }), bins),
+                                        xt::ones<value_type>({ n }),
+                                        density,
+                                        true);
     }
 
     /**
@@ -229,14 +229,14 @@ namespace xt
      * @param density If true the resulting integral is normalized to 1. [default: false]
      * @return An one-dimensional xarray<double>, length: bin_edges.size()-1.
      */
-    template <class E1, class E2>
+    template <class R = double, class E1, class E2>
     inline auto histogram(E1&& data, std::size_t bins, E2&& weights, bool density = false)
     {
-        return detail::histogram_imp(std::forward<E1>(data),
-                                     histogram_bin_edges(data, weights, bins),
-                                     std::forward<E2>(weights),
-                                     density,
-                                     true);
+        return detail::histogram_imp<R>(std::forward<E1>(data),
+                                        histogram_bin_edges(data, weights, bins),
+                                        std::forward<E2>(weights),
+                                        density,
+                                        true);
     }
 
     /**
