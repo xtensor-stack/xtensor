@@ -6,8 +6,9 @@
 *                                                                          *
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
-
 // This file is generated from test/files/cppy_source/test_extended_xmath_interp.cppy by preprocess.py!
+// Warning: This file should not be modified directly! Instead, modify the `*.cppy` file.
+
 
 #include <algorithm>
 

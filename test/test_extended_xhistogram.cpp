@@ -6,8 +6,8 @@
 *                                                                          *
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
-// This file is generated from the source file test/files/cppy_source/test_extended_xhistogram.cppy by preprocess.py!
-// Warning: This file should not be modified directly! Please modify the source file to change the test!
+// This file is generated from test/files/cppy_source/test_extended_xhistogram.cppy by preprocess.py!
+// Warning: This file should not be modified directly! Instead, modify the `*.cppy` file.
 
 
 #include <algorithm>

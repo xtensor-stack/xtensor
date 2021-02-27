@@ -6,6 +6,9 @@
 *                                                                          *
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
+// This file is generated from test/files/cppy_source/test_extended_xmath_reducers.cppy by preprocess.py!
+// Warning: This file should not be modified directly! Instead, modify the `*.cppy` file.
+
 
 #include <algorithm>
 
@@ -14,14 +17,12 @@
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xmath.hpp"
 
-// This file is generated from test/files/cppy_source/test_extended_xmath_reducers.cppy by preprocess.py!
-
 namespace xt
 {
     using namespace xt::placeholders;
 
-// Tmporary disabling for TBB and OPENMP due to a potential
-// race conditoin that must be identified
+// Temporary disabling for TBB and OPENMP due to a potential
+// race condition that must be identified
 
     /*py
     a  = np.random.random(4*5*6*7).reshape(4,5,6,7)
@@ -1238,16 +1239,21 @@ namespace xt
                                  0.0762240153024691,0.0845913536241975,0.0819087439628765,
                                  0.0894375580083343}};
         // py_vr_ddof
-        xarray<double> py_vr_ddof = {{0.08891148, 0.08839767, 0.06947427, 0.10903093,
-                                      0.10375136, 0.06545346, 0.10283867},
-                                     {0.06667108, 0.07973733, 0.07441828, 0.06940026,
-                                      0.07520572, 0.08607668, 0.06691591},
-                                     {0.11243408, 0.07297399, 0.10511975, 0.11647158,
-                                      0.05646425, 0.09405099, 0.06935457},
-                                     {0.09180797, 0.0812563, 0.06370912, 0.10690023,
-                                      0.055978, 0.05262839, 0.08073249},
-                                     {0.07532817, 0.07518685, 0.09620904, 0.0795381,
-                                      0.08826924, 0.08546999, 0.09332615}};
+        xarray<double> py_vr_ddof = {{0.0889114757349588,0.0883976713043945,0.0694742729233944,
+                                      0.1090309311660738,0.1037513645688315,0.0654534628399395,
+                                      0.1028386731127582},
+                                     {0.0666710818474757,0.0797373343688865,0.0744182799737598,
+                                      0.0694002553843638,0.0752057167414209,0.0860766763056127,
+                                      0.0669159125951853},
+                                     {0.1124340777829665,0.0729739900850924,0.1051197541801289,
+                                      0.1164715842186635,0.0564642526641848,0.0940509914024565,
+                                      0.0693545738074637},
+                                     {0.0918079650451022,0.0812562992275442,0.0637091206300426,
+                                      0.1069002331036898,0.0559780026304832,0.0526283861985847,
+                                      0.0807324924887657},
+                                     {0.0753281695405429,0.0751868529546781,0.096209041268935 ,
+                                      0.0795381029243156,0.08826923856438  ,0.0854699937003928,
+                                      0.0933261474869576}};
         // py_st
         xarray<double> py_st = {{0.2919020913125989,0.2910574427841431,0.2580300593953858,
                                  0.3232459987390728,0.3153226776575547,0.2504520617236133,
