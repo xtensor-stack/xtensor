@@ -42,17 +42,7 @@ compilers are supported:
 
 ### Package managers
 
-If you are using Conan to manage your dependencies, merely add `xtensor/x.y.z@omaralvarez/public-conan` to your requires, where x.y.z is the release version you want to use. Please file issues in [conan-xtensor](https://github.com/omaralvarez/conan-xtensor) if you experience problems with the packages. Sample `conanfile.txt`:
-
-```
-[requires]
-xtensor/0.20.8@omaralvarez/public-conan
-
-[generators]
-cmake
-```
-
-We also provide a package for the conda package manager:
+We provide a package for the conda package manager:
 
 ```bash
 conda install -c conda-forge xtensor
