@@ -92,6 +92,15 @@ namespace xt
     {
         xt::xarray<double> arr = { 5., 6. };
         xt::strided_view(arr, { 0 }) = xt::strided_view(arr, { 1 });
+
+        auto v1 = xt::strided_view(arr, {0});
+        const bool res1 = xt::can_assign<decltype(v1), const xt::xarray<double>&>::value;
+        EXPECT_TRUE(res1);
+
+        const xt::xarray<double> arr2 = arr;
+        auto v2 = xt::strided_view(arr2, {0});
+        const bool res2 = xt::can_assign<decltype(v2), const xt::xarray<double>&>::value;
+        EXPECT_FALSE(res2);
     }
 
     TEST(xstrided_view, three_dimensional)
