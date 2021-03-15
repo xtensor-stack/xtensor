@@ -192,6 +192,17 @@ namespace xt
     template <class E, class R = void>
     using disable_xsharable_expression = typename std::enable_if<!is_xsharable_expression<E>::value, R>::type;
 
+    template <class LHS, class RHS>
+    struct can_assign : std::is_assignable<LHS, RHS>
+    {
+    };
+
+    template <class LHS, class RHS, class R = void>
+    using enable_assignable_expression = typename std::enable_if<can_assign<LHS, RHS>::value, R>::type;
+
+    template <class LHS, class RHS, class R = void>
+    using enable_not_assignable_expression = typename std::enable_if<!can_assign<LHS, RHS>::value, R>::type;
+
     /***********************
      * evaluation_strategy *
      ***********************/

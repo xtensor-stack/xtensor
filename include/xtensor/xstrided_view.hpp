@@ -104,6 +104,12 @@ namespace xt
             xstepper<xstrided_view<CT, S, L, FST>>>;
     };
 
+    template <class CT, class S, layout_type L, class FST, class RHS>
+    struct can_assign<xstrided_view<CT, S, L, FST>, RHS>
+        : can_assign<CT, RHS>
+    {
+    };
+
     /*****************
      * xstrided_view *
      *****************/
@@ -178,7 +184,8 @@ namespace xt
         xstrided_view(CTA&& e, SA&& shape, strides_type&& strides, std::size_t offset, layout_type layout) noexcept;
 
         xstrided_view(const xstrided_view& rhs) = default;
-        xstrided_view& operator=(const xstrided_view& rhs);
+
+        self_type& operator=(const self_type&);
 
         template <class E>
         self_type& operator=(const xexpression<E>& e);
@@ -215,23 +222,32 @@ namespace xt
         const_storage_iterator storage_cbegin() const;
         const_storage_iterator storage_cend() const;
 
-        template <class ST>
-        stepper stepper_begin(const ST& shape);
-        template <class ST>
-        stepper stepper_end(const ST& shape, layout_type l);
+        template <class ST, class STEP = stepper>
+        disable_indexed_stepper_t<STEP>
+        stepper_begin(const ST& shape);
+        template <class ST, class STEP = stepper>
+        disable_indexed_stepper_t<STEP>
+        stepper_end(const ST& shape, layout_type l);
+
+        template <class ST, class STEP = stepper>
+        enable_indexed_stepper_t<STEP>
+        stepper_begin(const ST& shape);
+        template <class ST, class STEP = stepper>
+        enable_indexed_stepper_t<STEP>
+        stepper_end(const ST& shape, layout_type l);
 
         template <class ST, class STEP = const_stepper>
-        std::enable_if_t<!is_indexed_stepper<STEP>::value, STEP>
+        disable_indexed_stepper_t<STEP>
         stepper_begin(const ST& shape) const;
         template <class ST, class STEP = const_stepper>
-        std::enable_if_t<!is_indexed_stepper<STEP>::value, STEP>
+        disable_indexed_stepper_t<STEP>
         stepper_end(const ST& shape, layout_type l) const;
 
         template <class ST, class STEP = const_stepper>
-        std::enable_if_t<is_indexed_stepper<STEP>::value, STEP>
+        enable_indexed_stepper_t<STEP>
         stepper_begin(const ST& shape) const;
         template <class ST, class STEP = const_stepper>
-        std::enable_if_t<is_indexed_stepper<STEP>::value, STEP>
+        enable_indexed_stepper_t<STEP>
         stepper_end(const ST& shape, layout_type l) const;
 
         template <class requested_type>
@@ -354,7 +370,7 @@ namespace xt
     //@}
 
     template <class CT, class S, layout_type L, class FST>
-    inline xstrided_view<CT, S, L, FST>& xstrided_view<CT, S, L, FST>::operator=(const xstrided_view<CT, S, L, FST>& rhs)
+    inline auto xstrided_view<CT, S, L, FST>::operator=(const self_type& rhs) -> self_type&
     {
         temporary_type tmp(rhs);
         return this->assign_temporary(std::move(tmp));
@@ -471,16 +487,18 @@ namespace xt
      ***************/
 
     template <class CT, class S, layout_type L, class FST>
-    template <class ST>
-    inline auto xstrided_view<CT, S, L, FST>::stepper_begin(const ST& shape) -> stepper
+    template <class ST, class STEP>
+    inline auto xstrided_view<CT, S, L, FST>::stepper_begin(const ST& shape)
+        -> disable_indexed_stepper_t<STEP>
     {
         size_type offset = shape.size() - dimension();
         return stepper(this, data_xbegin(), offset);
     }
 
     template <class CT, class S, layout_type L, class FST>
-    template <class ST>
-    inline auto xstrided_view<CT, S, L, FST>::stepper_end(const ST& shape, layout_type l) -> stepper
+    template <class ST, class STEP>
+    inline auto xstrided_view<CT, S, L, FST>::stepper_end(const ST& shape, layout_type l)
+        -> disable_indexed_stepper_t<STEP>
     {
         size_type offset = shape.size() - dimension();
         return stepper(this, data_xend(l, offset), offset);
@@ -488,7 +506,26 @@ namespace xt
 
     template <class CT, class S, layout_type L, class FST>
     template <class ST, class STEP>
-    inline auto xstrided_view<CT, S, L, FST>::stepper_begin(const ST& shape) const -> std::enable_if_t<!is_indexed_stepper<STEP>::value, STEP>
+    inline auto xstrided_view<CT, S, L, FST>::stepper_begin(const ST& shape)
+        -> enable_indexed_stepper_t<STEP>
+    {
+        size_type offset = shape.size() - dimension();
+        return stepper(this, offset);
+    }
+
+    template <class CT, class S, layout_type L, class FST>
+    template <class ST, class STEP>
+    inline auto xstrided_view<CT, S, L, FST>::stepper_end(const ST& shape, layout_type /*l*/)
+        -> enable_indexed_stepper_t<STEP>
+    {
+        size_type offset = shape.size() - dimension();
+        return stepper(this, offset, true);
+    }
+
+    template <class CT, class S, layout_type L, class FST>
+    template <class ST, class STEP>
+    inline auto xstrided_view<CT, S, L, FST>::stepper_begin(const ST& shape) const
+        -> disable_indexed_stepper_t<STEP>
     {
         size_type offset = shape.size() - dimension();
         return const_stepper(this, data_xbegin(), offset);
@@ -496,7 +533,8 @@ namespace xt
 
     template <class CT, class S, layout_type L, class FST>
     template <class ST, class STEP>
-    inline auto xstrided_view<CT, S, L, FST>::stepper_end(const ST& shape, layout_type l) const -> std::enable_if_t<!is_indexed_stepper<STEP>::value, STEP>
+    inline auto xstrided_view<CT, S, L, FST>::stepper_end(const ST& shape, layout_type l) const
+        -> disable_indexed_stepper_t<STEP>
     {
         size_type offset = shape.size() - dimension();
         return const_stepper(this, data_xend(l, offset), offset);
@@ -504,7 +542,8 @@ namespace xt
 
     template <class CT, class S, layout_type L, class FST>
     template <class ST, class STEP>
-    inline auto xstrided_view<CT, S, L, FST>::stepper_begin(const ST& shape) const -> std::enable_if_t<is_indexed_stepper<STEP>::value, STEP>
+    inline auto xstrided_view<CT, S, L, FST>::stepper_begin(const ST& shape) const
+        -> enable_indexed_stepper_t<STEP>
     {
         size_type offset = shape.size() - dimension();
         return const_stepper(this, offset);
@@ -512,7 +551,8 @@ namespace xt
 
     template <class CT, class S, layout_type L, class FST>
     template <class ST, class STEP>
-    inline auto xstrided_view<CT, S, L, FST>::stepper_end(const ST& shape, layout_type /*l*/) const -> std::enable_if_t<is_indexed_stepper<STEP>::value, STEP>
+    inline auto xstrided_view<CT, S, L, FST>::stepper_end(const ST& shape, layout_type /*l*/) const
+        -> enable_indexed_stepper_t<STEP>
     {
         size_type offset = shape.size() - dimension();
         return const_stepper(this, offset, true);
