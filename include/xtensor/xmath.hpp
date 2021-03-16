@@ -407,6 +407,45 @@ namespace detail {
                           init_value_fct(detail::fill_init<init_value_type >(INIT))), std::forward<E>(e), axes, es); \
     }
 
+#define XTENSOR_MIN_MAX_REDUCER_FUNCTION(NAME, FUNCTOR, INIT_VALUE_TYPE, INIT)                                       \
+    template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,                                               \
+              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::negation<xtl::is_integral<X>>)>                \
+    inline auto NAME(E&& e, X&& axes, EVS es = EVS())                                                                \
+    {                                                                                                                \
+        using functor_type = FUNCTOR;                                                                                \
+        using init_value_fct = xt::const_value<INIT_VALUE_TYPE>;                                                     \
+        return xt::reduce(make_xreducer_functor(functor_type(),                                                      \
+                          init_value_fct(detail::fill_init<INIT_VALUE_TYPE>(INIT))),                                 \
+                          std::forward<E>(e),                                                                        \
+                          std::forward<X>(axes), es);                                                                \
+    }                                                                                                                \
+                                                                                                                     \
+    template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,                                               \
+              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::is_integral<X>)>                               \
+    inline auto NAME(E&& e, X axis, EVS es = EVS())                                                                  \
+    {                                                                                                                \
+        return NAME(std::forward<E>(e), {axis}, es);                                                                 \
+    }                                                                                                                \
+                                                                                                                     \
+    template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS,                                                        \
+              XTL_REQUIRES(is_reducer_options<EVS>)>                                                                 \
+    inline auto NAME(E&& e, EVS es = EVS())                                                                          \
+    {                                                                                                                \
+        using functor_type = FUNCTOR;                                                                                \
+        using init_value_fct = xt::const_value<INIT_VALUE_TYPE >;                                                    \
+        return xt::reduce(make_xreducer_functor(functor_type(),                                                      \
+                          init_value_fct(detail::fill_init<INIT_VALUE_TYPE >(INIT))), std::forward<E>(e), es);       \
+    }                                                                                                                \
+                                                                                                                     \
+    template <class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>                                \
+    inline auto NAME(E&& e, const I (&axes)[N], EVS es = EVS())                                                      \
+    {                                                                                                                \
+        using functor_type = FUNCTOR;                                                                                \
+        using init_value_fct = xt::const_value<INIT_VALUE_TYPE >;                                                    \
+        return xt::reduce(make_xreducer_functor(functor_type(),                                                      \
+                          init_value_fct(detail::fill_init<INIT_VALUE_TYPE >(INIT))), std::forward<E>(e), axes, es); \
+    }
+
     /*******************
      * basic functions *
      *******************/
@@ -2307,6 +2346,30 @@ namespace detail {
             }
         };
 
+        struct nan_min
+        {
+            template <class T, class U>
+            constexpr auto operator()(const T lhs, const U rhs) const
+            {
+                // Clunky expression for working with GCC 4.9
+                return math::isnan(lhs) ?
+                       rhs :
+                       (math::isnan(rhs) ? lhs : std::common_type_t<T, U>(detail::make_xfunction<math::minimum<void>>(lhs, rhs)));
+            }
+        };
+
+        struct nan_max
+        {
+            template <class T, class U>
+            constexpr auto operator()(const T lhs, const U rhs) const
+            {
+                // Clunky expression for working with GCC 4.9
+                return math::isnan(lhs) ?
+                       rhs :
+                       (math::isnan(rhs) ? lhs : std::common_type_t<T, U>(detail::make_xfunction<math::maximum<void>>(lhs, rhs)));
+            }
+        };
+
         struct nan_plus
         {
             template <class T, class U>
@@ -2356,6 +2419,36 @@ namespace detail {
     {
         return detail::make_xfunction<detail::nan_to_num_functor>(std::forward<E>(e));
     }
+
+    /**
+     * @ingroup nan_functions
+     * @brief Minimum element over given axes, excluding nans.
+     *
+     * Returns an \ref xreducer for the minimum of elements over given
+     * \em axes, ignoring nans.
+     * @param e an \ref xexpression
+     * @param axes the axes along which the minimum is found (optional)
+     * @param es evaluation strategy of the reducer (optional)
+     * @tparam T used for determining the value type of the result, which is
+     *           the type of `T() + E::value_type()`. The default is `E::value_type`.
+     * @return an \ref xreducer
+     */
+    XTENSOR_REDUCER_FUNCTION(nanmin, detail::nan_min, typename std::decay_t<E>::value_type, std::nan("0"))
+
+    /**
+     * @ingroup nan_functions
+     * @brief Maximum element along given axes, excluding nans.
+     *
+     * Returns an \ref xreducer for the sum of elements over given
+     * \em axes, replacing nan with 0.
+     * @param e an \ref xexpression
+     * @param axes the axes along which the sum is performed (optional)
+     * @param es evaluation strategy of the reducer (optional)
+     * @tparam T used for determining the value type of the result, which is
+     *           the type of `T() + E::value_type()`. The default is `E::value_type`.
+     * @return an \ref xreducer
+     */
+    XTENSOR_REDUCER_FUNCTION(nanmax, detail::nan_max, typename std::decay_t<E>::value_type, std::nan("0"))
 
     /**
      * @ingroup nan_functions
