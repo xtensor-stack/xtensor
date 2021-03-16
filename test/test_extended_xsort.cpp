@@ -6,8 +6,9 @@
 *                                                                          *
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
-
 // This file is generated from test/files/cppy_source/test_extended_xsort.cppy by preprocess.py!
+// Warning: This file should not be modified directly! Instead, modify the `*.cppy` file.
+
 
 #include "gtest/gtest.h"
 
@@ -105,8 +106,8 @@ namespace xt
         check_argpartition_equal(py_a, py_a19, xt::argpartition(py_a, 19), 19);
 
         // py_median = np.median(a)
-        long py_median = 300;
-        EXPECT_EQ(py_median, xt::median(py_a));
+        double py_median = 300.0;
+        EXPECT_EQ(static_cast<decltype(py_a)::value_type>(py_median), xt::median(py_a));
     }
 
     /*py

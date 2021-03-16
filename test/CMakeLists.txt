@@ -271,10 +271,9 @@ foreach(filename IN LISTS XNPY_FILES)
     endforeach()
 endforeach()
 
-set(XTENSOR_PREPROCESS_FILES
-    files/cppy_source/test_xstrided_view_extended.cppy
-)
+file(GLOB XTENSOR_PREPROCESS_FILES files/cppy_source/*.cppy)
 
+# This target should only be run when the test source files have been changed.
 add_custom_target(
     preprocess_cppy
     COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/files/preprocess.py
