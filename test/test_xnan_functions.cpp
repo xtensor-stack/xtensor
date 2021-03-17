@@ -261,109 +261,94 @@ namespace xt
         xarray<float> afloat(shape);
         xarray<double> adouble(shape);
 
-#define CHECK_RESULT_TYPE_FOR_ALL(INPUT, RESULT_TYPE)             \
-        CHECK_RESULT_TYPE(nansum(INPUT, {1, 2}), RESULT_TYPE);    \
-        CHECK_RESULT_TYPE(nanmean(INPUT, {1, 2}), double);        \
-        CHECK_RESULT_TYPE(nanvar(INPUT, {1, 2}), double);         \
-        CHECK_RESULT_TYPE(nanstd(INPUT, {1, 2}), double);
+#define CHECK_RESULT_TYPE_FOR_ALL(INPUT, RESULT_TYPE, MINMAX_TYPE)  \
+        CHECK_RESULT_TYPE(nansum(INPUT, {1, 2}), RESULT_TYPE);      \
+        CHECK_RESULT_TYPE(nanmean(INPUT, {1, 2}), double);          \
+        CHECK_RESULT_TYPE(nanvar(INPUT, {1, 2}), double);           \
+        CHECK_RESULT_TYPE(nanstd(INPUT, {1, 2}), double);           \
+        CHECK_RESULT_TYPE(nanmin(INPUT, {1, 2}), MINMAX_TYPE);      \
+        CHECK_RESULT_TYPE(nanmax(INPUT, {1, 2}), MINMAX_TYPE);
 
-#define CHECK_NAN_MIN_MAX_RESULT_TYPE(INPUT, RESULT_TYPE)         \
-        CHECK_RESULT_TYPE(nanmin(INPUT, {1, 2}), RESULT_TYPE)     \
-        CHECK_RESULT_TYPE(nanmax(INPUT, {1, 2}), RESULT_TYPE)
-
-#define CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(INPUT, TEMPLATE_TYPE, RESULT_TYPE, STD_TYPE)  \
-        CHECK_RESULT_TYPE(nansum<TEMPLATE_TYPE>(INPUT, {1, 2}), RESULT_TYPE)              \
-        CHECK_RESULT_TYPE(nanmean<TEMPLATE_TYPE>(INPUT, {1, 2}), RESULT_TYPE)             \
-        CHECK_RESULT_TYPE(nanvar<TEMPLATE_TYPE>(INPUT, {1, 2}), RESULT_TYPE)              \
-        CHECK_RESULT_TYPE(nanstd<TEMPLATE_TYPE>(INPUT, {1, 2}), STD_TYPE)
+#define CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(INPUT, TEMPLATE_TYPE, RESULT_TYPE, STD_TYPE, MINMAX_TYPE)  \
+        CHECK_RESULT_TYPE(nansum<TEMPLATE_TYPE>(INPUT, {1, 2}), RESULT_TYPE)                           \
+        CHECK_RESULT_TYPE(nanmean<TEMPLATE_TYPE>(INPUT, {1, 2}), RESULT_TYPE)                          \
+        CHECK_RESULT_TYPE(nanvar<TEMPLATE_TYPE>(INPUT, {1, 2}), RESULT_TYPE)                           \
+        CHECK_RESULT_TYPE(nanstd<TEMPLATE_TYPE>(INPUT, {1, 2}), STD_TYPE)                              \
+        CHECK_RESULT_TYPE(nanmin<TEMPLATE_TYPE>(INPUT, {1, 2}), MINMAX_TYPE)                           \
+        CHECK_RESULT_TYPE(nanmax<TEMPLATE_TYPE>(INPUT, {1, 2}), MINMAX_TYPE)
 
         /*********
          * short *
          *********/
-        CHECK_RESULT_TYPE_FOR_ALL(ashort, int);
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(ashort, short, int, double);
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(ashort, int, int, double);
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(ashort, double, double, double);
-
-        CHECK_NAN_MIN_MAX_RESULT_TYPE(ashort, short);
+        CHECK_RESULT_TYPE_FOR_ALL(ashort, int, short);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(ashort, short, int, double, short);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(ashort, int, int, double, int);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(ashort, double, double, double, double);
 
         /******************
          * unsigned short *
          ******************/
-        CHECK_RESULT_TYPE_FOR_ALL(aushort, int);
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aushort, unsigned short, int, double);
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aushort, int, int, double);
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aushort, double, double, double);
-
-        CHECK_NAN_MIN_MAX_RESULT_TYPE(aushort, unsigned short);
+        CHECK_RESULT_TYPE_FOR_ALL(aushort, int, unsigned short);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aushort, unsigned short, int, double, unsigned short);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aushort, int, int, double, int);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aushort, double, double, double, double);
 
         /*********
          * int *
          *********/
-        CHECK_RESULT_TYPE_FOR_ALL(aint, int);
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aint, unsigned short, int, double);
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aint, int, int, double);
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aint, double, double, double);
-
-        CHECK_NAN_MIN_MAX_RESULT_TYPE(aint, int);
+        CHECK_RESULT_TYPE_FOR_ALL(aint, int, int);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aint, unsigned short, int, double, int);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aint, int, int, double, int);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aint, double, double, double, double);
 
         /****************
          * unsigned int *
          ****************/
-        CHECK_RESULT_TYPE_FOR_ALL(auint, unsigned int);
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(auint, unsigned int, unsigned int, double);
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(auint, unsigned int, unsigned int, double);
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(auint, double, double, double);
-
-        CHECK_NAN_MIN_MAX_RESULT_TYPE(auint, unsigned int);
+        CHECK_RESULT_TYPE_FOR_ALL(auint, unsigned int, unsigned int);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(auint, unsigned int, unsigned int, double, unsigned int);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(auint, unsigned int, unsigned int, double, unsigned int);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(auint, double, double, double, double);
 
         /**********************
          * long long *
          **********************/
 #ifndef SKIP_ON_WERROR
         // intermediate computation done in double may imply precision loss
-        CHECK_RESULT_TYPE_FOR_ALL(along, signed long long);
+        CHECK_RESULT_TYPE_FOR_ALL(along, signed long long, signed long long);
 #endif
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(along, int, signed long long, double);
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(along, long, signed long long, double);
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(along, signed long long, signed long long, double);
-
-        CHECK_NAN_MIN_MAX_RESULT_TYPE(along, signed long long);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(along, int, signed long long, double, signed long long);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(along, long, signed long long, double, signed long long);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(along, signed long long, signed long long, double, signed long long);
 
         /**********************
          * unsigned long long *
          **********************/
 #ifndef SKIP_ON_WERROR
         // intermediate computation done in double may imply precision loss
-        CHECK_RESULT_TYPE_FOR_ALL(aulong, unsigned long long);
+        CHECK_RESULT_TYPE_FOR_ALL(aulong, unsigned long long, unsigned long long);
 #endif
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aulong, unsigned int, unsigned long long, double);
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aulong, unsigned long, unsigned long long, double);
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aulong, unsigned long long, unsigned long long, double);
-
-        CHECK_NAN_MIN_MAX_RESULT_TYPE(aulong, unsigned long long);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aulong, unsigned int, unsigned long long, double, unsigned long long);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aulong, unsigned long, unsigned long long, double, unsigned long long);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aulong, unsigned long long, unsigned long long, double, unsigned long long);
 
         /*********
          * float *
          *********/
-        CHECK_RESULT_TYPE_FOR_ALL(afloat, float);
+        CHECK_RESULT_TYPE_FOR_ALL(afloat, float, float);
 #ifndef SKIP_ON_WERROR
         // final conversion to int may imply conversion loss
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(afloat, int, float, float);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(afloat, int, float, float, float);
 #endif
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(afloat, float, float, float);
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(afloat, double, double, double);
-
-        CHECK_NAN_MIN_MAX_RESULT_TYPE(afloat, float);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(afloat, float, float, float, float);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(afloat, double, double, double, double);
 
         /**********
          * double *
          **********/
-        CHECK_RESULT_TYPE_FOR_ALL(adouble, double);
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(adouble, float, double, double);
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(adouble, double, double, double);
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(adouble, long double, long double, long double);
+        CHECK_RESULT_TYPE_FOR_ALL(adouble, double, double);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(adouble, float, double, double, double);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(adouble, double, double, double, double);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(adouble, long double, long double, long double, long double);
 
-        CHECK_NAN_MIN_MAX_RESULT_TYPE(adouble, double);
     }
 }
