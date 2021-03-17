@@ -214,7 +214,7 @@ namespace xt
             {
                 buf[i] = static_cast<R>(start + step * mult_type(i));
             }
-            if (num > 0 && endpoint)
+            if (endpoint && num > 1)
             {
                 buf[num-1] = static_cast<R>(stop);
             }
