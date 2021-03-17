@@ -246,7 +246,10 @@ namespace xt
         xt::xarray<double> c = linspace<double>(0., 2., 1, true);
         EXPECT_EQ(c.dimension(), size_t(1));
         EXPECT_EQ(c.shape(), expected_shape);
-        EXPECT_EQ(0., b(0));
+        EXPECT_EQ(0., c(0));
+
+        auto d = linspace<double>(0., 2., 1, true);
+        EXPECT_EQ(c, d);
     }
 
     TEST(xbuilder, linspace_n_samples_endpoint)
@@ -284,6 +287,15 @@ namespace xt
         xarray<int> expected = {0, 0, 1, 2, 3, 4, 5, 5, 6, 7, 8, 9, 10};
 
         ASSERT_TRUE(all(equal(ls, expected)));
+    }
+
+    TEST(xbuilder, linspace_double)
+    {
+        // access_imp will also be tested here
+        double at_end = 99.78730976641236;
+        xt::xarray<double> a = xt::linspace(0., at_end, 100);
+        auto b = xt::linspace(0., at_end, 100);
+        EXPECT_EQ(a, b);
     }
 
     TEST(xbuilder, logspace)
@@ -689,14 +701,5 @@ namespace xt
         EXPECT_TRUE(b);
         b = std::is_same<decltype(ed3), xarray<double>>::value;
         EXPECT_TRUE(b);
-    }
-
-    TEST(xbuilder, linspace_double)
-    {
-        // access_imp will also be tested here
-        double at_end = 99.78730976641236;
-        xt::xarray<double> a = xt::linspace(0., at_end, 100);
-        auto b = xt::linspace(0., at_end, 100);
-        EXPECT_EQ(a, b);
     }
 }
