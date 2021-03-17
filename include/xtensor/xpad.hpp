@@ -306,7 +306,7 @@ namespace xt
     {
       std::vector<S> tw(e.shape().size(), static_cast<S>(1));
       tw[0] = reps;
-      return tile(std::forward<E>(e), tw);
+      return detail::tile(std::forward<E>(e), tw);
     }
 }
 
