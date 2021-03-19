@@ -27,6 +27,18 @@ Defined in ``xtensor/xmath.hpp``
 .. doxygenfunction:: nansum(E&&, X&&, EVS)
    :project: xtensor
 
+.. _nanmean-function-reference:
+.. doxygenfunction:: nanmean(E&&, X&&, EVS)
+   :project: xtensor
+
+.. _nanvar-function-reference:
+.. doxygenfunction:: nanvar(E&&, X&&, EVS)
+   :project: xtensor
+
+.. _nanstd-function-reference:
+.. doxygenfunction:: nanstd(E&&, X&&, EVS)
+   :project: xtensor
+
 .. _nanprod-function-reference:
 .. doxygenfunction:: nanprod(E&&, X&&, EVS)
    :project: xtensor
