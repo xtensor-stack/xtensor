@@ -2616,7 +2616,7 @@ namespace detail {
     }
 
     /**
-     * @ingroup red_functions
+     * @ingroup nan_functions
      * @brief Mean of elements over given axes, excluding nans.
      *
      * Returns an \ref xreducer for the mean of elements over given
@@ -2676,7 +2676,7 @@ namespace detail {
     }
 
     /**
-     * @ingroup red_functions
+     * @ingroup nan_functions
      * @brief Compute the variance along the specified axes, excluding nans
      *
      * Returns the variance of the array elements, a measure of the spread of a
@@ -2715,7 +2715,7 @@ namespace detail {
     }
 
     /**
-     * @ingroup red_functions
+     * @ingroup nan_functions
      * @brief Compute the standard deviation along the specified axis, excluding nans.
      *
      * Returns the standard deviation, a measure of the spread of a distribution,
