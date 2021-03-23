@@ -375,6 +375,28 @@ namespace xt
         friend class xview_semantic<xtensor_view<EC, N, L, Tag>>;
     };
 
+    namespace detail
+    {
+        template <class V>
+        struct tensor_view_simd_helper
+        {
+            using valid_return_type = detail::has_simd_interface_impl<V, typename V::value_type>;
+            using valid_reference = std::is_lvalue_reference<typename V::reference>;
+            static constexpr bool value = valid_return_type::value && valid_reference::value;
+            using type = std::integral_constant<bool, value>;
+        };
+    }
+
+    // xtensor_view can be used on pseudo containers, i.e. containers
+    // whowe access operator does not return a reference. Since it
+    // is not possible to take the address f a temporary, the load_simd
+    // method implementation leads to a compilation error.
+    template <class EC, std::size_t N, layout_type L, class Tag>
+    struct has_simd_interface<xtensor_view<EC, N, L, Tag>>
+        : detail::tensor_view_simd_helper<xtensor_view<EC, N, L, Tag>>::type
+    {
+    };
+
     /************************************
      * xtensor_container implementation *
      ************************************/

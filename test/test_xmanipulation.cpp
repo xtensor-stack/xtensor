@@ -13,6 +13,7 @@
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xmanipulation.hpp"
+#include "xtensor/xrandom.hpp"
 #include "xtensor/xview.hpp"
 
 #include "xtensor/xio.hpp"
@@ -135,6 +136,12 @@ namespace xt
         EXPECT_EQ(*iter++, 125);
         EXPECT_EQ(*iter++, 126);
         EXPECT_EQ(iter, view.end());
+    }
+
+    TEST(xmanipulation, flatten_generator)
+    {
+        // Compilation test
+        xt::xtensor<double, 1> y = xt::flatten(xt::random::randint({100, 1}, 1, 100));
     }
 
     TEST(xmanipulation, flatten_simd_linear_assign_trait)
