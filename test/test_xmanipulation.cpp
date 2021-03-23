@@ -172,6 +172,26 @@ namespace xt
         }
     }
 
+    TEST(xmanipulation, flatten_assign)
+    {
+      xt::xarray<int> patch = xt::zeros<int>({2, 8});
+      xt::xarray<int> seq_r = xt::zeros<int>({16});
+      seq_r[0] = 1;
+      seq_r[1] = 2;
+      seq_r[2] = 3;
+      seq_r[3] = 4;
+      xt::flatten(xt::view(patch, xt::all(), xt::range(0, 2))) = xt::view(seq_r, xt::range(0, 4));
+      EXPECT_EQ(patch(0, 0), 1);
+      EXPECT_EQ(patch(0, 1), 2);
+      EXPECT_EQ(patch(1, 0), 3);
+      EXPECT_EQ(patch(1, 1), 4);
+      for (size_t i = 2; i < 8; ++i)
+      {
+          EXPECT_EQ(patch(0, i), 0);
+          EXPECT_EQ(patch(1, i), 0);
+      }
+    }
+
     TEST(xmanipulation, flatnonzero)
     {
         xt::xtensor<int, 1> a = arange(-2, 3);
@@ -529,5 +549,10 @@ namespace xt
         ASSERT_EQ(7, repeated_array(3, 0));
         ASSERT_EQ(8, repeated_array(3, 1));
         ASSERT_EQ(9, repeated_array(3, 2));
+    }
+
+    TEST(xmanipulation, zzzzzz)
+    {
+
     }
 }

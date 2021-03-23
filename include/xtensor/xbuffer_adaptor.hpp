@@ -596,6 +596,12 @@ namespace xt
         using type = typename xiterator_adaptor<I, CI>::temporary_type;
     };
 
+    template <class C, class IG>
+    struct temporary_container<xiterator_owner_adaptor<C, IG>>
+    {
+        using type = typename xiterator_owner_adaptor<C, IG>::temporary_type;
+    };
+
     template <class C>
     using temporary_container_t = typename temporary_container<C>::type;
 
