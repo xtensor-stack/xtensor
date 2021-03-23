@@ -7,6 +7,22 @@
 Changelog
 =========
 
+0.23.3
+------
+
+- Use the correct version file for TBB since 2021.1
+  `#2334 https://github.com/xtensor-stack/xtensor/pull/2334`
+- Add missing API RTD for nan functions
+  `#2333 https://github.com/xtensor-stack/xtensor/pull/2333`
+- Fixed layout issue in container classes
+  `#2335 https://github.com/xtensor-stack/xtensor/pull/2335`
+- Fixed assignment of a tensor_view on a pseudo-container
+  `#2336 https://github.com/xtensor-stack/xtensor/pull/2336`
+- Fixed return type of data method
+  `#2338 https://github.com/xtensor-stack/xtensor/pull/2338`
+- Fixed assignment to flatten view
+  `#2339 https://github.com/xtensor-stack/xtensor/pull/2339`
+
 0.23.2
 ------
 
