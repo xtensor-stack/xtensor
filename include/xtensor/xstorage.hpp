@@ -33,6 +33,11 @@ namespace xt
                                                                                std::input_iterator_tag>::value>::type;
     }
 
+    template <class C>
+    struct is_contiguous_container : std::true_type
+    {
+    };
+
     template <class T, class A = std::allocator<T>>
     class uvector
     {

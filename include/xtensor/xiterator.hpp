@@ -357,6 +357,12 @@ namespace xt
     bool operator<(const xiterator<St, S, L>& lhs,
                    const xiterator<St, S, L>& rhs);
 
+    template <class St, class S, layout_type L>
+    struct is_contiguous_container<xiterator<St, S, L>>
+        : std::false_type
+    {
+    };
+
     /*********************
      * xbounded_iterator *
      *********************/

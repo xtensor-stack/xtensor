@@ -876,9 +876,11 @@ namespace xt
     inline bool xstrided_container<D>::is_contiguous() const noexcept
     {
         using str_type = typename inner_strides_type::value_type;
-        return m_strides.empty()
-            || (m_layout == layout_type::row_major && m_strides.back() == str_type(1))
-            || (m_layout == layout_type::column_major && m_strides.front() == str_type(1));
+        return is_contiguous_container<storage_type>::value &&
+               ( m_strides.empty()
+                 || (m_layout == layout_type::row_major && m_strides.back() == str_type(1))
+                 || (m_layout == layout_type::column_major && m_strides.front() == str_type(1)));
+
     }
 
     namespace detail
@@ -912,12 +914,15 @@ namespace xt
         std::size_t dim = shape.size();
         if (m_shape.size() != dim || !std::equal(std::begin(shape), std::end(shape), std::begin(m_shape)) || force)
         {
-            layout_type layout = (D::static_layout == layout_type::dynamic && m_layout == layout_type::dynamic) ? XTENSOR_DEFAULT_LAYOUT : m_layout;
+            if (D::static_layout == layout_type::dynamic && m_layout == layout_type::dynamic)
+            {
+                m_layout = XTENSOR_DEFAULT_LAYOUT;  // fall back to default layout
+            }
             m_shape = xtl::forward_sequence<shape_type, S>(shape);
 
             resize_container(m_strides, dim);
             resize_container(m_backstrides, dim);
-            size_type data_size = compute_strides<D::static_layout>(m_shape, layout, m_strides, m_backstrides);
+            size_type data_size = compute_strides<D::static_layout>(m_shape, m_layout, m_strides, m_backstrides);
             detail::resize_data_container(this->storage(), data_size);
         }
     }
