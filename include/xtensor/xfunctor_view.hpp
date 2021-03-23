@@ -198,7 +198,7 @@ namespace xt
 
         template <class FCT = functor_type>
         auto data_element(size_type i) const
-            -> decltype(std::declval<FCT>()(std::declval<undecay_expression>().data_element(i)))
+            -> decltype(std::declval<FCT>()(std::declval<const undecay_expression>().data_element(i)))
         {
             return m_functor(m_e.data_element(i));
         }
@@ -1097,7 +1097,7 @@ namespace xt
     template <layout_type L>
     inline auto xfunctor_applier_base<D>::crbegin() const noexcept
     {
-        return xfunctor_iterator<functor_type, decltype(m_e.template rbegin<L>())>
+        return xfunctor_iterator<const functor_type, decltype(m_e.template rbegin<L>())>
             (m_e.template rbegin<L>(), &m_functor);
     }
 
@@ -1110,7 +1110,7 @@ namespace xt
     template <layout_type L>
     inline auto xfunctor_applier_base<D>::crend() const noexcept
     {
-        return xfunctor_iterator<functor_type, decltype(m_e.template rend<L>())>
+        return xfunctor_iterator<const functor_type, decltype(m_e.template rend<L>())>
             (m_e.template rend<L>(), &m_functor);
     }
     //@}

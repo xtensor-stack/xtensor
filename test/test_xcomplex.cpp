@@ -18,6 +18,8 @@
 #include "xtensor/xio.hpp"
 #include "xtensor/xnorm.hpp"
 
+#include "xtensor/xview.hpp"
+
 namespace xt
 {
     using namespace std::complex_literals;
@@ -316,5 +318,27 @@ namespace xt
 
         auto simd_loaded = a.template load_simd<xt_simd::aligned_mode, complex_type, xt_simd::simd_traits<complex_type>::size>(0);
         (void)simd_loaded;
+    }
+
+    TEST(xcomplex, view)
+    {
+
+        using cpx = std::complex<double>;
+        xt::xtensor<cpx, 2> a = {
+            { cpx(1, 1), cpx(-1, 1), cpx(-2, -2) },
+            { cpx(-1, 0), cpx(0, 1), cpx(2, 2) }
+        };
+
+        xtensor<cpx, 1> c = conj(view(a, 0, xt::all()));
+        xtensor<cpx ,1> exp_conj = {cpx(1, -1), cpx(-1, -1), cpx(-2, 2)};
+        EXPECT_EQ(c, exp_conj);
+
+        xtensor<double, 1> r = real(view(a, 0, xt::all()));
+        xtensor<double, 1> exp_real = {double(1), double(-1), double(-2)};
+        EXPECT_EQ(r, exp_real);
+
+        xtensor<double, 1> im = imag(view(a, 0, xt::all()));
+        xtensor<double, 1> exp_im = {double(1), double(1), double(-2)};
+        EXPECT_EQ(im, exp_im);
     }
 }
