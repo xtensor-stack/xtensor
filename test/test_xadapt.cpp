@@ -221,6 +221,7 @@ namespace xt
         auto a0_view = adapt(const_data, size, no_ownership());
         a0(3) = 3;
         EXPECT_EQ(3, a0_view[3]);
+        EXPECT_EQ(a0.data(), a0_view.data());
 
         using shape_type = std::array<vec_type::size_type, 2>;
         shape_type s = {2, 2};

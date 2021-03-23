@@ -1586,8 +1586,6 @@ namespace xt
             { 3, 4 },
         };
 
-        std::cout << tensor.shape().size() << std::endl;
-
         const auto row0 = xt::row(tensor, 0);
         const auto row1 = xt::row(tensor, 1);
 
