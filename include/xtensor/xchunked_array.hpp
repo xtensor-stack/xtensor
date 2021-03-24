@@ -381,7 +381,19 @@ namespace xt
         size_type ci = 0;
         for (auto& chunk: chunks)
         {
-            noalias(chunk) = strided_view(e.derived_cast(), sv);
+            auto rhs = strided_view(e.derived_cast(), sv);
+            auto rhs_shape = rhs.shape();
+            if (rhs_shape != chunk_shape)
+            {
+                xstrided_slice_vector esv(chunk_shape.size());  // element slice in edge chunk
+                std::transform(rhs_shape.begin(), rhs_shape.end(), esv.begin(),
+                               [](auto size) { return range(0, size); });
+                noalias(strided_view(chunk, esv)) = rhs;
+            }
+            else
+            {
+                noalias(chunk) = rhs;
+            }
             bool last_chunk = ci == chunks.size() - 1;
             if (!last_chunk)
             {
