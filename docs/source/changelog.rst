@@ -7,6 +7,12 @@
 Changelog
 =========
 
+0.23.4
+------
+
+- Fix edge chunk assignment
+  `#2342 https://github.com/xtensor-stack/xtensor/pull/2342`
+
 0.23.3
 ------
 
