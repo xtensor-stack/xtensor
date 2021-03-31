@@ -179,6 +179,7 @@ set(COMMON_BASE
     test_xexpression_traits.cpp
     test_xfunction.cpp
     test_xfunc_on_xexpression.cpp
+    test_xgrid_view.cpp
     test_xiterator.cpp
     test_xmath.cpp
     test_xoperation.cpp
