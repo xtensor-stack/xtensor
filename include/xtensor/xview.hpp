@@ -1232,6 +1232,7 @@ namespace xt
         if (!m_strides_computed)
         {
             compute_strides(std::integral_constant<bool, has_trivial_strides>{});
+            m_strides_computed = true;
         }
         return m_data_offset;
     }
