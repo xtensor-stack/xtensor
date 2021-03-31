@@ -461,10 +461,10 @@ namespace xt
         return detail::unravel_noexcept(index, strides, l);
     }
 
-    template <class S>
-    inline get_strides_t<S> ravel_from_strides(const S& index, const S& strides)
+    template <class S, class T>
+    inline get_value_type_t<T> ravel_from_strides(const T& index, const S& strides)
     {
-        return element_offset<get_strides_t<S>>(strides, index.begin(), index.end());
+        return element_offset<get_value_type_t<T>>(strides, index.begin(), index.end());
     }
 
     template <class S>
@@ -494,14 +494,13 @@ namespace xt
         return out;
     }
 
-    template <class S>
-    inline get_value_type<S> ravel_index(const S& index, const S& shape, layout_type l)
+    template <class S, class T>
+    inline get_value_type_t<T> ravel_index(const T& index, const S& shape, layout_type l)
     {
         using strides_type = get_strides_t<S>;
-        using strides_value_type = typename strides_type::value_type;
         strides_type strides = xtl::make_sequence<strides_type>(shape.size(), 0);
         compute_strides(shape, l, strides);
-        return ravel_from_strides(static_cast<strides_value_type>(index), strides);
+        return ravel_from_strides(index, strides);
     }
 
     template <class S, class stype>
