@@ -10,20 +10,19 @@
 #include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xchunked_array.hpp"
-#include "xtensor/xgrid_view.hpp"
+#include "xtensor/xchunked_view.hpp"
 
 namespace xt
 {
-    TEST(xgrid_view, generate)
+    TEST(xchunked_view, iterate)
     {
         std::vector<std::size_t> shape = {3, 4};
         std::vector<std::size_t> chunk_shape = {1, 2};
         xarray<double> a(shape);
-        auto chunk_gen = grid_view(a, shape, chunk_shape);
         std::size_t chunk_nb = 0;
-        while (!chunk_gen.last_chunk())
+        auto chunk_iter = xchunk_iterator<xarray<double>>(a, shape, chunk_shape);
+        for (auto it = chunk_iter.begin(); it != chunk_iter.end(); it++)
         {
-            chunk_gen.next();
             chunk_nb++;
         }
 
@@ -32,7 +31,7 @@ namespace xt
         EXPECT_EQ(chunk_nb, expected_chunk_nb);
     }
 
-    TEST(xgrid_view, assign)
+    TEST(xchunked_view, assign)
     {
         std::vector<std::size_t> shape = {3, 4};
         std::vector<std::size_t> chunk_shape = {1, 2};
@@ -41,12 +40,12 @@ namespace xt
         std::copy(data.cbegin(), data.cend(), a.begin());
         xarray<double> b(shape);
 
-        grid_view(b, shape, chunk_shape) = a;
+        as_chunked(b, shape, chunk_shape) = a;
 
         EXPECT_EQ(a, b);
     }
 
-    TEST(xgrid_view, assign_chunked_array)
+    TEST(xchunked_view, assign_chunked_array)
     {
         std::vector<std::size_t> shape = {10, 10, 10};
         std::vector<std::size_t> chunk_shape = {2, 3, 4};
@@ -54,8 +53,8 @@ namespace xt
         xarray<double> b(shape);
         auto ref = arange(0, 1000).reshape(shape);
 
-        grid_view(a, shape, chunk_shape) = ref;
-        grid_view(b, shape, chunk_shape) = a;
+        as_chunked(a, shape, chunk_shape) = ref;
+        as_chunked(b, shape, chunk_shape) = a;
 
         EXPECT_EQ(ref, a);
         EXPECT_EQ(ref, b);

@@ -124,6 +124,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xbuffer_adaptor.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xbuilder.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xchunked_array.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xchunked_view.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xcomplex.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xcontainer.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xcsv.hpp
@@ -137,7 +138,6 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xfunction.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xfunctor_view.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xgenerator.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xgrid_view.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xhistogram.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xindex_view.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xinfo.hpp

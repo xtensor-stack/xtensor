@@ -179,7 +179,6 @@ set(COMMON_BASE
     test_xexpression_traits.cpp
     test_xfunction.cpp
     test_xfunc_on_xexpression.cpp
-    test_xgrid_view.cpp
     test_xiterator.cpp
     test_xmath.cpp
     test_xoperation.cpp
@@ -206,6 +205,8 @@ set(XTENSOR_TESTS
     test_xaxis_iterator.cpp
     test_xaxis_slice_iterator.cpp
     test_xbuffer_adaptor.cpp
+    test_xchunked_array.cpp
+    test_xchunked_view.cpp
     test_xcomplex.cpp
     test_xcsv.cpp
     test_xdatesupport.cpp
@@ -239,7 +240,6 @@ set(XTENSOR_TESTS
     test_extended_xmath_reducers.cpp
     test_extended_xhistogram.cpp
     test_extended_xsort.cpp
-    test_xchunked_array.cpp
     test_sfinae.cpp
 )
 
