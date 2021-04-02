@@ -20,7 +20,7 @@ namespace xt
         std::vector<std::size_t> chunk_shape = {1, 2};
         xarray<double> a(shape);
         std::size_t chunk_nb = 0;
-        auto chunked_view = xchunked_view<xarray<double>>(a, shape, chunk_shape);
+        auto chunked_view = xchunked_view<xarray<double>>(a, chunk_shape);
         for (auto it = chunked_view.begin(); it != chunked_view.end(); it++)
         {
             chunk_nb++;
@@ -40,7 +40,7 @@ namespace xt
         std::copy(data.cbegin(), data.cend(), a.begin());
         xarray<double> b(shape);
 
-        as_chunked(b, shape, chunk_shape) = a;
+        as_chunked(b, chunk_shape) = a;
 
         EXPECT_EQ(a, b);
     }
@@ -53,8 +53,8 @@ namespace xt
         xarray<double> b(shape);
         auto ref = arange(0, 1000).reshape(shape);
 
-        as_chunked(a, shape, chunk_shape) = ref;
-        as_chunked(b, shape, chunk_shape) = a;
+        as_chunked(a, chunk_shape) = ref;
+        as_chunked(b, chunk_shape) = a;
 
         EXPECT_EQ(ref, a);
         EXPECT_EQ(ref, b);

@@ -42,7 +42,7 @@ namespace xt
     {
     public:
         template <class OE>
-        xchunked_view(OE&& e, std::vector<std::size_t>& shape, std::vector<std::size_t>& chunk_shape);
+        xchunked_view(OE&& e, std::vector<std::size_t>& chunk_shape);
 
         xchunk_iterator<E> begin();
         xchunk_iterator<E> end();
@@ -131,11 +131,13 @@ namespace xt
 
     template <class E>
     template <class OE>
-    inline xchunked_view<E>::xchunked_view(OE&& e, std::vector<std::size_t>& shape, std::vector<std::size_t>& chunk_shape)
+    inline xchunked_view<E>::xchunked_view(OE&& e, std::vector<std::size_t>& chunk_shape)
         : m_expression(std::forward<OE>(e))
-        , m_shape(shape)
         , m_chunk_shape(chunk_shape)
     {
+        m_shape.resize(e.dimension());
+        const auto& s = e.shape();
+        std::copy(s.cbegin(), s.cend(), m_shape.begin());
         // compute chunk number in each dimension
         m_shape_of_chunks.resize(m_shape.size());
         std::transform
@@ -188,9 +190,9 @@ namespace xt
     }
 
     template <class E>
-    auto as_chunked(E&& e, std::vector<std::size_t>& shape, std::vector<std::size_t>& chunk_shape)
+    auto as_chunked(E&& e, std::vector<std::size_t>& chunk_shape)
     {
-        return xchunked_view<E>(std::forward<E>(e), shape, chunk_shape);
+        return xchunked_view<E>(std::forward<E>(e), chunk_shape);
     }
 
 }
