@@ -14,23 +14,6 @@
 
 namespace xt
 {
-    TEST(xchunked_view, iterate)
-    {
-        std::vector<std::size_t> shape = {3, 4};
-        std::vector<std::size_t> chunk_shape = {1, 2};
-        xarray<double> a(shape);
-        std::size_t chunk_nb = 0;
-        auto chunk_iter = xchunk_iterator<xarray<double>>(a, shape, chunk_shape);
-        for (auto it = chunk_iter.begin(); it != chunk_iter.end(); it++)
-        {
-            chunk_nb++;
-        }
-
-        std::size_t expected_chunk_nb = (shape[0] / chunk_shape[0]) * (shape[1] / chunk_shape[1]);
-
-        EXPECT_EQ(chunk_nb, expected_chunk_nb);
-    }
-
     TEST(xchunked_view, assign)
     {
         std::vector<std::size_t> shape = {3, 4};
