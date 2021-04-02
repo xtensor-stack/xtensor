@@ -41,7 +41,7 @@ jobs:
     steps:
 
       - script: |
-          if [[ $(gcc_version) == '4.9' || $(gcc_version) == '6' ]]; then
+          if [[ $(gcc_version) == '4.9' || $(gcc_version) == '6' || $(gcc_version) == '7' || $(gcc_version) == '8' ]]; then
             sudo add-apt-repository ppa:ubuntu-toolchain-r/test
             sudo apt-get update
             sudo apt-get --no-install-suggests --no-install-recommends install g++-$(gcc_version)
