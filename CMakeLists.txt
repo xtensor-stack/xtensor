@@ -124,6 +124,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xbuffer_adaptor.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xbuilder.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xchunked_array.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xchunked_view.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xcomplex.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xcontainer.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xcsv.hpp
