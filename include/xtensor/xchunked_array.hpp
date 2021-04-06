@@ -368,8 +368,7 @@ namespace xt
     template <class E>
     inline auto xchunked_semantic<D>::assign_xexpression(const xexpression<E>& e) -> derived_type&
     {
-        as_chunked(this->derived_cast()) = e.derived_cast();
-        return this->derived_cast();
+        return chunked_assign_expression(this->derived_cast(), e.derived_cast());
     }
 
     template <class D>

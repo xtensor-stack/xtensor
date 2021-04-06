@@ -16,49 +16,24 @@
 namespace xt
 {
 
-    template <class T>
-    inline void xchunked_view_init(T* that)
-    {
-        that->m_shape.resize(that->m_expression.dimension());
-        const auto& s = that->m_expression.shape();
-        std::copy(s.cbegin(), s.cend(), that->m_shape.begin());
-        // compute chunk number in each dimension
-        that->m_shape_of_chunks.resize(that->m_shape.size());
-        std::transform
-        (
-            that->m_shape.cbegin(), that->m_shape.cend(),
-            that->m_chunk_shape.cbegin(),
-            that->m_shape_of_chunks.begin(),
-            [](auto s, auto cs)
-            {
-                std::size_t cn = s / cs;
-                if (s % cs > 0)
-                {
-                    cn++; // edge_chunk
-                }
-                return cn;
-            }
-        );
-        that->m_ic.resize(that->m_shape.size());
-        that->m_chunk_nb = std::accumulate(std::begin(that->m_shape_of_chunks), std::end(that->m_shape_of_chunks), std::size_t(1), std::multiplies<>());
-        that->m_sv.resize(that->m_shape.size());
-    }
+    template <class E>
+    class xchunked_view;
 
-    template <class E, class V>
+    template <class E>
     class xchunk_iterator
     {
     public:
-        xchunk_iterator(V& chunked_view, std::size_t chunk_idx);
+        xchunk_iterator(xchunked_view<E>& chunked_view, std::size_t chunk_idx);
         xchunk_iterator() = default;
 
-        xchunk_iterator<E, V>& operator++();
-        xchunk_iterator<E, V> operator++(int);
+        xchunk_iterator<E>& operator++();
+        xchunk_iterator<E> operator++(int);
         bool operator==(const xchunk_iterator& other) const;
         bool operator!=(const xchunk_iterator& other) const;
         auto operator*();
 
     private:
-        V* m_pcv;
+        xchunked_view<E>* m_pcv;
         std::size_t m_ci;
     };
 
@@ -69,12 +44,13 @@ namespace xt
         template <class OE>
         xchunked_view(OE&& e, std::vector<std::size_t>& chunk_shape);
 
-        xchunk_iterator<E, xchunked_view<E>> begin();
-        xchunk_iterator<E, xchunked_view<E>> end();
+        xchunk_iterator<E> begin();
+        xchunk_iterator<E> end();
 
         template <class OE>
         xchunked_view<E>& operator=(const OE& e);
 
+    private:
         E m_expression;
         std::vector<std::size_t> m_shape;
         std::vector<std::size_t> m_chunk_shape;
@@ -83,50 +59,18 @@ namespace xt
         std::size_t m_chunk_nb;
         xstrided_slice_vector m_sv;
 
-    private:
-
-        friend class xchunk_iterator<E, xchunked_view<E>>;
+        friend class xchunk_iterator<E>;
     };
 
     template <class E>
-    class xchunked_view_on_chunked
-    {
-    public:
-        template <class OE>
-        xchunked_view_on_chunked(OE&& e);
-
-        xchunk_iterator<E, xchunked_view_on_chunked<E>> begin();
-        xchunk_iterator<E, xchunked_view_on_chunked<E>> end();
-
-        template <class OE>
-        xchunked_view_on_chunked<E>& operator=(const OE& e);
-
-        E m_expression;
-        std::vector<std::size_t> m_shape;
-        std::vector<std::size_t> m_chunk_shape;
-        std::vector<std::size_t> m_shape_of_chunks;
-        std::vector<std::size_t> m_ic;
-        std::size_t m_chunk_nb;
-        xstrided_slice_vector m_sv;
-
-    private:
-
-        friend class xchunk_iterator<E, xchunked_view_on_chunked<E>>;
-    };
-
-    /////////////////////
-    // xchunk_iterator //
-    /////////////////////
-
-    template <class E, class V>
-    inline xchunk_iterator<E, V>::xchunk_iterator(V& chunked_view, std::size_t chunk_idx)
+    inline xchunk_iterator<E>::xchunk_iterator(xchunked_view<E>& chunked_view, std::size_t chunk_idx)
         : m_pcv(&chunked_view)
         , m_ci(chunk_idx)
     {
     }
 
-    template <class E, class V>
-    inline xchunk_iterator<E, V>& xchunk_iterator<E, V>::operator++()
+    template <class E>
+    inline xchunk_iterator<E>& xchunk_iterator<E>::operator++()
     {
         if (m_ci != m_pcv->m_chunk_nb - 1)
         {
@@ -158,35 +102,31 @@ namespace xt
         return *this;
     }
 
-    template <class E, class V>
-    inline xchunk_iterator<E, V> xchunk_iterator<E, V>::operator++(int)
+    template <class E>
+    inline xchunk_iterator<E> xchunk_iterator<E>::operator++(int)
     {
-        xchunk_iterator<E, V> it = *this;
+        xchunk_iterator<E> it = *this;
         ++(*this);
         return it;
     }
 
-    template <class E, class V>
-    inline bool xchunk_iterator<E, V>::operator==(const xchunk_iterator& other) const
+    template <class E>
+    inline bool xchunk_iterator<E>::operator==(const xchunk_iterator& other) const
     {
         return m_ci == other.m_ci;
     }
 
-    template <class E, class V>
-    inline bool xchunk_iterator<E, V>::operator!=(const xchunk_iterator& other) const
+    template <class E>
+    inline bool xchunk_iterator<E>::operator!=(const xchunk_iterator& other) const
     {
         return !(*this == other);
     }
 
-    template <class E, class V>
-    inline auto xchunk_iterator<E, V>::operator*()
+    template <class E>
+    inline auto xchunk_iterator<E>::operator*()
     {
         return m_pcv->m_sv;
     }
-
-    ///////////////////
-    // xchunked_view //
-    ///////////////////
 
     template <class E>
     template <class OE>
@@ -194,13 +134,35 @@ namespace xt
         : m_expression(std::forward<OE>(e))
         , m_chunk_shape(chunk_shape)
     {
-        xchunked_view_init(this);
+        m_shape.resize(e.dimension());
+        const auto& s = e.shape();
+        std::copy(s.cbegin(), s.cend(), m_shape.begin());
+        // compute chunk number in each dimension
+        m_shape_of_chunks.resize(m_shape.size());
+        std::transform
+        (
+            m_shape.cbegin(), m_shape.cend(),
+            m_chunk_shape.cbegin(),
+            m_shape_of_chunks.begin(),
+            [](auto s, auto cs)
+            {
+                std::size_t cn = s / cs;
+                if (s % cs > 0)
+                {
+                    cn++; // edge_chunk
+                }
+                return cn;
+            }
+        );
+        m_ic.resize(m_shape.size());
+        m_chunk_nb = std::accumulate(std::begin(m_shape_of_chunks), std::end(m_shape_of_chunks), std::size_t(1), std::multiplies<>());
+        m_sv.resize(m_shape.size());
     }
 
     template <class E>
-    inline xchunk_iterator<E, xchunked_view<E>> xchunked_view<E>::begin()
+    inline xchunk_iterator<E> xchunked_view<E>::begin()
     {
-        auto it = xchunk_iterator<E, xchunked_view<E>>(*this, 0);
+        auto it = xchunk_iterator<E>(*this, 0);
         std::transform(m_chunk_shape.begin(), m_chunk_shape.end(), m_sv.begin(),
                        [](auto size) { return range(0, size); });
         std::fill(m_ic.begin(), m_ic.end(), std::size_t(0));
@@ -208,9 +170,9 @@ namespace xt
     }
 
     template <class E>
-    inline xchunk_iterator<E, xchunked_view<E>> xchunked_view<E>::end()
+    inline xchunk_iterator<E> xchunked_view<E>::end()
     {
-        auto it = xchunk_iterator<E, xchunked_view<E>>(*this, m_chunk_nb);
+        auto it = xchunk_iterator<E>(*this, m_chunk_nb);
         return it;
     }
 
@@ -226,52 +188,30 @@ namespace xt
         return *this;
     }
 
-    //////////////////////////////
-    // xchunked_view_on_chunked //
-    //////////////////////////////
-
     template <class E>
-    template <class OE>
-    inline xchunked_view_on_chunked<E>::xchunked_view_on_chunked(OE&& e)
-        : m_expression(std::forward<OE>(e))
+    auto as_chunked(E&& e, std::vector<std::size_t>& chunk_shape)
     {
-        m_chunk_shape.resize(e.dimension());
-        const auto& s = e.chunk_shape();
-        std::copy(s.cbegin(), s.cend(), m_chunk_shape.begin());
-        xchunked_view_init(this);
+        return xchunked_view<E>(std::forward<E>(e), chunk_shape);
     }
 
-    template <class E>
-    inline xchunk_iterator<E, xchunked_view_on_chunked<E>> xchunked_view_on_chunked<E>::begin()
+    template <class E1, class E2>
+    E1& chunked_assign_expression(E1&& e1, E2&& e2)
     {
-        auto it = xchunk_iterator<E, xchunked_view_on_chunked<E>>(*this, 0);
-        std::transform(m_chunk_shape.begin(), m_chunk_shape.end(), m_sv.begin(),
-                       [](auto size) { return range(0, size); });
-        std::fill(m_ic.begin(), m_ic.end(), std::size_t(0));
-        return it;
-    }
-
-    template <class E>
-    inline xchunk_iterator<E, xchunked_view_on_chunked<E>> xchunked_view_on_chunked<E>::end()
-    {
-        auto it = xchunk_iterator<E, xchunked_view_on_chunked<E>>(*this, m_chunk_nb);
-        return it;
-    }
-    template <class E>
-    template <class OE>
-    xchunked_view_on_chunked<E>& xchunked_view_on_chunked<E>::operator=(const OE& e)
-    {
-        auto& chunks = m_expression.chunks();
+        std::vector<std::size_t> chunk_shape;
+        chunk_shape.resize(e1.dimension());
+        const auto& s = e1.chunk_shape();
+        std::copy(s.cbegin(), s.cend(), chunk_shape.begin());
+        auto chunked_view = xchunked_view<E2>(std::forward<E2>(e2), chunk_shape);
+        auto& chunks = e1.chunks();
         auto chunk_it = chunks.begin();
-        for (auto it = begin(); it != end(); it++)
+        for (auto it = chunked_view.begin(); it != chunked_view.end(); it++)
         {
             auto sv = *it;
-
-            auto rhs = strided_view(e, sv);
+            auto rhs = strided_view(e2, sv);
             auto rhs_shape = rhs.shape();
-            if (rhs_shape != m_expression.chunk_shape())
+            if (rhs_shape != e1.chunk_shape())
             {
-                xstrided_slice_vector esv(m_chunk_shape.size());  // element slice in edge chunk
+                xstrided_slice_vector esv(chunk_shape.size());  // element slice in edge chunk
                 std::transform(rhs_shape.begin(), rhs_shape.end(), esv.begin(),
                                [](auto size) { return range(0, size); });
                 noalias(strided_view(*chunk_it, esv)) = rhs;
@@ -282,25 +222,8 @@ namespace xt
             }
             chunk_it++;
         }
-        return *this;
+        return e1;
     }
-
-    ////////////////
-    // as_chunked //
-    ////////////////
-
-    template <class E>
-    auto as_chunked(E&& e, std::vector<std::size_t>& chunk_shape)
-    {
-        return xchunked_view<E>(std::forward<E>(e), chunk_shape);
-    }
-
-    template <class E>
-    auto as_chunked(E&& e)
-    {
-        return xchunked_view_on_chunked<E>(std::forward<E>(e));
-    }
-
 }
 
 #endif
