@@ -35,6 +35,12 @@ namespace xt
             static constexpr std::size_t value = N;
         };
 
+        template <class T, std::size_t N>
+        struct array_size_impl<const_array<T, N>>
+        {
+            static constexpr std::size_t value = N;
+        };
+
         template <class C>
         using array_size = array_size_impl<std::decay_t<C>>;
 
