@@ -31,17 +31,29 @@ namespace xt
     {
     public:
         
+        using self_type = xchunked_view<E>;
+        using expression_type = std::decay_t<E>;
         using size_type = size_t;
         using shape_type = svector<size_type>;
+        using chunk_iterator_type = xchunk_iterator<self_type>;
 
         template <class OE, class S>
         xchunked_view(OE&& e, S&& chunk_shape);
 
-        xchunk_iterator<E> chunk_begin();
-        xchunk_iterator<E> chunk_end();
-
         template <class OE>
         xchunked_view<E>& operator=(const OE& e);
+
+        size_type dimension() const noexcept;
+        const shape_type& shape() const noexcept;
+        const shape_type& chunk_shape() const noexcept;
+        size_type grid_size() const noexcept;
+        const shape_type& grid_shape() const noexcept;
+
+        expression_type& expression() noexcept;
+        const expression_type& expression() const noexcept;
+
+        chunk_iterator_type chunk_begin();
+        chunk_iterator_type chunk_end();
 
     private:
 
@@ -50,48 +62,10 @@ namespace xt
         shape_type m_chunk_shape;
         shape_type m_grid_shape;
         size_type m_chunk_nb;
-
-        friend class xchunk_iterator<E>;
     };
 
     template <class E, class S>
     xchunked_view<E> as_chunked(E&& e, S&& chunk_shape);
-
-    /*********************
-     * xchunked_iterator *
-     *********************/
-
-    template <class E>
-    class xchunk_iterator
-    {
-    public:
-
-        using view_type = xchunked_view<E>;
-        using size_type = typename view_type::size_type;
-        using shape_type = typename view_type::shape_type;
-        using slice_vector = xstrided_slice_vector;
-
-        xchunk_iterator() = default;
-        xchunk_iterator(view_type& view,
-                        shape_type&& chunk_index,
-                        size_type chunk_linear_index);
-
-        xchunk_iterator<E>& operator++();
-        xchunk_iterator<E> operator++(int);
-        auto operator*();
-
-        bool operator==(const xchunk_iterator& other) const;
-        bool operator!=(const xchunk_iterator& other) const;
-
-        const slice_vector& get_slice_vector() const;
-
-    private:
-
-        view_type* p_chunked_view;
-        shape_type m_chunk_index;
-        size_type m_chunk_linear_index;
-        xstrided_slice_vector m_slice_vector;
-    };
 
     /********************************
      * xchunked_view implementation *
@@ -127,20 +101,6 @@ namespace xt
     }
 
     template <class E>
-    inline xchunk_iterator<E> xchunked_view<E>::chunk_begin()
-    {
-        shape_type chunk_index(m_shape.size(), size_type(0));
-        return xchunk_iterator<E>(*this, std::move(chunk_index), 0u);
-    }
-
-    template <class E>
-    inline xchunk_iterator<E> xchunked_view<E>::chunk_end()
-    {
-        auto it = xchunk_iterator<E>(*this, shape_type(m_grid_shape), m_chunk_nb);
-        return it;
-    }
-
-    template <class E>
     template <class OE>
     xchunked_view<E>& xchunked_view<E>::operator=(const OE& e)
     {
@@ -152,101 +112,65 @@ namespace xt
         return *this;
     }
 
+    template <class E>
+    inline auto xchunked_view<E>::dimension() const noexcept -> size_type
+    {
+        return m_shape.size();
+    }
+
+    template <class E>
+    inline auto xchunked_view<E>::shape() const noexcept -> const shape_type&
+    {
+        return m_shape;
+    }
+
+    template <class E>
+    inline auto xchunked_view<E>::chunk_shape() const noexcept -> const shape_type&
+    {
+        return m_chunk_shape;
+    }
+
+    template <class E>
+    inline auto xchunked_view<E>::grid_size() const noexcept -> size_type
+    {
+        return m_chunk_nb;
+    }
+
+    template <class E>
+    inline auto xchunked_view<E>::grid_shape() const noexcept -> const shape_type&
+    {
+        return m_grid_shape;
+    }
+
+    template <class E>
+    inline auto xchunked_view<E>::expression() noexcept -> expression_type&
+    {
+        return m_expression;
+    }
+
+    template <class E>
+    inline auto xchunked_view<E>::expression() const noexcept -> const expression_type&
+    {
+        return m_expression;
+    }
+
+    template <class E>
+    inline auto xchunked_view<E>::chunk_begin() -> chunk_iterator_type
+    {
+        shape_type chunk_index(m_shape.size(), size_type(0));
+        return chunk_iterator_type(*this, std::move(chunk_index), 0u);
+    }
+
+    template <class E>
+    inline auto xchunked_view<E>::chunk_end() -> chunk_iterator_type
+    {
+        return chunk_iterator_type(*this, shape_type(grid_shape()), grid_size());
+    }
+
     template <class E, class S>
     inline xchunked_view<E> as_chunked(E&& e, S&& chunk_shape)
     {
         return xchunked_view<E>(std::forward<E>(e), std::forward<S>(chunk_shape));
-    }
-
-    /**********************************
-     * xchunk_iterator implementation *
-     **********************************/
-
-    template <class E>
-    inline xchunk_iterator<E>::xchunk_iterator(view_type& view, shape_type&& chunk_index, size_type chunk_linear_index)
-        : p_chunked_view(&view)
-        , m_chunk_index(std::move(chunk_index))
-        , m_chunk_linear_index(chunk_linear_index)
-        , m_slice_vector(m_chunk_index.size())
-    {
-        for (size_type i = 0; i < m_chunk_index.size(); ++i)
-        {
-            if (m_chunk_index[i] == 0)
-            {
-                m_slice_vector[i] = range(0, p_chunked_view->m_chunk_shape[i]);
-            }
-            else
-            {
-                m_slice_vector[i] = range(m_chunk_index[i] * p_chunked_view->m_chunk_shape[i],
-                                          (m_chunk_index[i] + 1) * p_chunked_view->m_chunk_shape[i]);
-            }
-        }
-    }
-
-    template <class E>
-    inline xchunk_iterator<E>& xchunk_iterator<E>::operator++()
-    {
-        if (m_chunk_linear_index != p_chunked_view->m_chunk_nb - 1)
-        {
-            size_type di = p_chunked_view->m_shape.size() - 1;
-            while (true)
-            {
-                if (m_chunk_index[di] + 1 == p_chunked_view->m_grid_shape[di])
-                {
-                    m_chunk_index[di] = 0;
-                    m_slice_vector[di] = range(0, p_chunked_view->m_chunk_shape[di]);
-                    if (di == 0)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        di--;
-                    }
-                }
-                else
-                {
-                    m_chunk_index[di] += 1;
-                    m_slice_vector[di] = range(m_chunk_index[di] * p_chunked_view->m_chunk_shape[di],
-                                                     (m_chunk_index[di] + 1) * p_chunked_view->m_chunk_shape[di]);
-                    break;
-                }
-            }
-        }
-        m_chunk_linear_index++;
-        return *this;
-    }
-
-    template <class E>
-    inline xchunk_iterator<E> xchunk_iterator<E>::operator++(int)
-    {
-        xchunk_iterator<E> it = *this;
-        ++(*this);
-        return it;
-    }
-
-    template <class E>
-    inline auto xchunk_iterator<E>::operator*()
-    {
-        return strided_view(p_chunked_view->m_expression, m_slice_vector);
-    }
-
-    template <class E>
-    inline bool xchunk_iterator<E>::operator==(const xchunk_iterator& other) const
-    {
-        return m_chunk_linear_index == other.m_chunk_linear_index;
-    }
-
-    template <class E>
-    inline bool xchunk_iterator<E>::operator!=(const xchunk_iterator& other) const
-    {
-        return !(*this == other);
-    }
-
-    template <class E>
-    inline auto xchunk_iterator<E>::get_slice_vector() const -> const slice_vector& 
-    {
-        return m_slice_vector;
     }
 }
 

@@ -74,6 +74,7 @@ namespace xt
         using bool_load_type = xt::bool_load_type<value_type>;
         static constexpr layout_type static_layout = layout_type::dynamic;
         static constexpr bool contiguous_layout = false;
+        using chunk_iterator_type = xchunk_iterator<self_type>;
 
         template <class S>
         xchunked_array(chunk_storage_type&& chunks, S&& shape, S&& chunk_shape, layout_type chunk_memory_layout = XTENSOR_DEFAULT_LAYOUT);
@@ -94,6 +95,7 @@ namespace xt
         template <class E>
         xchunked_array& operator=(const xexpression<E>& e);
 
+        size_type dimension() const noexcept;
         const shape_type& shape() const noexcept;
         layout_type layout() const noexcept;
         bool is_contiguous() const noexcept;
@@ -126,9 +128,15 @@ namespace xt
         template <class S>
         const_stepper stepper_end(const S& shape, layout_type) const noexcept;
 
-        const shape_type& chunk_shape() const;
+        const shape_type& chunk_shape() const noexcept;
+        size_type grid_size() const noexcept;
+        const shape_type& grid_shape() const noexcept;
+
         chunk_storage_type& chunks();
         const chunk_storage_type& chunks() const;
+
+        chunk_iterator_type chunk_begin();
+        chunk_iterator_type chunk_end();
 
     private:
 
@@ -344,6 +352,12 @@ namespace xt
     }
 
     template <class CS>
+    inline auto xchunked_array<CS>::dimension() const noexcept -> size_type
+    {
+        return m_shape.size();
+    }
+
+    template <class CS>
     inline auto xchunked_array<CS>::shape() const noexcept -> const shape_type&
     {
         return m_shape;
@@ -444,6 +458,24 @@ namespace xt
     }
 
     template <class CS>
+    inline auto xchunked_array<CS>::chunk_shape() const noexcept -> const shape_type&
+    {
+        return m_chunk_shape;
+    }
+
+    template <class CS>
+    inline auto xchunked_array<CS>::grid_size() const noexcept -> size_type
+    {
+        return m_chunks.size();
+    }
+
+    template <class CS>
+    inline auto xchunked_array<CS>::grid_shape() const noexcept -> const shape_type&
+    {
+        return m_chunks.shape();
+    }
+
+    template <class CS>
     inline auto xchunked_array<CS>::chunks() -> chunk_storage_type&
     {
         return m_chunks;
@@ -456,9 +488,16 @@ namespace xt
     }
 
     template <class CS>
-    inline auto xchunked_array<CS>::chunk_shape() const -> const shape_type&
+    inline auto xchunked_array<CS>::chunk_begin() -> chunk_iterator_type
     {
-        return m_chunk_shape;
+        shape_type chunk_index(m_shape.size(), size_type(0));
+        return chunk_iterator_type(*this, std::move(chunk_index), 0u);
+    }
+
+    template <class CS>
+    inline auto xchunked_array<CS>::chunk_end() -> chunk_iterator_type
+    {
+        return chunk_iterator_type(*this, shape_type(grid_shape()), grid_size());
     }
 
     template <class CS>
