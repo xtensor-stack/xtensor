@@ -21,7 +21,7 @@ namespace xt
         xarray<double> a(shape);
         std::size_t chunk_nb = 0;
         auto chunked_view = xchunked_view<xarray<double>>(a, chunk_shape);
-        for (auto it = chunked_view.begin(); it != chunked_view.end(); it++)
+        for (auto it = chunked_view.chunk_begin(); it != chunked_view.chunk_end(); it++)
         {
             chunk_nb++;
         }
