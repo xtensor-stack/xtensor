@@ -534,7 +534,7 @@ namespace xt
         template <class T = xexpression_type>
         std::enable_if_t<has_data_interface<T>::value && is_strided_view, const_storage_iterator>
         storage_end() const;
-        
+
         template <class T = xexpression_type>
         std::enable_if_t<has_data_interface<T>::value && is_strided_view, const_storage_iterator>
         storage_cbegin() const;
@@ -650,6 +650,12 @@ namespace xt
 
         template <class T = xexpression_type>
         enable_simd_interface<T, const_reference> data_element(size_type i) const;
+
+        template <class T = xexpression_type>
+        enable_simd_interface<T, reference> flat(size_type i);
+
+        template <class T = xexpression_type>
+        enable_simd_interface<T, const_reference> flat(size_type i) const;
 
     private:
 
@@ -1485,6 +1491,22 @@ namespace xt
     inline auto xview<CT, S...>::data_element(size_type i) const -> enable_simd_interface<T, const_reference>
     {
         return m_e.data_element(data_offset() + i);
+    }
+
+    template <class CT, class... S>
+    template <class T>
+    inline auto xview<CT, S...>::flat(size_type i) -> enable_simd_interface<T, reference>
+    {
+        XTENSOR_ASSERT(is_contiguous());
+        return m_e.flat(data_offset() + i);
+    }
+
+    template <class CT, class... S>
+    template <class T>
+    inline auto xview<CT, S...>::flat(size_type i) const -> enable_simd_interface<T, const_reference>
+    {
+        XTENSOR_ASSERT(is_contiguous());
+        return m_e.flat(data_offset() + i);
     }
 
     template <class CT, class... S>

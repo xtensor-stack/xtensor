@@ -334,6 +334,26 @@ namespace xt
         EXPECT_EQ(a, b);
     }
 
+    TEST(xtensor, flat)
+    {
+        {
+            xt::xtensor<size_t, 2, xt::layout_type::row_major> a = {{0,1,2}, {3,4,5}};
+            xt::xtensor<size_t, 2, xt::layout_type::row_major> b = {{0,1,2}, {30,40,50}};
+            a.flat(3) = 30;
+            a.flat(4) = 40;
+            a.flat(5) = 50;
+            EXPECT_EQ(a, b);
+        }
+        {
+            xt::xtensor<size_t, 2, xt::layout_type::column_major> a = {{0,1,2}, {3,4,5}};
+            xt::xtensor<size_t, 2, xt::layout_type::column_major> b = {{0,1,2}, {30,40,50}};
+            a.flat(1) = 30;
+            a.flat(3) = 40;
+            a.flat(5) = 50;
+            EXPECT_EQ(a, b);
+        }
+    }
+
     TEST(xtensor, in_bounds)
     {
         xt::xtensor<size_t,2> a = {{0,1,2}, {3,4,5}};

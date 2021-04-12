@@ -181,6 +181,9 @@ namespace xt
         template <class... Args>
         const_reference unchecked(Args... args) const;
 
+        reference flat(size_type index);
+        const_reference flat(size_type index) const;
+
         using base_type::operator[];
         using base_type::at;
         using base_type::periodic;
@@ -448,6 +451,18 @@ namespace xt
         offset_type offset = base_type::compute_unchecked_index(args...);
         offset = adjust_offset(args...);
         return base_type::storage()[static_cast<size_type>(offset)];
+    }
+
+    template <class CT, class S, layout_type L, class FST>
+    inline auto xdynamic_view<CT, S, L, FST>::flat(size_type i) -> reference
+    {
+        return base_type::storage()[data_offset() + i];
+    }
+
+    template <class CT, class S, layout_type L, class FST>
+    inline auto xdynamic_view<CT, S, L, FST>::flat(size_type i) const -> const_reference
+    {
+        return base_type::storage()[data_offset() + i];
     }
 
     template <class CT, class S, layout_type L, class FST>

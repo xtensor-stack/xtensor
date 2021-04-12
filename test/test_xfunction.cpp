@@ -271,6 +271,14 @@ namespace xt
         }
     }
 
+    TEST(xfunction, flat)
+    {
+        xfunction_features f;
+        int a = (f.m_a + f.m_a).flat(0);
+        int b = f.m_a.flat(0) + f.m_a.flat(0);
+        EXPECT_EQ(a, b);
+    }
+
     TEST(xfunction, in_bounds)
     {
         xfunction_features f;

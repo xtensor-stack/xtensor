@@ -178,6 +178,7 @@ namespace xt
         using accessible_base::at;
         using accessible_base::operator[];
         using accessible_base::periodic;
+
         using accessible_base::in_bounds;
 
         xexpression_type& expression() noexcept;
@@ -201,6 +202,20 @@ namespace xt
             -> decltype(std::declval<FCT>()(std::declval<const undecay_expression>().data_element(i)))
         {
             return m_functor(m_e.data_element(i));
+        }
+
+        template <class FCT = functor_type>
+        auto flat(size_type i)
+            -> decltype(std::declval<FCT>()(std::declval<undecay_expression>().flat(i)))
+        {
+            return m_functor(m_e.flat(i));
+        }
+
+        template <class FCT = functor_type>
+        auto flat(size_type i) const
+            -> decltype(std::declval<FCT>()(std::declval<const undecay_expression>().flat(i)))
+        {
+            return m_functor(m_e.flat(i));
         }
 
         // The following functions are defined inline because otherwise signatures
@@ -732,7 +747,7 @@ namespace xt
      *
      * @warning This method is meant for performance, for expressions with a dynamic
      * number of dimensions (i.e. not known at compile time). Since it may have
-     * undefined behavior (see parameters), operator() should be prefered whenever
+     * undefined behavior (see parameters), operator() should be preferred whenever
      * it is possible.
      * @warning This method is NOT compatible with broadcasting, meaning the following
      * code has undefined behavior:
@@ -740,7 +755,7 @@ namespace xt
      * xt::xarray<double> a = {{0, 1}, {2, 3}};
      * xt::xarray<double> b = {0, 1};
      * auto fd = a + b;
-     * double res = fd.uncheked(0, 1);
+     * double res = fd.unchecked(0, 1);
      * \endcode
      */
     template <class D>
