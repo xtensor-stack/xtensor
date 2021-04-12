@@ -7,6 +7,18 @@
 Changelog
 =========
 
+0.23.5
+------
+
+- No need to explicitly install blas anymore with latest xtensor-blas
+  `#2343 https://github.com/xtensor-stack/xtensor/pull/2343`
+- FIX for xtensor-stack/xtl/issues/245 
+  `#2344 https://github.com/xtensor-stack/xtensor/pull/2344`
+- Implement grid view
+  `#2346 https://github.com/xtensor-stack/xtensor/pull/2346`
+- Refactoring of xchunked_view 
+  `#2353 https://github.com/xtensor-stack/xtensor/pull/2353`
+
 0.23.4
 ------
 
