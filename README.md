@@ -42,10 +42,10 @@ compilers are supported:
 
 ### Package managers
 
-We provide a package for the conda package manager:
+We provide a package for the mamba (or conda) package manager:
 
 ```bash
-conda install -c conda-forge xtensor
+mamba install -c conda-forge xtensor
 ```
 
 ### Install from sources
