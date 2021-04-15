@@ -898,6 +898,18 @@ namespace xt
             (void) size;
             XTENSOR_ASSERT_MSG(c.size() == size, "Trying to resize const data container with wrong size.");
         }
+
+        template <class S, class T>
+        constexpr bool check_resize_dimension(const S&, const T&)
+        {
+            return true;
+        }
+
+        template <class T, size_t N, class S>
+        constexpr bool check_resize_dimension(const std::array<T, N>&, const S& s)
+        {
+            return N == s.size();
+        }
     }
 
     /**
@@ -911,6 +923,8 @@ namespace xt
     template <class S>
     inline void xstrided_container<D>::resize(S&& shape, bool force)
     {
+        XTENSOR_ASSERT_MSG(detail::check_resize_dimension(m_shape, shape),
+                           "cannot change the number of dimensions of xtensor")
         std::size_t dim = shape.size();
         if (m_shape.size() != dim || !std::equal(std::begin(shape), std::end(shape), std::begin(m_shape)) || force)
         {
@@ -938,6 +952,8 @@ namespace xt
     template <class S>
     inline void xstrided_container<D>::resize(S&& shape, layout_type l)
     {
+        XTENSOR_ASSERT_MSG(detail::check_resize_dimension(m_shape, shape),
+                           "cannot change the number of dimensions of xtensor")
         if (base_type::static_layout != layout_type::dynamic && l != base_type::static_layout)
         {
             XTENSOR_THROW(std::runtime_error, "Cannot change layout_type if template parameter not layout_type::dynamic.");
@@ -957,6 +973,8 @@ namespace xt
     template <class S>
     inline void xstrided_container<D>::resize(S&& shape, const strides_type& strides)
     {
+        XTENSOR_ASSERT_MSG(detail::check_resize_dimension(m_shape, shape),
+                           "cannot change the number of dimensions of xtensor")
         if (base_type::static_layout != layout_type::dynamic)
         {
             XTENSOR_THROW(std::runtime_error,
