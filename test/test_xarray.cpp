@@ -147,7 +147,14 @@ namespace xt
     TEST(xarray, resize)
     {
         xarray_dynamic a;
+        std::vector<size_t> shape = {2, 2};
+        xarray_dynamic::strides_type strides = {2, 1};
         test_resize(a);
+#ifdef XTENSOR_ENABLE_ASSERT
+        EXPECT_NO_THROW(a.resize(shape));
+        EXPECT_NO_THROW(a.resize(shape, layout_type::row_major));
+        EXPECT_NO_THROW(a.resize(shape, strides));
+#endif
     }
 
     TEST(xarray, reshape)

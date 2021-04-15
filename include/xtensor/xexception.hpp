@@ -208,7 +208,7 @@ namespace xt
         {
             XTENSOR_THROW(std::out_of_range,
                           "Number of arguments (" + std::to_string(sizeof...(Args)) +
-                          ") us greater than the number of dimensions (" +
+                          ") is greater than the number of dimensions (" +
                           std::to_string(shape.size()) + ")");
         }
     }
