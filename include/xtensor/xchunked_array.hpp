@@ -55,6 +55,7 @@ namespace xt
 
         using chunk_storage_type = chunk_storage;
         using chunk_type = typename chunk_storage::value_type;
+        using grid_shape_type = typename chunk_storage::shape_type;
         using const_reference = typename chunk_type::const_reference;
         using reference = typename chunk_type::reference;
         using self_type = xchunked_array<chunk_storage>;
@@ -130,7 +131,7 @@ namespace xt
 
         const shape_type& chunk_shape() const noexcept;
         size_type grid_size() const noexcept;
-        const shape_type& grid_shape() const noexcept;
+        const grid_shape_type& grid_shape() const noexcept;
 
         chunk_storage_type& chunks();
         const chunk_storage_type& chunks() const;
@@ -470,7 +471,7 @@ namespace xt
     }
 
     template <class CS>
-    inline auto xchunked_array<CS>::grid_shape() const noexcept -> const shape_type&
+    inline auto xchunked_array<CS>::grid_shape() const noexcept -> const grid_shape_type&
     {
         return m_chunks.shape();
     }
@@ -497,7 +498,8 @@ namespace xt
     template <class CS>
     inline auto xchunked_array<CS>::chunk_end() -> chunk_iterator_type
     {
-        return chunk_iterator_type(*this, shape_type(grid_shape()), grid_size());
+        shape_type sh = xtl::forward_sequence<shape_type, const grid_shape_type>(grid_shape());
+        return chunk_iterator_type(*this, std::move(sh), grid_size());
     }
 
     template <class CS>
