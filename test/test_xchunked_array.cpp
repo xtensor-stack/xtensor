@@ -123,4 +123,30 @@ namespace xt
 
         EXPECT_EQ(a, b);
     }
+
+    TEST(xchunked_array, chunk_iterator)
+    {
+        std::vector<std::size_t> shape = {10, 10, 10};
+        std::vector<std::size_t> chunk_shape = {2, 2, 2};
+        auto a = chunked_array<double>(shape, chunk_shape);
+        xt::xarray<double> b = arange(1000).reshape({10, 10, 10});
+        noalias(a) = b;
+
+        auto it = a.chunk_begin();
+        auto cit = a.chunk_cbegin();
+
+        for (size_t i = 0; i < 5; ++i)
+        {
+            for (size_t j = 0; j < 5; ++j)
+            {
+                for (size_t k = 0; k < 5; ++k)
+                {
+                    EXPECT_EQ(*((*it).begin()), a(2*i, 2*j, 2*k));
+                    EXPECT_EQ(*((*cit).cbegin()), a(2*i, 2*j, 2*k));
+                    ++it;
+                    ++cit;
+                }
+            }
+        }
+    }
 }

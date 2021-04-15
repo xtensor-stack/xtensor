@@ -75,7 +75,8 @@ namespace xt
         using bool_load_type = xt::bool_load_type<value_type>;
         static constexpr layout_type static_layout = layout_type::dynamic;
         static constexpr bool contiguous_layout = false;
-        using chunk_iterator_type = xchunk_iterator<self_type>;
+        using chunk_iterator = xchunk_iterator<self_type>;
+        using const_chunk_iterator = xchunk_iterator<const self_type>;
 
         template <class S>
         xchunked_array(chunk_storage_type&& chunks, S&& shape, S&& chunk_shape, layout_type chunk_memory_layout = XTENSOR_DEFAULT_LAYOUT);
@@ -136,8 +137,13 @@ namespace xt
         chunk_storage_type& chunks();
         const chunk_storage_type& chunks() const;
 
-        chunk_iterator_type chunk_begin();
-        chunk_iterator_type chunk_end();
+        chunk_iterator chunk_begin();
+        chunk_iterator chunk_end();
+
+        const_chunk_iterator chunk_begin() const;
+        const_chunk_iterator chunk_end() const;
+        const_chunk_iterator chunk_cbegin() const;
+        const_chunk_iterator chunk_cend() const;
 
     private:
 
@@ -489,17 +495,44 @@ namespace xt
     }
 
     template <class CS>
-    inline auto xchunked_array<CS>::chunk_begin() -> chunk_iterator_type
+    inline auto xchunked_array<CS>::chunk_begin() -> chunk_iterator
     {
         shape_type chunk_index(m_shape.size(), size_type(0));
-        return chunk_iterator_type(*this, std::move(chunk_index), 0u);
+        return chunk_iterator(*this, std::move(chunk_index), 0u);
     }
 
     template <class CS>
-    inline auto xchunked_array<CS>::chunk_end() -> chunk_iterator_type
+    inline auto xchunked_array<CS>::chunk_end() -> chunk_iterator
     {
         shape_type sh = xtl::forward_sequence<shape_type, const grid_shape_type>(grid_shape());
-        return chunk_iterator_type(*this, std::move(sh), grid_size());
+        return chunk_iterator(*this, std::move(sh), grid_size());
+    }
+
+    template <class CS>
+    inline auto xchunked_array<CS>::chunk_begin() const -> const_chunk_iterator
+    {
+        shape_type chunk_index(m_shape.size(), size_type(0));
+        return const_chunk_iterator(*this, std::move(chunk_index), 0u);
+    }
+
+    template <class CS>
+    inline auto xchunked_array<CS>::chunk_end() const -> const_chunk_iterator
+    {
+        shape_type sh = xtl::forward_sequence<shape_type, const grid_shape_type>(grid_shape());
+        return const_chunk_iterator(*this, std::move(sh), grid_size());
+    }
+
+    template <class CS>
+    inline auto xchunked_array<CS>::chunk_cbegin() const -> const_chunk_iterator
+    {
+        return chunk_begin();
+    }
+
+    template <class CS>
+    inline auto xchunked_array<CS>::chunk_cend() const -> const_chunk_iterator
+    {
+        return chunk_end();
+
     }
 
     template <class CS>

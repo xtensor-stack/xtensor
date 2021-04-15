@@ -35,7 +35,8 @@ namespace xt
         using expression_type = std::decay_t<E>;
         using size_type = size_t;
         using shape_type = svector<size_type>;
-        using chunk_iterator_type = xchunk_iterator<self_type>;
+        using chunk_iterator = xchunk_iterator<self_type>;
+        using const_chunk_iterator = xchunk_iterator<const self_type>;
 
         template <class OE, class S>
         xchunked_view(OE&& e, S&& chunk_shape);
@@ -52,8 +53,13 @@ namespace xt
         expression_type& expression() noexcept;
         const expression_type& expression() const noexcept;
 
-        chunk_iterator_type chunk_begin();
-        chunk_iterator_type chunk_end();
+        chunk_iterator chunk_begin();
+        chunk_iterator chunk_end();
+
+        const_chunk_iterator chunk_begin() const;
+        const_chunk_iterator chunk_end() const;
+        const_chunk_iterator chunk_cbegin() const;
+        const_chunk_iterator chunk_cend() const;
 
     private:
 
@@ -155,16 +161,41 @@ namespace xt
     }
 
     template <class E>
-    inline auto xchunked_view<E>::chunk_begin() -> chunk_iterator_type
+    inline auto xchunked_view<E>::chunk_begin() -> chunk_iterator
     {
         shape_type chunk_index(m_shape.size(), size_type(0));
-        return chunk_iterator_type(*this, std::move(chunk_index), 0u);
+        return chunk_iterator(*this, std::move(chunk_index), 0u);
     }
 
     template <class E>
-    inline auto xchunked_view<E>::chunk_end() -> chunk_iterator_type
+    inline auto xchunked_view<E>::chunk_end() -> chunk_iterator
     {
-        return chunk_iterator_type(*this, shape_type(grid_shape()), grid_size());
+        return chunk_iterator(*this, shape_type(grid_shape()), grid_size());
+    }
+
+    template <class E>
+    inline auto xchunked_view<E>::chunk_begin() const -> const_chunk_iterator
+    {
+        shape_type chunk_index(m_shape.size(), size_type(0));
+        return const_chunk_iterator(*this, std::move(chunk_index), 0u);
+    }
+
+    template <class E>
+    inline auto xchunked_view<E>::chunk_end() const -> const_chunk_iterator
+    {
+        return const_chunk_iterator(*this, shape_type(grid_shape()), grid_size());
+    }
+
+    template <class E>
+    inline auto xchunked_view<E>::chunk_cbegin() const -> const_chunk_iterator
+    {
+        return chunk_begin();
+    }
+
+    template <class E>
+    inline auto xchunked_view<E>::chunk_cend() const -> const_chunk_iterator
+    {
+        return chunk_end();
     }
 
     template <class E, class S>
