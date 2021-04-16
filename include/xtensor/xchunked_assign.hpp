@@ -172,8 +172,11 @@ namespace xt
         bool operator!=(const self_type& rhs) const;
 
         const slice_vector& get_slice_vector() const;
+        slice_vector get_chunk_slice_vector() const;
 
     private:
+
+        void fill_slice_vector(size_type index);
 
         E* p_chunked_expression;
         shape_type m_chunk_index;
@@ -198,9 +201,20 @@ namespace xt
     inline auto xchunked_semantic<D>::assign_xexpression(const xexpression<E>& e) -> derived_type&
     {
         auto& d = this->derived_cast();
-        for (auto it = d.chunk_begin(); it != d.chunk_end(); ++it)
+        const auto& chunk_shape = d.chunk_shape();
+        size_t i = 0;
+        auto it_end = d.chunk_end();
+        for (auto it = d.chunk_begin(); it != it_end; ++it, ++i)
         {
-            noalias(*it) = strided_view(e.derived_cast(), it.get_slice_vector());
+            auto rhs = strided_view(e.derived_cast(), it.get_slice_vector());
+            if (rhs.shape() != chunk_shape)
+            {
+                noalias(strided_view(*it, it.get_chunk_slice_vector())) = rhs;
+            }
+            else
+            {
+                noalias(*it) = rhs;
+            }
         }
 
         return this->derived_cast();
@@ -262,17 +276,7 @@ namespace xt
     {
         for (size_type i = 0; i < m_chunk_index.size(); ++i)
         {
-            if (m_chunk_index[i] == 0)
-            {
-                m_slice_vector[i] = range(0, p_chunked_expression->chunk_shape()[i]);
-            }
-            else
-            {
-                size_type range_start = m_chunk_index[i] * p_chunked_expression->chunk_shape()[i];
-                size_type range_end = std::min((m_chunk_index[i] + 1) * p_chunked_expression->chunk_shape()[i],
-                                                p_chunked_expression->shape()[i]);
-                m_slice_vector[i] = range(range_start, range_end);
-            }
+            fill_slice_vector(i);
         }
     }
 
@@ -288,15 +292,12 @@ namespace xt
                 if (m_chunk_index[i] + 1u == p_chunked_expression->grid_shape()[i])
                 {
                     m_chunk_index[i] = 0;
-                    m_slice_vector[i] = range(0, p_chunked_expression->chunk_shape()[i]);
+                    fill_slice_vector(i);
                 }
                 else
                 {
                     m_chunk_index[i] += 1;
-                    size_type range_start = m_chunk_index[i] * p_chunked_expression->chunk_shape()[i];
-                    size_type range_end = std::min((m_chunk_index[i] + 1) * p_chunked_expression->chunk_shape()[i],
-                                                   p_chunked_expression->shape()[i]);
-                    m_slice_vector[i] = range(range_start, range_end);
+                    fill_slice_vector(i);
                     break;
                 }
             }
@@ -335,6 +336,29 @@ namespace xt
     inline auto xchunk_iterator<E>::get_slice_vector() const -> const slice_vector& 
     {
         return m_slice_vector;
+    }
+
+    template <class E>
+    inline auto xchunk_iterator<E>::get_chunk_slice_vector() const -> slice_vector
+    {
+        slice_vector slices(m_chunk_index.size());
+        for (size_type i = 0; i < m_chunk_index.size(); ++i)
+        {
+            size_type chunk_shape = p_chunked_expression->chunk_shape()[i];
+            size_type end = std::min(chunk_shape,
+                                     p_chunked_expression->shape()[i] - m_chunk_index[i] * chunk_shape);
+            slices[i] = range(0u, end);
+        }
+        return slices;
+    }
+
+    template <class E>
+    inline void xchunk_iterator<E>::fill_slice_vector(size_type i)
+    {
+        size_type range_start = m_chunk_index[i] * p_chunked_expression->chunk_shape()[i];
+        size_type range_end = std::min((m_chunk_index[i] + 1) * p_chunked_expression->chunk_shape()[i],
+                                        p_chunked_expression->shape()[i]);
+        m_slice_vector[i] = range(range_start, range_end);
     }
 }
 
