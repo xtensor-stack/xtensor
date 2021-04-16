@@ -148,5 +148,9 @@ namespace xt
                 }
             }
         }
+
+        it = a.chunk_begin();
+        std::advance(it, 2);
+        EXPECT_EQ(*((*it).begin()), a(0, 0, 4));
     }
 }

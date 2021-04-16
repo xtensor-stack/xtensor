@@ -33,7 +33,13 @@ namespace xt
         
         using self_type = xchunked_view<E>;
         using expression_type = std::decay_t<E>;
-        using size_type = size_t;
+        using value_type = typename expression_type::value_type;
+        using reference = typename expression_type::reference;
+        using const_reference = typename expression_type::const_reference;
+        using pointer = typename expression_type::pointer;
+        using const_pointer = typename expression_type::const_pointer;
+        using size_type = typename expression_type::size_type;
+        using difference_type = typename expression_type::difference_type;
         using shape_type = svector<size_type>;
         using chunk_iterator = xchunk_iterator<self_type>;
         using const_chunk_iterator = xchunk_iterator<const self_type>;
