@@ -110,6 +110,8 @@ namespace xt
         template <class A>
         struct xchunk_iterator_array
         {
+            using reference = decltype(*(std::declval<A>().chunks().begin()));
+
             inline decltype(auto) get_chunk(A& arr, typename A::size_type i, const xstrided_slice_vector&) const
             {
                 return *(arr.chunks().begin() + i);
@@ -119,6 +121,8 @@ namespace xt
         template <class V>
         struct xchunk_iterator_view
         {
+            using reference = decltype(xt::strided_view(std::declval<V>().expression(), std::declval<xstrided_slice_vector>()));
+            
             inline auto get_chunk(V& view, typename V::size_type, const xstrided_slice_vector& sv) const
             {
                 return xt::strided_view(view.expression(), sv);
@@ -147,6 +151,13 @@ namespace xt
         using size_type = typename E::size_type;
         using shape_type = typename E::shape_type;
         using slice_vector = xstrided_slice_vector;
+
+        using reference = typename base_type::reference;
+        using value_type = std::remove_reference_t<reference>;
+        using pointer = value_type*;
+        using difference_type = typename E::difference_type;
+        using iterator_category = std::forward_iterator_tag;
+
 
         xchunk_iterator() = default;
         xchunk_iterator(E& chunked_expression,
