@@ -7,6 +7,20 @@
 Changelog
 =========
 
+0.23.6
+------
+
+- Update installation instructions to mention mamba
+  `#2357 https://github.com/xtensor-stack/xtensor/pull/2357`
+- Fixed grid_shape return type
+  `#2360 https://github.com/xtensor-stack/xtensor/pull/2360`
+- Added assertion in resize method
+  `#2361 https://github.com/xtensor-stack/xtensor/pull/2361`
+- Added const chunk iterators
+  `#2362 https://github.com/xtensor-stack/xtensor/pull/2362`
+- Fixed chunk assignment 
+  `#2363 https://github.com/xtensor-stack/xtensor/pull/2363`
+
 0.23.5
 ------
 
