@@ -114,7 +114,8 @@ namespace xt
 
             inline decltype(auto) get_chunk(A& arr, typename A::size_type i, const xstrided_slice_vector&) const
             {
-                return *(arr.chunks().begin() + i);
+                using difference_type = typename A::difference_type;
+                return *(arr.chunks().begin() + static_cast<difference_type>(i));
             }
         };
 
