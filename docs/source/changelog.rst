@@ -7,6 +7,12 @@
 Changelog
 =========
 
+0.23.7
+------
+
+- Fixed chunked_iterator
+  `#2365 https://github.com/xtensor-stack/xtensor/pull/2365`
+
 0.23.6
 ------
 
