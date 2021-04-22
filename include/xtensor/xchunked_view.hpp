@@ -15,24 +15,10 @@
 #include "xnoalias.hpp"
 #include "xstorage.hpp"
 #include "xstrided_view.hpp"
+#include "xchunked_array.hpp"
 
 namespace xt
 {
-
-    // SFINAE test if chunked
-    template <typename T>
-    class has_chunks
-    {
-    private:
-        typedef char YesType[1];
-        typedef char NoType[2];
-
-        template <typename C> static YesType& test(decltype(&C::chunk_shape));
-        template <typename C> static NoType& test(...);
-
-    public:
-        enum { value = sizeof(test<T>(0)) == sizeof(YesType) };
-    };
 
     /*****************
      * xchunked_view *
@@ -45,7 +31,7 @@ namespace xt
     class xchunked_view
     {
     public:
-        
+
         using self_type = xchunked_view<E>;
         using expression_type = std::decay_t<E>;
         using value_type = typename expression_type::value_type;
@@ -63,10 +49,10 @@ namespace xt
         xchunked_view(OE&& e, S&& chunk_shape);
 
         template <class OE>
-        typename std::enable_if<!has_chunks<OE>::value, xchunked_view<E>&>::type operator=(const OE& e);
+        typename std::enable_if<!is_chunked<OE>(), xchunked_view<E>&>::type operator=(const OE& e);
 
         template <class OE>
-        typename std::enable_if<has_chunks<OE>::value, xchunked_view<E>&>::type operator=(const OE& e);
+        typename std::enable_if<is_chunked<OE>(), xchunked_view<E>&>::type operator=(const OE& e);
 
         size_type dimension() const noexcept;
         const shape_type& shape() const noexcept;
@@ -132,9 +118,10 @@ namespace xt
 
     template <class E>
     template <class OE>
-    typename std::enable_if<!has_chunks<OE>::value, xchunked_view<E>&>::type xchunked_view<E>::operator=(const OE& e)
+    typename std::enable_if<!is_chunked<OE>(), xchunked_view<E>&>::type xchunked_view<E>::operator=(const OE& e)
     {
-        for (auto it = chunk_begin(); it != chunk_end(); it++)
+        auto end = chunk_end();
+        for (auto it = chunk_begin(); it != end; ++it)
         {
             auto el = *it;
             noalias(el) = strided_view(e, it.get_slice_vector());
@@ -144,9 +131,11 @@ namespace xt
 
     template <class E>
     template <class OE>
-    typename std::enable_if<has_chunks<OE>::value, xchunked_view<E>&>::type xchunked_view<E>::operator=(const OE& e)
+    typename std::enable_if<is_chunked<OE>(), xchunked_view<E>&>::type xchunked_view<E>::operator=(const OE& e)
     {
-        for (auto it1 = chunk_begin(), it2 = e.chunks().begin(); it1 != chunk_end(); it1++, it2++)
+        auto it2 = e.chunks().begin();
+        auto end1 = chunk_end();
+        for (auto it1 = chunk_begin(); it1 != end1; ++it1, ++it2)
         {
             auto el1 = *it1;
             auto el2 = *it2;
