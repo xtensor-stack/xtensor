@@ -20,6 +20,11 @@
 namespace xt
 {
 
+    template <class E>
+    struct is_chunked_t: detail::chunk_helper<E>::is_chunked
+    {
+    };
+
     /*****************
      * xchunked_view *
      *****************/
@@ -49,10 +54,15 @@ namespace xt
         xchunked_view(OE&& e, S&& chunk_shape);
 
         template <class OE>
-        typename std::enable_if<!is_chunked<OE>(), xchunked_view<E>&>::type operator=(const OE& e);
+        xchunked_view(OE&& e);
+
+        void init();
 
         template <class OE>
-        typename std::enable_if<is_chunked<OE>(), xchunked_view<E>&>::type operator=(const OE& e);
+        typename std::enable_if_t<!is_chunked_t<OE>::value, xchunked_view<E>&> operator=(const OE& e);
+
+        template <class OE>
+        typename std::enable_if_t<is_chunked_t<OE>::value, xchunked_view<E>&> operator=(const OE& e);
 
         size_type dimension() const noexcept;
         const shape_type& shape() const noexcept;
@@ -96,6 +106,22 @@ namespace xt
         m_shape.resize(e.dimension());
         const auto& s = e.shape();
         std::copy(s.cbegin(), s.cend(), m_shape.begin());
+        init();
+    }
+
+    template <class E>
+    template <class OE>
+    inline xchunked_view<E>::xchunked_view(OE&& e)
+        : m_expression(std::forward<OE>(e))
+    {
+        m_shape.resize(e.dimension());
+        const auto& s = e.shape();
+        std::copy(s.cbegin(), s.cend(), m_shape.begin());
+    }
+
+    template <class E>
+    void xchunked_view<E>::init()
+    {
         // compute chunk number in each dimension
         m_grid_shape.resize(m_shape.size());
         std::transform
@@ -118,7 +144,7 @@ namespace xt
 
     template <class E>
     template <class OE>
-    typename std::enable_if<!is_chunked<OE>(), xchunked_view<E>&>::type xchunked_view<E>::operator=(const OE& e)
+    typename std::enable_if_t<!is_chunked_t<OE>::value, xchunked_view<E>&> xchunked_view<E>::operator=(const OE& e)
     {
         auto end = chunk_end();
         for (auto it = chunk_begin(); it != end; ++it)
@@ -131,8 +157,12 @@ namespace xt
 
     template <class E>
     template <class OE>
-    typename std::enable_if<is_chunked<OE>(), xchunked_view<E>&>::type xchunked_view<E>::operator=(const OE& e)
+    typename std::enable_if_t<is_chunked_t<OE>::value, xchunked_view<E>&> xchunked_view<E>::operator=(const OE& e)
     {
+        m_chunk_shape.resize(e.dimension());
+        const auto& cs = e.chunk_shape();
+        std::copy(cs.cbegin(), cs.cend(), m_chunk_shape.begin());
+        init();
         auto it2 = e.chunks().begin();
         auto end1 = chunk_end();
         for (auto it1 = chunk_begin(); it1 != end1; ++it1, ++it2)
@@ -239,6 +269,12 @@ namespace xt
     inline xchunked_view<E> as_chunked(E&& e, S&& chunk_shape)
     {
         return xchunked_view<E>(std::forward<E>(e), std::forward<S>(chunk_shape));
+    }
+
+    template <class E>
+    inline xchunked_view<E> as_chunked(E&& e)
+    {
+        return xchunked_view<E>(std::forward<E>(e));
     }
 }
 
