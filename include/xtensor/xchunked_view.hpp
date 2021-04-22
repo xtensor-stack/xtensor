@@ -15,9 +15,15 @@
 #include "xnoalias.hpp"
 #include "xstorage.hpp"
 #include "xstrided_view.hpp"
+#include "xchunked_array.hpp"
 
 namespace xt
 {
+
+    template <class E>
+    struct is_chunked_t: detail::chunk_helper<E>::is_chunked
+    {
+    };
 
     /*****************
      * xchunked_view *
@@ -30,7 +36,7 @@ namespace xt
     class xchunked_view
     {
     public:
-        
+
         using self_type = xchunked_view<E>;
         using expression_type = std::decay_t<E>;
         using value_type = typename expression_type::value_type;
@@ -48,7 +54,15 @@ namespace xt
         xchunked_view(OE&& e, S&& chunk_shape);
 
         template <class OE>
-        xchunked_view<E>& operator=(const OE& e);
+        xchunked_view(OE&& e);
+
+        void init();
+
+        template <class OE>
+        typename std::enable_if_t<!is_chunked_t<OE>::value, xchunked_view<E>&> operator=(const OE& e);
+
+        template <class OE>
+        typename std::enable_if_t<is_chunked_t<OE>::value, xchunked_view<E>&> operator=(const OE& e);
 
         size_type dimension() const noexcept;
         const shape_type& shape() const noexcept;
@@ -92,6 +106,22 @@ namespace xt
         m_shape.resize(e.dimension());
         const auto& s = e.shape();
         std::copy(s.cbegin(), s.cend(), m_shape.begin());
+        init();
+    }
+
+    template <class E>
+    template <class OE>
+    inline xchunked_view<E>::xchunked_view(OE&& e)
+        : m_expression(std::forward<OE>(e))
+    {
+        m_shape.resize(e.dimension());
+        const auto& s = e.shape();
+        std::copy(s.cbegin(), s.cend(), m_shape.begin());
+    }
+
+    template <class E>
+    void xchunked_view<E>::init()
+    {
         // compute chunk number in each dimension
         m_grid_shape.resize(m_shape.size());
         std::transform
@@ -114,12 +144,43 @@ namespace xt
 
     template <class E>
     template <class OE>
-    xchunked_view<E>& xchunked_view<E>::operator=(const OE& e)
+    typename std::enable_if_t<!is_chunked_t<OE>::value, xchunked_view<E>&> xchunked_view<E>::operator=(const OE& e)
     {
-        for (auto it = chunk_begin(); it != chunk_end(); it++)
+        auto end = chunk_end();
+        for (auto it = chunk_begin(); it != end; ++it)
         {
             auto el = *it;
             noalias(el) = strided_view(e, it.get_slice_vector());
+        }
+        return *this;
+    }
+
+    template <class E>
+    template <class OE>
+    typename std::enable_if_t<is_chunked_t<OE>::value, xchunked_view<E>&> xchunked_view<E>::operator=(const OE& e)
+    {
+        m_chunk_shape.resize(e.dimension());
+        const auto& cs = e.chunk_shape();
+        std::copy(cs.cbegin(), cs.cend(), m_chunk_shape.begin());
+        init();
+        auto it2 = e.chunks().begin();
+        auto end1 = chunk_end();
+        for (auto it1 = chunk_begin(); it1 != end1; ++it1, ++it2)
+        {
+            auto el1 = *it1;
+            auto el2 = *it2;
+            auto lhs_shape = el1.shape();
+            if (lhs_shape != el2.shape())
+            {
+                xstrided_slice_vector esv(el2.dimension());  // element slice in edge chunk
+                std::transform(lhs_shape.begin(), lhs_shape.end(), esv.begin(),
+                               [](auto size) { return range(0, size); });
+                noalias(el1) = strided_view(el2, esv);
+            }
+            else
+            {
+                noalias(el1) = el2;
+            }
         }
         return *this;
     }
@@ -208,6 +269,12 @@ namespace xt
     inline xchunked_view<E> as_chunked(E&& e, S&& chunk_shape)
     {
         return xchunked_view<E>(std::forward<E>(e), std::forward<S>(chunk_shape));
+    }
+
+    template <class E>
+    inline xchunked_view<E> as_chunked(E&& e)
+    {
+        return xchunked_view<E>(std::forward<E>(e));
     }
 }
 

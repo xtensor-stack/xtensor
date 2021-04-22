@@ -184,6 +184,9 @@ namespace xt
     template<class E>
     constexpr bool is_chunked(const xexpression<E>& e);
 
+    template<class E>
+    constexpr bool is_chunked();
+
     /**
      * Creates an in-memory chunked array.
      * This function returns an uninitialized ``xchunked_array<xarray<T>>``.
@@ -286,6 +289,12 @@ namespace xt
 
     template<class E>
     constexpr bool is_chunked(const xexpression<E>&)
+    {
+        return is_chunked<E>();
+    }
+
+    template<class E>
+    constexpr bool is_chunked()
     {
         using return_type = typename detail::chunk_helper<E>::is_chunked;
         return return_type::value;
