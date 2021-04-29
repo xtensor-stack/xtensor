@@ -7,6 +7,12 @@
 Changelog
 =========
 
+0.23.8
+------
+
+- Specialize operator= when RHS is chunked
+  `#2367 https://github.com/xtensor-stack/xtensor/pull/2367`
+
 0.23.7
 ------
 
