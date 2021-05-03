@@ -534,7 +534,7 @@ namespace xt
         template <class T = xexpression_type>
         std::enable_if_t<has_data_interface<T>::value && is_strided_view, const_storage_iterator>
         storage_end() const;
-        
+
         template <class T = xexpression_type>
         std::enable_if_t<has_data_interface<T>::value && is_strided_view, const_storage_iterator>
         storage_cbegin() const;
@@ -1331,6 +1331,7 @@ namespace xt
         if (!m_strides_computed)
         {
             compute_strides(std::integral_constant<bool, has_trivial_strides>{});
+            m_strides_computed = true;
         }
         return m_data_offset;
     }
