@@ -7,6 +7,12 @@
 Changelog
 =========
 
+0.23.9
+------
+
+- Fix data_offset method in xview to compute the strides only once
+  `#2371 https://github.com/xtensor-stack/xtensor/pull/2371`
+
 0.23.8
 ------
 
