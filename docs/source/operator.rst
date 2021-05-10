@@ -58,7 +58,7 @@ and an element-wise ternary function (similar to the ``: ?`` ternary operator):
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
+    #include <xtensor/xarray.hpp>
 
     xt::xarray<bool> b = { false, true, true, false };
     xt::xarray<int> a1 = { 1,   2,  3,  4 };
@@ -67,7 +67,7 @@ and an element-wise ternary function (similar to the ``: ?`` ternary operator):
     xt::xarray<int> res = xt::where(b, a1, a2);
     // => res = { 11, 2, 3, 14 }
 
-Unlike in ``numpy.where``, ``xt::where`` takes full advantage of the lazyness
+Unlike in :any:`numpy.where`, ``xt::where`` takes full advantage of the lazyness
 of `xtensor`.
 
 Comparison operators
@@ -86,7 +86,7 @@ C++ inequality operators: they are element-wise operators returning boolean
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
+    #include <xtensor/xarray.hpp>
 
     xt::xarray<int> a1 = {  1, 12,  3, 14 };
     xt::xarray<int> a2 = { 11,  2, 13, 4  };
@@ -103,7 +103,7 @@ function.
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
+    #include <xtensor/xarray.hpp>
 
     xt::xarray<int> a1 = {  1,  2, 3, 4};
     xt::xarray<int> a2 = { 11, 12, 3, 4};
@@ -151,7 +151,7 @@ performed via ``cast``, which performs an element-wise ``static_cast``.
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
+    #include <xtensor/xarray.hpp>
 
     xt::xarray<int> a = { 3, 5, 7 };
 
@@ -171,8 +171,8 @@ axes removed.
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
-    #include "xtensor/xmath.hpp"
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xmath.hpp>
 
     xt::xarray<double> a = xt::ones<double>({3, 2, 4, 6, 5});
     xt::xarray<double> res = xt::sum(a, {1, 3});
@@ -183,8 +183,8 @@ You can also call the ``reduce`` generator with your own reducing function:
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
-    #include "xtensor/xreducer.hpp"
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xreducer.hpp>
 
     xt::xarray<double> arr = some_init_function({3, 2, 4, 6, 5});
     xt::xarray<double> res = xt::reduce([](double a, double b) { return a*a + b*b; },
@@ -197,8 +197,8 @@ build the ``xreducer_functors`` object, the last function can be omitted:
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
-    #include "xtensor/xreducer.hpp"
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xreducer.hpp>
 
     xt::xarray<double> arr = some_init_function({3, 2, 4, 6, 5});
     xt::xarray<double> res = xt::reduce(xt::make_xreducer_functor([](double a, double b) { return a*a + b*b; },
@@ -212,11 +212,44 @@ the evaluation and get the result:
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
-    #include "xtensor/xreducer.hpp"
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xreducer.hpp>
 
     xt::xarray<double> arr = some_init_function({3, 2, 4, 6, 5});
     double res = xt::reduce([](double a, double b) { return a*a + b*b; }, arr)();
+
+The ``value_type`` of a reducer is the traditional result type of the reducing operation. For instance,
+the ``value_type`` of the reducer for the sum is:
+
+- ``int`` if the underlying expression holds ``int`` values
+- ``int`` if the underlying expression holds ``short`` values, because ``short + short`` = ``int``
+
+You can pass a template argument to the reducer functions to specify the type of the initial value of
+the reduction. This allows you to "promote" the value type of the reducer and limit overflows in
+computation:
+
+.. code::
+
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xreducer.hpp>
+
+    xt::xarray<int> arr = some_init_function({3, 2, 4, 6, 5});
+    auto s1 = xt::sum<short>(arr); // No effect, short + int = int
+    auto s2 = xt::sum<long int>(arr); // The value_type of s2 is long int
+
+When you write generic code and you want to limit overflows, you can use ``xt::big_promote_value_type_t``
+as shown below:
+
+.. code::
+
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xreducer.hpp>
+    
+    template <class E>
+    void my_computation(E&& e)
+    {
+        auto s = xt::sum<xt::big_promote_value_type_t<E>>(e);
+    }
 
 Accumulators
 ------------
@@ -229,8 +262,8 @@ or ``xtensor``.
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
-    #include "xtensor/xmath.hpp"
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xmath.hpp>
 
     xt::xarray<double> a = xt::ones<double>({5, 8, 3});
     xt::xarray<double> res = xt::cumsum(a, 1);
@@ -243,13 +276,28 @@ function. For example, the implementation of cumsum is as follows:
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
-    #include "xtensor/xaccumulator.hpp"
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xaccumulator.hpp>
 
     xt::xarray<double> arr = some_init_function({5, 5, 5});
     xt::xarray<double> res = xt::accumulate([](double a, double b) { return a + b; },
                                             arr,
                                             1);
+
+Like reducers, accumulators accept a template parameter to specify the ``value_type``
+of the initial value of the accumulation. The ``value_type`` of the result is computed
+with the same rules as those for reducers:
+
+.. code::
+
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xaccumulator.hpp>
+
+    xt::xarray<int> arr = some_init_function({5, 5, 5});
+    auto r1 = xt::cumsum<short>(a, 1);
+    // r1 holds int values
+    auto r2 = xt::cumsum<long int>(a, 1);
+    // r2 hols long int values
 
 Evaluation strategy
 -------------------
@@ -272,8 +320,8 @@ Choosing an evaluation_strategy is straightforward. For reducers:
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
-    #include "xtensor/xreducer.hpp"
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xreducer.hpp>
 
     xt::xarray<double> a = xt::ones<double>({3, 2, 4, 6, 5});
     auto res = xt::sum(a, {1, 3}, xt::evaluation_strategy::immediate);
@@ -300,8 +348,8 @@ arguments:
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
-    #include "xtensor/xvectorize.hpp"
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xvectorize.hpp>
 
     int f(int a, int b)
     {

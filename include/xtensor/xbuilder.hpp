@@ -21,9 +21,6 @@
 #include <functional>
 #include <utility>
 #include <vector>
-#ifdef X_OLD_CLANG
-    #include <initializer_list>
-#endif
 
 #include <xtl/xclosure.hpp>
 #include <xtl/xsequence.hpp>
@@ -51,19 +48,11 @@ namespace xt
         return broadcast(T(1), std::forward<S>(shape));
     }
 
-#ifdef X_OLD_CLANG
-    template <class T, class I>
-    inline auto ones(std::initializer_list<I> shape) noexcept
-    {
-        return broadcast(T(1), shape);
-    }
-#else
     template <class T, class I, std::size_t L>
     inline auto ones(const I (&shape)[L]) noexcept
     {
         return broadcast(T(1), shape);
     }
-#endif
 
     /*********
      * zeros *
@@ -79,19 +68,11 @@ namespace xt
         return broadcast(T(0), std::forward<S>(shape));
     }
 
-#ifdef X_OLD_CLANG
-    template <class T, class I>
-    inline auto zeros(std::initializer_list<I> shape) noexcept
-    {
-        return broadcast(T(0), shape);
-    }
-#else
     template <class T, class I, std::size_t L>
     inline auto zeros(const I (&shape)[L]) noexcept
     {
         return broadcast(T(0), shape);
     }
-#endif
 
     /**
      * Create a xcontainer (xarray, xtensor or xtensor_fixed) with uninitialized values of
@@ -117,20 +98,12 @@ namespace xt
         return xtensor<T, N, L>(xtl::forward_sequence<shape_type, decltype(shape)>(shape));
     }
 
-#ifndef X_OLD_CLANG
     template <class T, layout_type L = XTENSOR_DEFAULT_LAYOUT, class I, std::size_t N>
     inline xtensor<T, N, L> empty(const I(&shape)[N])
     {
         using shape_type = typename xtensor<T, N>::shape_type;
         return xtensor<T, N, L>(xtl::forward_sequence<shape_type, decltype(shape)>(shape));
     }
-#else
-    template <class T, layout_type L = XTENSOR_DEFAULT_LAYOUT, class I>
-    inline xarray<T, L> empty(const std::initializer_list<I>& init)
-    {
-        return xarray<T, L>::from_shape(init);
-    }
-#endif
 
     template <class T, layout_type L = XTENSOR_DEFAULT_LAYOUT, std::size_t... N>
     inline xtensor_fixed<T, fixed_shape<N...>, L> empty(const fixed_shape<N...>& /*shape*/)
@@ -147,7 +120,7 @@ namespace xt
     template <class E>
     inline auto empty_like(const xexpression<E>& e)
     {
-        using xtype = temporary_type_t<typename E::value_type, typename E::shape_type, E::static_layout>;
+        using xtype = temporary_type_t<E>;
         auto res = xtype::from_shape(e.derived_cast().shape());
         return res;
     }
@@ -162,7 +135,7 @@ namespace xt
     template <class E>
     inline auto full_like(const xexpression<E>& e, typename E::value_type fill_value)
     {
-        using xtype = temporary_type_t<typename E::value_type, typename E::shape_type, E::static_layout>;
+        using xtype = temporary_type_t<E>;
         auto res = xtype::from_shape(e.derived_cast().shape());
         res.fill(fill_value);
         return res;
@@ -217,8 +190,8 @@ namespace xt
 
         // These methods should be private methods of arange_generator, however thi leads
         // to ICE on VS2015
-        template <class R, class E, class U, class X, XTL_REQUIRES(std::is_integral<X>)>
-        inline void arange_assign_to(xexpression<E>& e, U start, X step) noexcept
+        template <class R, class E, class U, class X, XTL_REQUIRES(xtl::is_integral<X>)>
+        inline void arange_assign_to(xexpression<E>& e, U start, U, X step, bool) noexcept
         {
             auto& de = e.derived_cast();
             U value = start;
@@ -230,15 +203,20 @@ namespace xt
             }
         }
 
-        template <class R, class E, class U, class X, XTL_REQUIRES(xtl::negation<std::is_integral<X>>)>
-        inline void arange_assign_to(xexpression<E>& e, U start, X step) noexcept
+        template <class R, class E, class U, class X, XTL_REQUIRES(xtl::negation<xtl::is_integral<X>>)>
+        inline void arange_assign_to(xexpression<E>& e, U start, U stop, X step, bool endpoint) noexcept
         {
             auto& buf = e.derived_cast().storage();
             using size_type = decltype(buf.size());
             using mult_type = get_mult_type<U, X>;
-            for(size_type i = 0; i < buf.size(); ++i)
+            size_type num = buf.size();
+            for(size_type i = 0; i < num; ++i)
             {
                 buf[i] = static_cast<R>(start + step * mult_type(i));
+            }
+            if (endpoint && num > 1)
+            {
+                buf[num-1] = static_cast<R>(stop);
             }
         }
 
@@ -250,8 +228,8 @@ namespace xt
             using value_type = R;
             using step_type = S;
 
-            arange_generator(T start, T stop, S step)
-                : m_start(start), m_stop(stop), m_step(step)
+            arange_generator(T start, T stop, S step, size_t num_steps, bool endpoint=false)
+                : m_start(start), m_stop(stop), m_step(step), m_num_steps(num_steps), m_endpoint(endpoint)
             {
             }
 
@@ -264,15 +242,13 @@ namespace xt
             template <class It>
             inline R element(It first, It) const
             {
-                // Avoids warning when T = char (because char + char => int!)
-                using mult_type = get_mult_type<T, S>;
-                return static_cast<R>(m_start + m_step * mult_type(*first));
+                return access_impl(*first);
             }
 
             template <class E>
             inline void assign_to(xexpression<E>& e) const noexcept
             {
-                arange_assign_to<R>(e, m_start, m_step);
+                arange_assign_to<R>(e, m_start, m_stop, m_step, m_endpoint);
             }
 
         private:
@@ -280,10 +256,17 @@ namespace xt
             T m_start;
             T m_stop;
             step_type m_step;
+            size_t m_num_steps;
+            bool m_endpoint; // true for setting the last element to m_stop
 
             template <class T1, class... Args>
             inline R access_impl(T1 t, Args...) const
             {
+                if (m_endpoint && m_num_steps > 1 && size_t(t) == m_num_steps - 1)
+                {
+                    return static_cast<R>(m_stop);
+                }
+                // Avoids warning when T = char (because char + char => int!)
                 using mult_type = get_mult_type<T, S>;
                 return static_cast<R>(m_start + m_step * mult_type(t));
             }
@@ -295,10 +278,10 @@ namespace xt
         };
 
         template <class T, class S>
-        using both_integer = xtl::conjunction<std::is_integral<T>, std::is_integral<S>>;
+        using both_integer = xtl::conjunction<xtl::is_integral<T>, xtl::is_integral<S>>;
 
         template <class T, class S>
-        using integer_with_signed_integer = xtl::conjunction<both_integer<T, S>, std::is_signed<S>>;
+        using integer_with_signed_integer = xtl::conjunction<both_integer<T, S>, xtl::is_signed<S>>;
 
         template <class T, class S>
         using integer_with_unsigned_integer = xtl::conjunction<both_integer<T, S>, std::is_unsigned<S>>;
@@ -307,7 +290,7 @@ namespace xt
         inline auto arange_impl(T start, T stop, S step = 1) noexcept
         {
             std::size_t shape = static_cast<std::size_t>(std::ceil((stop - start) / step));
-            return detail::make_xgenerator(detail::arange_generator<T, T, S>(start, stop, step), {shape});
+            return detail::make_xgenerator(detail::arange_generator<T, T, S>(start, stop, step, shape), {shape});
         }
 
         template <class T, class S = T, XTL_REQUIRES(integer_with_signed_integer<T, S>)>
@@ -320,7 +303,7 @@ namespace xt
                 shape = stop > start ? static_cast<std::size_t>((stop - start + step - S(1)) / step)
                                      : static_cast<std::size_t>((start - stop - step - S(1)) / -step);
             }
-            return detail::make_xgenerator(detail::arange_generator<T, T, S>(start, stop, step), {shape});
+            return detail::make_xgenerator(detail::arange_generator<T, T, S>(start, stop, step, shape), {shape});
         }
 
         template <class T, class S = T, XTL_REQUIRES(integer_with_unsigned_integer<T, S>)>
@@ -332,7 +315,7 @@ namespace xt
             {
                 shape = static_cast<std::size_t>((stop - start + step - S(1)) / step);
             }
-            return detail::make_xgenerator(detail::arange_generator<T, T, S>(start, stop, step), { shape });
+            return detail::make_xgenerator(detail::arange_generator<T, T, S>(start, stop, step, shape), { shape });
         }
 
         template <class F>
@@ -473,7 +456,7 @@ namespace xt
     {
         using fp_type = std::common_type_t<T, double>;
         fp_type step = fp_type(stop - start) / std::fmax(fp_type(1), fp_type(num_samples - (endpoint ? 1 : 0)));
-        return detail::make_xgenerator(detail::arange_generator<fp_type, T>(fp_type(start), fp_type(stop), step), {num_samples});
+        return detail::make_xgenerator(detail::arange_generator<fp_type, T>(fp_type(start), fp_type(stop), step, num_samples, endpoint), {num_samples});
     }
 
     /**
@@ -900,7 +883,7 @@ namespace xt
         template <std::size_t... I, class... E>
         inline auto meshgrid_impl(std::index_sequence<I...>, E&&... e) noexcept
         {
-#if defined X_OLD_CLANG || defined _MSC_VER
+#if defined _MSC_VER
             const std::array<std::size_t, sizeof...(E)> shape = {e.shape()[0]...};
             return std::make_tuple(
                 detail::make_xgenerator(

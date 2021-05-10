@@ -68,7 +68,10 @@ def translate_file(contents, f):
 	for line in contents.split('\n'):
 		if lidx == 8:
 			f = os.path.split(f)[1]
-			result_file += "// This file is generated from test/files/cppy_source/{} by preprocess.py!".format(f) + '\n\n'
+			result_file += "// This file is generated from test/files/cppy_source/{} by preprocess.py!\n".format(f)
+			result_file += "// Warning: This file should not be modified directly! " \
+						   "Instead, modify the `*.cppy` file.\n\n"
+
 		lstrip = line.lstrip()
 		if lstrip.startswith("/*py"):
 			exec_comment(matches[idx], True)

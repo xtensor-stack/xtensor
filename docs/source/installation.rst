@@ -30,14 +30,14 @@ cmake's ``find_package`` to locate xtensor headers.
 
 .. image:: conda.svg
 
-Using the conda package
------------------------
+Using the conda-forge package
+-----------------------------
 
-A package for xtensor is available on the conda package manager.
+A package for xtensor is available on the mamba (or conda) package manager.
 
 .. code::
 
-    conda install -c conda-forge xtensor
+    mamba install -c conda-forge xtensor
 
 .. image:: debian.svg
 

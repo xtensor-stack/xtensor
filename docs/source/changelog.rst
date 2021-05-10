@@ -7,6 +7,354 @@
 Changelog
 =========
 
+0.23.9
+------
+
+- Fix data_offset method in xview to compute the strides only once
+  `#2371 https://github.com/xtensor-stack/xtensor/pull/2371`
+
+0.23.8
+------
+
+- Specialize operator= when RHS is chunked
+  `#2367 https://github.com/xtensor-stack/xtensor/pull/2367`
+
+0.23.7
+------
+
+- Fixed chunked_iterator
+  `#2365 https://github.com/xtensor-stack/xtensor/pull/2365`
+
+0.23.6
+------
+
+- Update installation instructions to mention mamba
+  `#2357 https://github.com/xtensor-stack/xtensor/pull/2357`
+- Fixed grid_shape return type
+  `#2360 https://github.com/xtensor-stack/xtensor/pull/2360`
+- Added assertion in resize method
+  `#2361 https://github.com/xtensor-stack/xtensor/pull/2361`
+- Added const chunk iterators
+  `#2362 https://github.com/xtensor-stack/xtensor/pull/2362`
+- Fixed chunk assignment 
+  `#2363 https://github.com/xtensor-stack/xtensor/pull/2363`
+
+0.23.5
+------
+
+- No need to explicitly install blas anymore with latest xtensor-blas
+  `#2343 https://github.com/xtensor-stack/xtensor/pull/2343`
+- FIX for xtensor-stack/xtl/issues/245 
+  `#2344 https://github.com/xtensor-stack/xtensor/pull/2344`
+- Implement grid view
+  `#2346 https://github.com/xtensor-stack/xtensor/pull/2346`
+- Refactoring of xchunked_view 
+  `#2353 https://github.com/xtensor-stack/xtensor/pull/2353`
+
+0.23.4
+------
+
+- Fix edge chunk assignment
+  `#2342 https://github.com/xtensor-stack/xtensor/pull/2342`
+
+0.23.3
+------
+
+- Use the correct version file for TBB since 2021.1
+  `#2334 https://github.com/xtensor-stack/xtensor/pull/2334`
+- Add missing API RTD for nan functions
+  `#2333 https://github.com/xtensor-stack/xtensor/pull/2333`
+- Fixed layout issue in container classes
+  `#2335 https://github.com/xtensor-stack/xtensor/pull/2335`
+- Fixed assignment of a tensor_view on a pseudo-container
+  `#2336 https://github.com/xtensor-stack/xtensor/pull/2336`
+- Fixed return type of data method
+  `#2338 https://github.com/xtensor-stack/xtensor/pull/2338`
+- Fixed assignment to flatten view
+  `#2339 https://github.com/xtensor-stack/xtensor/pull/2339`
+
+0.23.2
+------
+
+- MSVC Build: Wrapped linker flags in quotes
+  `#2299 https://github.com/xtensor-stack/xtensor/pull/2299`
+- Added can_assign and enable_assignable_expression
+  `#2323 https://github.com/xtensor-stack/xtensor/pull/2323`
+- Fix automatically generated tests
+  `#2313 https://github.com/xtensor-stack/xtensor/pull/2313`
+- Fix linspace endpoint bug
+  `#2306 https://github.com/xtensor-stack/xtensor/pull/2306`
+- Added fallback to old behavior in FindTBB.cmake
+  `#2325 https://github.com/xtensor-stack/xtensor/pull/2325`
+- Implement nanmin and nanmax
+  `#2314 https://github.com/xtensor-stack/xtensor/pull/2314`
+- Clean up and add more tests for nanmin and nanmax
+  `#2326 https://github.com/xtensor-stack/xtensor/pull/2326`
+- Fix linespace with only one point
+  `#2327 https://github.com/xtensor-stack/xtensor/pull/2327`
+- Fixed ambiguous call of tile
+  `#2329 https://github.com/xtensor-stack/xtensor/pull/2329`
+
+0.23.1
+------
+
+- Fix compilation warnings on unused local typedefs
+  `#2295 https://github.com/xtensor-stack/xtensor/pull/2295`
+- Disable a failing shuffle test for clang
+  `#2294 https://github.com/xtensor-stack/xtensor/pull/2294`
+- Fix simd assign_data
+  `#2292 https://github.com/xtensor-stack/xtensor/pull/2292`
+- Fix -Wshadow and -Wunused-local-typedef warning
+  `#2293 https://github.com/xtensor-stack/xtensor/pull/2293`
+- Documentation improvement Part #B
+  `#2287 https://github.com/xtensor-stack/xtensor/pull/2287`
+
+0.23.0
+------
+
+Breaking changes
+~~~~~~~~~~~~~~~~
+
+- Remove chunked array extension mechanism
+  `#2283 <https://github.com/xtensor-stack/xtensor/pull/2283>`_
+- Upgraded to xtl 0.7.0 
+  `#2284 <https://github.com/xtensor-stack/xtensor/pull/2284>`_
+
+Other changes
+~~~~~~~~~~~~~
+
+- Harmonize #include statements in doc
+  `#2280 <https://github.com/xtensor-stack/xtensor/pull/2280>`_
+- Added missing shape_type in xfunctor_stepper
+  `#2285 <https://github.com/xtensor-stack/xtensor/pull/2285>`_
+
+0.22.0
+------
+
+Breaking changes
+~~~~~~~~~~~~~~~~
+
+- Drop support of 3.* Clang versions
+  `#2251 <https://github.com/xtensor-stack/xtensor/pull/2251>`_
+- Fix reducers assignment
+  `#2254 <https://github.com/xtensor-stack/xtensor/pull/2254>`_
+- Removed reducer ``big_promote_type``
+  `#2277 <https://github.com/xtensor-stack/xtensor/pull/2277>`_
+
+Other changes
+~~~~~~~~~~~~~
+
+- Improve histogram performance with equal bin sizes
+  `#2088 <https://github.com/xtensor-stack/xtensor/pull/2088>`_
+- Added missing header in xfixed
+  `#2225 <https://github.com/xtensor-stack/xtensor/pull/2225>`_
+- Implement xt::random::choice with weights vector
+  `#2241 <https://github.com/xtensor-stack/xtensor/pull/2241>`_
+- Testing alignment
+  `#2246 <https://github.com/xtensor-stack/xtensor/pull/2246>`_
+- Add reducers tests 
+  `#2252 <https://github.com/xtensor-stack/xtensor/pull/2252>`_
+- Fix binary operators on complex
+  `#2253 <https://github.com/xtensor-stack/xtensor/pull/2253>`_
+- Removed not implemented assign method from xchunked_array
+  `#2256 <https://github.com/xtensor-stack/xtensor/pull/2256>`_
+- Support initialized list for chunked_array shapes
+  `#2258 <https://github.com/xtensor-stack/xtensor/pull/2258>`_
+- Add as_strided free function
+  `#2261 <https://github.com/xtensor-stack/xtensor/pull/2261>`_
+- Fix histogram compatibility with containers beyond xtensor
+  `#2263 <https://github.com/xtensor-stack/xtensor/pull/2263>`_
+- Fixed broadcasting with keep_slice that holds a single element
+  `#2270 <https://github.com/xtensor-stack/xtensor/pull/2270>`_
+- Make xt::cast and xtl::optional compatible
+  `#2271 <https://github.com/xtensor-stack/xtensor/pull/2271>`_
+- Fix minor warnings detected by clang
+  `#2272 <https://github.com/xtensor-stack/xtensor/pull/2272>`_
+- Extra assert in mean computation wrt. ddof
+  `#2273 <https://github.com/xtensor-stack/xtensor/pull/2273>`_
+- Provide a -Werror mode and ensure xtensor passes with it
+  `#2274 <https://github.com/xtensor-stack/xtensor/pull/2274>`_
+- Moved layout_remove_any to xlayout.hpp
+  `#2275 <https://github.com/xtensor-stack/xtensor/pull/2275>`_
+- Provide a -Werror mode and ensure xtensor passes with it
+  `#2274 <https://github.com/xtensor-stack/xtensor/pull/2274>`_
+- Slight reorganization of the documentation
+  `#2276 <https://github.com/xtensor-stack/xtensor/pull/2276>`_
+- Updated reducer docs according to recent changes
+  `#2278 <https://github.com/xtensor-stack/xtensor/pull/2278>`_
+- Added template parameter for initial value type in accumulators 
+  `#2279 <https://github.com/xtensor-stack/xtensor/pull/2279>`_
+
+0.21.10
+-------
+
+- Document chunked arrays
+  `#2102 <https://github.com/xtensor-stack/xtensor/pull/2102>`_
+- Removed ``zarray`` files
+  `#2221 <https://github.com/xtensor-stack/xtensor/pull/2221>`_
+- Improved ``xeval``
+  `#2223 <https://github.com/xtensor-stack/xtensor/pull/2223>`_
+- Fixed various warnings
+  `#2224 <https://github.com/xtensor-stack/xtensor/pull/2224>`_
+
+0.21.9
+------
+
+- Adding macro ``XTENSOR_SELECT_ALIGN``
+  `#2152 <https://github.com/xtensor-stack/xtensor/pull/2152>`_
+- xcontainer.hpp: Renamed a shadowing type name inside a function
+  `#2208 <https://github.com/xtensor-stack/xtensor/pull/2208>`_
+- Add chunk_memory_layout to chunked_array factory
+  `#2211 <https://github.com/xtensor-stack/xtensor/pull/2211>`_
+- CMake: Modernized GTest-integration
+  `#2212 <https://github.com/xtensor-stack/xtensor/pull/2212>`_
+- ``xnpy.hpp``: fix multiple definition of 'host_endian_char' variable when included in different linked objects
+  `#2214 <https://github.com/xtensor-stack/xtensor/pull/2214>`_
+- Made global variable const to force internal linkage 
+  `#2216 <https://github.com/xtensor-stack/xtensor/pull/2216>`_
+- Use xtl::endianness instead of bundling it
+  `#2218 <https://github.com/xtensor-stack/xtensor/pull/2218>`_
+- Fix call to resize of chunk container
+  `#2219 <https://github.com/xtensor-stack/xtensor/pull/2219>`_
+
+0.21.8
+------
+
+- Fix undefined behavior while testing shifts 
+  `#2175 <https://github.com/xtensor-stack/xtensor/pull/2175>`_
+- Fix ``zarray`` initialization from ``zarray``
+  `#2180 <https://github.com/xtensor-stack/xtensor/pull/2180>`_
+- Portable and generic implementation of endianess detection
+  `#2182 <https://github.com/xtensor-stack/xtensor/pull/2182>`_
+- Fix xnpy save padding computation
+  `#2183 <https://github.com/xtensor-stack/xtensor/pull/2183>`_
+- Only use ``-march=native`` if it's available
+  `#2184 <https://github.com/xtensor-stack/xtensor/pull/2184>`_
+- Fix ``xchunked_array`` assignment
+  `#2177 <https://github.com/xtensor-stack/xtensor/pull/2177>`_
+- Add specific ``xchunked_array`` constructor for ``xchunk_store_manager``
+  `#2188 <https://github.com/xtensor-stack/xtensor/pull/2188>`_
+- Make xnpy tests aware of both little and big endian targets
+  `#2189 <https://github.com/xtensor-stack/xtensor/pull/2189>`_
+- Fixed constructors of ``xchunked_array``
+  `#2190 <https://github.com/xtensor-stack/xtensor/pull/2190>`_
+- First implementation of ``zchunked_wrapper``
+  `#2193 <https://github.com/xtensor-stack/xtensor/pull/2193>`_
+- Don't mark dirty a resized or reshaped ``xfile_array``
+  `#2194 <https://github.com/xtensor-stack/xtensor/pull/2194>`_
+- Replaced catch-all constructor of ``zarray`` with more restrictive ones
+  `#2195 <https://github.com/xtensor-stack/xtensor/pull/2195>`_
+- Fixed SFINAE based on ``xchunked_store_manager``
+  `#2197 <https://github.com/xtensor-stack/xtensor/pull/2197>`_
+- Fix generated cmake config to include missing required lib
+  `#2200 <https://github.com/xtensor-stack/xtensor/pull/2200>`_
+- Add ``set_chunk_shape`` to the first chunk of the pool
+  `#2198 <https://github.com/xtensor-stack/xtensor/pull/2198>`_
+- Chunked array refactoring
+  `#2201 <https://github.com/xtensor-stack/xtensor/pull/2201>`_
+- Refactored ``xchunked_array`` semantic
+  `#2202 <https://github.com/xtensor-stack/xtensor/pull/2202>`_
+- Added missing header to CMakeLists.txt
+  `#2203 <https://github.com/xtensor-stack/xtensor/pull/2203>`_
+- Fixed ``load_simd`` for ``xcomplex``
+  `#2204 <https://github.com/xtensor-stack/xtensor/pull/2204>`_
+- Upgraded to xtl 0.6.20
+  `#2206 <https://github.com/xtensor-stack/xtensor/pull/2206>`_
+- changed std traits to new ``xtl::xtraits``
+  `#2205 <https://github.com/xtensor-stack/xtensor/pull/2205>`_
+- ``xstorage.hpp``: Renamed a shadowing variable inside a function
+  `#2207 <https://github.com/xtensor-stack/xtensor/pull/2207>`_
+
+0.21.7
+------
+
+- Removed zheaders from single header
+  `#2157 <https://github.com/xtensor-stack/xtensor/pull/2157>`_
+- Implemented insertion of range and intializer list in svector
+  `#2165 <https://github.com/xtensor-stack/xtensor/pull/2165>`_
+- Adding has_shape
+  `#2163 <https://github.com/xtensor-stack/xtensor/pull/2163>`_
+- Adding get_rank and has_fixed_rank
+  `#2162 <https://github.com/xtensor-stack/xtensor/pull/2162>`_
+- Zrefactoring
+  `#2140 <https://github.com/xtensor-stack/xtensor/pull/2140>`_
+- Added missing header
+  `#2169 <https://github.com/xtensor-stack/xtensor/pull/2169>`_
+- Extending docs random
+  `#2173 <https://github.com/xtensor-stack/xtensor/pull/2173>`_
+
+0.21.6
+------
+
+- Added implementation of ``isin`` and ``in1d``
+  `#2021 <https://github.com/xtensor-stack/xtensor/pull/2021>`_
+- Wrote single include header
+  `#2031 <https://github.com/xtensor-stack/xtensor/pull/2031>`_
+- Added details for ``xt::random`` to docs
+  `#2043 <https://github.com/xtensor-stack/xtensor/pull/2043>`_
+- Added ``digitize``, ``searchsorted``, and ``bin_items``
+  `#2037 <https://github.com/xtensor-stack/xtensor/pull/2037>`_
+- Fixed error with zero tensor size in ``xt::mean``
+  `#2047 <https://github.com/xtensor-stack/xtensor/pull/2047>`_
+- Fixed initialization order in ``xfunction``
+  `#2050 <https://github.com/xtensor-stack/xtensor/pull/2050>`_
+- ``adapt_smart_ptr`` overloads now accept STL-like container as shape
+  `#2052 <https://github.com/xtensor-stack/xtensor/pull/2052>`_
+- Added ``xchunked_array``
+  `#2076 <https://github.com/xtensor-stack/xtensor/pull/2076>`_
+- ``xchunked_array`` inherits from ``xiterable``
+  `#2082 <https://github.com/xtensor-stack/xtensor/pull/2082>`_
+- ``xchunked_array`` inherits from ``xcontainer_semantic``
+  `#2083 <https://github.com/xtensor-stack/xtensor/pull/2083>`_
+- Fixed assignment operator of ``xchunked_array``
+  `#2084 <https://github.com/xtensor-stack/xtensor/pull/2084>`_
+- Added constructors from ``xexpression`` and ``chunk_shape`` to ``xchunked_array``
+  `#2087 <https://github.com/xtensor-stack/xtensor/pull/2087>`_
+- Fixed chunk layout
+  `#2091 <https://github.com/xtensor-stack/xtensor/pull/2091>`_
+- Copy constructor gets expression's chunk_shape if it is chunked 
+  `#2092 <https://github.com/xtensor-stack/xtensor/pull/2092>`_
+- Replaced template parameter chunk_type with chunk_storage
+  `#2095 <https://github.com/xtensor-stack/xtensor/pull/2095>`_
+- Implemented on-disk chunked array 
+  `#2096 <https://github.com/xtensor-stack/xtensor/pull/2096>`_
+- Implemented chunk pool in xchunk_store_manager 
+  `#2099 <https://github.com/xtensor-stack/xtensor/pull/2099>`_
+- ``xfile_array`` is now an expression
+  `#2107 <https://github.com/xtensor-stack/xtensor/pull/2107>`_
+- ``xchunked_array`` code cleanup
+  `#2109 <https://github.com/xtensor-stack/xtensor/pull/2109>`_
+- ``xchunked_store_manager`` code cleanup
+  `#2110 <https://github.com/xtensor-stack/xtensor/pull/2110>`_
+- Refactored ``xfile_array``
+  `#2117 <https://github.com/xtensor-stack/xtensor/pull/2117>`_
+- Added simd accessors to ``xfil_array_container``
+  `#2118 <https://github.com/xtensor-stack/xtensor/pull/2118>`_
+- Abstracted file format through a formal class
+  `#2115 <https://github.com/xtensor-stack/xtensor/pull/2115>`_
+- Added ``xchunked_array`` extension template 
+  `#2122 <https://github.com/xtensor-stack/xtensor/pull/2122>`_
+- Refactored ``xdisk_io_handler``
+  `#2123 <https://github.com/xtensor-stack/xtensor/pull/2123>`_
+- Fixed exception for file write operation
+  `#2125 <https://github.com/xtensor-stack/xtensor/pull/2125>`_
+- Implemented ``zarray``
+  `#2127 <https://github.com/xtensor-stack/xtensor/pull/2127>`_
+- Implemented the skeleton of the dynamic expression system
+  `#2129 <https://github.com/xtensor-stack/xtensor/pull/2129>`_
+- Implemented zfunctions, equivalent of xfunction for dynamic expression system
+  `#2130 <https://github.com/xtensor-stack/xtensor/pull/2130>`_
+- Implemented ``allocate_result`` in ``zfunction``
+  `#2132 <https://github.com/xtensor-stack/xtensor/pull/2132>`_
+- Implemented assign mechanism for ``zarray``
+  `#2133 <https://github.com/xtensor-stack/xtensor/pull/2133>`_
+- Added xindex_path to transform indexes into path
+  `#2131 <https://github.com/xtensor-stack/xtensor/pull/2131>`_
+- Fixing various compiler warnings
+  `#2145 <https://github.com/xtensor-stack/xtensor/pull/2145>`_
+- Removed conversion and initialization warnings
+  `#2141 <https://github.com/xtensor-stack/xtensor/pull/2141>`_
+
 0.21.5
 ------
 
@@ -34,7 +382,6 @@ Changelog
   `#2024 <https://github.com/xtensor-stack/xtensor/pull/2024>`_
 - Initialized all members of ``xfunciton_cache_impl``
   `#2026 <https://github.com/xtensor-stack/xtensor/pull/2026>`_
-
 
 0.21.4
 ------

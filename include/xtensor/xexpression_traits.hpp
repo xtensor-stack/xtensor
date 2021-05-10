@@ -51,7 +51,7 @@ namespace xt
 
     template <class... C>
     using common_value_type_t = typename common_value_type<C...>::type;
-    
+
     /********************
      * common_size_type *
      ********************/
@@ -89,7 +89,7 @@ namespace xt
 
     template <class... Args>
     using common_difference_type_t = typename common_difference_type<Args...>::type;
-    
+
     /******************
      * temporary_type *
      ******************/
@@ -104,7 +104,7 @@ namespace xt
         };
 
 #if defined(__GNUC__) && (__GNUC__ > 6)
-#if __cplusplus == 201703L 
+#if __cplusplus == 201703L
         template <template <class, std::size_t, class, bool> class S, class X, std::size_t N, class A, bool Init>
         struct xtype_for_shape<S<X, N, A, Init>>
         {
@@ -128,15 +128,34 @@ namespace xt
             using type = xtensor_fixed<T, xshape<X...>, L>;
         };
     }
-    
-    template <class T, class S, layout_type L>
-    struct temporary_type
+
+    template <class Tag, class T>
+    struct temporary_type_from_tag;
+
+    template <class T>
+    struct temporary_type_from_tag<xtensor_expression_tag, T>
     {
-        using type = typename detail::xtype_for_shape<S>::template type<T, L>;
+        using I = std::decay_t<T>;
+        using shape_type = typename I::shape_type;
+        using value_type = typename I::value_type;
+        static constexpr layout_type static_layout = XTENSOR_DEFAULT_LAYOUT;
+        using type = typename detail::xtype_for_shape<shape_type>::template type<value_type, static_layout>;
     };
 
-    template <class T, class S, layout_type L>
-    using temporary_type_t = typename temporary_type<T, S, L>::type;
+    template <class T, class = void>
+    struct temporary_type
+    {
+        using type = typename temporary_type_from_tag<xexpression_tag_t<T>, T>::type;
+    };
+
+    template <class T>
+    struct temporary_type<T, void_t<typename std::decay_t<T>::temporary_type>>
+    {
+        using type = typename std::decay_t<T>::temporary_type;
+    };
+
+    template <class T>
+    using temporary_type_t = typename temporary_type<T>::type;
 
     /**********************
      * common_tensor_type *
@@ -148,9 +167,9 @@ namespace xt
         struct common_tensor_type_impl
         {
             static constexpr layout_type static_layout = compute_layout(std::decay_t<C>::static_layout...);
-            using type = temporary_type_t<common_value_type_t<C...>,
-                                          promote_shape_t<typename C::shape_type...>,
-                                          static_layout>;
+            using value_type = common_value_type_t<C...>;
+            using shape_type = promote_shape_t<typename C::shape_type...>;
+            using type = typename xtype_for_shape<shape_type>::template type<value_type, static_layout>;
         };
     }
 
@@ -161,6 +180,19 @@ namespace xt
 
     template <class... C>
     using common_tensor_type_t = typename common_tensor_type<C...>::type;
+
+    /**************************
+     * big_promote_value_type *
+     **************************/
+
+    template <class E>
+    struct big_promote_value_type
+    {
+        using type = xtl::big_promote_type_t<typename std::decay_t<E>::value_type>;
+    };
+
+    template <class E>
+    using big_promote_value_type_t = typename big_promote_value_type<E>::type;
 }
 
 #endif

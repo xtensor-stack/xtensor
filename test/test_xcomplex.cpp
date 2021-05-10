@@ -10,11 +10,15 @@
 #include "gtest/gtest.h"
 
 #include <complex>
+#include <xtl/xcomplex.hpp>
+
 #include "xtensor/xarray.hpp"
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xcomplex.hpp"
 #include "xtensor/xio.hpp"
 #include "xtensor/xnorm.hpp"
+
+#include "xtensor/xview.hpp"
 
 namespace xt
 {
@@ -305,5 +309,36 @@ namespace xt
         EXPECT_EQ(rc(0).real(), r(0));
         EXPECT_EQ(rc(1).real(), r(1));
         EXPECT_EQ(rc(2).real(), r(2));
+    }
+
+    TEST(xcomplex, xcomplex)
+    {
+        using complex_type = xtl::xcomplex<double>;
+        xt::xarray<complex_type> a = xt::ones<complex_type>(std::vector<size_t>(3,7));
+
+        auto simd_loaded = a.template load_simd<xt_simd::aligned_mode, complex_type, xt_simd::simd_traits<complex_type>::size>(0);
+        (void)simd_loaded;
+    }
+
+    TEST(xcomplex, view)
+    {
+
+        using cpx = std::complex<double>;
+        xt::xtensor<cpx, 2> a = {
+            { cpx(1, 1), cpx(-1, 1), cpx(-2, -2) },
+            { cpx(-1, 0), cpx(0, 1), cpx(2, 2) }
+        };
+
+        xtensor<cpx, 1> c = conj(view(a, 0, xt::all()));
+        xtensor<cpx ,1> exp_conj = {cpx(1, -1), cpx(-1, -1), cpx(-2, 2)};
+        EXPECT_EQ(c, exp_conj);
+
+        xtensor<double, 1> r = real(view(a, 0, xt::all()));
+        xtensor<double, 1> exp_real = {double(1), double(-1), double(-2)};
+        EXPECT_EQ(r, exp_real);
+
+        xtensor<double, 1> im = imag(view(a, 0, xt::all()));
+        xtensor<double, 1> exp_im = {double(1), double(1), double(-2)};
+        EXPECT_EQ(im, exp_im);
     }
 }

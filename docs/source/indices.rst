@@ -71,7 +71,7 @@ To print the ``std::vector``, it is converted to a ``xt::xtensor<size_t, 2>`` ar
 From array indices to flat indices
 ----------------------------------
 
-To convert the array indices to a ``xt::xtensor<size_t, 1>`` of flat indices, ``xt::ravel_indices`` can be used. For to same example:
+To convert the array indices to a ``xt::xtensor<size_t, 1>`` of flat indices, ``xt::ravel_indices`` can be used. For the same example:
 
 .. code-block:: cpp
 
@@ -126,7 +126,7 @@ For 1-D arrays the array indices and flat indices coincide. One can use the gene
         std::cout << xt::view(a, xt::keep(idx)) << std::endl;
     }
 
-which print the indices and the selection (which are in this case identical):
+which prints the indices and the selection (which are in this case identical):
 
 .. code-block:: none
 

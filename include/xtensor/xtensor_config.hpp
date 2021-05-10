@@ -11,17 +11,9 @@
 #define XTENSOR_CONFIG_HPP
 
 #define XTENSOR_VERSION_MAJOR 0
-#define XTENSOR_VERSION_MINOR 21
-#define XTENSOR_VERSION_PATCH 6-dev
+#define XTENSOR_VERSION_MINOR 23
+#define XTENSOR_VERSION_PATCH 9
 
-// DETECT 3.6 <= clang < 3.8 for compiler bug workaround.
-#ifdef __clang__
-    #if __clang_major__ == 3 && __clang_minor__ < 8
-        #define X_OLD_CLANG
-        #include <initializer_list>
-        #include <vector>
-    #endif
-#endif
 
 // Define if the library is going to be using exceptions.
 #if (!defined(__cpp_exceptions) && !defined(__EXCEPTIONS) && !defined(_CPPUNWIND))
@@ -31,6 +23,7 @@
 
 // Exception support.
 #if defined(XTENSOR_DISABLE_EXCEPTIONS)
+#include <iostream>
 #define XTENSOR_THROW(_, msg)            \
     {                                    \
       std::cerr << msg << std::endl;     \
@@ -107,6 +100,14 @@
 
 #ifndef XTENSOR_OPENMP_TRESHOLD
 #define XTENSOR_OPENMP_TRESHOLD 0
+#endif
+
+#ifndef XTENSOR_SELECT_ALIGN
+#define XTENSOR_SELECT_ALIGN(T) (XTENSOR_DEFAULT_ALIGNMENT != 0 ? XTENSOR_DEFAULT_ALIGNMENT : alignof(T))
+#endif
+
+#ifndef XTENSOR_FIXED_ALIGN
+#define XTENSOR_FIXED_ALIGN XTENSOR_SELECT_ALIGN(void*)
 #endif
 
 #ifdef IN_DOXYGEN

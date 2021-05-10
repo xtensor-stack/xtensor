@@ -1,3 +1,7 @@
+# Doxygen output
+docs/html/
+docs/xml/
+
 # Prerequisites
 *.d
 

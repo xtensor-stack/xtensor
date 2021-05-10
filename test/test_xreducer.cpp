@@ -9,37 +9,62 @@
 
 #include "gtest/gtest.h"
 #include "test_common_macros.hpp"
-#include "xtensor/xarray.hpp"
-#include "xtensor/xtensor.hpp"
-#include "xtensor/xutils.hpp"
-#include "xtensor/xfixed.hpp"
-#include "xtensor/xbuilder.hpp"
-#include "xtensor/xmath.hpp"
-#include "xtensor/xreducer.hpp"
-#include "xtensor/xview.hpp"
-#include "xtensor/xmanipulation.hpp"
 #if (defined(__GNUC__) && !defined(__clang__))
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#include "xtensor/xrandom.hpp"
+#pragma GCC diagnostic ignored "-Wconversion"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#include "xtensor/xmath.hpp"
 #pragma GCC diagnostic pop
 #else
-#include "xtensor/xrandom.hpp"
+#include "xtensor/xmath.hpp"
 #endif
-
+#include "xtensor/xutils.hpp"
+#include "xtensor/xfixed.hpp"
+#include "xtensor/xbuilder.hpp"
+#include "xtensor/xreducer.hpp"
+#include "xtensor/xview.hpp"
+#include "xtensor/xmanipulation.hpp"
+#include "xtensor/xarray.hpp"
+#include "xtensor/xtensor.hpp"
+#include "xtensor/xrandom.hpp"
+#include "xtensor/xoptional.hpp"
+#include "xtensor/xoptional_assembly.hpp"
 #include "xtensor/xio.hpp"
 
 namespace xt
 {
+
+#define CHECK_RESULT_TYPE(EXPRESSION, EXPECTED_TYPE)                             \
+{                                                                                \
+    using result_type = typename std::decay_t<decltype(EXPRESSION)>::value_type; \
+    EXPECT_TRUE((std::is_same<result_type, EXPECTED_TYPE>::value));              \
+}
+
+#define CHECK_TAG_TYPE(EXPRESSION, EXPECTED_TYPE)                                    \
+{                                                                                    \
+    using result_type = typename std::decay_t<decltype(EXPRESSION)>::expression_tag; \
+    EXPECT_TRUE((std::is_same<result_type, EXPECTED_TYPE>::value));                  \
+}
+
+#define CHECK_TYPE(VALUE, EXPECTED_TYPE)                                         \
+{                                                                                \
+    using result_type = typename std::decay_t<decltype(VALUE)>;                  \
+    EXPECT_TRUE((std::is_same<result_type, EXPECTED_TYPE>::value));              \
+}
+
     struct xreducer_features
     {
         using axes_type = std::array<std::size_t, 2>;
-        axes_type m_axes;
-        xarray<double> m_a;
         using shape_type = xarray<double>::shape_type;
+        using xarray_type = xarray<double>;
+        using func = xreducer_functors<std::plus<double>>; 
 
-        using func = xreducer_functors<std::plus<double>>;
-        xreducer<func, const xarray<double>&, axes_type, xt::reducer_options<double, std::tuple<xt::evaluation_strategy::lazy_type>>> m_red;
+        axes_type m_axes;
+
+        xarray_type m_a;
+
+        xreducer<func, const xarray_type&, axes_type, xt::reducer_options<double, std::tuple<xt::evaluation_strategy::lazy_type>>> m_red;
 
         xreducer_features();
     };
@@ -56,6 +81,112 @@ namespace xt
             }
         }
     }
+
+   struct xreducer_opt_features
+    {
+        using axes_type = std::array<std::size_t, 2>;
+        using shape_type = typename xarray_optional<double>::shape_type;
+
+        using xarray_of_optional_type = xarray<xtl::xoptional<double>>;
+        using xarray_optional_type = xarray_optional<double>;
+        using optional_assembly_type = xoptional_assembly<xarray<double>, xarray<bool>>;
+
+        axes_type m_axes;
+
+        xarray_of_optional_type m_array_of_optional, m_simple_array_of_optional;
+
+        xarray_optional_type m_array_optional, m_simple_array_optional;
+    
+        optional_assembly_type m_optional_assembly, m_simple_optional_assembly;
+
+        xreducer_opt_features(): 
+            m_axes({1, 3}),
+            m_array_of_optional(ones<xtl::xoptional<double>>({3, 2, 4, 6, 5})),
+            m_array_optional(ones<xtl::xoptional<double>>({3, 2, 4, 6, 5})),
+            m_optional_assembly(ones<xtl::xoptional<double>>({3, 2, 4, 6, 5}))
+        {
+            for (std::size_t i = 0; i < 2; ++i)
+            {
+                for (std::size_t j = 0; j < 6; ++j)
+                {
+                    m_array_of_optional(1, i, 1, j, 1) = 2;
+                    m_array_optional(1, i, 1, j, 1) = 2;
+                    m_optional_assembly(1, i, 1, j, 1) = 2;
+                }
+            }
+            m_array_of_optional(0, 0, 0, 0, 0) = xtl::missing<double>();
+            m_array_optional(0, 0, 0, 0, 0) = xtl::missing<double>();
+            m_optional_assembly(0, 0, 0, 0, 0) = xtl::missing<double>();
+
+            m_simple_array_of_optional = xarray_of_optional_type({{1, 2, 0}, {4, 8, xtl::missing<double>()}});
+            m_simple_array_optional = xarray_optional_type({{1, 2, 0}, {4, 8, xtl::missing<double>()}});
+            m_simple_optional_assembly = optional_assembly_type({{1, 2, 0}, {4, 8, xtl::missing<double>()}});
+        }
+    };
+
+#define TEST_EXPRESSION_TAG(INPUT, EXPECTED)   \
+    auto res = xt::sum(INPUT, feats.m_axes);   \
+    CHECK_TAG_TYPE(res, EXPECTED);
+
+    TEST(xreducer, expression_tag)
+    {
+        xreducer_features feats;
+        TEST_EXPRESSION_TAG(feats.m_a, xtensor_expression_tag);
+    }
+
+    TEST(xreducer_array_of_optional, expression_tag)
+    {
+        xreducer_opt_features feats;
+        TEST_EXPRESSION_TAG(feats.m_array_of_optional, xtensor_expression_tag);
+    }
+
+    TEST(xreducer_array_optional, expression_tag)
+    {
+        xreducer_opt_features feats;
+        TEST_EXPRESSION_TAG(feats.m_array_optional, xoptional_expression_tag);
+    }
+
+    TEST(xreducer_optional_assembly, expression_tag)
+    {
+        xreducer_opt_features feats;
+        TEST_EXPRESSION_TAG(feats.m_optional_assembly, xoptional_expression_tag);
+    }
+#undef TEST_EXPRESSION_TAG
+
+#define TEST_VALUE_HAS_VALUE(INPUT, V_TYPE, OPTIONAL)                                      \
+    using result_type = std::conditional_t<OPTIONAL, xtl::xoptional<double>, double>;      \
+                                                                                           \
+    auto res = xt::sum(INPUT, feats.m_axes);                                               \
+    CHECK_RESULT_TYPE(res, result_type);                                                   \
+    CHECK_TYPE(xt::value(res)(1, 1, 1), V_TYPE);                                           \
+    EXPECT_EQ(!OPTIONAL, xt::has_value(res)(0, 0, 0));                                     \
+    EXPECT_TRUE(xt::has_value(res)(1, 1, 1));
+
+    TEST(xreducer, value_has_value)
+    {
+        xreducer_features feats;
+        TEST_VALUE_HAS_VALUE(feats.m_a, double, false);
+    }
+/*
+    TEST(xreducer_array_of_optional, value_has_value)
+    {
+        xreducer_opt_features feats;
+        TEST_VALUE_HAS_VALUE(feats.m_array_of_optional, xtl::xoptional<double>, true);  // TODO: fail, the mask is not reflecting the missing values
+    }
+*/
+    TEST(xreducer_array_optional, value_has_value)
+    {
+       xreducer_opt_features feats;
+       TEST_VALUE_HAS_VALUE(feats.m_array_optional, double, true);
+    }
+
+    TEST(xreducer_optional_assembly, value_has_value)
+    {
+        xreducer_opt_features feats;
+        TEST_VALUE_HAS_VALUE(feats.m_optional_assembly, double, true);
+    }
+
+#undef TEST_VALUE_HAS_VALUE
 
     TEST(xreducer, functor_type)
     {
@@ -144,7 +275,75 @@ namespace xt
         xarray<double> expected = 12 * ones<double>({3, 4, 5});
         expected(1, 1, 1) = 24;
         EXPECT_EQ(expected, res);
+
+        xarray_optional<double> opt_expected = 12 * ones<double>({3, 4, 5});
+        opt_expected(1, 1, 1) = 24;
+
+// TODO: fix the reducer assignment issue in multithreaded env and enable
+// these tests again.
+#if !defined(XTENSOR_USE_TBB) && !defined(XTENSOR_USE_OPENMP)
+        xreducer_opt_features::xarray_of_optional_type opt_res1 = res;
+        CHECK_RESULT_TYPE(opt_res1, xtl::xoptional<double>);
+        CHECK_TYPE(xt::value(opt_res1)(1, 1, 1), xtl::xoptional<double>);
+        EXPECT_EQ(xt::has_value(opt_res1), xt::full_like(res, true));
+        EXPECT_EQ(opt_expected, opt_res1);
+        
+        xreducer_opt_features::xarray_optional_type opt_res2 = res;
+        CHECK_RESULT_TYPE(opt_res2, xtl::xoptional<double>);
+        CHECK_TYPE(xt::value(opt_res2)(1, 1, 1), double);
+        EXPECT_EQ(xt::has_value(opt_res2), xt::full_like(res, true));
+        EXPECT_EQ(opt_expected, opt_res2);
+
+        xreducer_opt_features::optional_assembly_type opt_res3 = res;
+        CHECK_RESULT_TYPE(opt_res3, xtl::xoptional<double>);
+        CHECK_TYPE(xt::value(opt_res3)(1, 1, 1), double);
+        EXPECT_EQ(xt::has_value(opt_res3), xt::full_like(res, true));
+        EXPECT_EQ(opt_expected, opt_res3);
+#endif
     }
+
+#define TEST_OPT_ASSIGNMENT(INPUT)                               \
+    auto res = xt::sum(INPUT, feats.m_axes);                     \
+                                                                 \
+    xreducer_opt_features::xarray_of_optional_type res1 = res;   \
+    CHECK_RESULT_TYPE(res1, xtl::xoptional<double>);             \
+    CHECK_TYPE(xt::value(res1)(1, 1, 1), xtl::xoptional<double>);\
+    EXPECT_EQ(res1(1, 1, 1), 24.);                               \
+    /* EXPECT_FALSE(xt::has_value(res1)(0, 0, 0)); */            \
+    EXPECT_TRUE(xt::has_value(res1)(1, 1, 1));                   \
+                                                                 \
+    xreducer_opt_features::xarray_optional_type res2 = res;      \
+    CHECK_RESULT_TYPE(res2, xtl::xoptional<double>);             \
+    CHECK_TYPE(xt::value(res2)(1, 1, 1), double);                \
+    EXPECT_EQ(res2(1, 1, 1), 24.);                               \
+    EXPECT_FALSE(xt::has_value(res2)(0, 0, 0));                  \
+    EXPECT_TRUE(xt::has_value(res2)(1, 1, 1));                   \
+                                                                 \
+    xreducer_opt_features::optional_assembly_type res3 = res;    \
+    CHECK_RESULT_TYPE(res3, xtl::xoptional<double>);             \
+    CHECK_TYPE(xt::value(res3)(1, 1, 1), double);                \
+    EXPECT_EQ(res3(1, 1, 1), 24.);                               \
+    EXPECT_FALSE(xt::has_value(res3)(0, 0, 0));                  \
+    EXPECT_TRUE(xt::has_value(res3)(1, 1, 1));
+
+    TEST(xreducer_array_of_optional, assign)
+    {
+        xreducer_opt_features feats;
+        TEST_OPT_ASSIGNMENT(feats.m_array_of_optional)
+    }
+
+    TEST(xreducer_array_optional, assign)
+    {
+        xreducer_opt_features feats;
+        TEST_OPT_ASSIGNMENT(feats.m_array_optional) 
+    }
+    
+    TEST(xreducer_optional_assembly, assign)
+    {
+        xreducer_opt_features feats;
+        TEST_OPT_ASSIGNMENT(feats.m_optional_assembly) 
+    }
+#undef TEST_OPT_ASSIGNMENT
 
     TEST(xreducer, sum)
     {
@@ -154,6 +353,31 @@ namespace xt
         expected(1, 1, 1) = 24;
         EXPECT_EQ(expected, res);
     }
+
+#define TEST_OPT_SUM(INPUT)                            \
+    auto res = xt::sum(INPUT, feats.m_axes);           \
+    EXPECT_EQ(res.dimension(), std::size_t(3));        \
+    EXPECT_EQ(res(0, 0, 0), xtl::missing<double>());   \
+    EXPECT_EQ(res(1, 1, 1), 24.);  
+
+    TEST(xreducer_array_of_optional, sum)
+    {
+        xreducer_opt_features feats;
+        TEST_OPT_SUM(feats.m_array_of_optional);   
+    }
+
+    TEST(xreducer_array_optional, sum)
+    {
+        xreducer_opt_features feats;
+        TEST_OPT_SUM(feats.m_array_optional);       
+    } 
+
+    TEST(xreducer_optional_assembly, sum)
+    {
+        xreducer_opt_features feats;
+        TEST_OPT_SUM(feats.m_optional_assembly);        
+    }
+#undef TEST_OPT_SUM
 
     TEST(xreducer, sum_tensor)
     {
@@ -176,6 +400,35 @@ namespace xt
         xarray<double> res4 = xt::sum(m, 1);
         EXPECT_EQ(res3, res4);
     }
+
+#define TEST_OPT_SINGLE_AXIS(INPUT)                                    \
+    auto res = xt::sum(INPUT, feats.m_axes);                           \
+    xarray_optional<std::size_t> res1 = xt::count_nonzero(INPUT, {1}); \
+    xarray_optional<std::size_t> res2 = xt::count_nonzero(INPUT, 1);   \
+    EXPECT_EQ(res1, res2);                                             \
+                                                                       \
+    xarray_optional<double> res3 = xt::sum(INPUT, {1});                \
+    xarray_optional<double> res4 = xt::sum(INPUT, 1);                  \
+    EXPECT_EQ(res3, res4); 
+
+    TEST(xreducer_array_of_optional, single_axis_sugar)
+    {
+        xreducer_opt_features feats;
+        TEST_OPT_SINGLE_AXIS(feats.m_array_of_optional);   
+    }
+
+    TEST(xreducer_array_optional, single_axis_sugar)
+    {
+        xreducer_opt_features feats;
+        TEST_OPT_SINGLE_AXIS(feats.m_array_optional);       
+    } 
+
+    TEST(xreducer_optional_assembly, single_axis_sugar)
+    {
+        xreducer_opt_features feats;
+        TEST_OPT_SINGLE_AXIS(feats.m_optional_assembly);        
+    }
+#undef TEST_OPT_SINGLE_AXIS
 
     TEST(xreducer, sum2)
     {
@@ -218,12 +471,62 @@ namespace xt
         EXPECT_EQ(res(), expected);
     }
 
+#define TEST_OPT_SUM_ALL(INPUT)               \
+    auto res = xt::sum(INPUT);                \
+    EXPECT_EQ(res(), xtl::missing<double>());
+
+    TEST(xreducer_array_of_optional, sum_all)
+    {
+        xreducer_opt_features feats;
+        TEST_OPT_SUM_ALL(feats.m_array_of_optional);   
+    }
+
+    TEST(xreducer_array_optional, sum_all)
+    {
+        xreducer_opt_features feats;
+        TEST_OPT_SUM_ALL(feats.m_array_optional);       
+    } 
+
+    TEST(xreducer_optional_assembly, sum_all)
+    {
+        xreducer_opt_features feats;
+        TEST_OPT_SUM_ALL(feats.m_optional_assembly);        
+    }
+#undef TEST_OPT_SUM_ALL
+
     TEST(xreducer, prod)
     {
         // check that there is no overflow
         xarray<uint8_t> c = 2 * ones<uint8_t>({34});
-        EXPECT_EQ(1ULL << 34, prod(c)());
+        EXPECT_EQ(1ULL << 34, prod<long long>(c)());
     }
+
+#define TEST_OPT_PROD(INPUT)                     \
+    auto res1 = xt::prod(INPUT);                 \
+    EXPECT_EQ(res1(), xtl::missing<double>());   \
+                                                 \
+    auto res2 = xt::prod(INPUT, feats.m_axes);   \
+    EXPECT_EQ(res2(), xtl::missing<double>());   \
+    EXPECT_EQ(res2(1, 1, 1), 4096.);
+
+    TEST(xreducer_array_of_optional, prod)
+    {
+        xreducer_opt_features feats;
+        TEST_OPT_PROD(feats.m_array_of_optional);   
+    }
+
+    TEST(xreducer_array_optional, prod)
+    {
+        xreducer_opt_features feats;
+        TEST_OPT_PROD(feats.m_array_optional);       
+    } 
+
+    TEST(xreducer_optional_assembly, prod)
+    {
+        xreducer_opt_features feats;
+        TEST_OPT_PROD(feats.m_optional_assembly);        
+    }
+#undef TEST_OPT_PROD
 
     TEST(xreducer, mean)
     {
@@ -241,12 +544,43 @@ namespace xt
         EXPECT_TRUE(all(equal(mean0, expect0)));
         EXPECT_TRUE(all(equal(mean1, expect1)));
 
+#ifndef SKIP_ON_WERROR
+        // may loose precision because uint8_t is casted to long for intermediate
+        // computations and then divided by a double for mean
         xarray<uint8_t> c = {1, 2};
         EXPECT_EQ(mean(c)(), 1.5);
+#endif
 
         const auto rvalue_xarray = [] () { return xtensor<double, 1>({1, 2}); };
         EXPECT_EQ(mean(rvalue_xarray(), {0})(), 1.5);
     }
+
+#define TEST_OPT_MEAN(INPUT)                      \
+    auto res1 = xt::mean(INPUT);                  \
+    EXPECT_EQ(res1(), xtl::missing<double>());    \
+                                                  \
+    auto res2 = xt::mean(INPUT, feats.m_axes);    \
+    EXPECT_EQ(res2(), xtl::missing<double>());    \
+    EXPECT_EQ(res2(1, 1, 1), 2.);
+
+    TEST(xreducer_array_of_optional, mean)
+    {
+        xreducer_opt_features feats;
+        TEST_OPT_MEAN(feats.m_array_of_optional);   
+    }
+
+    TEST(xreducer_array_optional, mean)
+    {
+        xreducer_opt_features feats;
+        TEST_OPT_MEAN(feats.m_array_optional);       
+    } 
+
+    TEST(xreducer_optional_assembly, mean)
+    {
+        xreducer_opt_features feats;
+        TEST_OPT_MEAN(feats.m_optional_assembly);        
+    }
+#undef TEST_OPT_MEAN
 
     TEST(xreducer, average)
     {
@@ -271,6 +605,81 @@ namespace xt
         EXPECT_TRUE(all(equal(avg_m1, expect1)));
         EXPECT_TRUE(all(equal(avg_d1, expect1)));
     }
+
+#define TEST_OPT_AVERAGE(INPUT)                                            \
+    xt::xarray<double> all_weights = {{3, 3, 3},                           \
+                                      {1, 1, 1}};                          \
+    auto res1 = xt::average(INPUT, all_weights);                           \
+    EXPECT_EQ(res1(), xtl::missing<double>());                             \
+                                                                           \
+    xtensor_optional<double, 1> expect = {1., 2., xtl::missing<double>()}; \
+    xt::xarray<double> weights = {2, 0};                                   \
+    auto res2 = xt::average(INPUT, weights, {0});                          \
+    EXPECT_TRUE(all(equal(res2, expect)));
+
+    TEST(xreducer_array_of_optional, average)
+    {
+        xreducer_opt_features feats;
+        TEST_OPT_AVERAGE(feats.m_simple_array_of_optional);   
+    }
+
+    TEST(xreducer_array_optional, average)
+    {
+        xreducer_opt_features feats;
+        TEST_OPT_AVERAGE(feats.m_simple_array_optional);       
+    } 
+
+    TEST(xreducer_optional_assembly, average)
+    {
+        xreducer_opt_features feats;
+        TEST_OPT_AVERAGE(feats.m_simple_optional_assembly);        
+    }
+#undef TEST_OPT_AVERAGE
+
+    TEST(xreducer, count_nonzero)
+    {
+        xarray<double> m = {{1, 0}, {3, 4}};
+
+        xarray<std::size_t> res0 = xt::count_nonzero(m, {0});
+        xtensor<std::size_t, 1> expect0 = {2, 1};
+        EXPECT_TRUE(all(equal(res0, expect0)));
+
+        xarray<std::size_t> res1 = xt::count_nonzero(m, {1});
+        xtensor<std::size_t, 1> expect1 = {1, 2};
+        EXPECT_TRUE(all(equal(res1, expect1)));
+    }
+
+#define TEST_OPT_COUNT_NONZEROS(INPUT)             \
+    auto res0 = xt::count_nonzero(INPUT, {0});     \
+    xtensor_optional<std::size_t, 1> expect0 =     \
+            {2, 2, xtl::missing<std::size_t>()};   \
+    EXPECT_TRUE(all(equal(res0, expect0)));        \
+                                                   \
+    auto res1 = xt::count_nonzero(INPUT, {1});     \
+    xtensor_optional<std::size_t, 1> expect1 =     \
+            {2, xtl::missing<std::size_t>()};      \
+    EXPECT_TRUE(all(equal(res1, expect1)));
+
+/*  TODO: fix policy, missing values should lead to a missing value result
+    TEST(xreducer_array_of_optional, count_nonzero)
+    {
+        xreducer_opt_features feats;
+        TEST_OPT_COUNT_NONZEROS(feats.m_simple_array_of_optional);   
+    }
+
+    TEST(xreducer_array_optional, count_nonzero)
+    {
+        xreducer_opt_features feats;
+        TEST_OPT_COUNT_NONZEROS(feats.m_simple_array_optional);       
+    } 
+
+    TEST(xreducer_optional_assembly, count_nonzero)
+    {
+        xreducer_opt_features feats;
+        TEST_OPT_COUNT_NONZEROS(feats.m_simple_optional_assembly);        
+    }
+*/
+#undef TEST_OPT_COUNT_NONZEROS
 
     TEST(xreducer, minmax)
     {
@@ -371,9 +780,7 @@ namespace xt
             return istrue;
         };
 
-    #ifndef X_OLD_CLANG
         EXPECT_TRUE(is_arr(xa.shape()));
-    #endif
 
         xtensor<double, 3> a;
         a.resize({3, 3, 3});
@@ -392,10 +799,8 @@ namespace xt
         auto a_gd_2 = sum(a, {0, 2}, evaluation_strategy::immediate);
         EXPECT_EQ(a_lz, a_gd_2);
 
-    #ifndef X_OLD_CLANG
         EXPECT_TRUE(is_arr(a_gd_1.shape()));
         EXPECT_TRUE(is_arr(a_gd_2.shape()));
-    #endif
 
         a_lz = sum(a, {1, 2});
         a_gd_2 = sum(a, {1, 2}, evaluation_strategy::immediate);
@@ -436,10 +841,8 @@ namespace xt
         EXPECT_EQ(b_gd_2, a_gd_2);
         EXPECT_EQ(a_gd_2.dimension(), std::size_t(1));
 
-    #ifndef X_OLD_CLANG
         // EXPECT_TRUE(is_arr(a_gd_1.shape()));
         EXPECT_TRUE(is_arr(a_gd_2.shape()));
-    #endif
 
         a_lz = sum(a, {1, 2});
         a_gd_2 = sum(a, {1, 2}, evaluation_strategy::immediate);
@@ -465,9 +868,9 @@ namespace xt
         EXPECT_TRUE(b_fx_2 == sum(c, {0, 1}));
         EXPECT_EQ(b_fx_3, sum(c, {0, 1, 2}));
 
-        truth = std::is_same<std::decay_t<decltype(b_fx_1)>, xtensor_fixed<long long, xshape<5>>>::value;
+        truth = std::is_same<std::decay_t<decltype(b_fx_1)>, xtensor_fixed<int, xshape<5>>>::value;
         EXPECT_TRUE(truth);
-        truth = std::is_same<std::decay_t<decltype(b_fx_3)>, xtensor_fixed<long long, xshape<>>>::value;
+        truth = std::is_same<std::decay_t<decltype(b_fx_3)>, xtensor_fixed<int, xshape<>>>::value;
         EXPECT_TRUE(truth);
 
         truth = std::is_same<xshape<1, 3>, typename fixed_xreducer_shape_type<xshape<1, 5, 3>, xshape<1>>::type>();
@@ -549,17 +952,10 @@ namespace xt
     {
         xt::xtensor<double, 4> a = xt::reshape_view(xt::arange<double>(5 * 5 * 5 * 5), {5, 5, 5, 5});
 
-    #ifndef X_OLD_CLANG
         auto res = xt::sum(a, {0, 1}, xt::keep_dims | xt::evaluation_strategy::immediate);   
         EXPECT_EQ(res.shape(), (std::array<std::size_t, 4>{1, 1, 5, 5}));
         auto res2 = xt::sum(a, {0, 1}, xt::keep_dims);   
         EXPECT_EQ(res2.shape(), (std::array<std::size_t, 4>{1, 1, 5, 5}));
-    #else
-        auto res = xt::sum(a, {0, 1}, xt::keep_dims | xt::evaluation_strategy::immediate);   
-        EXPECT_EQ(res.shape(), (xt::dynamic_shape<std::size_t>{1, 1, 5, 5}));
-        auto res2 = xt::sum(a, {0, 1}, xt::keep_dims);   
-        EXPECT_EQ(res2.shape(), (xt::dynamic_shape<std::size_t>{1, 1, 5, 5}));
-    #endif
 
         xt::xarray<double> b = a;
         auto res3 = xt::sum(b, {0, 1}, xt::keep_dims | xt::evaluation_strategy::immediate);   
@@ -679,7 +1075,11 @@ namespace xt
     {
         xt::xtensor_fixed<float, xt::xshape<3>> a = {1, 2, 3}, b = {1, 2, 3};
         xt::xtensor<xt::xtensor_fixed<float, xt::xshape<3>>, 1> c = {a, b};
+
         auto res = xt::sum(c)();
-        EXPECT_EQ(res, a * 2);
+        EXPECT_EQ(res, a * 2.);
+
+        xt::xtensor_fixed<float, xt::xshape<3>> res1 = res;
+        EXPECT_EQ(res1, a * 2.);
     }
 }

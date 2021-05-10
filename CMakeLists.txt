@@ -29,7 +29,7 @@ message(STATUS "Building xtensor v${${PROJECT_NAME}_VERSION}")
 # Dependencies
 # ============
 
-set(xtl_REQUIRED_VERSION 0.6.16)
+set(xtl_REQUIRED_VERSION 0.7.0)
 if(TARGET xtl)
     set(xtl_VERSION ${XTL_VERSION_MAJOR}.${XTL_VERSION_MINOR}.${XTL_VERSION_PATCH})
     # Note: This is not SEMVER compatible comparison
@@ -123,6 +123,9 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xbroadcast.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xbuffer_adaptor.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xbuilder.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xchunked_array.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xchunked_assign.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xchunked_view.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xcomplex.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xcontainer.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xcsv.hpp
@@ -179,11 +182,6 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xvectorize.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xview.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xview_utils.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/zarray.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/zarray_impl.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/zdispatcher.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/zfunction.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/zmath.hpp
 )
 
 add_library(xtensor INTERFACE)
@@ -234,6 +232,7 @@ if(MSVC AND DISABLE_MSVC_ITERATOR_CHECK)
 endif()
 
 if(BUILD_TESTS)
+    enable_testing()
     add_subdirectory(test)
 endif()
 

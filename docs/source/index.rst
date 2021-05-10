@@ -69,6 +69,7 @@ for details.
    missing
    histogram
    random
+   rank
    file_loading
    build-options
    pitfall
@@ -85,6 +86,7 @@ for details.
    view
    quickref/iterator
    quickref/manipulation
+   quickref/chunked_arrays
 
 .. toctree::
    :caption: API REFERENCE

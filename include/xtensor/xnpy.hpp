@@ -15,10 +15,12 @@
 // relicensed from MIT License with permission
 
 #include <xtl/xsequence.hpp>
+#include <xtl/xplatform.hpp>
 
 #include <algorithm>
 #include <complex>
 #include <cstdint>
+#include <cstring>
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -42,26 +44,9 @@ namespace xt
     namespace detail
     {
 
-    /* Compile-time test for byte order.
-       If your compiler does not define these per default, you may want to define
-       one of these constants manually.
-       Defaults to little endian order. */
-#if defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN || defined(__BIG_ENDIAN__) || \
-    defined(__ARMEB__) || defined(__THUMBEB__) || defined(__AARCH64EB__) ||             \
-    defined(_MIBSEB) || defined(__MIBSEB) || defined(__MIBSEB__)
-        const bool big_endian = true;
-#else
-        const bool big_endian = false;
-#endif
-
         const char magic_string[] = "\x93NUMPY";
-        const std::size_t magic_string_length = 6;
+        const std::size_t magic_string_length = sizeof(magic_string) - 1;
 
-        const char little_endian_char = '<';
-        const char big_endian_char = '>';
-        const char no_endian_char = '|';
-
-        constexpr char host_endian_char = (big_endian ? big_endian_char : little_endian_char);
 
         template <class O>
         inline void write_magic(O& ostream,
@@ -127,9 +112,26 @@ namespace xt
         }
 
         template <class T>
-        constexpr char get_endianess()
+        inline char get_endianess()
         {
-            return sizeof(T) <= sizeof(char) ? no_endian_char : host_endian_char;
+            constexpr char little_endian_char = '<';
+            constexpr char big_endian_char = '>';
+            constexpr char no_endian_char = '|';
+
+            if(sizeof(T) <= sizeof(char))
+            {
+                return no_endian_char;
+            }
+
+            switch(xtl::endianness())
+            {
+            case xtl::endian::little_endian:
+                return little_endian_char;
+            case xtl::endian::big_endian:
+                return big_endian_char;
+            default:
+                return no_endian_char;
+            }
         }
 
         template <class T>
@@ -393,7 +395,7 @@ namespace xt
                 version[0] = 2;
                 version[1] = 0;
             }
-            std::size_t padding_len = 16 - metadata_len % 16;
+            std::size_t padding_len = 64 - (metadata_len % 64);
             std::string padding(padding_len, ' ');
             ss_header << padding;
             ss_header << std::endl;

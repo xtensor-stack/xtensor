@@ -28,7 +28,7 @@ Basic usage
     *   ``bins = 10``
     *   ``mode = xt::histogram::automatic``
 
-The behavior, in-, and output of ``histogram`` is similar to that of `numpy.histogram <https://docs.scipy.org/doc/numpy/reference/generated/numpy.histogram.html>`_ with that difference that the bin-edges are obtained by a separate function call:
+The behavior, in-, and output of ``histogram`` is similar to that of :any:`numpy.histogram` with that difference that the bin-edges are obtained by a separate function call:
 
 .. code-block:: cpp
 
@@ -80,4 +80,4 @@ The following algorithms are available:
 
 *   ``logspace``: bins that logarithmically increase in size.
 
-*   ``uniform``: bin-edges such that the number of data-points is the same in all bins (as much as possible).
+*   ``uniform``: bin-edges such that the number of data points is the same in all bins (as much as possible).

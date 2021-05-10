@@ -10,6 +10,7 @@
 #ifndef XTENSOR_EVAL_HPP
 #define XTENSOR_EVAL_HPP
 
+#include "xexpression_traits.hpp"
 #include "xtensor_forward.hpp"
 #include "xshape.hpp"
 
@@ -40,28 +41,119 @@ namespace xt
     }
 
     /// @cond DOXYGEN_INCLUDE_SFINAE
-    template <class T, class I = std::decay_t<T>>
+    template <class T>
     inline auto eval(T&& t)
-        -> std::enable_if_t<!detail::is_container<I>::value && detail::is_array<typename I::shape_type>::value && !detail::is_fixed<typename I::shape_type>::value, xtensor<typename I::value_type, std::tuple_size<typename I::shape_type>::value>>
+        -> std::enable_if_t<!detail::is_container<std::decay_t<T>>::value, temporary_type_t<T>>
     {
-        return xtensor<typename I::value_type, std::tuple_size<typename I::shape_type>::value>(std::forward<T>(t));
+        return std::forward<T>(t);
     }
 
-    template <class T, class I = std::decay_t<T>>
-    inline auto eval(T&& t)
-        -> std::enable_if_t<!detail::is_container<I>::value && !detail::is_array<typename I::shape_type>::value && !detail::is_fixed<typename I::shape_type>::value, xt::xarray<typename I::value_type>>
+    namespace detail
     {
-        return xarray<typename I::value_type>(std::forward<T>(t));
+        /**********************************
+         * has_same_layout implementation *
+         **********************************/
+
+        template <layout_type L = layout_type::any, class E>
+        constexpr bool has_same_layout()
+        {
+            return (std::decay_t<E>::static_layout == L) || (L == layout_type::any);
+        }
+
+        template <layout_type L = layout_type::any, class E>
+        constexpr bool has_same_layout(E&&)
+        {
+            return has_same_layout<L, E>();
+        }
+
+        template <class E1, class E2>
+        constexpr bool has_same_layout(E1&&, E2&&)
+        {
+            return has_same_layout<std::decay_t<E1>::static_layout, E2>();
+        }
+
+        /*********************************
+         * has_fixed_dims implementation *
+         *********************************/
+
+        template <class E>
+        constexpr bool has_fixed_dims()
+        {
+            return detail::is_array<typename std::decay_t<E>::shape_type>::value;
+        }
+
+        template <class E>
+        constexpr bool has_fixed_dims(E&&)
+        {
+            return has_fixed_dims<E>();
+        }
+
+        /****************************************
+         * as_xarray_container_t implementation *
+         ****************************************/
+
+        template <class E, layout_type L>
+        using as_xarray_container_t = xarray<typename std::decay_t<E>::value_type, layout_remove_any(L)>;
+
+        /*****************************************
+         * as_xtensor_container_t implementation *
+         *****************************************/
+
+        template <class E, layout_type L>
+        using as_xtensor_container_t = xtensor<typename std::decay_t<E>::value_type,
+                                               std::tuple_size<typename std::decay_t<E>::shape_type>::value,
+                                               layout_remove_any(L)>;
     }
 
-    template <class T, class I = std::decay_t<T>>
-    inline auto eval(T&& t)
-        -> std::enable_if_t<!detail::is_container<I>::value && detail::is_fixed<typename I::shape_type>::value && !detail::is_array<typename I::shape_type>::value,
-                            xt::xtensor_fixed<typename I::value_type, typename I::shape_type>>
+    /**
+     * Force evaluation of xexpression not providing a data interface
+     * and convert to the required layout.
+     * 
+     * @warning This function should be used in a local context only.
+     * Returning the value returned by this function could lead to a dangling reference.
+     * 
+     * @return The expression when it already provides a data interface with the correct layout,
+     * an evaluated xarray or xtensor depending on shape type otherwise.
+     *
+     * \code{.cpp}
+     * xarray<double, layout_type::row_major> a = {1,2,3,4};
+     * auto&& b = xt::as_strided(a); // b is a reference to a, no copy!
+     * auto&& c = xt::as_strided<layout_type::column_major>(a); // b is xarray<double> with the required layout
+     * auto&& a_cast = xt::cast<int>(a); // a_cast is an xexpression
+     * auto&& d = xt::as_strided(a_cast); // d is xarray<int>, not an xexpression
+     * auto&& e = xt::as_strided<layout_type::column_major>(a_cast); // d is xarray<int> with the required layout
+     * \endcode
+     */
+    template <layout_type L = layout_type::any, class E>
+    inline auto as_strided(E&& e)
+        -> std::enable_if_t<has_data_interface<std::decay_t<E>>::value
+                            && detail::has_same_layout<L, E>(),
+                            E&&>
     {
-        return xtensor_fixed<typename I::value_type, typename I::shape_type>(std::forward<T>(t));
+        return std::forward<E>(e);
     }
-    /// @endcond
+
+    /// @cond DOXYGEN_INCLUDE_SFINAE
+    template <layout_type L = layout_type::any, class E>
+    inline auto as_strided(E&& e)
+        -> std::enable_if_t<(!(has_data_interface<std::decay_t<E>>::value
+                               && detail::has_same_layout<L, E>()))
+                            && detail::has_fixed_dims<E>(),
+                            detail::as_xtensor_container_t<E, L>>
+    {
+        return e;
+    }
+
+    /// @cond DOXYGEN_INCLUDE_SFINAE
+    template <layout_type L = layout_type::any, class E>
+    inline auto as_strided(E&& e)
+        -> std::enable_if_t<(!(has_data_interface<std::decay_t<E>>::value
+                               && detail::has_same_layout<L, E>()))
+                            && (!detail::has_fixed_dims<E>()),
+                            detail::as_xarray_container_t<E, L>>
+    {
+        return e;
+    }
 }
 
 #endif

@@ -235,6 +235,24 @@ namespace xt
         static const bool value = true;
     };
 
+    template <class T, class R = T>
+    struct enable_indexed_stepper
+        : std::enable_if<is_indexed_stepper<T>::value, R>
+    {
+    };
+
+    template <class T, class R = T>
+    using enable_indexed_stepper_t = typename enable_indexed_stepper<T, R>::type;
+
+    template <class T, class R = T>
+    struct disable_indexed_stepper
+        : std::enable_if<!is_indexed_stepper<T>::value, R>
+    {
+    };
+
+    template <class T, class R = T>
+    using disable_indexed_stepper_t = typename disable_indexed_stepper<T, R>::type;
+
     /*************
      * xiterator *
      *************/
@@ -338,6 +356,12 @@ namespace xt
     template <class St, class S, layout_type L>
     bool operator<(const xiterator<St, S, L>& lhs,
                    const xiterator<St, S, L>& rhs);
+
+    template <class St, class S, layout_type L>
+    struct is_contiguous_container<xiterator<St, S, L>>
+        : std::false_type
+    {
+    };
 
     /*********************
      * xbounded_iterator *

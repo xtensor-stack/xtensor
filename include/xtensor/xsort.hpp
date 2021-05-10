@@ -406,7 +406,7 @@ namespace xt
      * @return partially sorted xcontainer
      */
     template <class E, class C, class R = detail::flatten_sort_result_type_t<E>,
-              class = std::enable_if_t<!std::is_integral<C>::value, int>>
+              class = std::enable_if_t<!xtl::is_integral<C>::value, int>>
     inline R partition(const xexpression<E>& e, const C& kth_container, placeholders::xtuph /*ax*/)
     {
         const auto& de = e.derived_cast();
@@ -431,19 +431,11 @@ namespace xt
         return ev;
     }
 
-#ifdef X_OLD_CLANG
-    template <class E, class I, class R = detail::flatten_sort_result_type_t<E>>
-    inline R partition(const xexpression<E>& e, std::initializer_list<I> kth_container, placeholders::xtuph tag)
-    {
-        return partition(e, xtl::forward_sequence<std::vector<std::size_t>, decltype(kth_container)>(kth_container), tag);
-    }
-#else
     template <class E, class I, std::size_t N, class R = detail::flatten_sort_result_type_t<E>>
     inline R partition(const xexpression<E>& e, const I(&kth_container)[N], placeholders::xtuph tag)
     {
         return partition(e, xtl::forward_sequence<std::array<std::size_t, N>, decltype(kth_container)>(kth_container), tag);
     }
-#endif
 
     template <class E, class R = detail::flatten_sort_result_type_t<E>>
     inline R partition(const xexpression<E>& e, std::size_t kth, placeholders::xtuph tag)
@@ -451,7 +443,7 @@ namespace xt
         return partition(e, std::array<std::size_t, 1>({kth}), tag);
     }
 
-    template <class E, class C, class = std::enable_if_t<!std::is_integral<C>::value, int>>
+    template <class E, class C, class = std::enable_if_t<!xtl::is_integral<C>::value, int>>
     inline auto partition(const xexpression<E>& e, const C& kth_container, std::ptrdiff_t axis = -1)
     {
         using eval_type = typename detail::sort_eval_type<E>::type;
@@ -507,19 +499,12 @@ namespace xt
         return res;
     }
 
-#ifdef X_OLD_CLANG
-    template <class E, class I>
-    inline auto partition(const xexpression<E>& e, std::initializer_list<I> kth_container, std::ptrdiff_t axis = -1)
-    {
-        return partition(e, xtl::forward_sequence<std::vector<std::size_t>, decltype(kth_container)>(kth_container), axis);
-    }
-#else
     template <class E, class T, std::size_t N>
     inline auto partition(const xexpression<E>& e, const T(&kth_container)[N], std::ptrdiff_t axis = -1)
     {
         return partition(e, xtl::forward_sequence<std::array<std::size_t, N>, decltype(kth_container)>(kth_container), axis);
     }
-#endif
+
     template <class E>
     inline auto partition(const xexpression<E>& e, std::size_t kth, std::ptrdiff_t axis = -1)
     {
@@ -553,7 +538,7 @@ namespace xt
      */
     template <class E, class C,
               class R = typename detail::linear_argsort_result_type<typename detail::sort_eval_type<E>::type>::type,
-              class = std::enable_if_t<!std::is_integral<C>::value, int>>
+              class = std::enable_if_t<!xtl::is_integral<C>::value, int>>
     inline R argpartition(const xexpression<E>& e, const C& kth_container, placeholders::xtuph)
     {
         using eval_type = typename detail::sort_eval_type<E>::type;
@@ -586,19 +571,11 @@ namespace xt
         return ev;
     }
 
-#ifdef X_OLD_CLANG
-    template <class E, class I>
-    inline auto argpartition(const xexpression<E>& e, std::initializer_list<I> kth_container, placeholders::xtuph tag)
-    {
-        return argpartition(e, xtl::forward_sequence<std::vector<std::size_t>, decltype(kth_container)>(kth_container), tag);
-    }
-#else
     template <class E, class I, std::size_t N>
     inline auto argpartition(const xexpression<E>& e, const I(&kth_container)[N], placeholders::xtuph tag)
     {
         return argpartition(e, xtl::forward_sequence<std::array<std::size_t, N>, decltype(kth_container)>(kth_container), tag);
     }
-#endif
 
     template <class E>
     inline auto argpartition(const xexpression<E>& e, std::size_t kth, placeholders::xtuph tag)
@@ -653,7 +630,7 @@ namespace xt
         }
     }
 
-    template <class E, class C, class = std::enable_if_t<!std::is_integral<C>::value, int>>
+    template <class E, class C, class = std::enable_if_t<!xtl::is_integral<C>::value, int>>
     inline auto argpartition(const xexpression<E>& e, const C& kth_container, std::ptrdiff_t axis = -1)
     {
         using eval_type = typename detail::sort_eval_type<E>::type;
@@ -708,19 +685,11 @@ namespace xt
         return res;
     }
 
-#ifdef X_OLD_CLANG
-    template <class E, class I>
-    inline auto argpartition(const xexpression<E>& e, std::initializer_list<I> kth_container, std::ptrdiff_t axis = -1)
-    {
-        return argpartition(e, xtl::forward_sequence<std::vector<std::size_t>, decltype(kth_container)>(kth_container), axis);
-    }
-#else
     template <class E, class I, std::size_t N>
     inline auto argpartition(const xexpression<E>& e, const I(&kth_container)[N], std::ptrdiff_t axis = -1)
     {
         return argpartition(e, xtl::forward_sequence<std::array<std::size_t, N>, decltype(kth_container)>(kth_container), axis);
     }
-#endif
 
     template <class E>
     inline auto argpartition(const xexpression<E>& e, std::size_t kth, std::ptrdiff_t axis = -1)

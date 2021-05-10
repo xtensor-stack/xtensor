@@ -22,10 +22,10 @@ namespace xt
     TEST(xaccumulator, one_d)
     {
         xt::xarray<short> a = { short(1), short(2), short(3), short(4)};
-        xt::xarray<long> expected = { 1, 3, 6, 10};
+        xt::xarray<int> expected = { 1, 3, 6, 10};
         auto no_axis = cumsum(a);
         auto with_axis = cumsum(a, 0);
-        bool promotion_works = std::is_same<decltype(no_axis)::value_type, long long>::value;
+        bool promotion_works = std::is_same<decltype(no_axis)::value_type, int>::value;
         EXPECT_TRUE(promotion_works);
         EXPECT_TRUE(all(equal(no_axis, expected)));
 
@@ -208,7 +208,7 @@ namespace xt
     TEST(xaccumulator, xfixed)
     {
         xtensor_fixed<float, xshape<2, 4, 3>> a = xt::random::rand<float>({2, 4, 3});
-        auto res = cumsum(a, 1);
+        auto res = cumsum<double>(a, 1);
 
         bool truth = std::is_same<decltype(res), xtensor_fixed<double, xshape<2, 4, 3>>>::value;
         EXPECT_TRUE(truth);

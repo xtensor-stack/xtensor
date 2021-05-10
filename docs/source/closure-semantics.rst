@@ -32,7 +32,7 @@ The two main requirements are the following:
 It is important for the closure type not to be a reference when the passed argument is an rvalue, which can result in dangling references.
 
 Following the conventions of the C++ standard library for naming type traits, we provide two type traits classes providing an implementation of these rules
-in the ``xutils.hpp`` header, ``closure_type``, and ``const_closure_type``. The latter adds the const qualifier to the reference even when the provided argument is not const.
+in the ``xutils.hpp`` header, ``closure_type``, and ``const_closure_type``. The latter adds the ``const`` qualifier to the reference even when the provided argument is not const.
 
 .. code:: cpp
 
@@ -174,7 +174,7 @@ upon access or assignment.
 
 - In order to perform the division, the expression must hold the values or references on the numerator and denominator.
 - Since ``s`` is a local variable, it will be destroyed upon leaving the scope of the function, and more importantly, it is an *lvalue*.
-- A consequence of ``s`` being an lvalue and a local variable, is that the ``s / value_type(size)`` would end up holding a dangling const reference on ``s``.
+- A consequence of ``s`` being an lvalue and a local variable, is that the ``s / value_type(size)`` would end up holding a dangling ``const`` reference on ``s``.
 - Hence we must call return ``std::move(s) / value_type(size)``.
 
 The other place in this example where the C++ move semantics is used is the line ``s = sum(std::forward<E>(e))``. The goal is to have the unevaluated ``s`` expression

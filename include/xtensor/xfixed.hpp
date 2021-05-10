@@ -16,6 +16,8 @@
 #include <utility>
 #include <vector>
 
+#include <xtl/xsequence.hpp>
+
 #include "xcontainer.hpp"
 #include "xstrides.hpp"
 #include "xstorage.hpp"
@@ -54,7 +56,7 @@ namespace xt
     namespace detail
     {
         /**************************************************************************************
-           The following is something we can currently only dream about -- for when we drop 
+           The following is something we can currently only dream about -- for when we drop
            support for a lot of the old compilers (e.g. GCC 4.9, MSVC 2017 ;)
 
         template <class T>
@@ -281,7 +283,7 @@ namespace xt
      * with tensor semantic and fixed dimension
      *
      * @tparam ET The type of the elements.
-     * @tparam S The xshape template paramter of the container. 
+     * @tparam S The xshape template paramter of the container.
      * @tparam L The layout_type of the tensor.
      * @tparam SH Wether the tensor can be used as a shared expression.
      * @tparam Tag The expression tag.
@@ -313,6 +315,7 @@ namespace xt
         using expression_tag = Tag;
 
         constexpr static std::size_t N = std::tuple_size<shape_type>::value;
+        constexpr static std::size_t rank = N;
 
         xfixed_container() = default;
         xfixed_container(const value_type& v);
@@ -616,7 +619,7 @@ namespace xt
 
     /**
      * Allocates an xfixed_container with shape S with values from a C array.
-     * The type returned by get_init_type_t is raw C array ``value_type[X][Y][Z]`` for ``xt::xshape<X, Y, Z>``. 
+     * The type returned by get_init_type_t is raw C array ``value_type[X][Y][Z]`` for ``xt::xshape<X, Y, Z>``.
      * C arrays can be initialized with the initializer list syntax, but the size is checked at compile
      * time to prevent errors.
      * Note: for clang < 3.8 this is an initializer_list and the size is not checked at compile-or runtime.

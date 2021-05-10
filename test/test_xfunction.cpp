@@ -465,6 +465,7 @@ namespace xt
 #endif
     }
 
+#ifndef _MSC_VER
     TEST(xfunction, xfunction_in_xfunction)
     {
         using Point3 = xt::xtensor_fixed<double, xshape<3>>;
@@ -477,4 +478,5 @@ namespace xt
         xtensor<Point3, 1> res{r1, r2, r3};
         EXPECT_EQ(c, res);
     }
+#endif
 }

@@ -1,10 +1,10 @@
 # ![xtensor](docs/source/xtensor.svg)
 
-[![Travis](https://travis-ci.org/xtensor-stack/xtensor.svg?branch=master)](https://travis-ci.org/xtensor-stack/xtensor)
 [![Appveyor](https://ci.appveyor.com/api/projects/status/dljjg79povwgncuf?svg=true)](https://ci.appveyor.com/project/xtensor-stack/xtensor)
 [![Azure](https://dev.azure.com/xtensor-stack/xtensor-stack/_apis/build/status/xtensor-stack.xtensor?branchName=master)](https://dev.azure.com/xtensor-stack/xtensor-stack/_build/latest?definitionId=4&branchName=master)
 [![Coverity](https://scan.coverity.com/projects/18335/badge.svg)](https://scan.coverity.com/projects/xtensor)
 [![Documentation](http://readthedocs.org/projects/xtensor/badge/?version=latest)](https://xtensor.readthedocs.io/en/latest/?badge=latest)
+[![Doxygen -> gh-pages](https://github.com/xtensor-stack/xtensor/workflows/gh-pages/badge.svg)](https://xtensor-stack.github.io/xtensor)
 [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/xtensor-stack/xtensor/stable?filepath=notebooks%2Fxtensor.ipynb)
 [![Join the Gitter Chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/QuantStack/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -42,20 +42,10 @@ compilers are supported:
 
 ### Package managers
 
-If you are using Conan to manage your dependencies, merely add `xtensor/x.y.z@omaralvarez/public-conan` to your requires, where x.y.z is the release version you want to use. Please file issues in [conan-xtensor](https://github.com/omaralvarez/conan-xtensor) if you experience problems with the packages. Sample `conanfile.txt`:
-
-```
-[requires]
-xtensor/0.20.8@omaralvarez/public-conan
-
-[generators]
-cmake
-```
-
-We also provide a package for the conda package manager:
+We provide a package for the mamba (or conda) package manager:
 
 ```bash
-conda install -c conda-forge xtensor
+mamba install -c conda-forge xtensor
 ```
 
 ### Install from sources
@@ -93,24 +83,18 @@ library:
 
 | `xtensor` | `xtl`   |`xsimd` (optional) |
 |-----------|---------|-------------------|
-|  master   | ^0.6.16 |       ^7.4.8      |
-|  0.21.5   | ^0.6.12 |       ^7.4.6      |
-|  0.21.4   | ^0.6.12 |       ^7.4.6      |
-|  0.21.3   | ^0.6.9  |       ^7.4.4      |
-|  0.21.2   | ^0.6.9  |       ^7.4.4      |
-|  0.21.1   | ^0.6.9  |       ^7.4.2      |
-|  0.21.0   | ^0.6.9  |       ^7.4.2      |
-|  0.20.10  | ^0.6.7  |       ^7.4.0      |
-|  0.20.9   | ^0.6.7  |       ^7.4.0      |
-|  0.20.8   | ^0.6.4  |       ^7.2.3      |
-|  0.20.7   | ^0.6.4  |       ^7.2.3      |
-|  0.20.6   | ^0.6.4  |       ^7.2.3      |
-|  0.20.5   | ^0.6.4  |       ^7.2.1      |
-|  0.20.4   | ^0.6.2  |       ^7.0.0      |
-|  0.20.3   | ^0.6.2  |       ^7.0.0      |
-|  0.20.2   | ^0.6.1  |       ^7.0.0      |
-|  0.20.1   | ^0.6.1  |       ^7.0.0      |
-|  0.20.0   | ^0.6.1  |       ^7.0.0      |
+|  master   | ^0.7.0  |       ^7.4.8      |
+|  0.23.9   | ^0.7.0  |       ^7.4.8      |
+|  0.23.8   | ^0.7.0  |       ^7.4.8      |
+|  0.23.7   | ^0.7.0  |       ^7.4.8      |
+|  0.23.6   | ^0.7.0  |       ^7.4.8      |
+|  0.23.5   | ^0.7.0  |       ^7.4.8      |
+|  0.23.4   | ^0.7.0  |       ^7.4.8      |
+|  0.23.3   | ^0.7.0  |       ^7.4.8      |
+|  0.23.2   | ^0.7.0  |       ^7.4.8      |
+|  0.23.1   | ^0.7.0  |       ^7.4.8      |
+|  0.23.0   | ^0.7.0  |       ^7.4.8      |
+|  0.22.0   | ^0.6.23 |       ^7.4.8      |
 
 The dependency on `xsimd` is required if you want to enable SIMD acceleration
 in `xtensor`. This can be done by defining the macro `XTENSOR_USE_XSIMD`

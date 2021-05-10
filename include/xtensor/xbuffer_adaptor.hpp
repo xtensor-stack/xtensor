@@ -476,6 +476,12 @@ namespace xt
     void swap(xiterator_adaptor<I, CI>& lhs,
               xiterator_adaptor<I, CI>& rhs) noexcept;
 
+    template <class I, class CI>
+    struct is_contiguous_container<xiterator_adaptor<I, CI>>
+        : is_contiguous_container<I>
+    {
+    };
+
     /***************************
      * xiterator_owner_adaptor *
      ***************************/
@@ -552,8 +558,14 @@ namespace xt
     };
 
     template <class C, class IG>
-    void swap(xiterator_adaptor<C, IG>& lhs,
-              xiterator_adaptor<C, IG>& rhs) noexcept;
+    void swap(xiterator_owner_adaptor<C, IG>& lhs,
+              xiterator_owner_adaptor<C, IG>& rhs) noexcept;
+
+    template <class C, class IG>
+    struct is_contiguous_container<xiterator_owner_adaptor<C, IG>>
+        : is_contiguous_container<typename IG::iterator>
+    {
+    };
 
     /**************************
      * make_xiterator_adaptor *
@@ -582,6 +594,12 @@ namespace xt
     struct temporary_container<xiterator_adaptor<I, CI>>
     {
         using type = typename xiterator_adaptor<I, CI>::temporary_type;
+    };
+
+    template <class C, class IG>
+    struct temporary_container<xiterator_owner_adaptor<C, IG>>
+    {
+        using type = typename xiterator_owner_adaptor<C, IG>::temporary_type;
     };
 
     template <class C>

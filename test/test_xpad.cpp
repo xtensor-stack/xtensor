@@ -13,6 +13,8 @@
 #include "gtest/gtest.h"
 #include "xtensor/xpad.hpp"
 
+#include "xtensor/xio.hpp"
+
 namespace xt
 {
     TEST(xpad, constant_a)
@@ -330,5 +332,23 @@ namespace xt
         xt::xtensor<size_t, 2> c = xt::tile(a, std::vector<size_t>{{3u, 4u}});
 
         EXPECT_EQ(b, c);
+    }
+
+    TEST(xpad, tile_f)
+    {
+        xt::xarray<double> m = xt::tile(xt::expand_dims(xt::eye<double>(4), 0), 3u);
+        xt::xarray<double> expected = {{{1., 0., 0., 0.},
+                                        {0., 1., 0., 0.},
+                                        {0., 0., 1., 0.},
+                                        {0., 0., 0., 1.}},
+                                       {{1., 0., 0., 0.},
+                                        {0., 1., 0., 0.},
+                                        {0., 0., 1., 0.},
+                                        {0., 0., 0., 1.}},
+                                       {{1., 0., 0., 0.},
+                                        {0., 1., 0., 0.},
+                                        {0., 0., 1., 0.},
+                                        {0., 0., 0., 1.}}};
+        EXPECT_EQ(m, expected);
     }
 }

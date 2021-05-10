@@ -33,6 +33,11 @@ namespace xt
                                                                                std::input_iterator_tag>::value>::type;
     }
 
+    template <class C>
+    struct is_contiguous_container : std::true_type
+    {
+    };
+
     template <class T, class A = std::allocator<T>>
     class uvector
     {
@@ -380,7 +385,7 @@ namespace xt
     inline void uvector<T, A>::reserve(size_type /*new_cap*/)
     {
     }
-    
+
     template <class T, class A>
     inline auto uvector<T, A>::capacity() const noexcept -> size_type
     {
@@ -714,6 +719,11 @@ namespace xt
         iterator erase(const_iterator cfirst, const_iterator clast);
 
         iterator insert(const_iterator it, const T& elt);
+
+        template <class It>
+        iterator insert(const_iterator pos, It first, It last);
+
+        iterator insert(const_iterator pos, std::initializer_list<T> l);
 
         template <std::size_t ON, class OA, bool InitA>
         void swap(svector<T, ON, OA, InitA>& rhs);
@@ -1184,6 +1194,34 @@ namespace xt
     }
 
     template <class T, std::size_t N, class A, bool Init>
+    template <class It>
+    inline auto svector<T, N, A, Init>::insert(const_iterator pos, It first, It last) -> iterator
+    {
+        auto it = const_cast<pointer>(pos);
+        difference_type n = std::distance(first, last);
+        if (n > 0)
+        {
+            if (n > m_capacity - m_end)
+            {
+                std::ptrdiff_t elt_no = it - m_begin;
+                grow(static_cast<size_t>((m_capacity - m_begin) + n));
+                it = m_begin + elt_no;
+            }
+
+            std::move_backward(it, m_end, m_end + n);
+            m_end += n;
+            std::copy(first, last, it);
+        }
+        return it;
+    }
+
+    template <class T, std::size_t N, class A, bool Init>
+    inline auto svector<T, N, A, Init>::insert(const_iterator pos, std::initializer_list<T> l) -> iterator
+    {
+        return insert(pos, l.begin(), l.end());
+    }
+
+    template <class T, std::size_t N, class A, bool Init>
     inline void svector<T, N, A, Init>::destroy_range(T* begin, T* end)
     {
         if (!xtrivially_default_constructible<T>::value)
@@ -1335,8 +1373,6 @@ namespace xt
         lhs.swap(rhs);
     }
 
-    #define XTENSOR_SELECT_ALIGN (XTENSOR_DEFAULT_ALIGNMENT != 0 ? XTENSOR_DEFAULT_ALIGNMENT : alignof(T))
-
     template <class X, class T, std::size_t N, class A, bool B>
     struct rebind_container<X, svector<T, N, A, B>>
     {
@@ -1350,7 +1386,7 @@ namespace xt
      *
      * To be moved to xtl, along with the rest of xstorage.hpp
      */
-    template <class T, std::size_t N, std::size_t Align = XTENSOR_SELECT_ALIGN>
+    template <class T, std::size_t N, std::size_t Align = XTENSOR_SELECT_ALIGN(T)>
     class alignas(Align) aligned_array : public std::array<T, N>
     {
     public:
@@ -1607,8 +1643,8 @@ namespace xt
         template <std::size_t idx>
         constexpr static auto get()
         {
-            using cast_type = std::array<std::size_t, sizeof...(X)>;
-            return std::get<idx>(cast_type{X...});
+            using tmp_cast_type = std::array<std::size_t, sizeof...(X)>;
+            return std::get<idx>(tmp_cast_type{X...});
         }
 
         XTENSOR_FIXED_SHAPE_CONSTEXPR operator cast_type() const
@@ -1653,7 +1689,7 @@ namespace xt
 
         XTENSOR_FIXED_SHAPE_CONSTEXPR bool empty() const
         {
-            return sizeof...(X) == 0; 
+            return sizeof...(X) == 0;
         }
 
     private:
@@ -1903,6 +1939,5 @@ namespace std
 #endif
 
 #undef XTENSOR_CONST
-#undef XTENSOR_SELECT_ALIGN
 
 #endif

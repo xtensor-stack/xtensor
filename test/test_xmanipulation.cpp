@@ -13,6 +13,7 @@
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xmanipulation.hpp"
+#include "xtensor/xrandom.hpp"
 #include "xtensor/xview.hpp"
 
 #include "xtensor/xio.hpp"
@@ -135,6 +136,60 @@ namespace xt
         EXPECT_EQ(*iter++, 125);
         EXPECT_EQ(*iter++, 126);
         EXPECT_EQ(iter, view.end());
+    }
+
+    TEST(xmanipulation, flatten_generator)
+    {
+        // Compilation test
+        xt::xtensor<double, 1> y = xt::flatten(xt::random::randint({100, 1}, 1, 100));
+    }
+
+    TEST(xmanipulation, flatten_simd_linear_assign_trait)
+    {
+        xtensor<double, 3> a = linspace<double>(1., 100., 100).reshape({2, 5, 10});
+        auto v = view(a, range(0, 2), range(0, 3), range(0, 3));
+
+        {
+            auto e = flatten<XTENSOR_DEFAULT_LAYOUT>(a);
+            xtensor<double, 1> fl = e;
+            using assign_traits = xassign_traits<decltype(fl), decltype(e)>;
+        
+        #if XTENSOR_USE_XSIMD
+            EXPECT_TRUE(assign_traits::simd_linear_assign());
+            EXPECT_TRUE(assign_traits::simd_linear_assign(fl, e));
+        #else
+            EXPECT_FALSE(assign_traits::simd_linear_assign());
+            EXPECT_FALSE(assign_traits::simd_linear_assign(fl, e));
+        #endif
+        }
+
+        {
+            auto e = flatten<XTENSOR_DEFAULT_LAYOUT>(v);
+            xtensor<double, 1> fl = e;
+            using assign_traits = xassign_traits<decltype(fl), decltype(e)>;
+            EXPECT_FALSE(assign_traits::simd_linear_assign());
+            EXPECT_FALSE(assign_traits::simd_linear_assign(fl, e));
+        }
+    }
+
+    TEST(xmanipulation, flatten_assign)
+    {
+      xt::xarray<int> patch = xt::zeros<int>({2, 8});
+      xt::xarray<int> seq_r = xt::zeros<int>({16});
+      seq_r[0] = 1;
+      seq_r[1] = 2;
+      seq_r[2] = 3;
+      seq_r[3] = 4;
+      xt::flatten(xt::view(patch, xt::all(), xt::range(0, 2))) = xt::view(seq_r, xt::range(0, 4));
+      EXPECT_EQ(patch(0, 0), 1);
+      EXPECT_EQ(patch(0, 1), 2);
+      EXPECT_EQ(patch(1, 0), 3);
+      EXPECT_EQ(patch(1, 1), 4);
+      for (size_t i = 2; i < 8; ++i)
+      {
+          EXPECT_EQ(patch(0, i), 0);
+          EXPECT_EQ(patch(1, i), 0);
+      }
     }
 
     TEST(xmanipulation, flatnonzero)
@@ -494,5 +549,10 @@ namespace xt
         ASSERT_EQ(7, repeated_array(3, 0));
         ASSERT_EQ(8, repeated_array(3, 1));
         ASSERT_EQ(9, repeated_array(3, 2));
+    }
+
+    TEST(xmanipulation, zzzzzz)
+    {
+
     }
 }

@@ -39,6 +39,8 @@ The following macros are helpers for debugging, they are not defined by default:
 - ``XTENSOR_ENABLE_CHECK_DIMENSION``: enables the dimensions check in ``xtensor``. Note that this option should not be turned
   on if you expect ``operator()`` to perform broadcasting.
 
+.. _external-dependencies:
+
 External dependencies
 ---------------------
 
@@ -103,7 +105,8 @@ anything, the system will do its best to enable the most recent supported instru
 Linux/OSX
 ~~~~~~~~~
 
-Whether you enabled ``XTENSOR_USE_XSIMD`` or not, it is highly recommended to build with ``-march=native`` option:
+Whether you enabled ``XTENSOR_USE_XSIMD`` or not, it is highly recommended to build with ``-march=native`` option,
+if your compiler supports it:
 
 .. code:: cmake
 

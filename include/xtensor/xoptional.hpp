@@ -215,6 +215,35 @@ namespace xt
                 return b1 & simd_apply_impl(b2, args...);
             }
         };
+
+        /*********************************
+         * optional const_value rebinder *
+         *********************************/
+
+        template <class T, class B>
+        struct const_value_rebinder<xtl::xoptional<T, B>, T>
+        {
+            static const_value<T> run(const const_value<xtl::xoptional<T, B>>& src)
+            {
+                return const_value<T>(src.m_value.value());
+            }
+        };
+
+        /**************************
+         * xreducer types helpers *
+         **************************/
+
+        template <class T, class B>
+        struct xreducer_size_type<xtl::xoptional<T, B>>
+        {
+            using type = xtl::xoptional<std::size_t, bool>;
+        };
+
+        template <class T, class B>
+        struct xreducer_temporary_type<xtl::xoptional<T, B>>
+        {
+            using type = xtl::xoptional<std::decay_t<T>, bool>;;
+        };
     }
 
     /**********************
@@ -636,10 +665,17 @@ namespace xt
         public:
 
             using expression_tag = xoptional_expression_tag;
-            using value_expression = xreducer<F, xt::detail::value_expression_t<CT>, X, O>;
+            using result_type = typename F::init_value_type;
+
+            using rebound_result_type = typename result_type::value_type;
+            using rebound_functors_type = typename F::template rebind_t<rebound_result_type>;
+            using rebound_reduce_options_values = typename O::template rebind_t<rebound_result_type>;
+            using rebound_reduce_options_flag = typename O::template rebind_t<bool>;
+
             using flag_reducer = xreducer_functors<xt::detail::optional_bitwise<bool>, xt::const_value<bool>>;
-            using rebound_flag_reduce_options = typename O::template rebind_t<bool>;
-            using flag_expression = xreducer<flag_reducer, xt::detail::flag_expression_t<CT>, X, rebound_flag_reduce_options>;
+            using flag_expression = xreducer<flag_reducer, xt::detail::flag_expression_t<CT>, X, rebound_reduce_options_flag>;
+            using value_expression = xreducer<rebound_functors_type, xt::detail::value_expression_t<CT>, X, rebound_reduce_options_values>;
+
             using const_value_expression = value_expression;
             using const_flag_expression = flag_expression;
 
@@ -1082,7 +1118,13 @@ namespace xt
         template <class F, class CT, class X, class O>
         inline auto xreducer_optional<F, CT, X, O>::value() const -> const_value_expression
         {
-            return this->derived_cast().build_reducer(this->derived_cast().expression().value());
+            auto func = this->derived_cast().functors();
+            auto opts = this->derived_cast().options().template rebind<rebound_result_type>(this->derived_cast().options().initial_value.value(), 
+                                                                                            this->derived_cast().options());
+
+            return this->derived_cast().build_reducer(this->derived_cast().expression().value(),
+                                                      func.template rebind<rebound_result_type>(),
+                                                      std::move(opts));
         }
 
         template <class F, class CT, class X, class O>
@@ -1219,17 +1261,77 @@ namespace xt
         return detail::split_optional_expression<E>::has_value(std::forward<E>(e));
     }
 
+    namespace detail
+    {
+        template <class T1, class T2>
+        struct assign_data_impl
+        {
+            template <class E1, class E2>
+            static void run(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial)
+            {
+                E1& de1 = e1.derived_cast();
+                const E2& de2 = e2.derived_cast();
+
+                decltype(auto) bde1 = xt::value(de1);
+                decltype(auto) hde1 = xt::has_value(de1);
+                xexpression_assigner_base<xtensor_expression_tag>::assign_data(bde1, xt::value(de2), trivial);
+                xexpression_assigner_base<xtensor_expression_tag>::assign_data(hde1, xt::has_value(de2), trivial);
+            }
+        };
+
+        template <class T>
+        struct xarray_assigner
+        {
+            template <class E1, class E2>
+            static void assign(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial)
+            {
+                E1& de1 = e1.derived_cast();
+                const E2& de2 = e2.derived_cast();
+                xarray<bool> mask = xt::full_like(de2, true);
+
+                decltype(auto) bde1 = xt::value(de1);
+                decltype(auto) hde1 = xt::has_value(de1);
+                xexpression_assigner_base<xtensor_expression_tag>::assign_data(bde1, e2, trivial);
+                xexpression_assigner_base<xtensor_expression_tag>::assign_data(hde1, mask, trivial);
+            }
+        };
+
+        template <class T>
+        struct xarray_assigner<xtl::xoptional<T>>
+        {
+            template <class E1, class E2>
+            static void assign(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial)
+            {
+                xexpression_assigner_base<xtensor_expression_tag>::assign_data(e1, e2, trivial);
+            }
+        };
+
+        template <>
+        struct assign_data_impl<xoptional_expression_tag, xtensor_expression_tag>
+        {
+            template <class E1, class E2>
+            static void run(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial)
+            {
+                xarray_assigner<typename E2::value_type>::assign(e1, e2, trivial);
+            }
+        };
+
+        template <>
+        struct assign_data_impl<xtensor_expression_tag, xoptional_expression_tag>
+        {
+            template <class E1, class E2>
+            static void run(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial)
+            {
+                xexpression_assigner_base<xtensor_expression_tag>::assign_data(e1, e2, trivial);
+            }
+        };
+    }
+
     template <class E1, class E2>
     inline void xexpression_assigner_base<xoptional_expression_tag>::assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial)
     {
-        E1& de1 = e1.derived_cast();
-        const E2& de2 = e2.derived_cast();
-
-        decltype(auto) bde1 = xt::value(de1);
-        decltype(auto) hde1 = xt::has_value(de1);
-        xexpression_assigner_base<xtensor_expression_tag>::assign_data(bde1, xt::value(de2), trivial);
-        xexpression_assigner_base<xtensor_expression_tag>::assign_data(hde1, xt::has_value(de2), trivial);
-    }
+        detail::assign_data_impl<typename E1::expression_tag, typename E2::expression_tag>::run(e1, e2, trivial);
+    } 
 }
 
 #endif

@@ -104,7 +104,6 @@ namespace xt
         auto derive_xstrided_view(CT&& e, typename std::decay_t<CT>::size_type axis, typename std::decay_t<CT>::size_type offset)
         {
             using xexpression_type = std::decay_t<CT>;
-            using size_type = typename xexpression_type::size_type;
             using shape_type = typename xexpression_type::shape_type;
             using strides_type = typename xexpression_type::strides_type;
 
@@ -237,7 +236,7 @@ namespace xt
     /**
      * Checks equality of the xaxis_slice_iterator and \c rhs.
      *
-     * @param 
+     * @param
      * @return true if the iterators are equivalent, false otherwise
      */
     template <class CT>
@@ -290,7 +289,7 @@ namespace xt
      *
      * @param e the expession to iterate over
      * @param axis the axis to iterate over
-     * @return an instance of xaxis_iterator 
+     * @return an instance of xaxis_iterator
      */
     template <class E>
     inline auto axis_begin(E&& e, typename std::decay_t<E>::size_type axis)
@@ -320,7 +319,7 @@ namespace xt
      *
      * @param e the expession to iterate over
      * @param axis the axis to iterate over
-     * @return an instance of xaxis_iterator 
+     * @return an instance of xaxis_iterator
      */
     template <class E>
     inline auto axis_end(E&& e, typename std::decay_t<E>::size_type axis)

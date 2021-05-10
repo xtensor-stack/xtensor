@@ -12,6 +12,8 @@ cmake_minimum_required(VERSION 3.1)
 if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     project(xtensor-test)
 
+    enable_testing()
+
     find_package(xtensor REQUIRED CONFIG)
     set(XTENSOR_INCLUDE_DIR ${xtensor_INCLUDE_DIRS})
 endif ()
@@ -62,8 +64,11 @@ if(NOT _cxx_std_flag)
   message(FATAL_ERROR "xtensor-blas needs a C++14-compliant compiler.")
 endif()
 
+OPTION(XTENSOR_ENABLE_WERROR "Turn on -Werror" OFF)
+
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR (CMAKE_CXX_COMPILER_ID MATCHES "Intel" AND NOT WIN32))
-  if(NOT CMAKE_CXX_FLAGS MATCHES "-march")
+  CHECK_CXX_COMPILER_FLAG(-march=native arch_native_supported)
+  if(arch_native_supported AND NOT CMAKE_CXX_FLAGS MATCHES "-march")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
   endif()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_cxx_std_flag} -Wunused-parameter -Wextra -Wreorder -Wconversion -Wsign-conversion")
@@ -71,9 +76,12 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR (CMAKE_CXX_COMPILER_ID MATCHES "Intel"
   if (XTENSOR_DISABLE_EXCEPTIONS)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions")
   endif()
+  if (XTENSOR_ENABLE_WERROR)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -DSKIP_ON_WERROR")
+  endif()
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_cxx_std_flag} /MP /bigobj")
-  set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} /MANIFEST:NO)
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /MANIFEST:NO")
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
   add_definitions(-D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
   if (XTENSOR_DISABLE_EXCEPTIONS)
@@ -83,13 +91,17 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
   endif()
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   if(NOT WIN32)
-    if(NOT CMAKE_CXX_FLAGS MATCHES "-march")
+    CHECK_CXX_COMPILER_FLAG(-march=native arch_native_supported)
+    if(arch_native_supported AND NOT CMAKE_CXX_FLAGS MATCHES "-march")
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
     endif()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_cxx_std_flag} -Wunused-parameter -Wextra -Wreorder -Wconversion -Wsign-conversion")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wold-style-cast -Wunused-variable")
     if (XTENSOR_DISABLE_EXCEPTIONS)
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions")
+    endif()
+    if (XTENSOR_ENABLE_WERROR)
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -DSKIP_ON_WERROR")
     endif()
   else() # We are using clang-cl
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_cxx_std_flag} /bigobj")
@@ -135,7 +147,10 @@ if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
                      ${CMAKE_CURRENT_BINARY_DIR}/googletest-build EXCLUDE_FROM_ALL)
 
     set(GTEST_INCLUDE_DIRS "${gtest_SOURCE_DIR}/include")
-    set(GTEST_BOTH_LIBRARIES gtest_main gtest)
+    add_library(GTest::GTest INTERFACE IMPORTED)
+    target_link_libraries(GTest::GTest INTERFACE gtest)
+    add_library(GTest::Main INTERFACE IMPORTED)
+    target_link_libraries(GTest::Main INTERFACE gtest_main)
 else()
     find_package(GTest REQUIRED)
 endif()
@@ -181,7 +196,6 @@ set(COMMON_BASE
     test_xview.cpp
     test_xview_semantic.cpp
     test_xutils.cpp
-    test_zarray.cpp
 )
 
 set(XTENSOR_TESTS
@@ -191,6 +205,8 @@ set(XTENSOR_TESTS
     test_xaxis_iterator.cpp
     test_xaxis_slice_iterator.cpp
     test_xbuffer_adaptor.cpp
+    test_xchunked_array.cpp
+    test_xchunked_view.cpp
     test_xcomplex.cpp
     test_xcsv.cpp
     test_xdatesupport.cpp
@@ -217,13 +233,14 @@ set(XTENSOR_TESTS
     test_xrandom.cpp
     test_xrepeat.cpp
     test_xsort.cpp
+    test_xsimd.cpp
     test_xvectorize.cpp
     test_extended_xmath_interp.cpp
     test_extended_broadcast_view.cpp
     test_extended_xmath_reducers.cpp
     test_extended_xhistogram.cpp
     test_extended_xsort.cpp
-    test_xchunked_array.cpp
+    test_sfinae.cpp
 )
 
 if(nlohmann_json_FOUND)
@@ -239,23 +256,25 @@ endif()
 
 # Add files for npy tests
 set(XNPY_FILES
-    bool.npy
-    bool_fortran.npy
-    double.npy
-    double_fortran.npy
-    int.npy
-    unsignedlong.npy
-    unsignedlong_fortran.npy
+    bool
+    bool_fortran
+    double
+    double_fortran
+    int
+    unsignedlong
+    unsignedlong_fortran
 )
+
 foreach(filename IN LISTS XNPY_FILES)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/files/xnpy_files/${filename}
-        ${CMAKE_CURRENT_BINARY_DIR}/files/xnpy_files/${filename} COPYONLY)
+    foreach(suffix .be.npy .le.npy)
+        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/files/xnpy_files/${filename}${suffix}
+            ${CMAKE_CURRENT_BINARY_DIR}/files/xnpy_files/${filename}${suffix} COPYONLY)
+    endforeach()
 endforeach()
 
-set(XTENSOR_PREPROCESS_FILES
-    files/cppy_source/test_xstrided_view_extended.cppy
-)
+file(GLOB XTENSOR_PREPROCESS_FILES files/cppy_source/*.cppy)
 
+# This target should only be run when the test source files have been changed.
 add_custom_target(
     preprocess_cppy
     COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/files/preprocess.py
@@ -266,7 +285,10 @@ foreach(filename IN LISTS COMMON_BASE XTENSOR_TESTS)
     string(REPLACE ".cpp" "" targetname ${filename})
     add_executable(${targetname} ${filename} ${TEST_HEADERS} ${XTENSOR_HEADERS})
     if(XTENSOR_USE_XSIMD)
-        target_compile_definitions(${targetname} PRIVATE XTENSOR_USE_XSIMD)
+        target_compile_definitions(${targetname}
+                                   PRIVATE
+                                   XTENSOR_USE_XSIMD
+                                   XSIMD_ENABLE_XTL_COMPLEX)
         target_link_libraries(${targetname} PRIVATE xsimd)
     endif()
     if(XTENSOR_USE_TBB)
@@ -281,16 +303,20 @@ foreach(filename IN LISTS COMMON_BASE XTENSOR_TESTS)
         add_dependencies(${targetname} gtest_main)
     endif()
     target_include_directories(${targetname} PRIVATE ${XTENSOR_INCLUDE_DIR})
-    target_link_libraries(${targetname} PRIVATE xtensor ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+    target_link_libraries(${targetname} PRIVATE xtensor GTest::GTest GTest::Main ${CMAKE_THREAD_LIBS_INIT})
     add_custom_target(
         x${targetname}
         COMMAND ${targetname}
         DEPENDS ${targetname} ${filename} ${XTENSOR_HEADERS})
+    add_test(NAME ${targetname} COMMAND ${targetname})
 endforeach()
 
 add_executable(test_xtensor_lib ${COMMON_BASE} ${XTENSOR_TESTS} ${TEST_HEADERS} ${XTENSOR_HEADERS})
 if(XTENSOR_USE_XSIMD)
-    target_compile_definitions(test_xtensor_lib PRIVATE XTENSOR_USE_XSIMD)
+    target_compile_definitions(test_xtensor_lib
+                               PRIVATE
+                               XTENSOR_USE_XSIMD
+                               XSIMD_ENABLE_XTL_COMPLEX)
     target_link_libraries(test_xtensor_lib PRIVATE xsimd)
 endif()
 if(XTENSOR_USE_TBB)
@@ -307,9 +333,10 @@ if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
 endif()
 
 target_include_directories(test_xtensor_lib PRIVATE ${XTENSOR_INCLUDE_DIR})
-target_link_libraries(test_xtensor_lib PRIVATE xtensor ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(test_xtensor_lib PRIVATE xtensor GTest::GTest GTest::Main ${CMAKE_THREAD_LIBS_INIT})
 
 add_custom_target(xtest COMMAND test_xtensor_lib DEPENDS test_xtensor_lib)
+add_test(NAME xtest COMMAND test_xtensor_lib)
 
 # Some files will be compiled twice, however compiling common files in a static
 # library and linking test_xtensor_lib with it removes half of the tests at
@@ -321,5 +348,5 @@ if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
     add_dependencies(test_xtensor_core_lib gtest_main)
 endif()
 
-target_link_libraries(test_xtensor_core_lib PRIVATE xtensor ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(test_xtensor_core_lib PRIVATE xtensor GTest::GTest GTest::Main ${CMAKE_THREAD_LIBS_INIT})
 add_custom_target(coverity COMMAND coverity_scan DEPENDS test_xtensor_core_lib)

@@ -92,6 +92,15 @@ namespace xt
     {
         xt::xarray<double> arr = { 5., 6. };
         xt::strided_view(arr, { 0 }) = xt::strided_view(arr, { 1 });
+
+        auto v1 = xt::strided_view(arr, {0});
+        const bool res1 = xt::can_assign<decltype(v1), const xt::xarray<double>&>::value;
+        EXPECT_TRUE(res1);
+
+        const xt::xarray<double> arr2 = arr;
+        auto v2 = xt::strided_view(arr2, {0});
+        const bool res2 = xt::can_assign<decltype(v2), const xt::xarray<double>&>::value;
+        EXPECT_FALSE(res2);
     }
 
     TEST(xstrided_view, three_dimensional)
@@ -696,12 +705,10 @@ namespace xt
         truthy = std::is_same<typename decltype(xv)::temporary_type, xtensor_fixed<double, xshape<3, 3>, XTENSOR_DEFAULT_LAYOUT>>();
         EXPECT_TRUE(truthy);
 
-#if !defined(X_OLD_CLANG)
         truthy = std::is_same<typename decltype(av)::temporary_type, xtensor<double, 2, XTENSOR_DEFAULT_LAYOUT>>();
         EXPECT_TRUE(truthy);
         truthy = std::is_same<typename decltype(av)::shape_type, typename decltype(e)::shape_type>::value;
         EXPECT_TRUE(truthy);
-#endif
 
         xarray<int> xa = {{1, 2, 3}, {4, 5, 6}};
         std::vector<std::size_t> new_shape = {3, 2};

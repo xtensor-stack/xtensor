@@ -1,3 +1,11 @@
+/***************************************************************************
+* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+* Copyright (c) QuantStack                                                 *
+*                                                                          *
+* Distributed under the terms of the BSD 3-Clause License.                 *
+*                                                                          *
+* The full license is in the file LICENSE, distributed with this software. *
+****************************************************************************/
 
 #include <algorithm>
 
@@ -9,6 +17,9 @@
 namespace xt
 {
     using namespace xt::placeholders;
+
+// Temporary disabling for TBB and OPENMP due to a potential
+// race condition that must be identified
 
     /*py
     a  = np.random.random(4*5*6*7).reshape(4,5,6,7)
@@ -22,7 +33,6 @@ namespace xt
         // py_av
 
         auto av = xt::average(py_a, py_w, {0,1});
-
         EXPECT_TRUE(xt::allclose(av, py_av));
     }
 
@@ -30,28 +40,42 @@ namespace xt
     a  = np.random.random(4*5*6*7).reshape(4,5,6,7)
     vr_all = np.var(a)
     st_all = np.std(a)
+    vr_all_ddof = np.var(a, ddof=1)
     vr = np.var(a, axis=(0,2))
     st = np.std(a, axis=(0,2))
+    vr_ddof = np.var(a, axis=(0,2), ddof=1)
     */
     TEST(xtest_extended_xmath, var_std)
     {
         // py_a
 
         // py_vr_all
+        // py_vr_all_ddof
         // py_st_all
         // py_vr
+        // py_vr_ddof
         // py_st
 
         auto st_all = xt::stddev(py_a);
         auto vr_all = xt::variance(py_a);
+        auto vr_all_ddof = xt::variance(py_a, {0, 1, 2, 3}, 1);
+        std::vector<size_t> axes_all = {0, 1, 2, 3};
+        auto vr_all_ddof_with_axes_arr = xt::variance(py_a, axes_all, 1);
 
         auto st = xt::stddev(py_a, {0, 2});
         auto vr = xt::variance(py_a, {0, 2});
+        auto vr_ddof = xt::variance(py_a, {0, 2}, 1);
+        std::vector<size_t> axes02 = {0, 2};
+        auto vr_ddof_with_axes_arr = xt::variance(py_a, axes02, 1);
 
         EXPECT_TRUE(xt::allclose(st_all, py_st_all));
         EXPECT_TRUE(xt::allclose(vr_all, py_vr_all));
+        EXPECT_TRUE(xt::allclose(vr_all_ddof, py_vr_all_ddof));
+        EXPECT_TRUE(xt::allclose(vr_all_ddof_with_axes_arr, py_vr_all_ddof));
         EXPECT_TRUE(xt::allclose(st, py_st));
         EXPECT_TRUE(xt::allclose(vr, py_vr));
+        EXPECT_TRUE(xt::allclose(vr_ddof, py_vr_ddof));
+        EXPECT_TRUE(xt::allclose(vr_ddof_with_axes_arr, py_vr_ddof));
     }
 
 }

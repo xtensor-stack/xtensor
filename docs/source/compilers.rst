@@ -41,7 +41,7 @@ definition.
 Visual Studio 2017 (15.7.1) seeing declarations as extra overloads
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In ``xvectorize.hpp``, Visual Studio 15.7.1 sees the forward declaration of ``vectorize(E&&)`` as a separate ovarload.
+In ``xvectorize.hpp``, Visual Studio 15.7.1 sees the forward declaration of ``vectorize(E&&)`` as a separate overload.
 
 Visual Studio 2017 double non-class parameter pack expansion
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -70,6 +70,14 @@ Workarounds for this compiler bug arise in various files of the code base.
 Everywhere, the handling of `Clang < 3.8` is wrapped with checks for the
 ``X_OLD_CLANG`` macro.
 
+**The support of `Clang < 4.0` is dropped in xtensor 0.22.**
+
+Clang-cl and ``std::get``
+-------------------------
+
+`Clang-cl` does not allow to call ``std::get`` with ``*this`` as parameter from a class inheriting from std::tuple.
+In that case, we explicitly upcast to ``std::tuple``.
+
 GCC < 5.1 and ``std::is_trivially_default_constructible``
 ---------------------------------------------------------
 
@@ -82,7 +90,7 @@ In this case, we polyfill the proper standard names using the deprecated
 ``std::has_trivial_default_constructor``. This must also be done when the
 compiler is clang when it makes use of the GCC implementation of the STL,
 which is the default behavior on linux. Properly detecting the version of the
-GCC STL used by clang cannot be done with the ``__GNUC__``  macro, which are
+GCC STL used by clang cannot be done with the ``__GNUC__``  macro, which is
 overridden by clang. Instead, we check for the definition of the macro
 ``_GLIBCXX_USE_CXX11_ABI`` which is only defined with GCC versions greater than
 ``5``.

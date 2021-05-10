@@ -105,6 +105,7 @@ namespace xt
         using inner_strides_type = typename base_type::inner_strides_type;
         using temporary_type = typename semantic_base::temporary_type;
         using expression_tag = Tag;
+        constexpr static std::size_t rank = N;
 
         xtensor_container();
         xtensor_container(nested_initializer_list_t<value_type, N> t);
@@ -372,6 +373,28 @@ namespace xt
 
         friend class xcontainer<xtensor_view<EC, N, L, Tag>>;
         friend class xview_semantic<xtensor_view<EC, N, L, Tag>>;
+    };
+
+    namespace detail
+    {
+        template <class V>
+        struct tensor_view_simd_helper
+        {
+            using valid_return_type = detail::has_simd_interface_impl<V, typename V::value_type>;
+            using valid_reference = std::is_lvalue_reference<typename V::reference>;
+            static constexpr bool value = valid_return_type::value && valid_reference::value;
+            using type = std::integral_constant<bool, value>;
+        };
+    }
+
+    // xtensor_view can be used on pseudo containers, i.e. containers
+    // whowe access operator does not return a reference. Since it
+    // is not possible to take the address f a temporary, the load_simd
+    // method implementation leads to a compilation error.
+    template <class EC, std::size_t N, layout_type L, class Tag>
+    struct has_simd_interface<xtensor_view<EC, N, L, Tag>>
+        : detail::tensor_view_simd_helper<xtensor_view<EC, N, L, Tag>>::type
+    {
     };
 
     /************************************
@@ -759,7 +782,7 @@ namespace xt
         std::fill(m_storage.begin(), m_storage.end(), e);
         return *this;
     }
-    
+
     template <class EC, std::size_t N, layout_type L, class Tag>
     inline auto xtensor_view<EC, N, L, Tag>::storage_impl() noexcept -> storage_type&
     {

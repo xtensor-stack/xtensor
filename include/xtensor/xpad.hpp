@@ -80,10 +80,7 @@ namespace xt
         XTENSOR_ASSERT(detail::check_pad_width(pad_width, e.shape()));
 
         using size_type = typename std::decay_t<E>::size_type;
-        using value_type = typename std::decay_t<E>::value_type;
-        using return_type = temporary_type_t<value_type,
-                                             typename std::decay_t<E>::shape_type,
-                                             std::decay_t<E>::static_layout>;
+        using return_type = temporary_type_t<E>;
 
         // place the original array in the center
 
@@ -239,10 +236,8 @@ namespace xt
         inline auto tile(E&& e, const S& reps)
         {
             using size_type = typename std::decay_t<E>::size_type;
-            using value_type = typename std::decay_t<E>::value_type;
-            using return_type = temporary_type_t<value_type,
-                                                 typename std::decay_t<E>::shape_type,
-                                                 std::decay_t<E>::static_layout>;
+
+            using return_type = temporary_type_t<E>;
 
             XTENSOR_ASSERT(e.shape().size() == reps.size());
 
@@ -262,7 +257,7 @@ namespace xt
 
             xt::xstrided_slice_vector svs(e.shape().size(), xt::all());
             xt::xstrided_slice_vector svt(e.shape().size(), xt::all());
-            
+
             for (size_type axis = 0; axis < e.shape().size(); ++axis)
             {
                 for (size_type i = 1; i < static_cast<size_type>(reps[axis]); ++i)
@@ -293,7 +288,7 @@ namespace xt
       return detail::tile(std::forward<E>(e), std::vector<S>{reps});
     }
 
-    template <class E, class C, XTL_REQUIRES(xtl::negation<std::is_integral<C>>)>
+    template <class E, class C, XTL_REQUIRES(xtl::negation<xtl::is_integral<C>>)>
     inline auto tile(E&& e, const C& reps)
     {
       return detail::tile(std::forward<E>(e), reps);
@@ -306,12 +301,12 @@ namespace xt
      * @param reps The number of repetitions of A along the first axis.
      * @return The tiled array.
      */
-    template <class E, class S = typename std::decay_t<E>::size_type, XTL_REQUIRES(std::is_integral<S>)>
+    template <class E, class S = typename std::decay_t<E>::size_type, XTL_REQUIRES(xtl::is_integral<S>)>
     inline auto tile(E&& e, S reps)
     {
       std::vector<S> tw(e.shape().size(), static_cast<S>(1));
       tw[0] = reps;
-      return tile(std::forward<E>(e), tw);
+      return detail::tile(std::forward<E>(e), tw);
     }
 }
 

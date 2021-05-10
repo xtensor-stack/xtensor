@@ -147,4 +147,12 @@ namespace xt
         vector_type strides_7 = { 1, 2, 1, 4 };
         EXPECT_FALSE(xt::do_strides_match(shape_2, strides_7, xt::layout_type::column_major, false));
     }
+
+    TEST(xstrides, ravel_index)
+    {
+        xt::uvector<std::size_t> index = { 1, 1, 1 };
+        xt::uvector<std::size_t> shape = { 10, 20, 30 };
+        auto idx = xt::ravel_index(index, shape, xt::layout_type::row_major);
+        EXPECT_EQ(idx, 631);
+    }
 }

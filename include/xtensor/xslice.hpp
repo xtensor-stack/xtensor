@@ -368,11 +368,11 @@ namespace xt
     namespace detail
     {
         template <class T>
-        using disable_integral_keep = std::enable_if_t<!std::is_integral<std::decay_t<T>>::value,
+        using disable_integral_keep = std::enable_if_t<!xtl::is_integral<std::decay_t<T>>::value,
             xkeep_slice<typename std::decay_t<T>::value_type>>;
 
         template <class T, class R>
-        using enable_integral_keep = std::enable_if_t<std::is_integral<T>::value, xkeep_slice<R>>;
+        using enable_integral_keep = std::enable_if_t<xtl::is_integral<T>::value, xkeep_slice<R>>;
     }
 
     /**
@@ -492,11 +492,11 @@ namespace xt
     namespace detail
     {
         template <class T>
-        using disable_integral_drop = std::enable_if_t<!std::is_integral<std::decay_t<T>>::value,
+        using disable_integral_drop = std::enable_if_t<!xtl::is_integral<std::decay_t<T>>::value,
                                      xdrop_slice<typename std::decay_t<T>::value_type>>;
 
         template <class T, class R>
-        using enable_integral_drop = std::enable_if_t<std::is_integral<T>::value, xdrop_slice<R>>;
+        using enable_integral_drop = std::enable_if_t<xtl::is_integral<T>::value, xdrop_slice<R>>;
     }
 
     /**
@@ -549,9 +549,9 @@ namespace xt
         }
 
         template <class MI = A, class MA = B, class STEP = C>
-        inline std::enable_if_t<std::is_integral<MI>::value &&
-                                std::is_integral<MA>::value &&
-                                std::is_integral<STEP>::value,
+        inline std::enable_if_t<xtl::is_integral<MI>::value &&
+                                xtl::is_integral<MA>::value &&
+                                xtl::is_integral<STEP>::value,
                                 xstepped_range<std::ptrdiff_t>>
         get(std::size_t size) const
         {
@@ -559,9 +559,9 @@ namespace xt
         }
 
         template <class MI = A, class MA = B, class STEP = C>
-        inline std::enable_if_t<!std::is_integral<MI>::value &&
-                                std::is_integral<MA>::value &&
-                                std::is_integral<STEP>::value,
+        inline std::enable_if_t<!xtl::is_integral<MI>::value &&
+                                xtl::is_integral<MA>::value &&
+                                xtl::is_integral<STEP>::value,
                                 xstepped_range<std::ptrdiff_t>>
         get(std::size_t size) const
         {
@@ -569,9 +569,9 @@ namespace xt
         }
 
         template <class MI = A, class MA = B, class STEP = C>
-        inline std::enable_if_t<std::is_integral<MI>::value &&
-                                !std::is_integral<MA>::value &&
-                                std::is_integral<STEP>::value,
+        inline std::enable_if_t<xtl::is_integral<MI>::value &&
+                                !xtl::is_integral<MA>::value &&
+                                xtl::is_integral<STEP>::value,
                                 xstepped_range<std::ptrdiff_t>>
         get(std::size_t size) const
         {
@@ -580,9 +580,9 @@ namespace xt
         }
 
         template <class MI = A, class MA = B, class STEP = C>
-        inline std::enable_if_t<std::is_integral<MI>::value &&
-                                std::is_integral<MA>::value &&
-                                !std::is_integral<STEP>::value,
+        inline std::enable_if_t<xtl::is_integral<MI>::value &&
+                                xtl::is_integral<MA>::value &&
+                                !xtl::is_integral<STEP>::value,
                                 xrange<std::ptrdiff_t>>
         get(std::size_t size) const
         {
@@ -590,9 +590,9 @@ namespace xt
         }
 
         template <class MI = A, class MA = B, class STEP = C>
-        inline std::enable_if_t<!std::is_integral<MI>::value &&
-                                !std::is_integral<MA>::value &&
-                                std::is_integral<STEP>::value,
+        inline std::enable_if_t<!xtl::is_integral<MI>::value &&
+                                !xtl::is_integral<MA>::value &&
+                                xtl::is_integral<STEP>::value,
                                 xstepped_range<std::ptrdiff_t>>
         get(std::size_t size) const
         {
@@ -602,9 +602,9 @@ namespace xt
         }
 
         template <class MI = A, class MA = B, class STEP = C>
-        inline std::enable_if_t<std::is_integral<MI>::value &&
-                                !std::is_integral<MA>::value &&
-                                !std::is_integral<STEP>::value,
+        inline std::enable_if_t<xtl::is_integral<MI>::value &&
+                                !xtl::is_integral<MA>::value &&
+                                !xtl::is_integral<STEP>::value,
                                 xrange<std::ptrdiff_t>>
         get(std::size_t size) const
         {
@@ -612,9 +612,9 @@ namespace xt
         }
 
         template <class MI = A, class MA = B, class STEP = C>
-        inline std::enable_if_t<!std::is_integral<MI>::value &&
-                                std::is_integral<MA>::value &&
-                                !std::is_integral<STEP>::value,
+        inline std::enable_if_t<!xtl::is_integral<MI>::value &&
+                                xtl::is_integral<MA>::value &&
+                                !xtl::is_integral<STEP>::value,
                                 xrange<std::ptrdiff_t>>
         get(std::size_t size) const
         {
@@ -622,9 +622,9 @@ namespace xt
         }
 
         template <class MI = A, class MA = B, class STEP = C>
-        inline std::enable_if_t<!std::is_integral<MI>::value &&
-                                !std::is_integral<MA>::value &&
-                                !std::is_integral<STEP>::value,
+        inline std::enable_if_t<!xtl::is_integral<MI>::value &&
+                                !xtl::is_integral<MA>::value &&
+                                !xtl::is_integral<STEP>::value,
                                 xall<std::ptrdiff_t>>
         get(std::size_t size) const
         {
@@ -766,7 +766,7 @@ namespace xt
         };
 
         template <class T>
-        struct cast_if_integer<T, std::enable_if_t<std::is_integral<T>::value>>
+        struct cast_if_integer<T, std::enable_if_t<xtl::is_integral<T>::value>>
         {
             using type = std::ptrdiff_t;
 
@@ -892,7 +892,7 @@ namespace xt
             template <class E, class SL>
             inline decltype(auto) operator()(E& e, SL&& slice, std::size_t index) const
             {
-                return get_slice(e, std::forward<SL>(slice), index, std::is_signed<std::decay_t<SL>>());
+                return get_slice(e, std::forward<SL>(slice), index, xtl::is_signed<std::decay_t<SL>>());
             }
 
         private:
@@ -1374,14 +1374,16 @@ namespace xt
         std::size_t sz = m_indices.size();
         for (std::size_t i = 0; i < sz; ++i)
         {
-            m_indices[i] = m_raw_indices[i] < 0 ? static_cast<std::ptrdiff_t>(shape) + m_raw_indices[i] : m_raw_indices[i];
+            m_indices[i] = m_raw_indices[i] < 0 ? static_cast<size_type>(shape) + m_raw_indices[i] : m_raw_indices[i];
         }
     }
 
     template <class T>
     inline auto xkeep_slice<T>::operator()(size_type i) const noexcept -> size_type
     {
-        return m_indices[static_cast<std::size_t>(i)];
+        return m_indices.size() == size_type(1) ?
+               m_indices.front() :
+               m_indices[static_cast<std::size_t>(i)];
     }
 
     template <class T>
@@ -1393,6 +1395,10 @@ namespace xt
     template <class T>
     inline auto xkeep_slice<T>::step_size(std::size_t i, std::size_t n) const noexcept -> size_type
     {
+        if (m_indices.size() == 1)
+        {
+            return 0;
+        }
         if (i + n >= m_indices.size())
         {
             return m_indices.back() - m_indices[i] + 1;
@@ -1495,7 +1501,7 @@ namespace xt
         std::size_t sz = m_indices.size();
         for (std::size_t i = 0; i < sz; ++i)
         {
-            m_indices[i] = m_raw_indices[i] < 0 ? static_cast<std::ptrdiff_t>(shape) + m_raw_indices[i] : m_raw_indices[i];
+            m_indices[i] = m_raw_indices[i] < 0 ? static_cast<size_type>(shape) + m_raw_indices[i] : m_raw_indices[i];
         }
         size_type cum = size_type(0);
         size_type prev_cum = cum;

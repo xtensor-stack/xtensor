@@ -385,14 +385,14 @@ namespace xt
     template <class O>
     inline auto xgenerator<F, R, S>::reshape(O&& shape) const &
     {
-        return reshape_view(*this, compute_shape(shape, std::is_signed<typename std::decay_t<O>::value_type>()));
+        return reshape_view(*this, compute_shape(shape, xtl::is_signed<typename std::decay_t<O>::value_type>()));
     }
 
     template <class F, class R, class S>
     template <class O>
     inline auto xgenerator<F, R, S>::reshape(O&& shape) &&
     {
-        return reshape_view(std::move(*this), compute_shape(shape, std::is_signed<typename std::decay_t<O>::value_type>()));
+        return reshape_view(std::move(*this), compute_shape(shape, xtl::is_signed<typename std::decay_t<O>::value_type>()));
     }
 
     template <class F, class R, class S>
@@ -454,7 +454,7 @@ namespace xt
         using sh_type = xt::dynamic_shape<T>;
         sh_type sh = xtl::make_sequence<sh_type>(shape.size());
         std::copy(shape.begin(), shape.end(), sh.begin());
-        return compute_shape(std::move(sh), std::is_signed<T>());
+        return compute_shape(std::move(sh), xtl::is_signed<T>());
     }
 
     template <class F, class R, class S>
@@ -467,14 +467,14 @@ namespace xt
     template <std::size_t dim, class I, class... Args>
     inline void xgenerator<F, R, S>::adapt_index(I& arg, Args&... args) const
     {
-        using value_type = typename decltype(m_shape)::value_type;
+        using tmp_value_type = typename decltype(m_shape)::value_type;
         if (sizeof...(Args) + 1 > m_shape.size())
         {
             adapt_index<dim>(args...);
         }
         else
         {
-            if (static_cast<value_type>(arg) >= m_shape[dim] && m_shape[dim] == 1)
+            if (static_cast<tmp_value_type>(arg) >= m_shape[dim] && m_shape[dim] == 1)
             {
                 arg = 0;
             }
@@ -484,15 +484,6 @@ namespace xt
 
     namespace detail
     {
-#ifdef X_OLD_CLANG
-        template <class Functor, class I>
-        inline auto make_xgenerator(Functor&& f, std::initializer_list<I> shape) noexcept
-        {
-            using shape_type = std::vector<std::size_t>;
-            using type = xgenerator<Functor, typename Functor::value_type, shape_type>;
-            return type(std::forward<Functor>(f), xtl::forward_sequence<shape_type, decltype(shape)>(shape));
-        }
-#else
         template <class Functor, class I, std::size_t L>
         inline auto make_xgenerator(Functor&& f, const I (&shape)[L]) noexcept
         {
@@ -500,7 +491,6 @@ namespace xt
             using type = xgenerator<Functor, typename Functor::value_type, shape_type>;
             return type(std::forward<Functor>(f), xtl::forward_sequence<shape_type, decltype(shape)>(shape));
         }
-#endif
 
         template <class Functor, class S>
         inline auto make_xgenerator(Functor&& f, S&& shape) noexcept

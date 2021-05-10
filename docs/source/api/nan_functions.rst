@@ -15,8 +15,28 @@ Defined in ``xtensor/xmath.hpp``
 .. doxygenfunction:: nan_to_num(E&&)
    :project: xtensor
 
+.. _nanmin-function-reference:
+.. doxygenfunction:: nanmin(E&&, X&&, EVS)
+   :project: xtensor
+
+.. _nanmax-function-reference:
+.. doxygenfunction:: nanmax(E&&, X&&, EVS)
+   :project: xtensor
+
 .. _nansum-function-reference:
 .. doxygenfunction:: nansum(E&&, X&&, EVS)
+   :project: xtensor
+
+.. _nanmean-function-reference:
+.. doxygenfunction:: nanmean(E&&, X&&, EVS)
+   :project: xtensor
+
+.. _nanvar-function-reference:
+.. doxygenfunction:: nanvar(E&&, X&&, EVS)
+   :project: xtensor
+
+.. _nanstd-function-reference:
+.. doxygenfunction:: nanstd(E&&, X&&, EVS)
    :project: xtensor
 
 .. _nanprod-function-reference:

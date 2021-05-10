@@ -16,7 +16,7 @@ array containing the scalar value:
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
+    #include <xtensor/xarray.hpp>
 
     xt::xarray<double> a = {{0., 1., 2.}, {3., 4., 5.}};
     double s = 1.2;
@@ -36,7 +36,7 @@ Assuming that the scalar assignment does not resize the array, we have the follo
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
+    #include <xtensor/xarray.hpp>
 
     xt::xarray<double> a = {{0., 1., 2.}, {3., 4., 5.}};
     double s = 1.2;
@@ -48,7 +48,7 @@ This is not consistent with the behavior of the copy constructor from a scalar:
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
+    #include <xtensor/xarray.hpp>
 
     xt::xarray<double> a(1.2);
     std::cout << a << std::endl;
@@ -59,7 +59,7 @@ a scalar:
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
+    #include <xtensor/xarray.hpp>
 
     xt::xarray<double> a = {{0., 1., 2.}, {3., 4., 5.}};
     a = 1.2;

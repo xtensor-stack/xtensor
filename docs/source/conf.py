@@ -39,3 +39,10 @@ htmlhelp_basename = 'xtensordoc'
 html_js_files = [
     'goatcounter.js'
 ]
+
+# Automatically link to numpy doc
+extensions += ['sphinx.ext.intersphinx']
+intersphinx_mapping = {
+    "numpy": ("https://numpy.org/doc/stable/", None),
+    "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
+}

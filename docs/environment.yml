@@ -1,8 +1,10 @@
 name: xtensor-docs
 
 channels:
-  - QuantStack
+  - conda-forge
 
 dependencies:
-  - breathe
-  - sphinx=2.4.4
+  # More recent version of breathe has an
+  # annoying bug regarding resolution of
+  # template overloads
+  - breathe==4.16.0

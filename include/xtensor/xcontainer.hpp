@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <memory>
 #include <numeric>
 #include <stdexcept>
 
@@ -151,8 +152,8 @@ namespace xt
         storage_type& storage() noexcept;
         const storage_type& storage() const noexcept;
 
-        value_type* data() noexcept;
-        const value_type* data() const noexcept;
+        pointer data() noexcept;
+        const_pointer data() const noexcept;
         const size_type data_offset() const noexcept;
 
         template <class S>
@@ -561,7 +562,7 @@ namespace xt
      * container is empty (data() is not is not dereferenceable in that case)
      */
     template <class D>
-    inline auto xcontainer<D>::data() noexcept -> value_type*
+    inline auto xcontainer<D>::data() noexcept -> pointer
     {
         return storage().data();
     }
@@ -572,7 +573,7 @@ namespace xt
     * container is empty (data() is not is not dereferenceable in that case)
     */
     template <class D>
-    inline auto xcontainer<D>::data() const noexcept -> const value_type*
+    inline auto xcontainer<D>::data() const noexcept -> const_pointer
     {
         return storage().data();
     }
@@ -707,7 +708,7 @@ namespace xt
     inline void xcontainer<D>::store_simd(size_type i, const simd& e)
     {
         using align_mode = driven_align_mode_t<alignment, data_alignment>;
-        xt_simd::store_simd<value_type, typename simd::value_type>(&(storage()[i]), e, align_mode());
+        xt_simd::store_simd<value_type, typename simd::value_type>(std::addressof(storage()[i]), e, align_mode());
     }
 
     template <class D>
@@ -717,7 +718,7 @@ namespace xt
         //-> simd_return_type<requested_type>
     {
         using align_mode = driven_align_mode_t<alignment, data_alignment>;
-        return xt_simd::load_simd<value_type, requested_type>(&(storage()[i]), align_mode());
+        return xt_simd::load_simd<value_type, requested_type>(std::addressof(storage()[i]), align_mode());
     }
 
     template <class D>
@@ -875,9 +876,11 @@ namespace xt
     inline bool xstrided_container<D>::is_contiguous() const noexcept
     {
         using str_type = typename inner_strides_type::value_type;
-        return m_strides.empty()
-            || (m_layout == layout_type::row_major && m_strides.back() == str_type(1))
-            || (m_layout == layout_type::column_major && m_strides.front() == str_type(1));
+        return is_contiguous_container<storage_type>::value &&
+               ( m_strides.empty()
+                 || (m_layout == layout_type::row_major && m_strides.back() == str_type(1))
+                 || (m_layout == layout_type::column_major && m_strides.front() == str_type(1)));
+
     }
 
     namespace detail
@@ -895,6 +898,18 @@ namespace xt
             (void) size;
             XTENSOR_ASSERT_MSG(c.size() == size, "Trying to resize const data container with wrong size.");
         }
+
+        template <class S, class T>
+        constexpr bool check_resize_dimension(const S&, const T&)
+        {
+            return true;
+        }
+
+        template <class T, size_t N, class S>
+        constexpr bool check_resize_dimension(const std::array<T, N>&, const S& s)
+        {
+            return N == s.size();
+        }
     }
 
     /**
@@ -908,6 +923,8 @@ namespace xt
     template <class S>
     inline void xstrided_container<D>::resize(S&& shape, bool force)
     {
+        XTENSOR_ASSERT_MSG(detail::check_resize_dimension(m_shape, shape),
+                           "cannot change the number of dimensions of xtensor")
         std::size_t dim = shape.size();
         if (m_shape.size() != dim || !std::equal(std::begin(shape), std::end(shape), std::begin(m_shape)) || force)
         {
@@ -916,6 +933,7 @@ namespace xt
                 m_layout = XTENSOR_DEFAULT_LAYOUT;  // fall back to default layout
             }
             m_shape = xtl::forward_sequence<shape_type, S>(shape);
+
             resize_container(m_strides, dim);
             resize_container(m_backstrides, dim);
             size_type data_size = compute_strides<D::static_layout>(m_shape, m_layout, m_strides, m_backstrides);
@@ -934,6 +952,8 @@ namespace xt
     template <class S>
     inline void xstrided_container<D>::resize(S&& shape, layout_type l)
     {
+        XTENSOR_ASSERT_MSG(detail::check_resize_dimension(m_shape, shape),
+                           "cannot change the number of dimensions of xtensor")
         if (base_type::static_layout != layout_type::dynamic && l != base_type::static_layout)
         {
             XTENSOR_THROW(std::runtime_error, "Cannot change layout_type if template parameter not layout_type::dynamic.");
@@ -953,6 +973,8 @@ namespace xt
     template <class S>
     inline void xstrided_container<D>::resize(S&& shape, const strides_type& strides)
     {
+        XTENSOR_ASSERT_MSG(detail::check_resize_dimension(m_shape, shape),
+                           "cannot change the number of dimensions of xtensor")
         if (base_type::static_layout != layout_type::dynamic)
         {
             XTENSOR_THROW(std::runtime_error,
@@ -983,7 +1005,7 @@ namespace xt
     template <class S>
     inline auto& xstrided_container<D>::reshape(S&& shape, layout_type layout) &
     {
-        reshape_impl(std::forward<S>(shape), std::is_signed<std::decay_t<typename std::decay_t<S>::value_type>>(), std::forward<layout_type>(layout));
+        reshape_impl(std::forward<S>(shape), xtl::is_signed<std::decay_t<typename std::decay_t<S>::value_type>>(), std::forward<layout_type>(layout));
         return this->derived_cast();
     }
 
@@ -994,7 +1016,7 @@ namespace xt
         using sh_type = rebind_container_t<T, shape_type>;
         sh_type sh = xtl::make_sequence<sh_type>(shape.size());
         std::copy(shape.begin(), shape.end(), sh.begin());
-        reshape_impl(std::move(sh), std::is_signed<T>(), std::forward<layout_type>(layout));
+        reshape_impl(std::move(sh), xtl::is_signed<T>(), std::forward<layout_type>(layout));
         return this->derived_cast();
     }
 
@@ -1025,14 +1047,14 @@ namespace xt
     template <class S>
     inline void xstrided_container<D>::reshape_impl(S&& _shape, std::true_type /* is signed */, layout_type layout)
     {
-        using value_type = typename std::decay_t<S>::value_type;
+        using tmp_value_type = typename std::decay_t<S>::value_type;
         auto new_size = compute_size(_shape);
         if (this->size() % new_size)
         {
             XTENSOR_THROW(std::runtime_error, "Negative axis size cannot be inferred. Shape mismatch.");
         }
         std::decay_t<S> shape = _shape;
-        value_type accumulator = 1;
+        tmp_value_type accumulator = 1;
         std::size_t neg_idx = 0;
         std::size_t i = 0;
         for(auto it = shape.begin(); it != shape.end(); ++it, i++)
@@ -1047,7 +1069,7 @@ namespace xt
         }
         if(accumulator < 0)
         {
-            shape[neg_idx] = static_cast<value_type>(this->size()) / std::abs(accumulator);
+            shape[neg_idx] = static_cast<tmp_value_type>(this->size()) / std::abs(accumulator);
         }
         else if(this->size() != new_size)
         {
@@ -1059,7 +1081,7 @@ namespace xt
         resize_container(m_backstrides, m_shape.size());
         compute_strides<D::static_layout>(m_shape, m_layout, m_strides, m_backstrides);
     }
-    
+
     template <class D>
     inline auto xstrided_container<D>::mutable_layout() noexcept -> layout_type&
     {

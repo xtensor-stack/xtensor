@@ -49,7 +49,7 @@ namespace xt
     template <class E>
     auto squeeze(E&& e);
 
-    template <class E, class S, class Tag = check_policy::none, std::enable_if_t<!std::is_integral<S>::value, int> = 0>
+    template <class E, class S, class Tag = check_policy::none, std::enable_if_t<!xtl::is_integral<S>::value, int> = 0>
     auto squeeze(E&& e, S&& axis, Tag check_policy = Tag());
 
     template <class E>
@@ -238,20 +238,11 @@ namespace xt
     }
 
     /// @cond DOXYGEN_INCLUDE_SFINAE
-#ifdef X_OLD_CLANG
-    template <class E, class I, class Tag = check_policy::none>
-    inline auto transpose(E&& e, std::initializer_list<I> permutation, Tag check_policy = Tag())
-    {
-        dynamic_shape<I> perm(permutation);
-        return detail::transpose_impl(std::forward<E>(e), std::move(perm), check_policy);
-    }
-#else
     template <class E, class I, std::size_t N, class Tag = check_policy::none>
     inline auto transpose(E&& e, const I(&permutation)[N], Tag check_policy = Tag())
     {
         return detail::transpose_impl(std::forward<E>(e), permutation, check_policy);
     }
-#endif
     /// @endcond
 
     /************************************
@@ -442,28 +433,19 @@ namespace xt
      * @param check_policy select check_policy. With check_policy::full(), selecting an axis
      *        which is greater than one will throw a runtime_error.
      */
-    template <class E, class S, class Tag, std::enable_if_t<!std::is_integral<S>::value, int>>
+    template <class E, class S, class Tag, std::enable_if_t<!xtl::is_integral<S>::value, int>>
     inline auto squeeze(E&& e, S&& axis, Tag check_policy)
     {
         return detail::squeeze_impl(std::forward<E>(e), std::forward<S>(axis), check_policy);
     }
 
     /// @cond DOXYGEN_INCLUDE_SFINAE
-#ifdef X_OLD_CLANG
-    template <class E, class I, class Tag = check_policy::none>
-    inline auto squeeze(E&& e, std::initializer_list<I> axis, Tag check_policy = Tag())
-    {
-        dynamic_shape<I> ax(axis);
-        return detail::squeeze_impl(std::forward<E>(e), std::move(ax), check_policy);
-    }
-#else
     template <class E, class I, std::size_t N, class Tag = check_policy::none>
     inline auto squeeze(E&& e, const I(&axis)[N], Tag check_policy = Tag())
     {
         using arr_t = std::array<I, N>;
         return detail::squeeze_impl(std::forward<E>(e), xtl::forward_sequence<arr_t, decltype(axis)>(axis), check_policy);
     }
-#endif
 
     template <class E, class Tag = check_policy::none>
     inline auto squeeze(E&& e, std::size_t axis, Tag check_policy = Tag())

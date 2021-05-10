@@ -26,7 +26,7 @@ class whose template parameter is ``A`` and should forward this parameter to ``x
 
 .. code::
 
-    #include "xtensor/xexpression.hpp"
+    #include <xtensor/xexpression.hpp>
 
     template <class T>
     class B : public xexpression<T>
@@ -111,7 +111,7 @@ given shape:
     #include <algorithm>
     #include <iterator>
     #include <iostream>
-    #include "xtensor/xarray.hpp"
+    #include <xtensor/xarray.hpp>
 
     int main(int argc, char* argv[])
     {
@@ -146,8 +146,8 @@ The first overload is meant for computed assignment involving a scalar; it allow
 
 .. code::
 
-    #include "xtensor/xarray.hpp"
-    #include "xio.hpp"
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xio.hpp>
 
     int main(int argc, char* argv)
     {

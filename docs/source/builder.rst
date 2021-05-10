@@ -31,8 +31,8 @@ Joining expressions
 
 - ``concatenate(tuple, axis=0)``: concatenates a list of expressions along the given axis.
 - ``stack(tuple, axis=0)``: stacks a list of expressions along the given axis.
-- ``hstack(tuple)``: stacks expressions in seqeunce horizontally (i.e. column wise).
-- ``vstack(tuple)``: stacks expressions in seqeunce vertically (i.e. row wise).
+- ``hstack(tuple)``: stacks expressions in sequence horizontally (i.e. column-wise).
+- ``vstack(tuple)``: stacks expressions in sequence vertically (i.e. row wise).
 
 Random distributions
 --------------------
