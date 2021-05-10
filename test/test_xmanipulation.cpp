@@ -153,7 +153,7 @@ namespace xt
             auto e = flatten<XTENSOR_DEFAULT_LAYOUT>(a);
             xtensor<double, 1> fl = e;
             using assign_traits = xassign_traits<decltype(fl), decltype(e)>;
-        
+
         #if XTENSOR_USE_XSIMD
             EXPECT_TRUE(assign_traits::simd_linear_assign());
             EXPECT_TRUE(assign_traits::simd_linear_assign(fl, e));
@@ -395,6 +395,22 @@ namespace xt
             {6, 7, 8}}};
 
         ASSERT_EQ(expected_2, ft);
+    }
+
+    TEST(xmanipulation, flip_noaxis)
+    {
+        {
+            xtensor<double, 1> e = {1, 2, 3, 4, 5, 6};
+            xtensor<double, 1> t = xt::flip(e);
+            xtensor<double, 1> expected = {6, 5, 4, 3, 2, 1};
+            ASSERT_EQ(expected, t);
+        }
+        {
+            xtensor<double, 2> e = {{1, 2, 3}, {4, 5, 6}};
+            xtensor<double, 2> t = xt::flip(e);
+            xtensor<double, 2> expected = {{6, 5, 4}, {3, 2, 1}};
+            ASSERT_EQ(expected, t);
+        }
     }
 
     TEST(xmanipulation, rot90)
