@@ -1999,6 +1999,13 @@ namespace detail {
         return sum<T>(std::forward<E>(e) * std::move(weights_view), std::move(ax), ev) / std::move(scl);
     }
 
+    template <class T = void, class E, class W, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTL_REQUIRES(is_reducer_options<EVS>, xtl::is_integral<X>)>
+    inline auto average(E&& e, W&& weights, X axis, EVS ev = EVS())
+    {
+        return average(std::forward<E>(e), std::forward<W>(weights), {axis}, std::forward<EVS>(ev));
+    }
+
     template <class T = void, class E, class W, class X, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
     inline auto average(E&& e, W&& weights, const X(&axes)[N], EVS ev = EVS())
     {
