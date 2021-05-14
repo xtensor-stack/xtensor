@@ -150,28 +150,40 @@ namespace xt
         template <class S, std::size_t dim, class T, class... Args>
         inline void check_index_impl(const S& shape, T arg, Args... args)
         {
-            if (sizeof...(Args) + 1 > shape.size())
+            if (std::size_t(arg) >= std::size_t(shape[dim]) && shape[dim] != 1)
             {
-                check_index_impl<S, dim>(shape, args...);
+                XTENSOR_THROW(std::out_of_range,
+                              "index " + std::to_string(arg) + " is out of bounds for axis " +
+                              std::to_string(dim) + " with size " + std::to_string(shape[dim]));
             }
-            else
-            {
-                if (std::size_t(arg) >= std::size_t(shape[dim]) && shape[dim] != 1)
-                {
-                    XTENSOR_THROW(std::out_of_range,
-                                  "index " + std::to_string(arg) + " is out of bounds for axis " +
-                                  std::to_string(dim) + " with size " + std::to_string(shape[dim]));
-                }
-                check_index_impl<S, dim + 1>(shape, args...);
-            }
+            check_index_impl<S, dim + 1>(shape, args...);
         }
     }
 
-    template <class S, class... Args>
-    inline void check_index(const S& shape, Args... args)
+    template <class S>
+    inline void check_index(const S&)
     {
-        using value_type = typename S::value_type;
-        detail::check_index_impl<S, 0>(shape, static_cast<value_type>(args)...);
+    }
+
+    template <class S, class Arg, class... Args>
+    inline void check_index(const S& shape, Arg arg, Args... args)
+    {
+        constexpr std::size_t nargs = sizeof...(Args) + 1;
+        if (nargs == shape.size())
+        {
+            detail::check_index_impl<S, 0>(shape, arg, args...);
+        }
+        else if (nargs > shape.size())
+        {
+            // Too many arguments: drop the first
+            check_index(shape, args...);
+        }
+        else
+        {
+            // Too few arguments: ignore the beginning of the shape
+            auto it = shape.end() - nargs;
+            detail::check_index_impl<decltype(it), 0>(it, arg, args...);
+        }
     }
 
     template <class S, class It>
