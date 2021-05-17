@@ -279,15 +279,15 @@ namespace xt
             {
                 n_iters = std::accumulate(data.shape().begin(), data.shape().end() - 1,
                                           std::size_t(1), std::multiplies<>());
-                data_secondary_stride = data.strides()[data.dimension() - 2];
-                inds_secondary_stride = inds.strides()[inds.dimension() - 2];
+                data_secondary_stride = data.shape(data.dimension() - 1);
+                inds_secondary_stride = inds.shape(inds.dimension() - 1);
             }
             else
             {
                 n_iters = std::accumulate(data.shape().begin() + 1, data.shape().end(),
                                           std::size_t(1), std::multiplies<>());
-                data_secondary_stride = data.strides()[1];
-                inds_secondary_stride = inds.strides()[1];
+                data_secondary_stride = data.shape(0);
+                inds_secondary_stride = inds.shape(0);
             }
 
             auto ptr = data.data();
