@@ -307,6 +307,8 @@ namespace xt
 
         const_reference data_element(size_type i) const;
 
+        const_reference flat(size_type i) const;
+
         template <class UT = self_type, class = typename std::enable_if<UT::only_scalar::value>::type>
         operator value_type() const;
 
@@ -581,6 +583,20 @@ namespace xt
         // The static cast prevents the compiler from instantiating the template methods with signed integers,
         // leading to warning about signed/unsigned conversions in the deeper layers of the access methods
         return access_impl(std::make_index_sequence<sizeof...(CT)>(), static_cast<size_type>(args)...);
+    }
+
+    /**
+     * @name Data
+     */
+    /**
+     * Returns a constant reference to the element at the specified position of the underlying
+     * contiguous storage of the function.
+     * @param index index to underlying flat storage.
+     */
+    template <class F, class... CT>
+    inline auto xfunction<F, CT...>::flat(size_type index) const -> const_reference
+    {
+        return data_element_impl(std::make_index_sequence<sizeof...(CT)>(), index);
     }
 
     /**

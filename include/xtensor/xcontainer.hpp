@@ -174,6 +174,9 @@ namespace xt
         reference data_element(size_type i);
         const_reference data_element(size_type i) const;
 
+        reference flat(size_type i);
+        const_reference flat(size_type i) const;
+
         template <class requested_type>
         using simd_return_type = xt_simd::simd_return_type<value_type, requested_type>;
 
@@ -639,6 +642,18 @@ namespace xt
 
     template <class D>
     inline auto xcontainer<D>::data_element(size_type i) const -> const_reference
+    {
+        return storage()[i];
+    }
+
+    template <class D>
+    inline auto xcontainer<D>::flat(size_type i) -> reference
+    {
+        return storage()[i];
+    }
+
+    template <class D>
+    inline auto xcontainer<D>::flat(size_type i) const -> const_reference
     {
         return storage()[i];
     }

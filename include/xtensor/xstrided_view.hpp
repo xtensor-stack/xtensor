@@ -266,6 +266,9 @@ namespace xt
         reference data_element(size_type i);
         const_reference data_element(size_type i) const;
 
+        reference flat(size_type i);
+        const_reference flat(size_type i) const;
+
         using container_iterator = std::conditional_t<is_const,
                                                       typename storage_type::const_iterator,
                                                       typename storage_type::iterator>;
@@ -457,6 +460,17 @@ namespace xt
         return storage()[i];
     }
 
+    template <class CT, class S, layout_type L, class FST>
+    inline auto xstrided_view<CT, S, L, FST>::flat(size_type i) -> reference
+    {
+        return storage()[i];
+    }
+
+    template <class CT, class S, layout_type L, class FST>
+    inline auto xstrided_view<CT, S, L, FST>::flat(size_type i) const -> const_reference
+    {
+        return storage()[i];
+    }
 
     template <class CT, class S, layout_type L, class FST>
     inline auto xstrided_view<CT, S, L, FST>::storage_begin() -> storage_iterator

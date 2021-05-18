@@ -1464,6 +1464,17 @@ namespace xt
         EXPECT_EQ(a, b);
     }
 
+    TEST(xview, flat)
+    {
+        xt::xtensor<size_t, 2, xt::layout_type::row_major> a = {{0,1,2}, {3,4,5}};
+        xt::xtensor<size_t, 2, xt::layout_type::row_major> b = {{0,1,2}, {30,40,50}};
+        auto view = xt::view(a, 1, xt::all());
+        view.flat(0) = 30;
+        view.flat(1) = 40;
+        view.flat(2) = 50;
+        EXPECT_EQ(a, b);
+    }
+
     TEST(xview, in_bounds)
     {
         xt::xtensor<size_t,2> a = {{0,1,2}, {3,4,5}};

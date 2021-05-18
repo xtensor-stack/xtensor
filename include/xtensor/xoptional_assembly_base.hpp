@@ -177,6 +177,9 @@ namespace xt
         template <class... Args>
         const_reference periodic(Args... args) const;
 
+        reference flat(size_type args);
+        const_reference flat(size_type args) const;
+
         template <class It>
         reference element(It first, It last);
         template <class It>
@@ -657,6 +660,28 @@ namespace xt
     inline auto xoptional_assembly_base<D>::periodic(Args... args) const -> const_reference
     {
         return const_reference(value().periodic(args...), has_value().periodic(args...));
+    }
+
+    /**
+     * Returns a reference to the element at the specified position
+     * of the underlying storage in the optional assembly.
+     * @param index index to underlying flat storage.
+     */
+    template <class D>
+    inline auto xoptional_assembly_base<D>::flat(size_type i) -> reference
+    {
+        return reference(value().flat(i), has_value().flat(i));
+    }
+
+    /**
+     * Returns a constant reference to the element at the specified position
+     * of the underlying storage in the optional assembly.
+     * @param index index to underlying flat storage.
+     */
+    template <class D>
+    inline auto xoptional_assembly_base<D>::flat(size_type i) const -> const_reference
+    {
+        return const_reference(value().flat(i), has_value().flat(i));
     }
 
     /**
