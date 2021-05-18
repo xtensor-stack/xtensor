@@ -334,6 +334,39 @@ namespace xt
         EXPECT_EQ(a, b);
     }
 
+    TEST(xtensor, row_index)
+    {
+        xt::xtensor<size_t, 2> a = {{0, 1, 2}, {10, 11, 12}, {20, 21, 22}, {30, 31, 32}};
+        EXPECT_TRUE(a.row_index(0) == a(0, 0));
+        EXPECT_TRUE(a.row_index(1) == a(1, 0));
+        EXPECT_TRUE(a.row_index(2) == a(2, 0));
+        EXPECT_TRUE(a.row_index(3) == a(3, 0));
+        EXPECT_TRUE(a.col_index(0) == a(0, 0));
+        EXPECT_TRUE(a.col_index(1) == a(0, 1));
+        EXPECT_TRUE(a.col_index(2) == a(0, 2));
+
+        xt::xtensor<size_t, 2> b = {{0, 1, 2, 3, 4}, {10, 11, 12, 13, 14}};
+        EXPECT_TRUE(a.row_index(0) == b(0, 0));
+        EXPECT_TRUE(a.row_index(1) == b(1, 0));
+        EXPECT_TRUE(b.col_index(0) == b(0, 0));
+        EXPECT_TRUE(b.col_index(1) == b(0, 1));
+        EXPECT_TRUE(b.col_index(2) == b(0, 2));
+        EXPECT_TRUE(b.col_index(3) == b(0, 3));
+        EXPECT_TRUE(b.col_index(4) == b(0, 4));
+
+        xt::xtensor<size_t, 3> c = {{{0, 1, 2}, {3, 4, 5}}, {{6, 7, 8}, {9, 10, 11}}};
+        EXPECT_TRUE(c.row_index(0) == c(0, 0, 0));
+        EXPECT_TRUE(c.row_index(1) == c(1, 0, 0));
+        EXPECT_TRUE(c.col_index(0) == c(0, 0, 0));
+        EXPECT_TRUE(c.col_index(1) == c(0, 0, 1));
+        EXPECT_TRUE(c.col_index(2) == c(0, 0, 2));
+        EXPECT_TRUE(c.row_index(0, 1) == c(0, 1, 0));
+        EXPECT_TRUE(c.row_index(1, 1) == c(1, 1, 0));
+        EXPECT_TRUE(c.col_index(1, 0) == c(0, 1, 0));
+        EXPECT_TRUE(c.col_index(1, 1) == c(0, 1, 1));
+        EXPECT_TRUE(c.col_index(1, 2) == c(0, 1, 2));
+    }
+
     TEST(xtensor, in_bounds)
     {
         xt::xtensor<size_t,2> a = {{0,1,2}, {3,4,5}};

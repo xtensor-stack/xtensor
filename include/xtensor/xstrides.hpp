@@ -38,6 +38,18 @@ namespace xt
     template <class offset_type, class S, class Arg, class... Args>
     offset_type data_offset(const S& strides, Arg arg, Args... args) noexcept;
 
+    template <class offset_type, class S>
+    offset_type row_index_offset(const S& strides) noexcept;
+
+    template <class offset_type, class S, class Arg, class... Args>
+    offset_type row_index_offset(const S& strides, Arg arg, Args... args) noexcept;
+
+    template <class offset_type, class S>
+    offset_type col_index_offset(const S& strides) noexcept;
+
+    template <class offset_type, class S, class Arg, class... Args>
+    offset_type col_index_offset(const S& strides, Arg arg, Args... args) noexcept;
+
     template <class offset_type, layout_type L = layout_type::dynamic, class S, class... Args>
     offset_type unchecked_data_offset(const S& strides, Args... args) noexcept;
 
@@ -276,6 +288,18 @@ namespace xt
             auto view = strides.cend() - nargs;
             return static_cast<offset_type>(detail::raw_data_offset<0>(view, arg, args...));
         }
+    }
+
+    template <class offset_type, class S>
+    inline offset_type row_index_offset(const S&) noexcept
+    {
+        return offset_type(0);
+    }
+
+    template <class offset_type, class S, class Arg, class... Args>
+    inline offset_type row_index_offset(const S& strides, Arg arg, Args... args) noexcept
+    {
+        return static_cast<offset_type>(detail::raw_data_offset<0>(strides, arg, args...));
     }
 
     template <class offset_type, layout_type L, class S, class... Args>

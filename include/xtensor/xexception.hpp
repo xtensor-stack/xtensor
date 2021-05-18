@@ -14,6 +14,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <iostream>
 
 #include "xtensor_config.hpp"
 
@@ -137,6 +138,9 @@ namespace xt
     template <class S, class... Args>
     void check_index(const S& shape, Args... args);
 
+    template <class S, class... Args>
+    void check_index_fromfirst(const S& shape, Args... args);
+
     template <class S, class It>
     void check_element_index(const S& shape, It first, It last);
 
@@ -174,6 +178,40 @@ namespace xt
         detail::check_index_impl<S, 0>(shape, static_cast<value_type>(args)...);
     }
 
+    namespace detail
+    {
+        template <class S, std::size_t dim>
+        inline void check_index_fromfirst_impl(const S&)
+        {
+        }
+
+        template <class S, std::size_t dim, class T, class... Args>
+        inline void check_index_fromfirst_impl(const S& shape, T arg, Args... args)
+        {
+            if (sizeof...(Args) + 1 > shape.size())
+            {
+                check_index_fromfirst_impl<S, dim>(shape, args...);
+            }
+            else
+            {
+                if (std::size_t(arg) >= std::size_t(shape[dim]) && shape[dim] != 1)
+                {
+                    XTENSOR_THROW(std::out_of_range,
+                                  "index " + std::to_string(arg) + " is out of bounds for axis " +
+                                  std::to_string(dim) + " with size " + std::to_string(shape[dim]));
+                }
+                check_index_fromfirst_impl<S, dim + 1>(shape, args...);
+            }
+        }
+    }
+
+    template <class S, class... Args>
+    inline void check_index_fromfirst(const S& shape, Args... args)
+    {
+        using value_type = typename S::value_type;
+        detail::check_index_fromfirst_impl<S, 0>(shape, static_cast<value_type>(args)...);
+    }
+
     template <class S, class It>
     inline void check_element_index(const S& shape, It first, It last)
     {
@@ -182,7 +220,7 @@ namespace xt
         auto dst = static_cast<size_type>(last - first);
         It efirst = last - static_cast<std::ptrdiff_t>((std::min)(shape.size(), dst));
         std::size_t axis = 0;
-        
+
         while (efirst != last)
         {
             if (*efirst >= value_type(shape[axis]) && shape[axis] != 1)

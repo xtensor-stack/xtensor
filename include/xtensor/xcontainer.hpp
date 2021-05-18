@@ -138,6 +138,18 @@ namespace xt
         template <class... Args>
         const_reference unchecked(Args... args) const;
 
+        template <class... Args>
+        reference row_index(Args... args);
+
+        template <class... Args>
+        const_reference row_index(Args... args) const;
+
+        template <class... Args>
+        reference col_index(Args... args);
+
+        template <class... Args>
+        const_reference col_index(Args... args) const;
+
         using accessible_base::shape;
         using accessible_base::at;
         using accessible_base::operator[];
@@ -504,6 +516,74 @@ namespace xt
     inline auto xcontainer<D>::unchecked(Args... args) const -> const_reference
     {
         size_type index = xt::unchecked_data_offset<size_type, static_layout>(strides(), static_cast<std::ptrdiff_t>(args)...);
+        return storage()[index];
+    }
+
+    /**
+     * Returns a reference to the element at the specified position in the container.
+     * @param args a list of indices specifying the position in the container. Indices
+     * must be unsigned integers, the number of indices should be equal or less than
+     * the number of dimensions of the container. If the number of indices is less,
+     * zeros are added to the end until the number of indices matches the number of dimensions.
+     */
+    template <class D>
+    template <class... Args>
+    inline auto xcontainer<D>::row_index(Args... args) -> reference
+    {
+        XTENSOR_TRY(check_index_fromfirst(shape(), args...));
+        XTENSOR_CHECK_DIMENSION(shape(), args...);
+        size_type index = xt::row_index_offset<size_type>(strides(), static_cast<std::ptrdiff_t>(args)...);
+        return storage()[index];
+    }
+
+    /**
+     * Returns a constant reference to the element at the specified position in the container.
+     * @param args a list of indices specifying the position in the container. Indices
+     * must be unsigned integers, the number of indices should be equal or less than
+     * the number of dimensions of the container. If the number of indices is less,
+     * zeros are pre-padded until the number of indices matches the number of dimensions.
+     */
+    template <class D>
+    template <class... Args>
+    inline auto xcontainer<D>::row_index(Args... args) const -> const_reference
+    {
+        XTENSOR_TRY(check_index_fromfirst(shape(), args...));
+        XTENSOR_CHECK_DIMENSION(shape(), args...);
+        size_type index = xt::col_index_offset<size_type>(strides(), static_cast<std::ptrdiff_t>(args)...);
+        return storage()[index];
+    }
+
+    /**
+     * Returns a reference to the element at the specified position in the container.
+     * @param args a list of indices specifying the position in the container. Indices
+     * must be unsigned integers, the number of indices should be equal or less than
+     * the number of dimensions of the container. If the number of indices is less,
+     * zeros are pre-padded until the number of indices matches the number of dimensions.
+     */
+    template <class D>
+    template <class... Args>
+    inline auto xcontainer<D>::col_index(Args... args) -> reference
+    {
+        // XTENSOR_TRY(check_index(shape(), args...));
+        XTENSOR_CHECK_DIMENSION(shape(), args...);
+        size_type index = xt::data_offset<size_type>(strides(), static_cast<std::ptrdiff_t>(args)...);
+        return storage()[index];
+    }
+
+    /**
+     * Returns a constant reference to the element at the specified position in the container.
+     * @param args a list of indices specifying the position in the container. Indices
+     * must be unsigned integers, the number of indices should be equal or less than
+     * the number of dimensions of the container. If the number of indices is less,
+     * zeros are added to the end until the number of indices matches the number of dimensions.
+     */
+    template <class D>
+    template <class... Args>
+    inline auto xcontainer<D>::col_index(Args... args) const -> const_reference
+    {
+        // XTENSOR_TRY(check_index(shape(), args...));
+        XTENSOR_CHECK_DIMENSION(shape(), args...);
+        size_type index = xt::data_offset<size_type>(strides(), static_cast<std::ptrdiff_t>(args)...);
         return storage()[index];
     }
 
