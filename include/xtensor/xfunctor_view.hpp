@@ -178,6 +178,8 @@ namespace xt
         using accessible_base::at;
         using accessible_base::operator[];
         using accessible_base::periodic;
+        using accessible_base::front;
+        using accessible_base::back;
 
         using accessible_base::in_bounds;
 

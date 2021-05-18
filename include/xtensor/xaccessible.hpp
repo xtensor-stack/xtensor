@@ -55,6 +55,9 @@ namespace xt
         template <class... Args>
         bool in_bounds(Args... args) const;
 
+        const_reference front() const;
+        const_reference back() const;
+
     protected:
 
         xconst_accessible() = default;
@@ -102,9 +105,14 @@ namespace xt
         template <class... Args>
         reference periodic(Args... args);
 
+        reference front();
+        reference back();
+
         using base_type::at;
         using base_type::operator[];
         using base_type::periodic;
+        using base_type::front;
+        using base_type::back;
 
     protected:
 
@@ -213,6 +221,24 @@ namespace xt
     }
 
     /**
+     * Returns a constant reference to first the element of the expression
+     */
+    template <class D>
+    inline auto xconst_accessible<D>::front() const -> const_reference
+    {
+        return *derived_cast().begin();
+    }
+
+    /**
+     * Returns a constant reference to last the element of the expression
+     */
+    template <class D>
+    inline auto xconst_accessible<D>::back() const -> const_reference
+    {
+        return *std::prev(derived_cast().end());
+    }
+
+    /**
      * Returns ``true`` only if the the specified position is a valid entry in the expression.
      * @param args a list of indices specifying the position in the expression.
      * @return bool
@@ -291,6 +317,24 @@ namespace xt
     {
         normalize_periodic(derived_cast().shape(), args...);
         return derived_cast()(static_cast<size_type>(args)...);
+    }
+
+    /**
+     * Returns a reference to the first element of the expression.
+     */
+    template <class D>
+    inline auto xaccessible<D>::front() -> reference
+    {
+        return *derived_cast().begin();
+    }
+
+    /**
+     * Returns a reference to the last element of the expression.
+     */
+    template <class D>
+    inline auto xaccessible<D>::back() -> reference
+    {
+        return *std::prev(derived_cast().end());
     }
 
     template <class D>

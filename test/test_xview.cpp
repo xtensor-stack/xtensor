@@ -1464,6 +1464,24 @@ namespace xt
         EXPECT_EQ(a, b);
     }
 
+    TEST(xview, front)
+    {
+        xt::xtensor<size_t,2> a = {{1,2,3}, {4,5,6}};
+        auto v = xt::view(a, 0, xt::all());
+        auto w = xt::view(a, 1, xt::all());
+        EXPECT_EQ(v.front(), 1);
+        EXPECT_EQ(w.front(), 4);
+    }
+
+    TEST(xview, back)
+    {
+        xt::xtensor<size_t,2> a = {{1,2,3}, {4,5,6}};
+        auto v = xt::view(a, 0, xt::all());
+        auto w = xt::view(a, 1, xt::all());
+        EXPECT_EQ(v.back(), 3);
+        EXPECT_EQ(w.back(), 6);
+    }
+
     TEST(xview, flat)
     {
         xt::xtensor<size_t, 2, xt::layout_type::row_major> a = {{0,1,2}, {3,4,5}};

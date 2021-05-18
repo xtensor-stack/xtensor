@@ -177,6 +177,12 @@ namespace xt
         template <class... Args>
         const_reference periodic(Args... args) const;
 
+        reference front();
+        const_reference front() const;
+
+        reference back();
+        const_reference back() const;
+
         reference flat(size_type args);
         const_reference flat(size_type args) const;
 
@@ -660,6 +666,42 @@ namespace xt
     inline auto xoptional_assembly_base<D>::periodic(Args... args) const -> const_reference
     {
         return const_reference(value().periodic(args...), has_value().periodic(args...));
+    }
+
+    /**
+     * Returns a reference to the first element of the optional assembly.
+     */
+    template <class D>
+    inline auto xoptional_assembly_base<D>::front() -> reference
+    {
+        return reference(value().front(), has_value().front());
+    }
+
+    /**
+     * Returns a constant reference to the first element of the optional assembly.
+     */
+    template <class D>
+    inline auto xoptional_assembly_base<D>::front() const -> const_reference
+    {
+        return const_reference(value().front(), has_value().front());
+    }
+
+    /**
+     * Returns a reference to the last element of the optional assembly.
+     */
+    template <class D>
+    inline auto xoptional_assembly_base<D>::back() -> reference
+    {
+        return reference(value().back(), has_value().back());
+    }
+
+    /**
+     * Returns a constant reference to the last element of the optional assembly.
+     */
+    template <class D>
+    inline auto xoptional_assembly_base<D>::back() const -> const_reference
+    {
+        return const_reference(value().back(), has_value().back());
     }
 
     /**

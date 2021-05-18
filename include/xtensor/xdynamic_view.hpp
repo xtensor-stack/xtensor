@@ -188,6 +188,8 @@ namespace xt
         using base_type::at;
         using base_type::periodic;
         using base_type::in_bounds;
+        using base_type::front;
+        using base_type::back;
 
         template <class It>
         reference element(It first, It last);
