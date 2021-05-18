@@ -171,6 +171,15 @@ namespace xt
     {
         xtensor_dynamic a;
         test_resize<xtensor_dynamic, storage_type>(a);
+
+#ifdef XTENSOR_ENABLE_ASSERT
+        xtensor_dynamic b;
+        std::vector<size_t> s = { 2u, 2u };
+        xtensor_dynamic::strides_type strides = {2u, 1u};
+        EXPECT_THROW(b.resize(s), std::runtime_error);
+        EXPECT_THROW(b.resize(s, layout_type::dynamic), std::runtime_error);
+        EXPECT_THROW(b.resize(s, strides), std::runtime_error);
+#endif
     }
 
     TEST(xtensor, reshape)
@@ -365,6 +374,26 @@ namespace xt
         EXPECT_TRUE(c.col_index(1, 0) == c(0, 1, 0));
         EXPECT_TRUE(c.col_index(1, 1) == c(0, 1, 1));
         EXPECT_TRUE(c.col_index(1, 2) == c(0, 1, 2));
+    }
+
+    TEST(xtensor, flat)
+    {
+        {
+            xt::xtensor<size_t, 2, xt::layout_type::row_major> a = {{0,1,2}, {3,4,5}};
+            xt::xtensor<size_t, 2, xt::layout_type::row_major> b = {{0,1,2}, {30,40,50}};
+            a.flat(3) = 30;
+            a.flat(4) = 40;
+            a.flat(5) = 50;
+            EXPECT_EQ(a, b);
+        }
+        {
+            xt::xtensor<size_t, 2, xt::layout_type::column_major> a = {{0,1,2}, {3,4,5}};
+            xt::xtensor<size_t, 2, xt::layout_type::column_major> b = {{0,1,2}, {30,40,50}};
+            a.flat(1) = 30;
+            a.flat(3) = 40;
+            a.flat(5) = 50;
+            EXPECT_EQ(a, b);
+        }
     }
 
     TEST(xtensor, in_bounds)

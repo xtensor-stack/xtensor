@@ -7,6 +7,50 @@
 Changelog
 =========
 
+0.23.9
+------
+
+- Fix data_offset method in xview to compute the strides only once
+  `#2371 https://github.com/xtensor-stack/xtensor/pull/2371`
+
+0.23.8
+------
+
+- Specialize operator= when RHS is chunked
+  `#2367 https://github.com/xtensor-stack/xtensor/pull/2367`
+
+0.23.7
+------
+
+- Fixed chunked_iterator
+  `#2365 https://github.com/xtensor-stack/xtensor/pull/2365`
+
+0.23.6
+------
+
+- Update installation instructions to mention mamba
+  `#2357 https://github.com/xtensor-stack/xtensor/pull/2357`
+- Fixed grid_shape return type
+  `#2360 https://github.com/xtensor-stack/xtensor/pull/2360`
+- Added assertion in resize method
+  `#2361 https://github.com/xtensor-stack/xtensor/pull/2361`
+- Added const chunk iterators
+  `#2362 https://github.com/xtensor-stack/xtensor/pull/2362`
+- Fixed chunk assignment 
+  `#2363 https://github.com/xtensor-stack/xtensor/pull/2363`
+
+0.23.5
+------
+
+- No need to explicitly install blas anymore with latest xtensor-blas
+  `#2343 https://github.com/xtensor-stack/xtensor/pull/2343`
+- FIX for xtensor-stack/xtl/issues/245 
+  `#2344 https://github.com/xtensor-stack/xtensor/pull/2344`
+- Implement grid view
+  `#2346 https://github.com/xtensor-stack/xtensor/pull/2346`
+- Refactoring of xchunked_view 
+  `#2353 https://github.com/xtensor-stack/xtensor/pull/2353`
+
 0.23.4
 ------
 

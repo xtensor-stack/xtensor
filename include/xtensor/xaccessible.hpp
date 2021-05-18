@@ -125,7 +125,7 @@ namespace xt
     /************************************
      * xconst_accessible implementation *
      ************************************/
-    
+
     /**
      * Returns the size of the expression.
      */
@@ -211,7 +211,7 @@ namespace xt
         normalize_periodic(derived_cast().shape(), args...);
         return derived_cast()(static_cast<size_type>(args)...);
     }
-    
+
     /**
      * Returns ``true`` only if the the specified position is a valid entry in the expression.
      * @param args a list of indices specifying the position in the expression.
@@ -246,7 +246,7 @@ namespace xt
     template <class D>
     template <class... Args>
     inline auto xaccessible<D>::at(Args... args) -> reference
-    {   
+    {
         check_access(derived_cast().shape(), static_cast<size_type>(args)...);
         return derived_cast().operator()(args...);
     }
@@ -292,7 +292,6 @@ namespace xt
         normalize_periodic(derived_cast().shape(), args...);
         return derived_cast()(static_cast<size_type>(args)...);
     }
-
 
     template <class D>
     inline auto xaccessible<D>::derived_cast() noexcept -> derived_type&

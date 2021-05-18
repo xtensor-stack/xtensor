@@ -281,6 +281,9 @@ namespace xt
         reference data_element(size_type i) noexcept;
         const_reference data_element(size_type i) const noexcept;
 
+        reference flat(size_type i) noexcept;
+        const_reference flat(size_type i) const noexcept;
+
         template <class align, class simd = simd_value_type>
         void store_simd(size_type i, const simd& e);
         template <class align, class requested_type = value_type,
@@ -928,6 +931,18 @@ namespace xt
 
     template <class CT>
     inline auto xscalar<CT>::data_element(size_type) const noexcept -> const_reference
+    {
+        return m_value;
+    }
+
+    template <class CT>
+    inline auto xscalar<CT>::flat(size_type) noexcept -> reference
+    {
+        return m_value;
+    }
+
+    template <class CT>
+    inline auto xscalar<CT>::flat(size_type) const noexcept -> const_reference
     {
         return m_value;
     }

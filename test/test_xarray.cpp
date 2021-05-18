@@ -147,7 +147,14 @@ namespace xt
     TEST(xarray, resize)
     {
         xarray_dynamic a;
+        std::vector<size_t> shape = {2, 2};
+        xarray_dynamic::strides_type strides = {2, 1};
         test_resize(a);
+#ifdef XTENSOR_ENABLE_ASSERT
+        EXPECT_NO_THROW(a.resize(shape));
+        EXPECT_NO_THROW(a.resize(shape, layout_type::row_major));
+        EXPECT_NO_THROW(a.resize(shape, strides));
+#endif
     }
 
     TEST(xarray, reshape)
@@ -348,6 +355,26 @@ namespace xt
         EXPECT_TRUE(c.col_index(1, 0) == c(0, 1, 0));
         EXPECT_TRUE(c.col_index(1, 1) == c(0, 1, 1));
         EXPECT_TRUE(c.col_index(1, 2) == c(0, 1, 2));
+    }
+
+    TEST(xarray, flat)
+    {
+        {
+            xt::xarray<size_t, xt::layout_type::row_major> a = {{0,1,2}, {3,4,5}};
+            xt::xarray<size_t, xt::layout_type::row_major> b = {{0,1,2}, {30,40,50}};
+            a.flat(3) = 30;
+            a.flat(4) = 40;
+            a.flat(5) = 50;
+            EXPECT_EQ(a, b);
+        }
+        {
+            xt::xarray<size_t, xt::layout_type::column_major> a = {{0,1,2}, {3,4,5}};
+            xt::xarray<size_t, xt::layout_type::column_major> b = {{0,1,2}, {30,40,50}};
+            a.flat(1) = 30;
+            a.flat(3) = 40;
+            a.flat(5) = 50;
+            EXPECT_EQ(a, b);
+        }
     }
 
     TEST(xarray, in_bounds)

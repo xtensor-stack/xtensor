@@ -1,3 +1,12 @@
+/***************************************************************************
+* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+* Copyright (c) QuantStack                                                 *
+*                                                                          *
+* Distributed under the terms of the BSD 3-Clause License.                 *
+*                                                                          *
+* The full license is in the file LICENSE, distributed with this software. *
+****************************************************************************/
+
 #ifndef XTENSOR_CHUNKED_ARRAY_HPP
 #define XTENSOR_CHUNKED_ARRAY_HPP
 
@@ -5,64 +14,10 @@
 #include <array>
 
 #include "xarray.hpp"
-#include "xnoalias.hpp"
-#include "xstrided_view.hpp"
+#include "xchunked_assign.hpp"
 
 namespace xt
 {
-
-    /*********************************
-     * xchunked_semantic declaration *
-     *********************************/
-
-    template <class T, class chunk_storage>
-    class xchunked_assigner
-    {
-    public:
-
-        using temporary_type = T;
-
-        template <class E, class DST>
-        void build_and_assign_temporary(const xexpression<E>& e, DST& dst);
-    };
-
-    template <class D>
-    class xchunked_semantic : public xsemantic_base<D>
-    {
-    public:
-
-        using base_type = xsemantic_base<D>;
-        using derived_type = D;
-        using temporary_type = typename base_type::temporary_type;
-
-        template <class E>
-        derived_type& assign_xexpression(const xexpression<E>& e);
-
-        template <class E>
-        derived_type& computed_assign(const xexpression<E>& e);
-
-        template <class E, class F>
-        derived_type& scalar_computed_assign(const E& e, F&& f);
-
-    protected:
-
-        xchunked_semantic() = default;
-        ~xchunked_semantic() = default;
-
-        xchunked_semantic(const xchunked_semantic&) = default;
-        xchunked_semantic& operator=(const xchunked_semantic&) = default;
-
-        xchunked_semantic(xchunked_semantic&&) = default;
-        xchunked_semantic& operator=(xchunked_semantic&&) = default;
-
-        template <class E>
-        derived_type& operator=(const xexpression<E>& e);
-
-    private:
-
-        template <class CS>
-        xchunked_assigner<temporary_type, CS> get_assigner(const CS&) const;
-    };
 
     /******************************
      * xchunked_array declaration *
@@ -100,6 +55,7 @@ namespace xt
 
         using chunk_storage_type = chunk_storage;
         using chunk_type = typename chunk_storage::value_type;
+        using grid_shape_type = typename chunk_storage::shape_type;
         using const_reference = typename chunk_type::const_reference;
         using reference = typename chunk_type::reference;
         using self_type = xchunked_array<chunk_storage>;
@@ -119,6 +75,8 @@ namespace xt
         using bool_load_type = xt::bool_load_type<value_type>;
         static constexpr layout_type static_layout = layout_type::dynamic;
         static constexpr bool contiguous_layout = false;
+        using chunk_iterator = xchunk_iterator<self_type>;
+        using const_chunk_iterator = xchunk_iterator<const self_type>;
 
         template <class S>
         xchunked_array(chunk_storage_type&& chunks, S&& shape, S&& chunk_shape, layout_type chunk_memory_layout = XTENSOR_DEFAULT_LAYOUT);
@@ -139,6 +97,7 @@ namespace xt
         template <class E>
         xchunked_array& operator=(const xexpression<E>& e);
 
+        size_type dimension() const noexcept;
         const shape_type& shape() const noexcept;
         layout_type layout() const noexcept;
         bool is_contiguous() const noexcept;
@@ -171,9 +130,20 @@ namespace xt
         template <class S>
         const_stepper stepper_end(const S& shape, layout_type) const noexcept;
 
-        const shape_type& chunk_shape() const;
+        const shape_type& chunk_shape() const noexcept;
+        size_type grid_size() const noexcept;
+        const grid_shape_type& grid_shape() const noexcept;
+
         chunk_storage_type& chunks();
         const chunk_storage_type& chunks() const;
+
+        chunk_iterator chunk_begin();
+        chunk_iterator chunk_end();
+
+        const_chunk_iterator chunk_begin() const;
+        const_chunk_iterator chunk_end() const;
+        const_chunk_iterator chunk_cbegin() const;
+        const_chunk_iterator chunk_cend() const;
 
     private:
 
@@ -213,6 +183,9 @@ namespace xt
 
     template<class E>
     constexpr bool is_chunked(const xexpression<E>& e);
+
+    template<class E>
+    constexpr bool is_chunked();
 
     /**
      * Creates an in-memory chunked array.
@@ -317,6 +290,12 @@ namespace xt
     template<class E>
     constexpr bool is_chunked(const xexpression<E>&)
     {
+        return is_chunked<E>();
+    }
+
+    template<class E>
+    constexpr bool is_chunked()
+    {
         using return_type = typename detail::chunk_helper<E>::is_chunked;
         return return_type::value;
     }
@@ -353,122 +332,6 @@ namespace xt
         return xchunked_array<chunk_storage>(e, chunk_storage(), chunk_memory_layout);
     }
 
-    /************************************
-     * xchunked_semantic implementation *
-     ************************************/
-
-    template <class T, class CS>
-    template <class E, class DST>
-    inline void xchunked_assigner<T, CS>::build_and_assign_temporary(const xexpression<E>& e, DST& dst)
-    {
-        temporary_type tmp(e, CS(), dst.chunk_shape());
-        dst = std::move(tmp);
-    }
-
-    template <class D>
-    template <class E>
-    inline auto xchunked_semantic<D>::assign_xexpression(const xexpression<E>& e) -> derived_type&
-    {
-        using shape_type = std::decay_t<decltype(this->derived_cast().shape())>;
-        using size_type = typename shape_type::size_type;
-        const auto& chunk_shape = this->derived_cast().chunk_shape();
-        auto& chunks = this->derived_cast().chunks();
-        size_t dimension = this->derived_cast().dimension();
-        xstrided_slice_vector sv(chunk_shape.size());  // element slice corresponding to chunk
-        std::transform(chunk_shape.begin(), chunk_shape.end(), sv.begin(),
-                       [](auto size) { return range(0, size); });
-        shape_type ic(dimension);  // index of chunk, initialized to 0...
-        size_type ci = 0;
-        for (auto& chunk: chunks)
-        {
-            auto rhs = strided_view(e.derived_cast(), sv);
-            auto rhs_shape = rhs.shape();
-            if (rhs_shape != chunk_shape)
-            {
-                xstrided_slice_vector esv(chunk_shape.size());  // element slice in edge chunk
-                std::transform(rhs_shape.begin(), rhs_shape.end(), esv.begin(),
-                               [](auto size) { return range(0, size); });
-                noalias(strided_view(chunk, esv)) = rhs;
-            }
-            else
-            {
-                noalias(chunk) = rhs;
-            }
-            bool last_chunk = ci == chunks.size() - 1;
-            if (!last_chunk)
-            {
-                size_type di = dimension - 1;
-                while (true)
-                {
-                    if (ic[di] + 1 == chunks.shape()[di])
-                    {
-                        ic[di] = 0;
-                        sv[di] = range(0, chunk_shape[di]);
-                        if (di == 0)
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            di--;
-                        }
-                    }
-                    else
-                    {
-                        ic[di] += 1;
-                        sv[di] = range(ic[di] * chunk_shape[di], (ic[di] + 1) * chunk_shape[di]);
-                        break;
-                    }
-                }
-            }
-            ++ci;
-        }
-        return this->derived_cast();
-    }
-
-    template <class D>
-    template <class E>
-    inline auto xchunked_semantic<D>::computed_assign(const xexpression<E>& e) -> derived_type&
-    {
-        D& d = this->derived_cast();
-        if (e.derived_cast().dimension() > d.dimension()
-            || e.derived_cast().shape() > d.shape())
-        {
-            return operator=(e);
-        }
-        else
-        {
-            return assign_xexpression(e);
-        }
-    }
-
-    template <class D>
-    template <class E, class F>
-    inline auto xchunked_semantic<D>::scalar_computed_assign(const E& e, F&& f) -> derived_type&
-    {
-        for (auto& c: this->derived_cast().chunks())
-        {
-            c.scalar_computed_assign(e, f);
-        }
-        return this->derived_cast();
-    }
-
-    template <class D>
-    template <class E>
-    inline auto xchunked_semantic<D>::operator=(const xexpression<E>& e) -> derived_type&
-    {
-        D& d = this->derived_cast();
-        get_assigner(d.chunks()).build_and_assign_temporary(e, d);
-        return d;
-    }
-
-    template <class D>
-    template <class CS>
-    inline auto xchunked_semantic<D>::get_assigner(const CS&) const -> xchunked_assigner<temporary_type, CS>
-    {
-        return xchunked_assigner<temporary_type, CS>();
-    }
-
     /*********************************
      * xchunked_array implementation *
      *********************************/
@@ -502,6 +365,12 @@ namespace xt
     inline auto xchunked_array<CS>::operator=(const xexpression<E>& e) -> self_type&
     {
         return semantic_base::operator=(e);
+    }
+
+    template <class CS>
+    inline auto xchunked_array<CS>::dimension() const noexcept -> size_type
+    {
+        return m_shape.size();
     }
 
     template <class CS>
@@ -605,6 +474,24 @@ namespace xt
     }
 
     template <class CS>
+    inline auto xchunked_array<CS>::chunk_shape() const noexcept -> const shape_type&
+    {
+        return m_chunk_shape;
+    }
+
+    template <class CS>
+    inline auto xchunked_array<CS>::grid_size() const noexcept -> size_type
+    {
+        return m_chunks.size();
+    }
+
+    template <class CS>
+    inline auto xchunked_array<CS>::grid_shape() const noexcept -> const grid_shape_type&
+    {
+        return m_chunks.shape();
+    }
+
+    template <class CS>
     inline auto xchunked_array<CS>::chunks() -> chunk_storage_type&
     {
         return m_chunks;
@@ -617,9 +504,44 @@ namespace xt
     }
 
     template <class CS>
-    inline auto xchunked_array<CS>::chunk_shape() const -> const shape_type&
+    inline auto xchunked_array<CS>::chunk_begin() -> chunk_iterator
     {
-        return m_chunk_shape;
+        shape_type chunk_index(m_shape.size(), size_type(0));
+        return chunk_iterator(*this, std::move(chunk_index), 0u);
+    }
+
+    template <class CS>
+    inline auto xchunked_array<CS>::chunk_end() -> chunk_iterator
+    {
+        shape_type sh = xtl::forward_sequence<shape_type, const grid_shape_type>(grid_shape());
+        return chunk_iterator(*this, std::move(sh), grid_size());
+    }
+
+    template <class CS>
+    inline auto xchunked_array<CS>::chunk_begin() const -> const_chunk_iterator
+    {
+        shape_type chunk_index(m_shape.size(), size_type(0));
+        return const_chunk_iterator(*this, std::move(chunk_index), 0u);
+    }
+
+    template <class CS>
+    inline auto xchunked_array<CS>::chunk_end() const -> const_chunk_iterator
+    {
+        shape_type sh = xtl::forward_sequence<shape_type, const grid_shape_type>(grid_shape());
+        return const_chunk_iterator(*this, std::move(sh), grid_size());
+    }
+
+    template <class CS>
+    inline auto xchunked_array<CS>::chunk_cbegin() const -> const_chunk_iterator
+    {
+        return chunk_begin();
+    }
+
+    template <class CS>
+    inline auto xchunked_array<CS>::chunk_cend() const -> const_chunk_iterator
+    {
+        return chunk_end();
+
     }
 
     template <class CS>

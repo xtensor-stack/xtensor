@@ -77,7 +77,6 @@ namespace xt
             EXPECT_EQ(v, 2. * val + 2.);
         }
 
-
         xarray<double> a3
           {{1., 2., 3.},
            {4., 5., 6.},
@@ -110,6 +109,20 @@ namespace xt
         {
             EXPECT_EQ(v, 3);
         }
+
+        std::vector<size_t> shape3 = {3, 3};
+        std::vector<size_t> chunk_shape3 = {1, 2};
+        auto a7 = chunked_array<double>(shape3, chunk_shape3);
+        for (auto it = a7.chunks().begin(); it != a7.chunks().end(); ++it)
+        {
+            it->resize(chunk_shape3);
+        }
+
+        a7 = a3;
+        for (auto it = a7.chunks().begin(); it != a7.chunks().end(); ++it)
+        {
+            EXPECT_EQ(it->shape(), chunk_shape3);
+        }
     }
 
     TEST(xchunked_array, noalias)
@@ -122,5 +135,35 @@ namespace xt
         noalias(a) = b;
 
         EXPECT_EQ(a, b);
+    }
+
+    TEST(xchunked_array, chunk_iterator)
+    {
+        std::vector<std::size_t> shape = {10, 10, 10};
+        std::vector<std::size_t> chunk_shape = {2, 2, 2};
+        auto a = chunked_array<double>(shape, chunk_shape);
+        xt::xarray<double> b = arange(1000).reshape({10, 10, 10});
+        noalias(a) = b;
+
+        auto it = a.chunk_begin();
+        auto cit = a.chunk_cbegin();
+
+        for (size_t i = 0; i < 5; ++i)
+        {
+            for (size_t j = 0; j < 5; ++j)
+            {
+                for (size_t k = 0; k < 5; ++k)
+                {
+                    EXPECT_EQ(*((*it).begin()), a(2*i, 2*j, 2*k));
+                    EXPECT_EQ(*((*cit).cbegin()), a(2*i, 2*j, 2*k));
+                    ++it;
+                    ++cit;
+                }
+            }
+        }
+
+        it = a.chunk_begin();
+        std::advance(it, 2);
+        EXPECT_EQ(*((*it).begin()), a(0, 0, 4));
     }
 }
