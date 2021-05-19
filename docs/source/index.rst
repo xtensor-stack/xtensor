@@ -98,6 +98,7 @@ for details.
    api/function_index
    api/io_index
    api/xmath
+   api/xshape
 
 .. toctree::
    :caption: DEVELOPER ZONE
