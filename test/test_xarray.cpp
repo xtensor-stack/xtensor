@@ -314,6 +314,19 @@ namespace xt
         EXPECT_EQ(a.layout(), c.layout());
     }
 
+    TEST(xarray, operator_brace)
+    {
+#ifdef XTENSOR_ENABLE_ASSERT
+        xt::xarray<size_t> a = {{0,1,2}, {3,4,5}};
+        EXPECT_THROW(a(2, 0), std::runtime_error);
+        EXPECT_THROW(a(0, 3), std::runtime_error);
+
+        xt::xarray<size_t> b = {{0,1,2}};
+        EXPECT_THROW(a(0, 3), std::runtime_error);
+        EXPECT_THROW(a(1, 3), std::runtime_error);
+#endif
+    }
+
     TEST(xarray, periodic)
     {
         xt::xarray<size_t> a = {{0,1,2}, {3,4,5}};
@@ -336,7 +349,7 @@ namespace xt
         EXPECT_EQ(a.back(), 6);
     }
 
-    TEST(xarray, flat)
+TEST(xarray, flat)
     {
         {
             xt::xarray<size_t, xt::layout_type::row_major> a = {{0,1,2}, {3,4,5}};
@@ -345,6 +358,9 @@ namespace xt
             a.flat(4) = 40;
             a.flat(5) = 50;
             EXPECT_EQ(a, b);
+#ifdef XTENSOR_ENABLE_ASSERT
+            EXPECT_THROW(a.flat(6), std::runtime_error);
+#endif
         }
         {
             xt::xarray<size_t, xt::layout_type::column_major> a = {{0,1,2}, {3,4,5}};
@@ -353,6 +369,9 @@ namespace xt
             a.flat(3) = 40;
             a.flat(5) = 50;
             EXPECT_EQ(a, b);
+#ifdef XTENSOR_ENABLE_ASSERT
+            EXPECT_THROW(a.flat(6), std::runtime_error);
+#endif
         }
     }
 

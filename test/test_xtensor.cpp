@@ -370,6 +370,19 @@ namespace xt
         EXPECT_TRUE(idx==jdx);
     }
 
+    TEST(xarray, operator_brace)
+    {
+#ifdef XTENSOR_ENABLE_ASSERT
+        xt::xtensor<size_t, 2> a = {{0,1,2}, {3,4,5}};
+        EXPECT_THROW(a(2, 0), std::runtime_error);
+        EXPECT_THROW(a(0, 3), std::runtime_error);
+
+        xt::xtensor<size_t, 2> b = {{0,1,2}};
+        EXPECT_THROW(a(0, 3), std::runtime_error);
+        EXPECT_THROW(a(1, 3), std::runtime_error);
+#endif
+    }
+
     TEST(xtensor, periodic)
     {
         xt::xtensor<size_t,2> a = {{0,1,2}, {3,4,5}};
@@ -389,6 +402,9 @@ namespace xt
             a.flat(4) = 40;
             a.flat(5) = 50;
             EXPECT_EQ(a, b);
+#ifdef XTENSOR_ENABLE_ASSERT
+            EXPECT_THROW(a.flat(6), std::runtime_error);
+#endif
         }
         {
             xt::xtensor<size_t, 2, xt::layout_type::column_major> a = {{0,1,2}, {3,4,5}};
@@ -397,6 +413,9 @@ namespace xt
             a.flat(3) = 40;
             a.flat(5) = 50;
             EXPECT_EQ(a, b);
+#ifdef XTENSOR_ENABLE_ASSERT
+            EXPECT_THROW(a.flat(6), std::runtime_error);
+#endif
         }
     }
 
