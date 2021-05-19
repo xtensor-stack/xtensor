@@ -37,6 +37,106 @@ Which prints
 
 The *array index* ``{1, 2}`` corresponds to the *flat index* ``6``.
 
+Operators: array index
+------------------------
+
+An *array index* can be specified to an operators by a sequence of numbers.
+To this end the following operators are at your disposal:
+
+``operator()(args...)``
+^^^^^^^^^^^^^^^^^^^^^^^
+
+*   Example: ``a(1, 2) == 6``.
+*   See also: :cpp:func:`xt::xcontainer::operator()`.
+
+Returns a (constant) reference to the element,
+specified by an *array index* given by a number of unsigned integers.
+
+.. note::
+
+    If the number of indices is less that the dimension of the array,
+    the indices are pre-padded with zeros until the dimension is matched
+    (example: ``a(2) == a(0, 2) == 2``).
+
+``at(args...)``
+^^^^^^^^^^^^^^^
+
+*   Example: ``a.at(1, 2) == 6``.
+*   See also: :cpp:func:`xt::xcontainer::at`.
+
+Same as ``operator()``:
+Returns a (constant) reference to the element,
+specified by an *array index* given by a number of unsigned integers.
+
+``unchecked(args...)``
+^^^^^^^^^^^^^^^^^^^^^^
+
+*   Example: ``a.unchecked(1, 2) == 6``.
+*   See also: :cpp:func:`xt::xcontainer::unchecked`.
+
+Returns a (constant) reference to the element,
+specified by an *array index* given by a number of unsigned integers.
+Different than ``operator()`` there are no bounds checks (even when assertions) are turned on,
+and the number of indices is assumed to match the dimension of the array.
+``unchecked`` is thus aimed at performance.
+
+.. note::
+
+    If you assume responsibility for bounds-checking, this operator can be used to virtually
+    post-pad zeros if you specify less indices than the rank of the array.
+    Example: ``a.unchecked(1) == a(1, 0)``.
+
+``periodic(args...)``
+^^^^^^^^^^^^^^^^^^^^^
+
+*   Example: ``a.periodic(-1, -2) == 7``.
+*   See also: :cpp:func:`xt::xcontainer::periodic`.
+
+Returns a (constant) reference to the element,
+specified by an *array index* given by a number of signed integers.
+Negative and 'overflowing' indices are changed by assuming periodicity along that axis.
+For example, for the first axis: ``-1 -> a.shape(0) - 1 = 2``,
+likewise for example ``3 -> 3 - a.shape(0) = 0``.
+Of course this comes as the cost of some extra complexity.
+
+``in_bounds(args...)``
+^^^^^^^^^^^^^^^^^^^^^^
+
+*   Example: ``a.in_bounds(1, 2) == true``.
+*   See also: :cpp:func:`xt::xcontainer::in_bounds`.
+
+Check if the *array index* is 'in bounds', return ``false`` otherwise.
+
+``operator[]({...})``
+^^^^^^^^^^^^^^^^^^^^^^
+
+*   Example: ``a[{1, 2}] == 6``.
+*   See also: :cpp:func:`xt::xcontainer::operator[]`.
+
+Returns a (constant) reference to the element,
+specified by an *array index* given by a list of unsigned integers.
+
+Operators: flat index
+---------------------
+
+``flat(i)``
+^^^^^^^^^^^
+
+*   Example: ``a.flat(6) == 6``.
+*   See also: :cpp:func:`xt::xcontainer::flat`.
+
+Returns a (constant) reference to the element specified by a *flat index*,
+given an unsigned integer.
+
+.. note::
+
+    If the layout would not have been the default *row major*,
+    but *column major*, then ``a.flat(6) == 2``.
+
+.. note::
+
+    In many cases ``a.flat(i) == a.data()[i]``.
+
 Array indices
 -------------
 
