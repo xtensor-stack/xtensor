@@ -271,6 +271,22 @@ namespace xt
         }
     }
 
+    TEST(xfunction, front)
+    {
+        xfunction_features f;
+        int a = (f.m_a + f.m_a).front();
+        int b = f.m_a.front() + f.m_a.front();
+        EXPECT_EQ(a, b);
+    }
+
+    TEST(xfunction, back)
+    {
+        xfunction_features f;
+        int a = (f.m_a + f.m_a).back();
+        int b = f.m_a.back() + f.m_a.back();
+        EXPECT_EQ(a, b);
+    }
+
     TEST(xfunction, flat)
     {
         xfunction_features f;

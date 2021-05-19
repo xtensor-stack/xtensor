@@ -324,6 +324,18 @@ namespace xt
         EXPECT_EQ(a, b);
     }
 
+    TEST(xarray, front)
+    {
+        xt::xarray<size_t> a = {{1,2,3}, {4,5,6}};
+        EXPECT_EQ(a.front(), 1);
+    }
+
+    TEST(xarray, back)
+    {
+        xt::xarray<size_t> a = {{1,2,3}, {4,5,6}};
+        EXPECT_EQ(a.back(), 6);
+    }
+
     TEST(xarray, flat)
     {
         {
