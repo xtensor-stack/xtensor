@@ -7,6 +7,28 @@
 Changelog
 =========
 
+0.23.10
+-------
+
+- Performance fix: set m_strides_computed = true after computing
+  `#2377 https://github.com/xtensor-stack/xtensor/pull/2377`
+- argsort: catching zeros stride leading axis (bugfix)
+  `#2238 https://github.com/xtensor-stack/xtensor/pull/2238`
+- Adding ``.flat(i)``
+  `#2356 https://github.com/xtensor-stack/xtensor/pull/2356`
+- Fixed ``check_index`` function
+  `#2378 https://github.com/xtensor-stack/xtensor/pull/2378`
+- Fixing & -> && in histogram
+  `#2386 https://github.com/xtensor-stack/xtensor/pull/2386`
+- Adding ``front()`` and ``back()`` convenience methods
+  `#2385 https://github.com/xtensor-stack/xtensor/pull/2385`
+- Adding description of index operators
+  `#2387 https://github.com/xtensor-stack/xtensor/pull/2387`
+- flip: adding overload without axis (mimics NumPy)
+  `#2373 https://github.com/xtensor-stack/xtensor/pull/2373`
+- average: fixing overload issue for axis argument
+  `#2374 https://github.com/xtensor-stack/xtensor/pull/2374`
+
 0.23.9
 ------
 
