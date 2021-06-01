@@ -459,16 +459,11 @@ namespace xt
         size_type dim2 = de2.dimension();
         shape_type shape = uninitialized_shape<shape_type>(dim2);
 
-
         bool trivial_broadcast = de2.broadcast_shape(shape, true);
 
         auto && de1_shape = de1.shape();
-        if (dim2 > de1.dimension() || std::lexicographical_compare(
-            shape.begin(),
-            shape.end(),
-            // we cannot simply call de1_shape.begin()/del1_shape.end() since this can be a pointer
-            std::begin(de1_shape), std::begin(de1_shape) + dim1
-        ))
+        // we cannot simply call de1_shape.begin()/del1_shape.end() since this can be a pointer
+        if (dim2 > de1.dimension() || std::lexicographical_compare(shape.begin(), shape.end(), std::begin(de1_shape), std::begin(de1_shape) + dim1))
         {
             using temporary_type = detail::select_tmp_type_t<E1, typename E1::value_type, typename E1::shape_type>;
             temporary_type tmp(shape);
