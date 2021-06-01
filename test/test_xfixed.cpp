@@ -307,6 +307,7 @@ namespace xt
         xt::xtensor_fixed<int, xt::xshape<2>> a = {2,3};
         xt::noalias(a) += a;
 
+
         EXPECT_EQ(a(0), 4);
         EXPECT_EQ(a(1), 6);
     }
