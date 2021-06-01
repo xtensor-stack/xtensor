@@ -427,7 +427,7 @@ namespace xt
         shape_type shape = uninitialized_shape<shape_type>(dim);
         bool trivial_broadcast = de2.broadcast_shape(shape, true);
 
-        if (dim > de1.dimension() || shape > de1.shape())
+        if (dim > de1.dimension() || std::lexicographical_compare(shape.begin(), shape.end(), de1.shape().begin()))
         {
             typename E1::temporary_type tmp(shape);
             base_type::assign_data(tmp, e2, trivial_broadcast);

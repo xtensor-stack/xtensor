@@ -301,6 +301,15 @@ namespace xt
         using tiny_tensor = xtensor_fixed<double, xshape<2>, layout_type::row_major, false>;
         EXPECT_GT(sizeof(fixed_tensor), sizeof(tiny_tensor)); 
     }
+
+    TEST(xtensor_fixed, different_shapes)
+    {
+        xt::xtensor_fixed<int, xt::xshape<2>> a = {2,3};
+        xt::noalias(a) += a;
+
+        EXPECT_EQ(a(0), 4);
+        EXPECT_EQ(a(1), 6);
+    }
 }
 
 #endif
