@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <type_traits>
 #include <utility>
+#include <functional>
 
 #include <xtl/xcomplex.hpp>
 #include <xtl/xsequence.hpp>
@@ -418,16 +419,20 @@ namespace xt
     inline void xexpression_assigner<Tag>::computed_assign(xexpression<E1>& e1, const xexpression<E2>& e2)
     {
         using shape_type = typename E1::shape_type;
+        using comperator_type = std::greater<typename shape_type::value_type>;
+
         using size_type = typename E1::size_type;
 
         E1& de1 = e1.derived_cast();
         const E2& de2 = e2.derived_cast();
 
-        size_type dim = de2.dimension();
-        shape_type shape = uninitialized_shape<shape_type>(dim);
+        size_type dim2 = de2.dimension();
+        shape_type shape = uninitialized_shape<shape_type>(dim2);
+
         bool trivial_broadcast = de2.broadcast_shape(shape, true);
 
-        if (dim > de1.dimension() || shape > de1.shape())
+        auto && de1_shape = de1.shape();
+        if (dim2 > de1.dimension() || std::lexicographical_compare(shape.begin(), shape.end(), de1_shape.begin(), de1_shape.end(), comperator_type()))
         {
             typename E1::temporary_type tmp(shape);
             base_type::assign_data(tmp, e2, trivial_broadcast);
