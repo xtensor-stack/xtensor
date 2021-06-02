@@ -202,6 +202,7 @@ set(XTENSOR_TESTS
     main.cpp
     test_xaccumulator.cpp
     test_xadapt.cpp
+    test_xassign.cpp
     test_xaxis_iterator.cpp
     test_xaxis_slice_iterator.cpp
     test_xbuffer_adaptor.cpp

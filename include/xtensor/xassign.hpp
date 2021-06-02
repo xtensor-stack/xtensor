@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <type_traits>
 #include <utility>
+#include <functional>
 
 #include <xtl/xcomplex.hpp>
 #include <xtl/xsequence.hpp>
@@ -413,60 +414,27 @@ namespace xt
         base_type::assign_data(e1, e2, trivial_broadcast);
     }
 
-    namespace detail
-    {
-
-        template<class SHAPE>
-        struct select_shape{
-            using type = SHAPE;
-        };
-
-        template<std::size_t ... X>
-        struct select_shape<xt::fixed_shape< X ...>>{
-            using type =  std::array<std::size_t, sizeof ... (X)>;
-        };
-
-        template<class SHAPE>
-        using select_shape_t = typename select_shape<SHAPE>::type;
-
-
-        template<class EXP, class T, class SHAPE>
-        struct select_tmp_type{
-            using type = typename EXP::temporary_type;
-        };
-
-        template<class EXP, class T, std::size_t ... X>
-        struct select_tmp_type<EXP, T,xt::fixed_shape< X ...>>{
-            using type =  xt::xtensor<T, sizeof ... (X)>;
-        };
-
-        template<class EXP, class T, class SHAPE>
-        using select_tmp_type_t = typename select_tmp_type<EXP,T, SHAPE>::type;
-
-    };
-
     template <class Tag>
     template <class E1, class E2>
     inline void xexpression_assigner<Tag>::computed_assign(xexpression<E1>& e1, const xexpression<E2>& e2)
     {
-        using shape_type = detail::select_shape_t< std::decay_t<typename E1::shape_type>>;
+        using shape_type = typename E1::shape_type;
+        using comperator_type = std::greater<typename shape_type::value_type>;
+
         using size_type = typename E1::size_type;
 
         E1& de1 = e1.derived_cast();
         const E2& de2 = e2.derived_cast();
 
-        size_type dim1 = de1.dimension();
         size_type dim2 = de2.dimension();
         shape_type shape = uninitialized_shape<shape_type>(dim2);
 
         bool trivial_broadcast = de2.broadcast_shape(shape, true);
 
         auto && de1_shape = de1.shape();
-        // we cannot simply call de1_shape.begin()/del1_shape.end() since this can be a pointer
-        if (dim2 > de1.dimension() || std::lexicographical_compare(shape.begin(), shape.end(), std::begin(de1_shape), std::begin(de1_shape) + dim1))
+        if (dim2 > de1.dimension() || std::lexicographical_compare(shape.begin(), shape.end(), de1_shape.begin(), de1_shape.end(), comperator_type()))
         {
-            using temporary_type = detail::select_tmp_type_t<E1, typename E1::value_type, typename E1::shape_type>;
-            temporary_type tmp(shape);
+            typename E1::temporary_type tmp(shape);
             base_type::assign_data(tmp, e2, trivial_broadcast);
             de1.assign_temporary(std::move(tmp));
         }
