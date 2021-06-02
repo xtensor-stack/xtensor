@@ -26,16 +26,14 @@ class my_vector
 private:
     using vector_type = std::vector<T>;
 public:
-    my_vector(){}
     using value_type = T;
     using size_type = typename vector_type::size_type;
     template<class U>
     my_vector(std::initializer_list<U> vals)
     : m_data(vals.begin(), vals.end())
     {
-
     }
-    my_vector(const std::size_t size, const T & val = T())
+    my_vector(const std::size_t size = 0, const T & val = T())
     : m_data(size, val)
     {
     }
