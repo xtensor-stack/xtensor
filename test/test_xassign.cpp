@@ -7,16 +7,38 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
+
+
+#if defined(_MSC_VER) && !defined(__clang__)
+#define VS_SKIP_XFIXED 1
+#endif
+
+
 #include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xtensor.hpp"
-
+#ifndef VS_SKIP_XFIXED
+#include "xtensor/xfixed.hpp"
+#endif
 #include "xtensor/xassign.hpp"
 #include "xtensor/xnoalias.hpp"
 #include "test_common.hpp"
 
 #include <type_traits>
 #include <vector>
+
+
+
+// On VS2015, when compiling in x86 mode, alignas(T) leads to C2718
+// when used for a function parameter, even indirectly. This means that
+// we cannot pass parameters whose class is declared with alignas specifier
+// or any type wrapping or inheriting from such a type.
+// The xtensor_fixed class internally uses aligned_array which is declared as
+// alignas(something_different_from_0), hence the workaround.
+#if _MSC_VER < 1910 && !_WIN64
+#define VS_X86_WORKAROUND 1
+#endif
+
 
 
 // a dummy shape *not derived* from std::vector but compatible
@@ -143,6 +165,122 @@ namespace xt
             EXPECT_EQ(a.shape(0), 2);
             EXPECT_EQ(a.shape(1), 3);
         }
-
     }
+
+    // test_fixed removed from MSVC x86 because of recurring ICE.
+    // Will be enabled again when the compiler is fixed
+
+    #ifndef VS_SKIP_XFIXED
+    #if (_MSC_VER < 1910 && _WIN64) || (_MSC_VER >= 1910 && !defined(DISABLE_VS2017)) || !defined(_MSC_VER)
+
+
+    TEST(xassign, fixed_shape)
+    {
+        // matching shape 1D
+        {
+            xt::xtensor_fixed<int, xt::xshape<2>> a = {2,3};
+            xt::xtensor_fixed<int, xt::xshape<2>> b = {3,4};
+
+            xt::noalias(a) += b;
+
+            EXPECT_EQ(a(0), 5);
+            EXPECT_EQ(a(1), 7);
+        }
+        //matching shape 2D
+        {
+            xt::xtensor_fixed<int, xt::xshape<2,2>> aa = {{1,2},{3,4}};
+            xt::xtensor_fixed<int, xt::xshape<2,2>> a(aa);
+            xt::xtensor_fixed<int, xt::xshape<2,2>> b = {{3,4},{5,6}};
+            xt::noalias(a) += b;
+
+            EXPECT_EQ(a(0,0),  aa(0,0) + b(0,0));
+            EXPECT_EQ(a(0,1),  aa(0,1) + b(0,1));
+            EXPECT_EQ(a(1,0),  aa(1,0) + b(1,0));
+            EXPECT_EQ(a(1,1),  aa(1,1) + b(1,1));
+        }
+        // b is broadcasted with matching dimension (first axis is singleton)
+        {
+            xt::xtensor_fixed<int, xt::xshape<2,2>> aa = {{1,2},{3,4}};
+            xt::xtensor_fixed<int, xt::xshape<2,2>> a(aa);
+            xt::xarray<int> b = {{5,6}};
+            EXPECT_EQ(b.shape(0),1);
+            EXPECT_EQ(b.shape(1),2);
+            xt::noalias(a) += b;
+
+            EXPECT_EQ(a(0,0),  aa(0,0) + b(0,0));
+            EXPECT_EQ(a(0,1),  aa(0,1) + b(0,1));
+            EXPECT_EQ(a(1,0),  aa(1,0) + b(0,0));
+            EXPECT_EQ(a(1,1),  aa(1,1) + b(0,1));
+        }
+        // b is broadcasted with matching dimension (second axis is singleton)
+        {
+            xt::xtensor_fixed<int, xt::xshape<2,2>> aa = {{1,2},{3,4}};
+            xt::xtensor_fixed<int, xt::xshape<2,2>> a(aa);
+            xt::xtensor_fixed<int, xt::xshape<2,1>> b = {{5},{6}};
+            EXPECT_EQ(b.shape(0),2);
+            EXPECT_EQ(b.shape(1),1);
+            xt::noalias(a) += b;
+
+            EXPECT_EQ(a(0,0),  aa(0,0) + b.at(0,0));
+            EXPECT_EQ(a(0,1),  aa(0,1) + b.at(0,0));
+            EXPECT_EQ(a(1,0),  aa(1,0) + b.at(1,0));
+            EXPECT_EQ(a(1,1),  aa(1,1) + b.at(1,0));
+        }
+        // b is broadcasted with matching dimension (first axis is singleton)
+        {
+            xt::xtensor_fixed<int, xt::xshape<2,2>> aa = {{1,2},{3,4}};
+            xt::xtensor_fixed<int, xt::xshape<2,2>> a(aa);
+            xt::xtensor_fixed<int, xt::xshape<1,2>> b = {{3,4}};
+            EXPECT_EQ(b.shape(0),1);
+            EXPECT_EQ(b.shape(1),2);
+            xt::noalias(a) += b;
+
+            EXPECT_EQ(a(0,0),  aa(0,0) + b(0,0));
+            EXPECT_EQ(a(0,1),  aa(0,1) + b(0,1));
+            EXPECT_EQ(a(1,0),  aa(1,0) + b(0,0));
+            EXPECT_EQ(a(1,1),  aa(1,1) + b(0,1));
+        }
+        // broadcast with non matching dimensions
+        {
+            xt::xtensor_fixed<int, xt::xshape<2,2>> aa = {{1,2},{3,4}};
+            xt::xtensor_fixed<int, xt::xshape<2,2>> a(aa);
+            xt::xtensor_fixed<int, xt::xshape<2>> b = {3,4};
+
+            xt::noalias(a) += b;
+
+            EXPECT_EQ(a(0,0),  aa(0,0) + b(0));
+            EXPECT_EQ(a(0,1),  aa(0,1) + b(1));
+            EXPECT_EQ(a(1,0),  aa(1,0) + b(0));
+            EXPECT_EQ(a(1,1),  aa(1,1) + b(1));
+        }
+    }
+    TEST(xassign, fixed_raises)
+    {
+        // cannot broadcast a  itself on assignment
+        {
+            xt::xtensor_fixed<int, xt::xshape<2>> a = {2,3};
+            xt::xtensor_fixed<int, xt::xshape<2,2>> b = {{3,4},{3,4}};
+
+            EXPECT_THROW(xt::noalias(a) += b, xt::broadcast_error);
+        }
+
+        // cannot broadcast a  itself on assignment
+        {
+            xt::xtensor_fixed<int, xt::xshape<1,2>> a = {{3,4}};
+            xt::xtensor_fixed<int, xt::xshape<2,2>> b = {{3,4},{3,4}};
+
+            EXPECT_THROW(xt::noalias(a) += b, xt::broadcast_error);
+        }
+
+        // cannot broadcast a  itself on assignment
+        {
+            xt::xtensor_fixed<int, xt::xshape<2,1>> a = {{3},{4}};
+            xt::xtensor_fixed<int, xt::xshape<2,2>> b = {{3,4},{3,4}};
+
+            EXPECT_THROW(xt::noalias(a) += b, xt::broadcast_error);
+        }
+    }
+    #endif
+    #endif // VS_SKIP_XFIXED
+
 }

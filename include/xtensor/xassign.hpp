@@ -74,6 +74,30 @@ namespace xt
         static void assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial);
     };
 
+    namespace detail{
+
+        template<class S>
+        struct is_fixed_shape : public std::false_type
+        {
+        };
+
+        template<std::size_t ... X>
+        struct is_fixed_shape<xt::fixed_shape< X ...>> : public std::true_type
+        {
+        };
+
+        template<class E>
+        using has_fixed_shape = is_fixed_shape<typename E::shape_type>;
+
+        template<class E>
+        using enable_if_has_fixed_shape_t = std::enable_if_t<has_fixed_shape<E>::value>;
+
+        template<class E>
+        using enable_if_has_no_fixed_shape_t = std::enable_if_t<!has_fixed_shape<E>::value>;
+
+    }
+
+
     template <class Tag>
     class xexpression_assigner : public xexpression_assigner_base<Tag>
     {
@@ -84,7 +108,12 @@ namespace xt
         template <class E1, class E2>
         static void assign_xexpression(E1& e1, const E2& e2);
 
-        template <class E1, class E2>
+
+
+        template <class E1, class E2, typename detail::enable_if_has_no_fixed_shape_t<E1> * = nullptr>
+        static void computed_assign(xexpression<E1>& e1, const xexpression<E2>& e2);
+
+        template <class E1, class E2, typename detail::enable_if_has_fixed_shape_t<E1> * = nullptr>
         static void computed_assign(xexpression<E1>& e1, const xexpression<E2>& e2);
 
         template <class E1, class E2, class F>
@@ -415,7 +444,7 @@ namespace xt
     }
 
     template <class Tag>
-    template <class E1, class E2>
+    template <class E1, class E2, typename detail::enable_if_has_no_fixed_shape_t<E1> *>
     inline void xexpression_assigner<Tag>::computed_assign(xexpression<E1>& e1, const xexpression<E2>& e2)
     {
         using shape_type = typename E1::shape_type;
@@ -441,6 +470,39 @@ namespace xt
         else
         {
             base_type::assign_data(e1, e2, trivial_broadcast);
+        }
+    }
+
+
+    template <class Tag>
+    template <class E1, class E2, typename detail::enable_if_has_fixed_shape_t<E1> *>
+    inline void xexpression_assigner<Tag>::computed_assign(xexpression<E1>& e1, const xexpression<E2>& e2)
+    {
+        using shape_type = typename E1::shape_type;
+
+        E1& de1 = e1.derived_cast();
+        const E2& de2 = e2.derived_cast();
+
+        if(de1.dimension() != de2.dimension())
+        {
+            // not sure if best error
+            throw_broadcast_error(de1.shape(), de2.shape());
+        }
+        else
+        {
+            auto && shape1 = de1.shape();
+            auto && shape2 = de2.shape();
+            if(std::equal(shape1.begin(), shape1.end(), shape2.begin()))
+            {
+                // the tests fail if  just set it to true for the case
+                // when creating e2 itself involved broadcasting
+                base_type::assign_data(e1, e2, false/*trivial_broadcast*/);
+            }
+            else
+            {
+                // not sure if best error
+                throw_broadcast_error(de1.shape(), de2.shape());
+            }
         }
     }
 
