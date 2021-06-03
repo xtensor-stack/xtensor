@@ -174,7 +174,21 @@ namespace xt
         {
             xt::xtensor_fixed<int, xt::xshape<2,2>> aa = {{1,2},{3,4}};
             xt::xtensor_fixed<int, xt::xshape<2,2>> a(aa);
-            xt::xtensor_fixed<int, xt::xshape<2,1>> b = {{5,6}};
+            xt::xarray<int> b = {{5,6}};
+            EXPECT_EQ(b.shape(0),1);
+            EXPECT_EQ(b.shape(1),2);
+            xt::noalias(a) += b;
+
+            EXPECT_EQ(a(0,0),  aa(0,0) + b(0,0));
+            EXPECT_EQ(a(0,1),  aa(0,1) + b(0,1));
+            EXPECT_EQ(a(1,0),  aa(1,0) + b(0,0));
+            EXPECT_EQ(a(1,1),  aa(1,1) + b(0,1));
+        }
+        // b is broadcasted with matching dimension (second axis is singleton)
+        {
+            xt::xtensor_fixed<int, xt::xshape<2,2>> aa = {{1,2},{3,4}};
+            xt::xtensor_fixed<int, xt::xshape<2,2>> a(aa);
+            xt::xtensor_fixed<int, xt::xshape<2,1>> b = {{5},{6}};
             EXPECT_EQ(b.shape(0),2);
             EXPECT_EQ(b.shape(1),1);
             xt::noalias(a) += b;
@@ -184,7 +198,7 @@ namespace xt
             EXPECT_EQ(a(1,0),  aa(1,0) + b.at(1,0));
             EXPECT_EQ(a(1,1),  aa(1,1) + b.at(1,0));
         }
-        // b is broadcasted with matching dimension (second axis is singleton)
+        // b is broadcasted with matching dimension (first axis is singleton)
         {
             xt::xtensor_fixed<int, xt::xshape<2,2>> aa = {{1,2},{3,4}};
             xt::xtensor_fixed<int, xt::xshape<2,2>> a(aa);

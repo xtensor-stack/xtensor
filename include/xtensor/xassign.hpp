@@ -494,7 +494,7 @@ namespace xt
             auto && shape2 = de2.shape();
             if(std::equal(shape1.begin(), shape1.end(), shape2.begin()))
             {
-                // the tests fail if I just set it to true for the case
+                // the tests fail if  just set it to true for the case
                 // when creating e2 itself involved broadcasting
                 base_type::assign_data(e1, e2, false/*trivial_broadcast*/);
             }
