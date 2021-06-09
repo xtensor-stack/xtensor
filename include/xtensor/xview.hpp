@@ -1571,9 +1571,13 @@ namespace xt
     template <class Arg, class... Args>
     inline auto xview<CT, S...>::access(Arg arg, Args... args) -> reference
     {
-        if (sizeof...(Args) >= this->dimension())
+        constexpr size_t dim = sizeof...(S) - integral_count<S...>();
+        if constexpr (sizeof...(Args) >= dim)
         {
-            return access(args...);
+            if (sizeof...(Args) >= this->dimension())
+            {
+                return access(args...);
+            }
         }
         return access_impl(make_index_sequence(arg, args...), arg, args...);
     }
