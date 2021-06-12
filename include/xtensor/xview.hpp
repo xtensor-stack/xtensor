@@ -1583,6 +1583,7 @@ namespace xt
         return access_impl(make_index_sequence(arg, args...), arg, args...); // make_index_sequence produces {0,1} for args={}?
                                                                              // while the assert in argument requires the indices to
                                                                              // be less than sizeof...(Args) - to select an argument?
+                                                                             // (in test_xview/regression_2395_access_compiler_problem)
     }
 
     template <class CT, class... S>
