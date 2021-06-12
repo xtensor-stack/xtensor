@@ -1571,15 +1571,13 @@ namespace xt
     template <class Arg, class... Args>
     inline auto xview<CT, S...>::access(Arg arg, Args... args) -> reference
     {
-        constexpr size_t dim = sizeof...(S) - integral_count<S...>();
-        if constexpr (sizeof...(Args) >= dim)
+        if (sizeof...(Args) >= this->dimension())
         {
-            if (sizeof...(Args) >= this->dimension())
-            {
-                return access(args...);
-            }
+            return access(args...);
         }
-        return access_impl(make_index_sequence(arg, args...), arg, args...);
+        return access_impl(make_index_sequence(arg, args...), arg, args...); // make_index_sequence produces {0,1} for args={}?
+                                                                             // while the assert in argument requires the indices to
+                                                                             // be less than sizeof...(Args) - to select an argument?
     }
 
     template <class CT, class... S>
