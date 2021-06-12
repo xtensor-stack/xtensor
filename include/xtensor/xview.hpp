@@ -1573,7 +1573,12 @@ namespace xt
     {
         if (sizeof...(Args) >= this->dimension())
         {
-            return access(args...);
+            return access(args...);                                          // this line (not called in our case depicted in 
+                                                                             // test_xview/regression_2395_access_compiler_problem)
+                                                                             // causes a problem while beeing instantiated.
+                                                                             // (using a compile-time-if, a workaround can be
+                                                                             // created to prevent instantiation, which makes the
+                                                                             // unittest compile and pass)
         }
         return access_impl(make_index_sequence(arg, args...), arg, args...); // make_index_sequence produces {0,1} for args={}?
                                                                              // while the assert in argument requires the indices to
