@@ -1664,7 +1664,7 @@ namespace xt
         else {
             // moved the static_assert from xutils.hpp here (using a C++17 compile time decision):
             // produces a runtime error if the code is really called.
-            XTENSOR_THROW(std::runtime_erroxr, "I should be lesser than sizeof...(Args)");
+            XTENSOR_THROW(std::runtime_error, "I should be lesser than sizeof...(Args)");
         }
     }
 
