@@ -1514,8 +1514,8 @@ namespace xt
     template <class... Args>
     inline auto xview<CT, S...>::make_index_sequence(Args...) const noexcept
     {
-        return std::make_index_sequence<(sizeof...(Args)+integral_count<S...>() > newaxis_count<S...>() ?
-                                         sizeof...(Args)+integral_count<S...>() - newaxis_count<S...>() :
+        return std::make_index_sequence<(sizeof...(Args)+integral_count<S...>() > newaxis_count<S...>() ? // here, "integral_count" and "newaxis_count"
+                                         sizeof...(Args)+integral_count<S...>() - newaxis_count<S...>() : // are taken into account (**label1**, see **label2** in xutils.hpp)
                                          0)>();
     }
 
