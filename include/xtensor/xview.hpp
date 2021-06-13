@@ -1658,7 +1658,14 @@ namespace xt
     inline auto xview<CT, S...>::sliced_access(const xslice<T>& slice, Arg arg, Args... args) const -> size_type
     {
         using ST = typename T::size_type;
-        return static_cast<size_type>(slice.derived_cast()(argument<I>(static_cast<ST>(arg), static_cast<ST>(args)...)));
+        if constexpr (I < sizeof...(Args)+1) {
+            return static_cast<size_type>(slice.derived_cast()(argument<I>(static_cast<ST>(arg), static_cast<ST>(args)...)));
+        }
+        else {
+            // moved the static_assert from xutils.hpp here (using a C++17 compile time decision):
+            // produces a runtime error if the code is really called.
+            XTENSOR_THROW(std::runtime_erroxr, "I should be lesser than sizeof...(Args)");
+        }
     }
 
     template <class CT, class... S>
