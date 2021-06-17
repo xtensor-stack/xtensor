@@ -261,8 +261,8 @@ namespace xt
     template <std::size_t I, class... Args>
     constexpr decltype(auto) argument(Args&&... args) noexcept
     {
-        static_assert(I < sizeof...(Args), "I should be lesser than sizeof...(Args)"); // here I must be within [0,sizeof(Args)..)
-        return detail::getter<I>::get(std::forward<Args>(args)...);                    // (**label2**, see **label1** in xview.hpp)
+        static_assert(I < sizeof...(Args), "I should be lesser than sizeof...(Args)");
+        return detail::getter<I>::get(std::forward<Args>(args)...);
     }
 
     /************************
