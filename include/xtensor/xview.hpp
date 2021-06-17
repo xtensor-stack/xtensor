@@ -1650,7 +1650,7 @@ namespace xt
 
     template <class CT, class... S>
     template <typename std::decay_t<CT>::size_type I, class T, class Arg, class... Args>
-    inline auto xview<CT, S...>::sliced_access(const xslice<T>& slice, Arg arg, Args... args) const -> std::enable_if_t<I < sizeof...(Args)+1, size_type>
+    inline auto xview<CT, S...>::sliced_access(const xslice<T>& slice, Arg arg, Args... args) const -> std::enable_if_t<(I < sizeof...(Args)+1), size_type>
     {
         using ST = typename T::size_type;
         return static_cast<size_type>(slice.derived_cast()(argument<I>(static_cast<ST>(arg), static_cast<ST>(args)...)));
@@ -1658,7 +1658,7 @@ namespace xt
 
     template <class CT, class... S>
     template <typename std::decay_t<CT>::size_type I, class T, class Arg, class... Args>
-    inline auto xview<CT, S...>::sliced_access(const xslice<T>&, Arg, Args...) const -> std::enable_if_t<I >= sizeof...(Args)+1, size_type>
+    inline auto xview<CT, S...>::sliced_access(const xslice<T>&, Arg, Args...) const -> std::enable_if_t<(I >= sizeof...(Args)+1), size_type>
     {
         XTENSOR_THROW(std::runtime_error, "I should be lesser than sizeof...(Args)");
     }
