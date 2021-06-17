@@ -718,10 +718,10 @@ namespace xt
         size_type sliced_access(const xslice<T>& slice) const;
 
         template <typename std::decay_t<CT>::size_type I, class T, class Arg, class... Args>
-        auto sliced_access(const xslice<T>& slice, Arg arg, Args... args) const -> std::enable_if_t<I < sizeof...(Args)+1, size_type>;
+        auto sliced_access(const xslice<T>& slice, Arg arg, Args... args) const -> std::enable_if_t<(I < sizeof...(Args)+1), size_type>;
 
         template <typename std::decay_t<CT>::size_type I, class T, class Arg, class... Args>
-        auto sliced_access(const xslice<T>& slice, Arg arg, Args... args) const -> std::enable_if_t<I >= sizeof...(Args)+1, size_type>;
+        auto sliced_access(const xslice<T>& slice, Arg arg, Args... args) const -> std::enable_if_t<(I >= sizeof...(Args)+1), size_type>;
 
         template <typename std::decay_t<CT>::size_type I, class T, class... Args>
         disable_xslice<T, size_type> sliced_access(const T& squeeze, Args...) const;
