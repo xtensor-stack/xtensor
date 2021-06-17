@@ -1735,4 +1735,26 @@ namespace xt
     //    xt::row(tensor, 0);
     //    xt::col(tensor, 0);
     //}
+
+    TEST(xview, regression_2395_access_compiler_problem)
+    {
+        // just checking it compiles...
+        xt::xarray<float> a4d = xt::zeros<float>({10, 10, 10, 10});
+        auto a4 = xt::view(a4d, xt::all(), xt::all(), 2, xt::all());
+        a4(0, 0, 0) = 0.5;
+
+        // similar test with some content checks...
+        xt::xarray<int> a3d = xt::zeros<int>({10, 10, 10});
+        auto a0 = xt::view(a3d, 0, xt::all(), xt::all());
+        auto a1 = xt::view(a3d, xt::all(), 1, xt::all());
+        auto a2 = xt::view(a3d, xt::all(), xt::all(), 2);
+        a0(0, 0) = 1; // ok
+        a1(0, 0) = 2; // ok
+        a2(0, 0) = 3; // produced "static_assert(I < sizeof...(Args), "I should be lesser than sizeof...(Args)");"
+
+        EXPECT_EQ(a3d(0, 0, 0), 1);
+        EXPECT_EQ(a3d(0, 1, 0), 2);
+        EXPECT_EQ(a3d(0, 0, 2), 3);
+    }
+
 }
