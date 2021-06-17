@@ -718,7 +718,10 @@ namespace xt
         size_type sliced_access(const xslice<T>& slice) const;
 
         template <typename std::decay_t<CT>::size_type I, class T, class Arg, class... Args>
-        size_type sliced_access(const xslice<T>& slice, Arg arg, Args... args) const;
+        auto sliced_access(const xslice<T>& slice, Arg arg, Args... args) const -> std::enable_if_t<I < sizeof...(Args)+1, size_type>;
+
+        template <typename std::decay_t<CT>::size_type I, class T, class Arg, class... Args>
+        auto sliced_access(const xslice<T>& slice, Arg arg, Args... args) const -> std::enable_if_t<I >= sizeof...(Args)+1, size_type>;
 
         template <typename std::decay_t<CT>::size_type I, class T, class... Args>
         disable_xslice<T, size_type> sliced_access(const T& squeeze, Args...) const;
@@ -1655,17 +1658,17 @@ namespace xt
 
     template <class CT, class... S>
     template <typename std::decay_t<CT>::size_type I, class T, class Arg, class... Args>
-    inline auto xview<CT, S...>::sliced_access(const xslice<T>& slice, Arg arg, Args... args) const -> size_type
+    inline auto xview<CT, S...>::sliced_access(const xslice<T>& slice, Arg arg, Args... args) const -> std::enable_if_t<I < sizeof...(Args)+1, size_type>
     {
         using ST = typename T::size_type;
-        if constexpr (I < sizeof...(Args)+1) {
-            return static_cast<size_type>(slice.derived_cast()(argument<I>(static_cast<ST>(arg), static_cast<ST>(args)...)));
-        }
-        else {
-            // moved the static_assert from xutils.hpp here (using a C++17 compile time decision):
-            // produces a runtime error if the code is really called.
-            XTENSOR_THROW(std::runtime_error, "I should be lesser than sizeof...(Args)");
-        }
+        return static_cast<size_type>(slice.derived_cast()(argument<I>(static_cast<ST>(arg), static_cast<ST>(args)...)));
+    }
+
+    template <class CT, class... S>
+    template <typename std::decay_t<CT>::size_type I, class T, class Arg, class... Args>
+    inline auto xview<CT, S...>::sliced_access(const xslice<T>&, Arg, Args...) const -> std::enable_if_t<I >= sizeof...(Args)+1, size_type>
+    {
+        XTENSOR_THROW(std::runtime_error, "I should be lesser than sizeof...(Args)");
     }
 
     template <class CT, class... S>
