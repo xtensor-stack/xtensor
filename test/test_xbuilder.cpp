@@ -11,8 +11,7 @@
 #define VS_SKIP_CONCATENATE_FIXED 1
 #endif
 
-#include "gtest/gtest.h"
-#include "test_common_macros.hpp"
+#include "test_common.hpp"
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xtensor.hpp"

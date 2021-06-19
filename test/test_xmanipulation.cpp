@@ -7,7 +7,7 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#include "gtest/gtest.h"
+#include "test_common_macros.hpp"
 #include "test_common_macros.hpp"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xtensor.hpp"

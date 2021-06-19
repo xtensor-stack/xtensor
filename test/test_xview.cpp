@@ -9,7 +9,7 @@
 
 #include <algorithm>
 
-#include "gtest/gtest.h"
+#include "test_common_macros.hpp"
 #include "test_common_macros.hpp"
 
 // Workaround to avoid warnings regarding initialization
@@ -1727,12 +1727,4 @@ namespace xt
             std::invalid_argument
         );
     }
-
-    // This code should not compile!
-    //TEST(xview, col_on_3dim_xtensor)
-    //{
-    //    xt::xtensor<int, 3> tensor;
-    //    xt::row(tensor, 0);
-    //    xt::col(tensor, 0);
-    //}
 }

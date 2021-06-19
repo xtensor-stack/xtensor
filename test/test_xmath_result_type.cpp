@@ -9,7 +9,7 @@
 
 #include <complex>
 
-#include "gtest/gtest.h"
+#include "test_common_macros.hpp"
 
 // The following disables the conversion warnings. These warnings
 // are legit and we don't want to avoid them with specific cast

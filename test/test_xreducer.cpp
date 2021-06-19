@@ -7,7 +7,7 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#include "gtest/gtest.h"
+#include "test_common_macros.hpp"
 #include "test_common_macros.hpp"
 #if (defined(__GNUC__) && !defined(__clang__))
 #pragma GCC diagnostic push
@@ -1019,13 +1019,24 @@ namespace xt
 
     TEST(xreducer, empty_axes)
     {
-        xarray<int> a = { {1, 2, 3}, {4, 5, 6} };
-        std::vector<std::size_t> axes = {};
-        auto res0 = xt::sum(a, axes);
-        auto res1 = xt::sum(a, axes, xt::keep_dims | xt::evaluation_strategy::immediate);
+        {
+            xarray<int> a = { {1, 2, 3}, {4, 5, 6} };
+            std::vector<std::size_t> axes = {};
+            auto res0 = xt::sum(a, axes);
+            auto res1 = xt::sum(a, axes, xt::keep_dims | xt::evaluation_strategy::immediate);
 
-        EXPECT_EQ(res0, a);
-        EXPECT_EQ(res1, a);
+            EXPECT_EQ(res0, a);
+            EXPECT_EQ(res1, a);
+        }
+        {
+            xarray<int> a = { {1, 2, 3}, {4, 5, 6} };
+            std::vector<std::size_t> axes = {};
+            auto res0 = xt::sum(a, axes);
+            auto res1 = xt::sum(a, axes, xt::keep_dims | xt::evaluation_strategy::immediate);
+
+            EXPECT_EQ(res0, a);
+            EXPECT_EQ(res1, a);
+        }
     }
 
     TEST(xreducer, zero_shape)

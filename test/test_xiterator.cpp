@@ -7,7 +7,7 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#include "gtest/gtest.h"
+#include "test_common_macros.hpp"
 
 #include "xtensor/xarray.hpp"
 #include "xtensor/xtensor.hpp"
@@ -23,10 +23,6 @@ namespace xt
 
         using result_type = R;
     };
-
-    using testing_types = ::testing::Types<row_major_result<>, column_major_result<>,
-        central_major_result<>, unit_shape_result<>>;
-    TYPED_TEST_SUITE(xiterator_test, testing_types);
 
     using std::size_t;
 
@@ -54,38 +50,8 @@ namespace xt
             iter2++;
         }
 
-        EXPECT_EQ(*iter, expected) << "preincrement operator doesn't give expected result";
-        EXPECT_EQ(*iter2, expected) << "postincrement operator doesn't give expected result";
-    }
-
-    TYPED_TEST(xiterator_test, increment)
-    {
-        typename TestFixture::result_type rm;
-        {
-            SCOPED_TRACE("same shape - row_major iterator");
-            test_increment<layout_type::row_major>(rm, rm.shape());
-        }
-
-        {
-            SCOPED_TRACE("broadcasting shape - row_major iterator");
-            layout_result<>::shape_type sh = rm.shape();
-            sh.insert(sh.begin(), 2);
-            sh.insert(sh.begin(), 4);
-            test_increment<layout_type::row_major>(rm, rm.shape());
-        }
-
-        {
-            SCOPED_TRACE("same shape - column_major iterator");
-            test_increment<layout_type::column_major>(rm, rm.shape());
-        }
-
-        {
-            SCOPED_TRACE("broadcasting shape - column_major iterator");
-            layout_result<>::shape_type sh = rm.shape();
-            sh.insert(sh.begin(), 2);
-            sh.insert(sh.begin(), 4);
-            test_increment<layout_type::column_major>(rm, rm.shape());
-        }
+        CHECK_MESSAGE(*iter==expected, "preincrement operator doesn't give expected result");
+        CHECK_MESSAGE(*iter2==expected, "postincrement operator doesn't give expected result");
     }
 
     template <layout_type L, class R, class S>
@@ -110,39 +76,12 @@ namespace xt
         iter += nb_inc;
         auto iter3 = iter2 + nb_inc;
 
-        EXPECT_EQ(*iter, expected) << "preincrement operator doesn't give expected result";
-        EXPECT_EQ(*iter3, expected) << "postincrement operator doesn't give expected result";
-        EXPECT_EQ(iter2[nb_inc], expected) << "postincrement operator doesn't give expected result";
-    }
 
-    TYPED_TEST(xiterator_test, random_increment)
-    {
-        typename TestFixture::result_type rm;
-        {
-            SCOPED_TRACE("same shape - row_major iterator");
-            test_random_increment<layout_type::row_major>(rm, rm.shape());
-        }
 
-        {
-            SCOPED_TRACE("broadcasting shape - row_major iterator");
-            layout_result<>::shape_type sh = rm.shape();
-            sh.insert(sh.begin(), 2);
-            sh.insert(sh.begin(), 4);
-            test_random_increment<layout_type::row_major>(rm, rm.shape());
-        }
+        CHECK_MESSAGE(*iter==expected,  "preincrement operator doesn't give expected result");
+        CHECK_MESSAGE(*iter3==expected,  "postincrement operator doesn't give expected result");
+        CHECK_MESSAGE(iter2[nb_inc]==expected,  "postincrement operator doesn't give expected result");
 
-        {
-            SCOPED_TRACE("same shape - column_major iterator");
-            test_random_increment<layout_type::column_major>(rm, rm.shape());
-        }
-
-        {
-            SCOPED_TRACE("broadcasting shape - column_major iterator");
-            layout_result<>::shape_type sh = rm.shape();
-            sh.insert(sh.begin(), 2);
-            sh.insert(sh.begin(), 4);
-            test_random_increment<layout_type::column_major>(rm, rm.shape());
-        }
     }
 
     template <layout_type L, class R, class S>
@@ -161,38 +100,8 @@ namespace xt
             ++iter;
         }
 
-        EXPECT_EQ(iter, last) << "iterator doesn't reach the end";
+        CHECK_MESSAGE(iter==last, "iterator doesn't reach the end");
         EXPECT_FALSE(iter < last);
-    }
-
-    TYPED_TEST(xiterator_test, end)
-    {
-        typename TestFixture::result_type rm;
-        {
-            SCOPED_TRACE("same shape - row_major iterator");
-            test_end<layout_type::row_major>(rm, rm.shape());
-        }
-
-        {
-            SCOPED_TRACE("broadcasting shape - row_major iterator");
-            layout_result<>::shape_type sh = rm.shape();
-            sh.insert(sh.begin(), 2);
-            sh.insert(sh.begin(), 4);
-            test_end<layout_type::row_major>(rm, sh);
-        }
-
-        {
-            SCOPED_TRACE("same shape - column_major iterator");
-            test_end<layout_type::column_major>(rm, rm.shape());
-        }
-
-        {
-            SCOPED_TRACE("broadcasting shape - column_major iterator");
-            layout_result<>::shape_type sh = rm.shape();
-            sh.insert(sh.begin(), 2);
-            sh.insert(sh.begin(), 4);
-            test_end<layout_type::column_major>(rm, sh);
-        }
     }
 
     template <layout_type L, class R, class S>
@@ -218,38 +127,8 @@ namespace xt
             ++iter;
             iter2++;
         }
-        EXPECT_EQ(*iter, expected) << "predecrement operator doesn't give expected result";
-        EXPECT_EQ(*iter2, expected) << "postdecrement operator doesn't give expected result";
-    }
-
-    TYPED_TEST(xiterator_test, decrement)
-    {
-        typename TestFixture::result_type rm;
-        {
-            SCOPED_TRACE("same shape - row_major iterator");
-            test_decrement<layout_type::row_major>(rm, rm.shape());
-        }
-
-        {
-            SCOPED_TRACE("broadcasting shape - row_major iterator");
-            layout_result<>::shape_type sh = rm.shape();
-            sh.insert(sh.begin(), 2);
-            sh.insert(sh.begin(), 4);
-            test_decrement<layout_type::row_major>(rm, sh);
-        }
-
-        {
-            SCOPED_TRACE("same shape - column_major iterator");
-            test_decrement<layout_type::column_major>(rm, rm.shape());
-        }
-
-        {
-            SCOPED_TRACE("broadcasting shape - column_major iterator");
-            layout_result<>::shape_type sh = rm.shape();
-            sh.insert(sh.begin(), 2);
-            sh.insert(sh.begin(), 4);
-            test_decrement<layout_type::column_major>(rm, sh);
-        }
+        CHECK_MESSAGE(*iter == expected, "predecrement operator doesn't give expected result");
+        CHECK_MESSAGE(*iter2 == expected, "postdecrement operator doesn't give expected result");
     }
 
     template <layout_type L, class R, class S>
@@ -275,38 +154,8 @@ namespace xt
         iter += nb_inc;
         auto iter3 = iter2 + nb_inc;
 
-        EXPECT_EQ(*iter, expected) << "predecrement operator doesn't give expected result";
-        EXPECT_EQ(*iter3, expected) << "postdecrement operator doesn't give expected result";
-    }
-
-    TYPED_TEST(xiterator_test, random_decrement)
-    {
-        typename TestFixture::result_type rm;
-        {
-            SCOPED_TRACE("same shape - row_major iterator");
-            test_random_decrement<layout_type::row_major>(rm, rm.shape());
-        }
-
-        {
-            SCOPED_TRACE("broadcasting shape - row_major iterator");
-            layout_result<>::shape_type sh = rm.shape();
-            sh.insert(sh.begin(), 2);
-            sh.insert(sh.begin(), 4);
-            test_random_decrement<layout_type::row_major>(rm, sh);
-        }
-
-        {
-            SCOPED_TRACE("same shape - column_major iterator");
-            test_random_decrement<layout_type::column_major>(rm, rm.shape());
-        }
-
-        {
-            SCOPED_TRACE("broadcasting shape - column_major iterator");
-            layout_result<>::shape_type sh = rm.shape();
-            sh.insert(sh.begin(), 2);
-            sh.insert(sh.begin(), 4);
-            test_random_decrement<layout_type::column_major>(rm, sh);
-        }
+        CHECK_MESSAGE(*iter == expected , "predecrement operator doesn't give expected result");
+        CHECK_MESSAGE(*iter3 == expected , "postdecrement operator doesn't give expected result");
     }
 
     template <layout_type L, class R, class S>
@@ -321,46 +170,208 @@ namespace xt
         auto iter = a.template rbegin<L>(shape);
         auto last = a.template rend<L>(shape);
 
-        EXPECT_EQ(*iter, data.back()) << "dereferencing rbegin does not result in last element";
-        EXPECT_EQ(*last, data.front()) << "dereferencing rend does not result in first element";
+        CHECK_MESSAGE(*iter==data.back(), "dereferencing rbegin does not result in last element");
+        CHECK_MESSAGE(*last==data.front(), "dereferencing rend does not result in first element");
 
         for (size_type i = 0; i < size; ++i)
         {
             ++iter;
         }
 
-        EXPECT_EQ(iter, last) << "reverse iterator doesn't reach the end";
+        CHECK_MESSAGE(iter==last, "reverse iterator doesn't reach the end");
     }
 
-    TYPED_TEST(xiterator_test, reverse_end)
+    TEST_CASE_TEMPLATE("xiterator_test", TypeParam,
+        row_major_result<>, column_major_result<>,
+        central_major_result<>, unit_shape_result<>)
     {
-        typename TestFixture::result_type rm;
+        using TestFixture = xiterator_test<TypeParam>;
+        SUBCASE("increment")
         {
-            SCOPED_TRACE("same shape - row_major iterator");
-            test_rend<layout_type::row_major>(rm, rm.shape());
+            typename TestFixture::result_type rm;
+            {
+                SCOPED_TRACE("same shape - row_major iterator");
+                test_increment<layout_type::row_major>(rm, rm.shape());
+            }
+
+            {
+                SCOPED_TRACE("broadcasting shape - row_major iterator");
+                layout_result<>::shape_type sh = rm.shape();
+                sh.insert(sh.begin(), 2);
+                sh.insert(sh.begin(), 4);
+                test_increment<layout_type::row_major>(rm, rm.shape());
+            }
+
+            {
+                SCOPED_TRACE("same shape - column_major iterator");
+                test_increment<layout_type::column_major>(rm, rm.shape());
+            }
+
+            {
+                SCOPED_TRACE("broadcasting shape - column_major iterator");
+                layout_result<>::shape_type sh = rm.shape();
+                sh.insert(sh.begin(), 2);
+                sh.insert(sh.begin(), 4);
+                test_increment<layout_type::column_major>(rm, rm.shape());
+            }
         }
 
+
+        SUBCASE("random_increment")
         {
-            SCOPED_TRACE("broadcasting shape - row_major iterator");
-            layout_result<>::shape_type sh = rm.shape();
-            sh.insert(sh.begin(), 2);
-            sh.insert(sh.begin(), 4);
-            test_rend<layout_type::row_major>(rm, sh);
+            typename TestFixture::result_type rm;
+            {
+                SCOPED_TRACE("same shape - row_major iterator");
+                test_random_increment<layout_type::row_major>(rm, rm.shape());
+            }
+
+            {
+                SCOPED_TRACE("broadcasting shape - row_major iterator");
+                layout_result<>::shape_type sh = rm.shape();
+                sh.insert(sh.begin(), 2);
+                sh.insert(sh.begin(), 4);
+                test_random_increment<layout_type::row_major>(rm, rm.shape());
+            }
+
+            {
+                SCOPED_TRACE("same shape - column_major iterator");
+                test_random_increment<layout_type::column_major>(rm, rm.shape());
+            }
+
+            {
+                SCOPED_TRACE("broadcasting shape - column_major iterator");
+                layout_result<>::shape_type sh = rm.shape();
+                sh.insert(sh.begin(), 2);
+                sh.insert(sh.begin(), 4);
+                test_random_increment<layout_type::column_major>(rm, rm.shape());
+            }
         }
 
+
+        SUBCASE("end")
         {
-            SCOPED_TRACE("same shape - column_major iterator");
-            test_rend<layout_type::column_major>(rm, rm.shape());
+            typename TestFixture::result_type rm;
+            {
+                SCOPED_TRACE("same shape - row_major iterator");
+                test_end<layout_type::row_major>(rm, rm.shape());
+            }
+
+            {
+                SCOPED_TRACE("broadcasting shape - row_major iterator");
+                layout_result<>::shape_type sh = rm.shape();
+                sh.insert(sh.begin(), 2);
+                sh.insert(sh.begin(), 4);
+                test_end<layout_type::row_major>(rm, sh);
+            }
+
+            {
+                SCOPED_TRACE("same shape - column_major iterator");
+                test_end<layout_type::column_major>(rm, rm.shape());
+            }
+
+            {
+                SCOPED_TRACE("broadcasting shape - column_major iterator");
+                layout_result<>::shape_type sh = rm.shape();
+                sh.insert(sh.begin(), 2);
+                sh.insert(sh.begin(), 4);
+                test_end<layout_type::column_major>(rm, sh);
+            }
         }
 
+
+        SUBCASE("decrement")
         {
-            SCOPED_TRACE("broadcasting shape - column_major iterator");
-            layout_result<>::shape_type sh = rm.shape();
-            sh.insert(sh.begin(), 2);
-            sh.insert(sh.begin(), 4);
-            test_rend<layout_type::column_major>(rm, sh);
+            typename TestFixture::result_type rm;
+            {
+                SCOPED_TRACE("same shape - row_major iterator");
+                test_decrement<layout_type::row_major>(rm, rm.shape());
+            }
+
+            {
+                SCOPED_TRACE("broadcasting shape - row_major iterator");
+                layout_result<>::shape_type sh = rm.shape();
+                sh.insert(sh.begin(), 2);
+                sh.insert(sh.begin(), 4);
+                test_decrement<layout_type::row_major>(rm, sh);
+            }
+
+            {
+                SCOPED_TRACE("same shape - column_major iterator");
+                test_decrement<layout_type::column_major>(rm, rm.shape());
+            }
+
+            {
+                SCOPED_TRACE("broadcasting shape - column_major iterator");
+                layout_result<>::shape_type sh = rm.shape();
+                sh.insert(sh.begin(), 2);
+                sh.insert(sh.begin(), 4);
+                test_decrement<layout_type::column_major>(rm, sh);
+            }
+        }
+
+        SUBCASE("random_decrement")
+        {
+            typename TestFixture::result_type rm;
+            {
+                SCOPED_TRACE("same shape - row_major iterator");
+                test_random_decrement<layout_type::row_major>(rm, rm.shape());
+            }
+
+            {
+                SCOPED_TRACE("broadcasting shape - row_major iterator");
+                layout_result<>::shape_type sh = rm.shape();
+                sh.insert(sh.begin(), 2);
+                sh.insert(sh.begin(), 4);
+                test_random_decrement<layout_type::row_major>(rm, sh);
+            }
+
+            {
+                SCOPED_TRACE("same shape - column_major iterator");
+                test_random_decrement<layout_type::column_major>(rm, rm.shape());
+            }
+
+            {
+                SCOPED_TRACE("broadcasting shape - column_major iterator");
+                layout_result<>::shape_type sh = rm.shape();
+                sh.insert(sh.begin(), 2);
+                sh.insert(sh.begin(), 4);
+                test_random_decrement<layout_type::column_major>(rm, sh);
+            }
+        }
+
+
+        SUBCASE("reverse_end")
+        {
+            typename TestFixture::result_type rm;
+            {
+                SCOPED_TRACE("same shape - row_major iterator");
+                test_rend<layout_type::row_major>(rm, rm.shape());
+            }
+
+            {
+                SCOPED_TRACE("broadcasting shape - row_major iterator");
+                layout_result<>::shape_type sh = rm.shape();
+                sh.insert(sh.begin(), 2);
+                sh.insert(sh.begin(), 4);
+                test_rend<layout_type::row_major>(rm, sh);
+            }
+
+            {
+                SCOPED_TRACE("same shape - column_major iterator");
+                test_rend<layout_type::column_major>(rm, rm.shape());
+            }
+
+            {
+                SCOPED_TRACE("broadcasting shape - column_major iterator");
+                layout_result<>::shape_type sh = rm.shape();
+                sh.insert(sh.begin(), 2);
+                sh.insert(sh.begin(), 4);
+                test_rend<layout_type::column_major>(rm, sh);
+            }
         }
     }
+
+
 
     template <layout_type L, class R, class S>
     void test_minus(const R& result, const S& shape)
@@ -383,17 +394,17 @@ namespace xt
 
         auto iter = a.template begin<L>() + nb_inc;
         auto iter2 = a.template begin<L>() + nb_inc2;
-        EXPECT_EQ(iter2 - iter, expected) << "operator- doesn't give expected result";
+        CHECK_MESSAGE(iter2 - iter == expected, "operator- doesn't give expected result");
 
         auto riter = a.template rbegin<L>() + nb_inc;
         auto riter2 = a.template rbegin<L>() + nb_inc2;
-        EXPECT_EQ(riter2 - riter, expected) << "operator- doesn't give expected result";
+        CHECK_MESSAGE(riter2 - riter == expected, "operator- doesn't give expected result");
 
         auto diff = a.template end<L>() - a.template begin<L>();
-        EXPECT_EQ(size_type(diff), a.size());
+        CHECK_EQ(size_type(diff), a.size());
 
         auto rdiff = a.template rend<L>() - a.template rbegin<L>();
-        EXPECT_EQ(size_type(rdiff), a.size());
+        CHECK_EQ(size_type(rdiff), a.size());
     }
 
     TEST(xiterator, row_major_minus)

@@ -10,7 +10,7 @@
 #include <complex>
 #include <limits>
 
-#include "gtest/gtest.h"
+#include "test_common_macros.hpp"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xadapt.hpp"
 #include "xtensor/xoptional_assembly.hpp"

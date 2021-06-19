@@ -13,7 +13,7 @@
 
 #include <string>
 
-#include "gtest/gtest.h"
+#include "test_common_macros.hpp"
 #include "xtensor/xexception.hpp"
 #include "test_common_macros.hpp"
 
@@ -33,7 +33,7 @@ namespace xt
         try
         {
             XTENSOR_ASSERT_MSG(false, "Intentional error");
-            FAIL() << "No exception thrown.";
+            CHECK_MESSAGE(false, "no exception thrown");
         }
         catch (std::runtime_error& e)
         {
@@ -44,7 +44,7 @@ namespace xt
         try
         {
             XTENSOR_PRECONDITION(false, "Intentional error");
-            FAIL() << "No exception thrown.";
+            CHECK_MESSAGE(false, "no exception thrown");
         }
         catch (std::runtime_error& e)
         {

@@ -36,6 +36,7 @@ jobs:
       - script: |
           conda install cmake==3.14.0 ^
                         ninja ^
+                        doctest ^
                         nlohmann_json ^
                         xtl==0.7.0 ^
                         xsimd==7.4.8 ^

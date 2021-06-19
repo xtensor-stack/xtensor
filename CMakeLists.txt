@@ -196,7 +196,7 @@ target_link_libraries(xtensor INTERFACE xtl)
 
 OPTION(XTENSOR_ENABLE_ASSERT "xtensor bound check" OFF)
 OPTION(XTENSOR_CHECK_DIMENSION "xtensor dimension check" OFF)
-OPTION(BUILD_TESTS "xtensor test suite" OFF)
+OPTION(BUILD_TESTS "xtensor test suite" ON)
 OPTION(BUILD_BENCHMARK "xtensor benchmark" OFF)
 OPTION(DOWNLOAD_GTEST "build gtest from downloaded sources" OFF)
 OPTION(DOWNLOAD_GBENCHMARK "download google benchmark and build from source" ON)
@@ -207,9 +207,6 @@ OPTION(CPP20 "enables C++20 (experimental)" OFF)
 OPTION(XTENSOR_DISABLE_EXCEPTIONS "Disable C++ exceptions" OFF)
 OPTION(DISABLE_MSVC_ITERATOR_CHECK "Disable the MVSC iterator check" ON)
 
-if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
-    set(BUILD_TESTS ON)
-endif()
 
 if(XTENSOR_ENABLE_ASSERT OR XTENSOR_CHECK_DIMENSION)
     add_definitions(-DXTENSOR_ENABLE_ASSERT)

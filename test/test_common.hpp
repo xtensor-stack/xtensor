@@ -14,6 +14,14 @@
 #include "xtensor/xmanipulation.hpp"
 #include "test_common_macros.hpp"
 
+namespace testing
+{
+    template<class ... ARGS>
+    using Types = std::tuple<ARGS ...>;
+
+    struct Test{};
+}
+
 namespace xt
 {
     template <class T, class A, class AV>

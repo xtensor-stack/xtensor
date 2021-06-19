@@ -6,3 +6,4 @@ dependencies:
   - xtl=0.7.0
   - xsimd=7.4.9
   - nlohmann_json
+  - doctest
