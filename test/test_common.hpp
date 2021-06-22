@@ -184,15 +184,15 @@ namespace xt
     template <class V, class C = dynamic_shape<std::size_t>>
     void test_resize(V& vec)
     {
+        SUBCASE("row_major resize")
         {
-            SCOPED_TRACE("row_major resize");
             row_major_result<C> rm;
             vec.resize(rm.m_shape, layout_type::row_major);
             compare_shape(vec, rm);
         }
 
+        SUBCASE("different types resize")
         {
-            SCOPED_TRACE("different types resize");
             row_major_result<C> rm;
             auto v_copy_a = vec;
             auto v_copy_b = vec;
@@ -204,22 +204,22 @@ namespace xt
             compare_shape(v_copy_b, rm);
         }
 
+        SUBCASE("column_major resize")
         {
-            SCOPED_TRACE("column_major resize");
             column_major_result<C> cm;
             vec.resize(cm.m_shape, layout_type::column_major);
             compare_shape(vec, cm);
         }
 
+        SUBCASE("central_major resize")
         {
-            SCOPED_TRACE("central_major resize");
             central_major_result<C> cem;
             vec.resize(cem.m_shape, cem.m_strides);
             compare_shape(vec, cem);
         }
 
+        SUBCASE("unit_shape resize")
         {
-            SCOPED_TRACE("unit_shape resize");
             unit_shape_result<C> usr;
             vec.resize(usr.m_shape, layout_type::row_major);
             compare_shape(vec, usr, false);
@@ -230,8 +230,8 @@ namespace xt
     template <class V, class C = std::vector<std::size_t>>
     void test_reshape(V& vec)
     {
+        SUBCASE("row_major reshape")
         {
-            SCOPED_TRACE("row_major reshape");
             row_major_result<C> rm;
             auto shape = rm.m_shape;
             std::size_t sz = compute_size(shape);
@@ -263,8 +263,8 @@ namespace xt
     template <class V>
     void test_throwing_reshape(V& vec)
     {
+        SUBCASE("throwing reshape")
         {
-            SCOPED_TRACE("throwing reshape");
             vec = xt::arange(6);
             XT_EXPECT_THROW(vec.reshape({2}), std::runtime_error);
         }
@@ -275,16 +275,16 @@ namespace xt
     {
         using shape_type = typename V::shape_type;
         using strides_type = typename V::strides_type;
+        SUBCASE("transpose")
         {
-            SCOPED_TRACE("transpose");
             shape_type shape_new = vec.shape();
             auto vt = transpose(vec);
             std::reverse(shape_new.begin(), shape_new.end());
             EXPECT_EQ(vt.shape(), shape_new);
         }
 
+        SUBCASE("transpose with data")
         {
-            SCOPED_TRACE("transpose with data");
             row_major_result<C> rm;
             vec.resize(rm.shape(), layout_type::row_major);
 
@@ -315,8 +315,8 @@ namespace xt
             EXPECT_EQ(vec_copy(1, 1, 2), vt(2, 1, 1));
         }
 
+        SUBCASE("transpose with permutation")
         {
-            SCOPED_TRACE("transpose with permutation");
             row_major_result<C> rm;
             vec.resize(rm.shape(), layout_type::row_major);
 
@@ -351,8 +351,8 @@ namespace xt
             transpose(vec, perm);
         }
 
+        SUBCASE("transpose permutation throws")
         {
-            SCOPED_TRACE("transpose permutation throws");
             row_major_result<C> rm;
             vec.reshape(rm.shape(), layout_type::row_major);
 
@@ -412,8 +412,8 @@ namespace xt
     template <class V, class C = dynamic_shape<std::size_t>>
     void test_access(V& vec)
     {
+        SUBCASE("row_major access")
         {
-            SCOPED_TRACE("row_major access");
             row_major_result<C> rm;
             vec.resize(rm.m_shape, layout_type::row_major);
             assign_array(vec, rm.m_assigner);
@@ -423,8 +423,8 @@ namespace xt
             test_bound_check(vec);
         }
 
+        SUBCASE("column_major access")
         {
-            SCOPED_TRACE("column_major access");
             column_major_result<C> cm;
             vec.resize(cm.m_shape, layout_type::column_major);
             assign_array(vec, cm.m_assigner);
@@ -434,8 +434,8 @@ namespace xt
             test_bound_check(vec);
         }
 
+        SUBCASE("central_major access")
         {
-            SCOPED_TRACE("central_major access");
             central_major_result<C> cem;
             vec.resize(cem.m_shape, cem.m_strides);
             assign_array(vec, cem.m_assigner);
@@ -445,8 +445,8 @@ namespace xt
             test_bound_check(vec);
         }
 
+        SUBCASE("unit_shape access")
         {
-            SCOPED_TRACE("unit_shape access");
             unit_shape_result<C> usr;
             vec.resize(usr.m_shape, layout_type::row_major);
             assign_array(vec, usr.m_assigner);
@@ -460,8 +460,8 @@ namespace xt
     template <class V, class C = dynamic_shape<std::size_t>>
     void test_unchecked(V& vec)
     {
+        SUBCASE("row_major access")
         {
-            SCOPED_TRACE("row_major access");
             row_major_result<C> rm;
             vec.resize(rm.m_shape, layout_type::row_major);
             assign_array(vec, rm.m_assigner);
@@ -469,8 +469,8 @@ namespace xt
             EXPECT_EQ(vec.unchecked(0, 1, 1), vec(0, 1, 1));
         }
 
+        SUBCASE("column_major access")
         {
-            SCOPED_TRACE("column_major access");
             column_major_result<C> cm;
             vec.resize(cm.m_shape, layout_type::column_major);
             assign_array(vec, cm.m_assigner);
@@ -478,8 +478,8 @@ namespace xt
             EXPECT_EQ(vec.unchecked(0, 1, 1), vec(0, 1, 1));
         }
 
+        SUBCASE("central_major access")
         {
-            SCOPED_TRACE("central_major access");
             central_major_result<C> cem;
             vec.resize(cem.m_shape, cem.m_strides);
             assign_array(vec, cem.m_assigner);
@@ -487,8 +487,8 @@ namespace xt
             EXPECT_EQ(vec.unchecked(0, 1, 1), vec(0, 1, 1));
         }
 
+        SUBCASE("unit_shape access")
         {
-            SCOPED_TRACE("unit_shape access");
             unit_shape_result<C> usr;
             vec.resize(usr.m_shape, layout_type::row_major);
             assign_array(vec, usr.m_assigner);
@@ -500,8 +500,8 @@ namespace xt
     template <class V, class C = dynamic_shape<std::size_t>>
     void test_at(V& vec)
     {
+        SUBCASE("row_major access")
         {
-            SCOPED_TRACE("row_major access");
             row_major_result<C> rm;
             vec.resize(rm.m_shape, layout_type::row_major);
             safe_assign_array(vec, rm.m_assigner);
@@ -509,8 +509,8 @@ namespace xt
             test_access_check(vec);
         }
 
+        SUBCASE("column_major access")
         {
-            SCOPED_TRACE("column_major access");
             column_major_result<C> cm;
             vec.resize(cm.m_shape, layout_type::column_major);
             safe_assign_array(vec, cm.m_assigner);
@@ -518,8 +518,8 @@ namespace xt
             test_access_check(vec);
         }
 
+        SUBCASE("central_major access")
         {
-            SCOPED_TRACE("central_major access");
             central_major_result<C> cem;
             vec.resize(cem.m_shape, cem.m_strides);
             safe_assign_array(vec, cem.m_assigner);
@@ -527,8 +527,8 @@ namespace xt
             test_access_check(vec);
         }
 
+        SUBCASE("unit_shape access")
         {
-            SCOPED_TRACE("unit_shape access");
             unit_shape_result<C> usr;
             vec.resize(usr.m_shape, layout_type::row_major);
             safe_assign_array(vec, usr.m_assigner);
@@ -540,8 +540,8 @@ namespace xt
     template <class V, class C = dynamic_shape<std::size_t>>
     void test_element(V& vec)
     {
+        SUBCASE("row_major access")
         {
-            SCOPED_TRACE("row_major access");
             row_major_result<C> rm;
             vec.resize(rm.m_shape, layout_type::row_major);
             assign_array(vec, rm.m_assigner);
@@ -555,8 +555,8 @@ namespace xt
             test_bound_check(vec);
         }
 
+        SUBCASE("column_major access")
         {
-            SCOPED_TRACE("column_major access");
             column_major_result<C> cm;
             vec.resize(cm.m_shape, layout_type::column_major);
             assign_array(vec, cm.m_assigner);
@@ -570,8 +570,8 @@ namespace xt
             test_bound_check(vec);
         }
 
+        SUBCASE("central_major access")
         {
-            SCOPED_TRACE("central_major access");
             central_major_result<C> cem;
             vec.resize(cem.m_shape, cem.m_strides);
             assign_array(vec, cem.m_assigner);
@@ -585,8 +585,8 @@ namespace xt
             test_bound_check(vec);
         }
 
+        SUBCASE("unit_shape access")
         {
-            SCOPED_TRACE("unit_shape access");
             unit_shape_result<C> usr;
             vec.resize(usr.m_shape, layout_type::row_major);
             assign_array(vec, usr.m_assigner);
@@ -625,8 +625,8 @@ namespace xt
     {
         xindex index1 = {1, 1};
         xindex index2 = {2, 2, 2, 1, 3};
+        SUBCASE("row_major access")
         {
-            SCOPED_TRACE("row_major access");
             row_major_result<C> rm;
             vec.resize(rm.m_shape, layout_type::row_major);
             indexed_assign_array(vec, rm.m_assigner);
@@ -637,8 +637,8 @@ namespace xt
             EXPECT_EQ(vec(2, 1, 3), (vec[{2, 2, 2, 1, 3}]));
         }
 
+        SUBCASE("column_major access")
         {
-            SCOPED_TRACE("column_major access");
             column_major_result<C> cm;
             vec.resize(cm.m_shape, layout_type::column_major);
             indexed_assign_array(vec, cm.m_assigner);
@@ -649,8 +649,8 @@ namespace xt
             EXPECT_EQ(vec(2, 1, 3), (vec[{2, 2, 2, 1, 3}]));
         }
 
+        SUBCASE("central_major access")
         {
-            SCOPED_TRACE("central_major access");
             central_major_result<C> cem;
             vec.resize(cem.m_shape, cem.m_strides);
             indexed_assign_array(vec, cem.m_assigner);
@@ -661,8 +661,8 @@ namespace xt
             EXPECT_EQ(vec(2, 1, 3), (vec[{2, 2, 2, 1, 3}]));
         }
 
+        SUBCASE("unit_shape access")
         {
-            SCOPED_TRACE("unit_shape access");
             unit_shape_result<C> usr;
             vec.resize(usr.m_shape, layout_type::row_major);
             indexed_assign_array(vec, usr.m_assigner);
@@ -684,16 +684,16 @@ namespace xt
         shape_type s = {3, 1, 4, 2};
         vec.resize(s);
 
+        SUBCASE("same shape")
         {
-            SCOPED_TRACE("same shape");
             shape_type s1 = s;
             bool res = vec.broadcast_shape(s1);
             EXPECT_EQ(s1, s);
             EXPECT_TRUE(res);
         }
 
+        SUBCASE("different shape")
         {
-            SCOPED_TRACE("different shape");
             shape_type s2 = {3, 5, 1, 2};
             shape_type s2r = {3, 5, 4, 2};
             bool res = vec.broadcast_shape(s2);
@@ -701,8 +701,8 @@ namespace xt
             EXPECT_FALSE(res);
         }
 
+        SUBCASE("incompatible shapes")
         {
-            SCOPED_TRACE("incompatible shapes");
             shape_type s4 = {2, 1, 3, 2};
             XT_EXPECT_THROW(vec.broadcast_shape(s4), broadcast_error);
         }
@@ -716,8 +716,8 @@ namespace xt
         shape_type s = {3, 1, 4, 2};
         vec.resize(s);
 
+        SUBCASE("different dimensions")
         {
-            SCOPED_TRACE("different dimensions");
             shape_type s3 = {5, 3, 1, 4, 2};
             shape_type s3r = s3;
             bool res = vec.broadcast_shape(s3);
@@ -729,8 +729,8 @@ namespace xt
     template <class VRM, class VCM, class C = dynamic_shape<std::size_t>>
     void test_iterator(VRM& vecrm, VCM& veccm)
     {
+        SUBCASE("row_major storage iterator")
         {
-            SCOPED_TRACE("row_major storage iterator");
             row_major_result<C> rm;
             vecrm.resize(rm.m_shape, layout_type::row_major);
             std::copy(rm.storage().cbegin(), rm.storage().cend(), vecrm.template begin<layout_type::row_major>());
@@ -738,8 +738,8 @@ namespace xt
             EXPECT_EQ(vecrm.template end<layout_type::row_major>(), vecrm.storage().end());
         }
 
+        SUBCASE("column_major storage iterator")
         {
-            SCOPED_TRACE("column_major storage iterator");
             column_major_result<C> cm;
             veccm.resize(cm.m_shape, layout_type::column_major);
             std::copy(cm.storage().cbegin(), cm.storage().cend(), veccm.template begin<layout_type::column_major>());
@@ -770,7 +770,7 @@ namespace xt
         size_t nb_iter = vec.size() / 2;
         using shape_type = std::vector<size_t>;
 
-        // broadcast_iterator
+        SUBCASE("broadcast_iterator")
         {
             auto iter = vec.template begin<layout_type::row_major>();
             auto iter_end = vec.template end<layout_type::row_major>();
@@ -786,7 +786,7 @@ namespace xt
             EXPECT_EQ(iter, iter_end);
         }
 
-        // shaped_xiterator
+        SUBCASE("shaped_xiterator")
         {
             shape_type shape(rm.m_shape.size() + 1);
             std::copy(rm.m_shape.begin(), rm.m_shape.end(), shape.begin() + 1);
@@ -805,7 +805,7 @@ namespace xt
             EXPECT_EQ(iter, iter_end);
         }
 
-        // column broadcast_iterator
+        SUBCASE("column broadcast_iterator")
         {
             auto iter = vec.template begin<layout_type::column_major>();
             auto iter_end = vec.template end<layout_type::column_major>();
@@ -821,7 +821,7 @@ namespace xt
             EXPECT_EQ(iter, iter_end);
         }
 
-        // column shaped_xiterator
+        SUBCASE("column shaped_xiterator")
         {
             shape_type shape(rm.m_shape.size() + 1);
             std::copy(rm.m_shape.begin(), rm.m_shape.end(), shape.begin() + 1);
@@ -849,7 +849,7 @@ namespace xt
         indexed_assign_array(vec, rm.m_assigner);
         size_t nb_iter = vec.size() / 2;
 
-        // broadcast_iterator
+        SUBCASE("broadcast_iterator")
         {
             auto iter = vec.template rbegin<layout_type::row_major>();
             auto iter_end = vec.template rend<layout_type::row_major>();
@@ -865,7 +865,7 @@ namespace xt
             EXPECT_EQ(iter, iter_end);
         }
 
-        // shaped_xiterator
+        SUBCASE("shaped_xiterator")
         {
             using shape_type = std::vector<size_t>;
             shape_type shape(rm.m_shape.size() + 1);

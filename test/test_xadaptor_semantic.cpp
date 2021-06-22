@@ -68,32 +68,32 @@ namespace xt
     {
         operation_tester<std::plus<>, TypeParam> tester;
         using adaptor_type = typename adaptor_semantic<TypeParam>::adaptor_type;
+        SUBCASE("row_major + row_major")
         {
-            SCOPED_TRACE("row_major + row_major");
             vector_type v;
             adaptor_type b(v);
             b = tester.a + tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major + column_major")
         {
-            SCOPED_TRACE("row_major + column_major");
             vector_type v;
             adaptor_type b(v);
             b = tester.a + tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major + central_major")
         {
-            SCOPED_TRACE("row_major + central_major");
             vector_type v;
             adaptor_type b(v);
             b = tester.a + tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major + unit_major")
         {
-            SCOPED_TRACE("row_major + unit_major");
             vector_type v;
             adaptor_type b(v);
             b = tester.a + tester.ua;
@@ -106,32 +106,32 @@ namespace xt
         operation_tester<std::minus<>, TypeParam> tester;
         using adaptor_type = typename adaptor_semantic<TypeParam>::adaptor_type;
 
+        SUBCASE("row_major - row_major")
         {
-            SCOPED_TRACE("row_major - row_major");
             vector_type v;
             adaptor_type b(v);
             b = tester.a - tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major - column_major")
         {
-            SCOPED_TRACE("row_major - column_major");
             vector_type v;
             adaptor_type b(v);
             b = tester.a - tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major - central_major")
         {
-            SCOPED_TRACE("row_major - central_major");
             vector_type v;
             adaptor_type b(v);
             b = tester.a - tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major - unit_major")
         {
-            SCOPED_TRACE("row_major - unit_major");
             vector_type v;
             adaptor_type b(v);
             b = tester.a - tester.ua;
@@ -144,32 +144,32 @@ namespace xt
         operation_tester<std::multiplies<>, TypeParam> tester;
         using adaptor_type = typename adaptor_semantic<TypeParam>::adaptor_type;
 
+        SUBCASE("row_major * row_major")
         {
-            SCOPED_TRACE("row_major * row_major");
             vector_type v;
             adaptor_type b(v);
             b = tester.a * tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major * column_major")
         {
-            SCOPED_TRACE("row_major * column_major");
             vector_type v;
             adaptor_type b(v);
             b = tester.a * tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major * central_major")
         {
-            SCOPED_TRACE("row_major * central_major");
             vector_type v;
             adaptor_type b(v);
             b = tester.a * tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major * unit_major")
         {
-            SCOPED_TRACE("row_major * unit_major");
             vector_type v;
             adaptor_type b(v);
             b = tester.a * tester.ua;
@@ -182,32 +182,32 @@ namespace xt
         operation_tester<std::divides<>, TypeParam> tester;
         using adaptor_type = typename adaptor_semantic<TypeParam>::adaptor_type;
 
+        SUBCASE("row_major / row_major")
         {
-            SCOPED_TRACE("row_major / row_major");
             vector_type v;
             adaptor_type b(v);
             b = tester.a / tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major / column_major")
         {
-            SCOPED_TRACE("row_major / column_major");
             vector_type v;
             adaptor_type b(v);
             b = tester.a / tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major / central_major")
         {
-            SCOPED_TRACE("row_major / central_major");
             vector_type v;
             adaptor_type b(v);
             b = tester.a / tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major / unit_major")
         {
-            SCOPED_TRACE("row_major / unit_major");
             vector_type v;
             adaptor_type b(v);
             b = tester.a / tester.ua;
@@ -220,8 +220,8 @@ namespace xt
         operation_tester<std::plus<>, TypeParam> tester;
         using adaptor_type = typename adaptor_semantic<TypeParam>::adaptor_type;
 
+        SUBCASE("row_major += row_major")
         {
-            SCOPED_TRACE("row_major += row_major");
             vector_type v;
             adaptor_type b(v);
             b = tester.a;
@@ -229,8 +229,8 @@ namespace xt
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major += column_major")
         {
-            SCOPED_TRACE("row_major += column_major");
             vector_type v;
             adaptor_type b(v);
             b = tester.a;
@@ -238,8 +238,8 @@ namespace xt
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major += central_major")
         {
-            SCOPED_TRACE("row_major += central_major");
             vector_type v;
             adaptor_type b(v);
             b = tester.a;
@@ -247,8 +247,8 @@ namespace xt
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major += unit_major")
         {
-            SCOPED_TRACE("row_major += unit_major");
             vector_type v;
             adaptor_type b(v);
             b = tester.a;
@@ -262,8 +262,8 @@ namespace xt
         operation_tester<std::minus<>, TypeParam> tester;
         using adaptor_type = typename adaptor_semantic<TypeParam>::adaptor_type;
 
+        SUBCASE("row_major -= row_major")
         {
-            SCOPED_TRACE("row_major -= row_major");
             vector_type v;
             adaptor_type b(v);
             b = tester.a;
@@ -271,8 +271,8 @@ namespace xt
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major -= column_major")
         {
-            SCOPED_TRACE("row_major -= column_major");
             vector_type v;
             adaptor_type b(v);
             b = tester.a;
@@ -280,8 +280,8 @@ namespace xt
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major -= central_major")
         {
-            SCOPED_TRACE("row_major -= central_major");
             vector_type v;
             adaptor_type b(v);
             b = tester.a;
@@ -289,8 +289,8 @@ namespace xt
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major -= unit_major")
         {
-            SCOPED_TRACE("row_major -= unit_major");
             vector_type v;
             adaptor_type b(v);
             b = tester.a;
@@ -304,8 +304,8 @@ namespace xt
         operation_tester<std::multiplies<>, TypeParam> tester;
         using adaptor_type = typename adaptor_semantic<TypeParam>::adaptor_type;
 
+        SUBCASE("row_major *= row_major")
         {
-            SCOPED_TRACE("row_major *= row_major");
             vector_type v;
             adaptor_type b(v);
             b = tester.a;
@@ -313,8 +313,8 @@ namespace xt
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major *= column_major")
         {
-            SCOPED_TRACE("row_major *= column_major");
             vector_type v;
             adaptor_type b(v);
             b = tester.a;
@@ -322,8 +322,8 @@ namespace xt
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major *= central_major")
         {
-            SCOPED_TRACE("row_major *= central_major");
             vector_type v;
             adaptor_type b(v);
             b = tester.a;
@@ -331,8 +331,8 @@ namespace xt
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major *= unit_major")
         {
-            SCOPED_TRACE("row_major *= unit_major");
             vector_type v;
             adaptor_type b(v);
             b = tester.a;
@@ -346,8 +346,8 @@ namespace xt
         operation_tester<std::divides<>, TypeParam> tester;
         using adaptor_type = typename adaptor_semantic<TypeParam>::adaptor_type;
 
+        SUBCASE("row_major /= row_major")
         {
-            SCOPED_TRACE("row_major /= row_major");
             vector_type v;
             adaptor_type b(v);
             b = tester.a;
@@ -355,8 +355,8 @@ namespace xt
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major /= column_major")
         {
-            SCOPED_TRACE("row_major /= column_major");
             vector_type v;
             adaptor_type b(v);
             b = tester.a;
@@ -364,8 +364,8 @@ namespace xt
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major /= central_major")
         {
-            SCOPED_TRACE("row_major /= central_major");
             vector_type v;
             adaptor_type b(v);
             b = tester.a;
@@ -373,8 +373,8 @@ namespace xt
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major /= unit_major")
         {
-            SCOPED_TRACE("row_major /= unit_major");
             vector_type v;
             adaptor_type b(v);
             b = tester.a;

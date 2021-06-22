@@ -28,7 +28,6 @@ namespace xt
 
     TEST_SUITE("xnoalias")
     {
-
         TEST_CASE_TEMPLATE("a_plus_b", TypeParam, XNOALIAS_TEST_TYPES)
         {
             operation_tester<std::plus<>, TypeParam> tester;

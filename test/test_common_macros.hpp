@@ -53,7 +53,5 @@
 
 #define EXPECT_DOUBLE_EQ(x,y)   CHECK(x == doctest::Approx(y));
 
-#define SCOPED_TRACE(A) CAPTURE(A)
-
 #define TEST_F(FIXTURE_CLASS, NAME)\
     TEST_CASE_FIXTURE(FIXTURE_CLASS, #NAME)

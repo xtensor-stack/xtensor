@@ -193,26 +193,26 @@ namespace xt
         {
             using TestFixture = xiterator_test<TypeParam>;
             typename TestFixture::result_type rm;
+            SUBCASE("same shape - row_major iterator")
             {
-                SCOPED_TRACE("same shape - row_major iterator");
                 test_increment<layout_type::row_major>(rm, rm.shape());
             }
 
+            SUBCASE("broadcasting shape - row_major iterator")
             {
-                SCOPED_TRACE("broadcasting shape - row_major iterator");
                 layout_result<>::shape_type sh = rm.shape();
                 sh.insert(sh.begin(), 2);
                 sh.insert(sh.begin(), 4);
                 test_increment<layout_type::row_major>(rm, rm.shape());
             }
 
+            SUBCASE("same shape - column_major iterator")
             {
-                SCOPED_TRACE("same shape - column_major iterator");
                 test_increment<layout_type::column_major>(rm, rm.shape());
             }
 
+            SUBCASE("broadcasting shape - column_major iterator")
             {
-                SCOPED_TRACE("broadcasting shape - column_major iterator");
                 layout_result<>::shape_type sh = rm.shape();
                 sh.insert(sh.begin(), 2);
                 sh.insert(sh.begin(), 4);
@@ -225,26 +225,26 @@ namespace xt
         {
             using TestFixture = xiterator_test<TypeParam>;
             typename TestFixture::result_type rm;
+            SUBCASE("same shape - row_major iterator")
             {
-                SCOPED_TRACE("same shape - row_major iterator");
                 test_random_increment<layout_type::row_major>(rm, rm.shape());
             }
 
+            SUBCASE("broadcasting shape - row_major iterator")
             {
-                SCOPED_TRACE("broadcasting shape - row_major iterator");
                 layout_result<>::shape_type sh = rm.shape();
                 sh.insert(sh.begin(), 2);
                 sh.insert(sh.begin(), 4);
                 test_random_increment<layout_type::row_major>(rm, rm.shape());
             }
 
+            SUBCASE("same shape - column_major iterator")
             {
-                SCOPED_TRACE("same shape - column_major iterator");
                 test_random_increment<layout_type::column_major>(rm, rm.shape());
             }
 
+            SUBCASE("broadcasting shape - column_major iterator")
             {
-                SCOPED_TRACE("broadcasting shape - column_major iterator");
                 layout_result<>::shape_type sh = rm.shape();
                 sh.insert(sh.begin(), 2);
                 sh.insert(sh.begin(), 4);
@@ -257,26 +257,26 @@ namespace xt
         {
             using TestFixture = xiterator_test<TypeParam>;
             typename TestFixture::result_type rm;
+            SUBCASE("same shape - row_major iterator")
             {
-                SCOPED_TRACE("same shape - row_major iterator");
                 test_end<layout_type::row_major>(rm, rm.shape());
             }
 
+            SUBCASE("broadcasting shape - row_major iterator")
             {
-                SCOPED_TRACE("broadcasting shape - row_major iterator");
                 layout_result<>::shape_type sh = rm.shape();
                 sh.insert(sh.begin(), 2);
                 sh.insert(sh.begin(), 4);
                 test_end<layout_type::row_major>(rm, sh);
             }
 
+            SUBCASE("same shape - column_major iterator")
             {
-                SCOPED_TRACE("same shape - column_major iterator");
                 test_end<layout_type::column_major>(rm, rm.shape());
             }
 
+            SUBCASE("broadcasting shape - column_major iterator")
             {
-                SCOPED_TRACE("broadcasting shape - column_major iterator");
                 layout_result<>::shape_type sh = rm.shape();
                 sh.insert(sh.begin(), 2);
                 sh.insert(sh.begin(), 4);
@@ -289,26 +289,26 @@ namespace xt
         {
             using TestFixture = xiterator_test<TypeParam>;
             typename TestFixture::result_type rm;
+            SUBCASE("same shape - row_major iterator")
             {
-                SCOPED_TRACE("same shape - row_major iterator");
                 test_decrement<layout_type::row_major>(rm, rm.shape());
             }
 
+            SUBCASE("broadcasting shape - row_major iterator")
             {
-                SCOPED_TRACE("broadcasting shape - row_major iterator");
                 layout_result<>::shape_type sh = rm.shape();
                 sh.insert(sh.begin(), 2);
                 sh.insert(sh.begin(), 4);
                 test_decrement<layout_type::row_major>(rm, sh);
             }
 
+            SUBCASE("same shape - column_major iterator")
             {
-                SCOPED_TRACE("same shape - column_major iterator");
                 test_decrement<layout_type::column_major>(rm, rm.shape());
             }
 
+            SUBCASE("broadcasting shape - column_major iterator")
             {
-                SCOPED_TRACE("broadcasting shape - column_major iterator");
                 layout_result<>::shape_type sh = rm.shape();
                 sh.insert(sh.begin(), 2);
                 sh.insert(sh.begin(), 4);
@@ -320,26 +320,26 @@ namespace xt
         {
             using TestFixture = xiterator_test<TypeParam>;
             typename TestFixture::result_type rm;
+            SUBCASE("same shape - row_major iterator")
             {
-                SCOPED_TRACE("same shape - row_major iterator");
                 test_random_decrement<layout_type::row_major>(rm, rm.shape());
             }
 
+            SUBCASE("broadcasting shape - row_major iterator")
             {
-                SCOPED_TRACE("broadcasting shape - row_major iterator");
                 layout_result<>::shape_type sh = rm.shape();
                 sh.insert(sh.begin(), 2);
                 sh.insert(sh.begin(), 4);
                 test_random_decrement<layout_type::row_major>(rm, sh);
             }
 
+            SUBCASE("same shape - column_major iterator")
             {
-                SCOPED_TRACE("same shape - column_major iterator");
                 test_random_decrement<layout_type::column_major>(rm, rm.shape());
             }
 
+            SUBCASE("broadcasting shape - column_major iterator")
             {
-                SCOPED_TRACE("broadcasting shape - column_major iterator");
                 layout_result<>::shape_type sh = rm.shape();
                 sh.insert(sh.begin(), 2);
                 sh.insert(sh.begin(), 4);
@@ -352,26 +352,26 @@ namespace xt
         {
             using TestFixture = xiterator_test<TypeParam>;
             typename TestFixture::result_type rm;
+            SUBCASE("same shape - row_major iterator")
             {
-                SCOPED_TRACE("same shape - row_major iterator");
                 test_rend<layout_type::row_major>(rm, rm.shape());
             }
 
+            SUBCASE("broadcasting shape - row_major iterator")
             {
-                SCOPED_TRACE("broadcasting shape - row_major iterator");
                 layout_result<>::shape_type sh = rm.shape();
                 sh.insert(sh.begin(), 2);
                 sh.insert(sh.begin(), 4);
                 test_rend<layout_type::row_major>(rm, sh);
             }
 
+            SUBCASE("same shape - column_major iterator")
             {
-                SCOPED_TRACE("same shape - column_major iterator");
                 test_rend<layout_type::column_major>(rm, rm.shape());
             }
 
+            SUBCASE("broadcasting shape - column_major iterator")
             {
-                SCOPED_TRACE("broadcasting shape - column_major iterator");
                 layout_result<>::shape_type sh = rm.shape();
                 sh.insert(sh.begin(), 2);
                 sh.insert(sh.begin(), 4);
@@ -419,13 +419,13 @@ namespace xt
     TEST(xiterator, row_major_minus)
     {
         row_major_result<> rm;
+        SUBCASE("same shape - row_major iterator")
         {
-            SCOPED_TRACE("same shape - row_major iterator");
             test_minus<layout_type::row_major>(rm, rm.shape());
         }
 
+        SUBCASE("broadcasting shape - row_major iterator")
         {
-            SCOPED_TRACE("broadcasting shape - row_major iterator");
             layout_result<>::shape_type sh = rm.shape();
             sh.insert(sh.begin(), 2);
             sh.insert(sh.begin(), 4);
@@ -436,13 +436,13 @@ namespace xt
     TEST(xiterator, column_major_minus)
     {
         column_major_result<> rm;
+        SUBCASE("same shape - column_major iterator")
         {
-            SCOPED_TRACE("same shape - column_major iterator");
             test_minus<layout_type::column_major>(rm, rm.shape());
         }
 
+        SUBCASE("broadcasting shape - column_major iterator")
         {
-            SCOPED_TRACE("broadcasting shape - column_major iterator");
             layout_result<>::shape_type sh = rm.shape();
             sh.insert(sh.begin(), 2);
             sh.insert(sh.begin(), 4);
@@ -510,15 +510,15 @@ namespace xt
         using vector_type = row_major_result<>::vector_type;
         xarray_adaptor<vector_type, layout_type::dynamic> a(rm.storage(), rm.shape(), rm.strides());
         
+        SUBCASE("row_major iterator")
         {
-            SCOPED_TRACE("row_major iterator");
             xarray<vector_type::value_type> dst(a.shape(), 1);
             std::copy(a.cbegin<layout_type::row_major>(), a.cend<layout_type::row_major>(), dst.begin<layout_type::row_major>());
             EXPECT_EQ(a, dst);
         }
 
+        SUBCASE("column_major iterator")
         {
-            SCOPED_TRACE("column_major iterator");
             xarray<vector_type::value_type> dst(a.shape(), 1);
             std::copy(a.cbegin<layout_type::column_major>(), a.cend<layout_type::column_major>(), dst.begin<layout_type::column_major>());
             EXPECT_EQ(a, dst);
@@ -531,15 +531,15 @@ namespace xt
         using vector_type = row_major_result<>::vector_type;
         xarray_adaptor<vector_type, layout_type::dynamic> a(rm.storage(), rm.shape(), rm.strides());
 
+        SUBCASE("row_major iterator")
         {
-            SCOPED_TRACE("row_major iterator");
             xarray<vector_type::value_type> dst(a.shape(), 1);
             std::copy(a.crbegin<layout_type::row_major>(), a.crend<layout_type::row_major>(), dst.rbegin<layout_type::row_major>());
             EXPECT_EQ(a, dst);
         }
 
+        SUBCASE("column_major iterator")
         {
-            SCOPED_TRACE("column_major iterator");
             xarray<vector_type::value_type> dst(a.shape(), 1);
             std::copy(a.crbegin<layout_type::column_major>(), a.crend<layout_type::column_major>(), dst.rbegin<layout_type::column_major>());
             EXPECT_EQ(a, dst);

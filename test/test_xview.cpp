@@ -178,8 +178,8 @@ namespace xt
         std::vector<double> data = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
         std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
 
+        SUBCASE("copy constructor")
         {
-            SCOPED_TRACE("copy constructor");
             auto view1 = view(a, 1, range(1, 4));
             auto view2(view1);
             EXPECT_EQ(a(1, 1), view2(0));
@@ -195,8 +195,8 @@ namespace xt
             }
         }
 
+        SUBCASE("copy assignment operator")
         {
-            SCOPED_TRACE("copy assignment operator");
             auto view1 = view(a, 1, range(1, 4));
             auto view2 = view(a, 2, range(0, 3));
             view2 = view1;
@@ -213,8 +213,8 @@ namespace xt
         std::vector<double> data = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
         std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
 
+        SUBCASE("copy constructor")
         {
-            SCOPED_TRACE("copy constructor");
             auto view1 = view(a, 1, range(1, 4));
             auto view2(std::move(view1));
             EXPECT_EQ(a(1, 1), view2(0));
@@ -230,8 +230,8 @@ namespace xt
             }
         }
 
+        SUBCASE("copy assignment operator")
         {
-            SCOPED_TRACE("copy assignment operator");
             auto view1 = view(a, 1, range(1, 4));
             auto view2 = view(a, 2, range(0, 3));
             view2 = std::move(view1);

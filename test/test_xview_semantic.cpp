@@ -88,8 +88,8 @@ namespace xt
             view_op_tester<std::plus<>, TypeParam> t;
             auto viewa = view(t.a, t.x_slice, t.y_slice, t.z_slice);
 
+            SUBCASE("row_major + row_major")
             {
-                SCOPED_TRACE("row_major + row_major");
                 TypeParam b = t.a;
                 auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
                 auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
@@ -97,8 +97,8 @@ namespace xt
                 EXPECT_EQ(t.vres_rr, b);
             }
 
+            SUBCASE("row_major + column_major")
             {
-                SCOPED_TRACE("row_major + column_major");
                 TypeParam b = t.a;
                 auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
                 auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
@@ -106,8 +106,8 @@ namespace xt
                 EXPECT_EQ(t.vres_rc, b);
             }
 
+            SUBCASE("row_major + central_major")
             {
-                SCOPED_TRACE("row_major + central_major");
                 TypeParam b = t.a;
                 auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
                 auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
@@ -115,8 +115,8 @@ namespace xt
                 EXPECT_EQ(t.vres_rct, b);
             }
 
+            SUBCASE("row_major + unit_major")
             {
-                SCOPED_TRACE("row_major + unit_major");
                 TypeParam b = t.a;
                 auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
                 auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
@@ -130,8 +130,8 @@ namespace xt
             view_op_tester<std::minus<>, TypeParam> t;
             auto viewa = view(t.a, t.x_slice, t.y_slice, t.z_slice);
 
+            SUBCASE("row_major - row_major")
             {
-                SCOPED_TRACE("row_major - row_major");
                 TypeParam b = t.a;
                 auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
                 auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
@@ -139,8 +139,8 @@ namespace xt
                 EXPECT_EQ(t.vres_rr, b);
             }
 
+            SUBCASE("row_major - column_major")
             {
-                SCOPED_TRACE("row_major - column_major");
                 TypeParam b = t.a;
                 auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
                 auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
@@ -148,8 +148,8 @@ namespace xt
                 EXPECT_EQ(t.vres_rc, b);
             }
 
+            SUBCASE("row_major - central_major")
             {
-                SCOPED_TRACE("row_major - central_major");
                 TypeParam b = t.a;
                 auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
                 auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
@@ -157,8 +157,8 @@ namespace xt
                 EXPECT_EQ(t.vres_rct, b);
             }
 
+            SUBCASE("row_major - unit_major")
             {
-                SCOPED_TRACE("row_major - unit_major");
                 TypeParam b = t.a;
                 auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
                 auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
@@ -172,8 +172,8 @@ namespace xt
             view_op_tester<std::multiplies<>, TypeParam> t;
             auto viewa = view(t.a, t.x_slice, t.y_slice, t.z_slice);
 
+            SUBCASE("row_major * row_major")
             {
-                SCOPED_TRACE("row_major * row_major");
                 TypeParam b = t.a;
                 auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
                 auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
@@ -181,8 +181,8 @@ namespace xt
                 EXPECT_EQ(t.vres_rr, b);
             }
 
+            SUBCASE("row_major * column_major")
             {
-                SCOPED_TRACE("row_major * column_major");
                 TypeParam b = t.a;
                 auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
                 auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
@@ -190,8 +190,8 @@ namespace xt
                 EXPECT_EQ(t.vres_rc, b);
             }
 
+            SUBCASE("row_major * central_major")
             {
-                SCOPED_TRACE("row_major * central_major");
                 TypeParam b = t.a;
                 auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
                 auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
@@ -199,8 +199,8 @@ namespace xt
                 EXPECT_EQ(t.vres_rct, b);
             }
 
+            SUBCASE("row_major * unit_major")
             {
-                SCOPED_TRACE("row_major * unit_major");
                 TypeParam b = t.a;
                 auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
                 auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
@@ -214,8 +214,8 @@ namespace xt
             view_op_tester<std::divides<>, TypeParam> t;
             auto viewa = view(t.a, t.x_slice, t.y_slice, t.z_slice);
 
+            SUBCASE("row_major / row_major")
             {
-                SCOPED_TRACE("row_major / row_major");
                 TypeParam b = t.a;
                 auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
                 auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
@@ -223,8 +223,8 @@ namespace xt
                 EXPECT_EQ(t.vres_rr, b);
             }
 
+            SUBCASE("row_major / column_major")
             {
-                SCOPED_TRACE("row_major / column_major");
                 TypeParam b = t.a;
                 auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
                 auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
@@ -232,8 +232,8 @@ namespace xt
                 EXPECT_EQ(t.vres_rc, b);
             }
 
+            SUBCASE("row_major / central_major")
             {
-                SCOPED_TRACE("row_major / central_major");
                 TypeParam b = t.a;
                 auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
                 auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
@@ -241,8 +241,8 @@ namespace xt
                 EXPECT_EQ(t.vres_rct, b);
             }
 
+            SUBCASE("row_major / unit_major")
             {
-                SCOPED_TRACE("row_major / unit_major");
                 TypeParam b = t.a;
                 auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
                 auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
@@ -255,8 +255,8 @@ namespace xt
         {
             view_op_tester<std::plus<>, TypeParam> t;
 
+            SUBCASE("row_major += row_major")
             {
-                SCOPED_TRACE("row_major += row_major");
                 TypeParam b = t.a;
                 auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
                 auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
@@ -264,8 +264,8 @@ namespace xt
                 EXPECT_EQ(t.vres_rr, b);
             }
 
+            SUBCASE("row_major += column_major")
             {
-                SCOPED_TRACE("row_major += column_major");
                 TypeParam b = t.a;
                 auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
                 auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
@@ -273,8 +273,8 @@ namespace xt
                 EXPECT_EQ(t.vres_rc, b);
             }
 
+            SUBCASE("row_major += central_major")
             {
-                SCOPED_TRACE("row_major += central_major");
                 TypeParam b = t.a;
                 auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
                 auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
@@ -282,8 +282,8 @@ namespace xt
                 EXPECT_EQ(t.vres_rct, b);
             }
 
+            SUBCASE("row_major += unit_major")
             {
-                SCOPED_TRACE("row_major += unit_major");
                 TypeParam b = t.a;
                 auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
                 auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
@@ -296,8 +296,8 @@ namespace xt
         {
             view_op_tester<std::minus<>, TypeParam> t;
 
+            SUBCASE("row_major -= row_major")
             {
-                SCOPED_TRACE("row_major -= row_major");
                 TypeParam b = t.a;
                 auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
                 auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
@@ -305,8 +305,8 @@ namespace xt
                 EXPECT_EQ(t.vres_rr, b);
             }
 
+            SUBCASE("row_major -= column_major")
             {
-                SCOPED_TRACE("row_major -= column_major");
                 TypeParam b = t.a;
                 auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
                 auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
@@ -314,8 +314,8 @@ namespace xt
                 EXPECT_EQ(t.vres_rc, b);
             }
 
+            SUBCASE("row_major -= central_major")
             {
-                SCOPED_TRACE("row_major -= central_major");
                 TypeParam b = t.a;
                 auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
                 auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
@@ -323,8 +323,8 @@ namespace xt
                 EXPECT_EQ(t.vres_rct, b);
             }
 
+            SUBCASE("row_major -= unit_major")
             {
-                SCOPED_TRACE("row_major -= unit_major");
                 TypeParam b = t.a;
                 auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
                 auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
@@ -337,8 +337,8 @@ namespace xt
         {
             view_op_tester<std::multiplies<>, TypeParam> t;
 
+            SUBCASE("row_major *= row_major")
             {
-                SCOPED_TRACE("row_major *= row_major");
                 TypeParam b = t.a;
                 auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
                 auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
@@ -346,8 +346,8 @@ namespace xt
                 EXPECT_EQ(t.vres_rr, b);
             }
 
+            SUBCASE("row_major *= column_major")
             {
-                SCOPED_TRACE("row_major *= column_major");
                 TypeParam b = t.a;
                 auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
                 auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
@@ -355,8 +355,8 @@ namespace xt
                 EXPECT_EQ(t.vres_rc, b);
             }
 
+            SUBCASE("row_major *= central_major")
             {
-                SCOPED_TRACE("row_major *= central_major");
                 TypeParam b = t.a;
                 auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
                 auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
@@ -364,8 +364,8 @@ namespace xt
                 EXPECT_EQ(t.vres_rct, b);
             }
 
+            SUBCASE("row_major *= unit_major")
             {
-                SCOPED_TRACE("row_major *= unit_major");
                 TypeParam b = t.a;
                 auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
                 auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
@@ -378,8 +378,8 @@ namespace xt
         {
             view_op_tester<std::divides<>, TypeParam> t;
 
+            SUBCASE("row_major /= row_major")
             {
-                SCOPED_TRACE("row_major /= row_major");
                 TypeParam b = t.a;
                 auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
                 auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
@@ -387,8 +387,8 @@ namespace xt
                 EXPECT_EQ(t.vres_rr, b);
             }
 
+            SUBCASE("row_major /= column_major")
             {
-                SCOPED_TRACE("row_major /= column_major");
                 TypeParam b = t.a;
                 auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
                 auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
@@ -396,8 +396,8 @@ namespace xt
                 EXPECT_EQ(t.vres_rc, b);
             }
 
+            SUBCASE("row_major /= central_major")
             {
-                SCOPED_TRACE("row_major /= central_major");
                 TypeParam b = t.a;
                 auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
                 auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
@@ -405,8 +405,8 @@ namespace xt
                 EXPECT_EQ(t.vres_rct, b);
             }
 
+            SUBCASE("row_major /= unit_major")
             {
-                SCOPED_TRACE("row_major /= unit_major");
                 TypeParam b = t.a;
                 auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
                 auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);

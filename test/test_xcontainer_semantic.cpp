@@ -27,26 +27,26 @@ namespace xt
     {
         operation_tester<std::plus<>, TypeParam> tester;
 
+        SUBCASE("row_major + row_major")
         {
-            SCOPED_TRACE("row_major + row_major");
             TypeParam b = tester.a + tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major + column_major")
         {
-            SCOPED_TRACE("row_major + column_major");
             TypeParam b = tester.a + tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major + central_major")
         {
-            SCOPED_TRACE("row_major + central_major");
             TypeParam b = tester.a + tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major + unit_major")
         {
-            SCOPED_TRACE("row_major + unit_major");
             TypeParam b = tester.a + tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
@@ -56,26 +56,26 @@ namespace xt
     {
         operation_tester<std::minus<>, TypeParam> tester;
 
+        SUBCASE("row_major - row_major")
         {
-            SCOPED_TRACE("row_major - row_major");
             TypeParam b = tester.a - tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major - column_major")
         {
-            SCOPED_TRACE("row_major - column_major");
             TypeParam b = tester.a - tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major - central_major")
         {
-            SCOPED_TRACE("row_major - central_major");
             TypeParam b = tester.a - tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major - unit_major")
         {
-            SCOPED_TRACE("row_major - unit_major");
             TypeParam b = tester.a - tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
@@ -85,26 +85,26 @@ namespace xt
     {
         operation_tester<std::multiplies<>, TypeParam> tester;
 
+        SUBCASE("row_major * row_major")
         {
-            SCOPED_TRACE("row_major * row_major");
             TypeParam b = tester.a * tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major * column_major")
         {
-            SCOPED_TRACE("row_major * column_major");
             TypeParam b = tester.a * tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major * central_major")
         {
-            SCOPED_TRACE("row_major * central_major");
             TypeParam b = tester.a * tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major * unit_major")
         {
-            SCOPED_TRACE("row_major * unit_major");
             TypeParam b = tester.a * tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
@@ -114,26 +114,26 @@ namespace xt
     {
         operation_tester<std::divides<>, TypeParam> tester;
 
+        SUBCASE("row_major / row_major")
         {
-            SCOPED_TRACE("row_major / row_major");
             TypeParam b = tester.a / tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major / column_major")
         {
-            SCOPED_TRACE("row_major / column_major");
             TypeParam b = tester.a / tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major / central_major")
         {
-            SCOPED_TRACE("row_major / central_major");
             TypeParam b = tester.a / tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major / unit_major")
         {
-            SCOPED_TRACE("row_major / unit_major");
             TypeParam b = tester.a / tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
@@ -143,26 +143,26 @@ namespace xt
     {
         operation_tester<std::bit_and<>, TypeParam> tester;
 
+        SUBCASE("row_major & row_major")
         {
-            SCOPED_TRACE("row_major & row_major");
             TypeParam b = tester.a & tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major & column_major")
         {
-            SCOPED_TRACE("row_major & column_major");
             TypeParam b = tester.a & tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major & central_major")
         {
-            SCOPED_TRACE("row_major & central_major");
             TypeParam b = tester.a & tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major & unit_major")
         {
-            SCOPED_TRACE("row_major & unit_major");
             TypeParam b = tester.a & tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
@@ -172,26 +172,26 @@ namespace xt
     {
         operation_tester<std::bit_or<>, TypeParam> tester;
 
+        SUBCASE("row_major | row_major")
         {
-            SCOPED_TRACE("row_major | row_major");
             TypeParam b = tester.a | tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major | column_major")
         {
-            SCOPED_TRACE("row_major | column_major");
             TypeParam b = tester.a | tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major | central_major")
         {
-            SCOPED_TRACE("row_major | central_major");
             TypeParam b = tester.a | tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major | unit_major")
         {
-            SCOPED_TRACE("row_major | unit_major");
             TypeParam b = tester.a | tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
@@ -201,26 +201,26 @@ namespace xt
     {
         operation_tester<std::bit_xor<>, TypeParam> tester;
 
+        SUBCASE("row_major ^ row_major")
         {
-            SCOPED_TRACE("row_major ^ row_major");
             TypeParam b = tester.a ^ tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major ^ column_major")
         {
-            SCOPED_TRACE("row_major ^ column_major");
             TypeParam b = tester.a ^ tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major ^ central_major")
         {
-            SCOPED_TRACE("row_major ^ central_major");
             TypeParam b = tester.a ^ tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major ^ unit_major")
         {
-            SCOPED_TRACE("row_major ^ unit_major");
             TypeParam b = tester.a ^ tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
@@ -230,29 +230,29 @@ namespace xt
     {
         operation_tester<std::plus<>, TypeParam> tester;
 
+        SUBCASE("row_major += row_major")
         {
-            SCOPED_TRACE("row_major += row_major");
             TypeParam b = tester.a;
             b += tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major += column_major")
         {
-            SCOPED_TRACE("row_major += column_major");
             TypeParam b = tester.a;
             b += tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major += central_major")
         {
-            SCOPED_TRACE("row_major += central_major");
             TypeParam b = tester.a;
             b += tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major += unit_major")
         {
-            SCOPED_TRACE("row_major += unit_major");
             TypeParam b = tester.a;
             b += tester.ua;
             EXPECT_EQ(tester.res_ru, b);
@@ -263,29 +263,29 @@ namespace xt
     {
         operation_tester<std::minus<>, TypeParam> tester;
 
+        SUBCASE("row_major -= row_major")
         {
-            SCOPED_TRACE("row_major -= row_major");
             TypeParam b = tester.a;
             b -= tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major -= column_major")
         {
-            SCOPED_TRACE("row_major -= column_major");
             TypeParam b = tester.a;
             b -= tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major -= central_major")
         {
-            SCOPED_TRACE("row_major -= central_major");
             TypeParam b = tester.a;
             b -= tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major -= unit_major")
         {
-            SCOPED_TRACE("row_major -= unit_major");
             TypeParam b = tester.a;
             b -= tester.ua;
             EXPECT_EQ(tester.res_ru, b);
@@ -296,29 +296,29 @@ namespace xt
     {
         operation_tester<std::multiplies<>, TypeParam> tester;
 
+        SUBCASE("row_major *= row_major")
         {
-            SCOPED_TRACE("row_major *= row_major");
             TypeParam b = tester.a;
             b *= tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major *= column_major")
         {
-            SCOPED_TRACE("row_major *= column_major");
             TypeParam b = tester.a;
             b *= tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major *= central_major")
         {
-            SCOPED_TRACE("row_major *= central_major");
             TypeParam b = tester.a;
             b *= tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major *= unit_major")
         {
-            SCOPED_TRACE("row_major *= unit_major");
             TypeParam b = tester.a;
             b *= tester.ua;
             EXPECT_EQ(tester.res_ru, b);
@@ -329,29 +329,29 @@ namespace xt
     {
         operation_tester<std::divides<>, TypeParam> tester;
 
+        SUBCASE("row_major /= row_major")
         {
-            SCOPED_TRACE("row_major /= row_major");
             TypeParam b = tester.a;
             b /= tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major /= column_major")
         {
-            SCOPED_TRACE("row_major /= column_major");
             TypeParam b = tester.a;
             b /= tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major /= central_major")
         {
-            SCOPED_TRACE("row_major /= central_major");
             TypeParam b = tester.a;
             b /= tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major /= unit_major")
         {
-            SCOPED_TRACE("row_major /= unit_major");
             TypeParam b = tester.a;
             b /= tester.ua;
             EXPECT_EQ(tester.res_ru, b);
@@ -362,29 +362,29 @@ namespace xt
     {
         operation_tester<std::bit_and<>, TypeParam> tester;
 
+        SUBCASE("row_major &= row_major")
         {
-            SCOPED_TRACE("row_major &= row_major");
             TypeParam b = tester.a;
             b &= tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major &= column_major")
         {
-            SCOPED_TRACE("row_major &= column_major");
             TypeParam b = tester.a;
             b &= tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major &= central_major")
         {
-            SCOPED_TRACE("row_major &= central_major");
             TypeParam b = tester.a;
             b &= tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major &= unit_major")
         {
-            SCOPED_TRACE("row_major &= unit_major");
             TypeParam b = tester.a;
             b &= tester.ua;
             EXPECT_EQ(tester.res_ru, b);
@@ -395,29 +395,29 @@ namespace xt
     {
         operation_tester<std::bit_or<>, TypeParam> tester;
 
+        SUBCASE("row_major |= row_major")
         {
-            SCOPED_TRACE("row_major |= row_major");
             TypeParam b = tester.a;
             b |= tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major |= column_major")
         {
-            SCOPED_TRACE("row_major |= column_major");
             TypeParam b = tester.a;
             b |= tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major |= central_major")
         {
-            SCOPED_TRACE("row_major |= central_major");
             TypeParam b = tester.a;
             b |= tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major |= unit_major")
         {
-            SCOPED_TRACE("row_major |= unit_major");
             TypeParam b = tester.a;
             b |= tester.ua;
             EXPECT_EQ(tester.res_ru, b);
@@ -428,29 +428,29 @@ namespace xt
     {
         operation_tester<std::bit_xor<>, TypeParam> tester;
 
+        SUBCASE("row_major ^= row_major")
         {
-            SCOPED_TRACE("row_major ^= row_major");
             TypeParam b = tester.a;
             b ^= tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major ^= column_major")
         {
-            SCOPED_TRACE("row_major ^= column_major");
             TypeParam b = tester.a;
             b ^= tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major ^= central_major")
         {
-            SCOPED_TRACE("row_major ^= central_major");
             TypeParam b = tester.a;
             b ^= tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major ^= unit_major")
         {
-            SCOPED_TRACE("row_major ^= unit_major");
             TypeParam b = tester.a;
             b ^= tester.ua;
             EXPECT_EQ(tester.res_ru, b);
@@ -461,29 +461,29 @@ namespace xt
     {
         operation_tester<std::plus<>, TypeParam> tester;
 
+        SUBCASE("row_major + row_major")
         {
-            SCOPED_TRACE("row_major + row_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a + tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major + column_major")
         {
-            SCOPED_TRACE("row_major + column_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a + tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major + central_major")
         {
-            SCOPED_TRACE("row_major + central_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a + tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major + unit_major")
         {
-            SCOPED_TRACE("row_major + unit_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a + tester.ua;
             EXPECT_EQ(tester.res_ru, b);
@@ -494,29 +494,29 @@ namespace xt
     {
         operation_tester<std::minus<>, TypeParam> tester;
 
+        SUBCASE("row_major - row_major")
         {
-            SCOPED_TRACE("row_major - row_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a - tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major - column_major")
         {
-            SCOPED_TRACE("row_major - column_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a - tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major - central_major")
         {
-            SCOPED_TRACE("row_major - central_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a - tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major - unit_major")
         {
-            SCOPED_TRACE("row_major - unit_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a - tester.ua;
             EXPECT_EQ(tester.res_ru, b);
@@ -527,29 +527,29 @@ namespace xt
     {
         operation_tester<std::multiplies<>, TypeParam> tester;
 
+        SUBCASE("row_major * row_major")
         {
-            SCOPED_TRACE("row_major * row_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a * tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major * column_major")
         {
-            SCOPED_TRACE("row_major * column_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a * tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major * central_major")
         {
-            SCOPED_TRACE("row_major * central_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a * tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major * unit_major")
         {
-            SCOPED_TRACE("row_major * unit_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a * tester.ua;
             EXPECT_EQ(tester.res_ru, b);
@@ -560,29 +560,29 @@ namespace xt
     {
         operation_tester<std::divides<>, TypeParam> tester;
 
+        SUBCASE("row_major / row_major")
         {
-            SCOPED_TRACE("row_major / row_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a / tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major / column_major")
         {
-            SCOPED_TRACE("row_major / column_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a / tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major / central_major")
         {
-            SCOPED_TRACE("row_major / central_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a / tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major / unit_major")
         {
-            SCOPED_TRACE("row_major / unit_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a / tester.ua;
             EXPECT_EQ(tester.res_ru, b);
@@ -593,29 +593,29 @@ namespace xt
     {
         operation_tester<std::bit_and<>, TypeParam> tester;
 
+        SUBCASE("row_major & row_major")
         {
-            SCOPED_TRACE("row_major & row_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a & tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major & column_major")
         {
-            SCOPED_TRACE("row_major & column_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a & tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major & central_major")
         {
-            SCOPED_TRACE("row_major & central_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a & tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major & unit_major")
         {
-            SCOPED_TRACE("row_major & unit_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a & tester.ua;
             EXPECT_EQ(tester.res_ru, b);
@@ -626,29 +626,29 @@ namespace xt
     {
         operation_tester<std::bit_or<>, TypeParam> tester;
 
+        SUBCASE("row_major | row_major")
         {
-            SCOPED_TRACE("row_major | row_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a | tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major | column_major")
         {
-            SCOPED_TRACE("row_major | column_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a | tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major | central_major")
         {
-            SCOPED_TRACE("row_major | central_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a | tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major | unit_major")
         {
-            SCOPED_TRACE("row_major | unit_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a | tester.ua;
             EXPECT_EQ(tester.res_ru, b);
@@ -659,35 +659,34 @@ namespace xt
     {
         operation_tester<std::bit_xor<>, TypeParam> tester;
 
+        SUBCASE("row_major ^ row_major")
         {
-            SCOPED_TRACE("row_major ^ row_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a ^ tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major ^ column_major")
         {
-            SCOPED_TRACE("row_major ^ column_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a ^ tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major ^ central_major")
         {
-            SCOPED_TRACE("row_major ^ central_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a ^ tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major ^ unit_major")
         {
-            SCOPED_TRACE("row_major ^ unit_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a ^ tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
     }
-
 
     #undef CONTAINER_SEMANTIC_TYPES
 }

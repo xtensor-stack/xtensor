@@ -623,8 +623,8 @@ namespace xt
             TypeParam a = { { 0., 1., 2. },{ 3., 4., 5. } };
             TypeParam b = { { 0., 1., 2. },{ 3., 4., 5. } };
 
+            SUBCASE("xarray<double> + xarray<double>")
             {
-                SCOPED_TRACE("xarray<double> + xarray<double>");
                 auto fd = a + b;
                 using assign_traits_double = xassign_traits<TypeParam, decltype(fd)>;
     #if XTENSOR_USE_XSIMD
@@ -638,8 +638,8 @@ namespace xt
     #endif
             }
 
+            SUBCASE("double * xarray<double>")
             {
-                SCOPED_TRACE("double * xarray<double>");
                 xscalar<double> sd = 2.;
                 auto fsd = sd * a;
                 using assign_traits_scalar_double = xassign_traits<TypeParam, decltype(fsd)>;
@@ -654,8 +654,8 @@ namespace xt
     #endif
             }
 
+            SUBCASE("xarray<double> + xarray<int>")
             {
-                SCOPED_TRACE("xarray<double> + xarray<int>");
                 using int_container_t = xop_test::rebind_container_t<TypeParam, int>;
                 int_container_t c = { { 0, 1, 2 },{ 3, 4, 5 } };
                 auto fm = a + c;
@@ -669,8 +669,8 @@ namespace xt
     #endif
             }
 
+            SUBCASE("int * xarray<double>")
             {
-                SCOPED_TRACE("int * xarray<double>");
                 xscalar<int> si = 2;
                 auto fsm = si * a;
                 using assign_traits_scalar_mixed = xassign_traits<TypeParam, decltype(fsm)>;
@@ -683,8 +683,8 @@ namespace xt
     #endif
             }
 
+            SUBCASE("xarray<double> + xarray<char>")
             {
-                SCOPED_TRACE("xarray<double> + xarray<char>");
                 using char_container_t = xop_test::rebind_container_t<TypeParam, char>;
                 char_container_t d = { { 0, 1, 2 },{ 3, 4, 5 } };
                 auto fdc = a + d;
@@ -698,8 +698,8 @@ namespace xt
     #endif
             }
 
+            SUBCASE("xarray<double> + xarray<my_double>")
             {
-                SCOPED_TRACE("xarray<double> + xarray<my_double>");
                 using md_container_t = xop_test::rebind_container_t<TypeParam, my_double>;
                 md_container_t d =  { { 0, 1, 2 },{ 3, 4, 5 } };
                 auto fdm = a + d;
@@ -713,8 +713,8 @@ namespace xt
     #endif
             }
 
+            SUBCASE("xarray<double> > xarray<double>")
             {
-                SCOPED_TRACE("xarray<double> > xarray<double>");
                 auto fgt = a > b;
                 using bool_container_t = xop_test::rebind_container_t<TypeParam, bool>;
                 using assign_traits_gt = xassign_traits<bool_container_t, decltype(fgt)>;
@@ -727,8 +727,8 @@ namespace xt
     #endif
             }
 
+            SUBCASE("xarray<bool> || xarray<bool>")
             {
-                SCOPED_TRACE("xarray<bool> || xarray<bool>");
                 using bool_container_t = xop_test::rebind_container_t<TypeParam, bool>;
                 bool_container_t b0 = {{true, false, true}, {false, false, true}};
                 bool_container_t b1 = {{true, true, false}, {false, true, true}};
@@ -790,8 +790,8 @@ namespace xt
             EXPECT_FALSE(frc_traits::simd_linear_assign());
             EXPECT_FALSE(fcc_traits::simd_linear_assign());
 
+            SUBCASE("row_major + row_major")
             {
-                SCOPED_TRACE("row_major + row_major");
     #if XTENSOR_USE_XSIMD
                 EXPECT_TRUE(frr_traits::simd_linear_assign(a, frr));
     #else
@@ -800,14 +800,14 @@ namespace xt
                 EXPECT_FALSE(frr_traits::simd_linear_assign(b, frr));
             }
 
+            SUBCASE("row_major + column_major")
             {
-                SCOPED_TRACE("row_major + column_major");
                 EXPECT_FALSE(frc_traits::simd_linear_assign(a, frc));
                 EXPECT_FALSE(frc_traits::simd_linear_assign(b, frc));
             }
 
+            SUBCASE("row_major + column_major")
             {
-                SCOPED_TRACE("row_major + column_major");
                 EXPECT_FALSE(fcc_traits::simd_linear_assign(a, fcc));
     #if XTENSOR_USE_XSIMD
                 EXPECT_TRUE(fcc_traits::simd_linear_assign(b, fcc));

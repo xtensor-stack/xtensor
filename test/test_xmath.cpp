@@ -330,8 +330,8 @@ namespace xt
         using array_type = xarray<double>;
         array_type a = { {1.2, 2.3}, {3.4, 4.5} };
 
+        SUBCASE("unary function")
         {
-            SCOPED_TRACE("unary function");
             auto fexp = exp(a);
             using assign_traits = xassign_traits<array_type, decltype(fexp)>;
 #if XTENSOR_USE_XSIMD
@@ -345,8 +345,8 @@ namespace xt
 #endif
         }
 
+        SUBCASE("binary function")
         {
-            SCOPED_TRACE("binary function");
             auto fpow = pow(a, a);
             using assign_traits = xassign_traits<array_type, decltype(fpow)>;
 #if XTENSOR_USE_XSIMD
@@ -360,8 +360,8 @@ namespace xt
 #endif
         }
 
+        SUBCASE("ternary function")
         {
-            SCOPED_TRACE("ternary function");
             auto ffma = xt::fma(a, a, a);
             using assign_traits = xassign_traits<array_type, decltype(ffma)>;
 #if XTENSOR_USE_XSIMD
