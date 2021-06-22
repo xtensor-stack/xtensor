@@ -10,6 +10,8 @@
 #include "test_common.hpp"
 #include "test_xsemantic.hpp"
 
+TEST_SUITE_BEGIN("adaptor_semantic");
+
 namespace xt
 {
     using vector_type = std::vector<int>;
@@ -35,352 +37,351 @@ namespace xt
     using get_test_adaptor_t = typename get_test_adaptor<C>::type;
 
     template <class C>
-    class adaptor_semantic : public ::testing::Test
+    class adaptor_semantic
     {
     public:
         using container_type = C;
         using adaptor_type = get_test_adaptor_t<C>;
     };
 
-    TEST_CASE_TEMPLATE("adaptor_semantic", TypeParam, xarray_dynamic, xtensor_dynamic)
+    #define ADAPTOR_SEMANTIC_TYPES xarray_dynamic, xtensor_dynamic
+
+    TEST_CASE_TEMPLATE("xsimd_info", TypeParam, ADAPTOR_SEMANTIC_TYPES)
     {
-        using TestFixture =  adaptor_semantic<TypeParam>;
-
-        SUBCASE("xsimd_info")
-        {
-    #if defined(XTENSOR_USE_XSIMD)
-            std::cout << "Built with XSIMD" << std::endl;
-        #if defined(XSIMD_X86_INSTR_SET)
-            std::cout << "Using X86 Instruction set: " << XSIMD_INSTR_SET << std::endl;
-        #elif defined(XSIMD_X86_AMD_INSTR_SET)
-            std::cout << "Using AMD Instruction set: " << XSIMD_INSTR_SET << std::endl;
-        #elif defined(XSIMD_ARM_INSTR_SET)
-            std::cout << "Using ARM Instruction set: " << XSIMD_INSTR_SET << std::endl;
-        #else
-            std::cout << "Using unknown Instruction set: " << XSIMD_INSTR_SET << std::endl;
-        #endif
+#if defined(XTENSOR_USE_XSIMD)
+        std::cout << "Built with XSIMD" << std::endl;
+    #if defined(XSIMD_X86_INSTR_SET)
+        std::cout << "Using X86 Instruction set: " << XSIMD_INSTR_SET << std::endl;
+    #elif defined(XSIMD_X86_AMD_INSTR_SET)
+        std::cout << "Using AMD Instruction set: " << XSIMD_INSTR_SET << std::endl;
+    #elif defined(XSIMD_ARM_INSTR_SET)
+        std::cout << "Using ARM Instruction set: " << XSIMD_INSTR_SET << std::endl;
     #else
-            std::cout << "Built without XSIMD" << std::endl;
+        std::cout << "Using unknown Instruction set: " << XSIMD_INSTR_SET << std::endl;
     #endif
+#else
+        std::cout << "Built without XSIMD" << std::endl;
+#endif
+    }
+
+    TEST_CASE_TEMPLATE("a_plus_b", TypeParam, ADAPTOR_SEMANTIC_TYPES)
+    {
+        operation_tester<std::plus<>, TypeParam> tester;
+        using adaptor_type = typename adaptor_semantic<TypeParam>::adaptor_type;
+        {
+            SCOPED_TRACE("row_major + row_major");
+            vector_type v;
+            adaptor_type b(v);
+            b = tester.a + tester.ra;
+            EXPECT_EQ(tester.res_rr, b);
         }
 
-        SUBCASE("a_plus_b")
         {
-            operation_tester<std::plus<>, TypeParam> tester;
-            using adaptor_type = typename TestFixture::adaptor_type;
-            {
-                SCOPED_TRACE("row_major + row_major");
-                vector_type v;
-                adaptor_type b(v);
-                b = tester.a + tester.ra;
-                EXPECT_EQ(tester.res_rr, b);
-            }
-
-            {
-                SCOPED_TRACE("row_major + column_major");
-                vector_type v;
-                adaptor_type b(v);
-                b = tester.a + tester.ca;
-                EXPECT_EQ(tester.res_rc, b);
-            }
-
-            {
-                SCOPED_TRACE("row_major + central_major");
-                vector_type v;
-                adaptor_type b(v);
-                b = tester.a + tester.cta;
-                EXPECT_EQ(tester.res_rct, b);
-            }
-
-            {
-                SCOPED_TRACE("row_major + unit_major");
-                vector_type v;
-                adaptor_type b(v);
-                b = tester.a + tester.ua;
-                EXPECT_EQ(tester.res_ru, b);
-            }
+            SCOPED_TRACE("row_major + column_major");
+            vector_type v;
+            adaptor_type b(v);
+            b = tester.a + tester.ca;
+            EXPECT_EQ(tester.res_rc, b);
         }
 
-        SUBCASE("a_minus_b")
         {
-            operation_tester<std::minus<>, TypeParam> tester;
-            using adaptor_type = typename TestFixture::adaptor_type;
-
-            {
-                SCOPED_TRACE("row_major - row_major");
-                vector_type v;
-                adaptor_type b(v);
-                b = tester.a - tester.ra;
-                EXPECT_EQ(tester.res_rr, b);
-            }
-
-            {
-                SCOPED_TRACE("row_major - column_major");
-                vector_type v;
-                adaptor_type b(v);
-                b = tester.a - tester.ca;
-                EXPECT_EQ(tester.res_rc, b);
-            }
-
-            {
-                SCOPED_TRACE("row_major - central_major");
-                vector_type v;
-                adaptor_type b(v);
-                b = tester.a - tester.cta;
-                EXPECT_EQ(tester.res_rct, b);
-            }
-
-            {
-                SCOPED_TRACE("row_major - unit_major");
-                vector_type v;
-                adaptor_type b(v);
-                b = tester.a - tester.ua;
-                EXPECT_EQ(tester.res_ru, b);
-            }
+            SCOPED_TRACE("row_major + central_major");
+            vector_type v;
+            adaptor_type b(v);
+            b = tester.a + tester.cta;
+            EXPECT_EQ(tester.res_rct, b);
         }
 
-        SUBCASE("a_times_b")
         {
-            operation_tester<std::multiplies<>, TypeParam> tester;
-            using adaptor_type = typename TestFixture::adaptor_type;
-
-            {
-                SCOPED_TRACE("row_major * row_major");
-                vector_type v;
-                adaptor_type b(v);
-                b = tester.a * tester.ra;
-                EXPECT_EQ(tester.res_rr, b);
-            }
-
-            {
-                SCOPED_TRACE("row_major * column_major");
-                vector_type v;
-                adaptor_type b(v);
-                b = tester.a * tester.ca;
-                EXPECT_EQ(tester.res_rc, b);
-            }
-
-            {
-                SCOPED_TRACE("row_major * central_major");
-                vector_type v;
-                adaptor_type b(v);
-                b = tester.a * tester.cta;
-                EXPECT_EQ(tester.res_rct, b);
-            }
-
-            {
-                SCOPED_TRACE("row_major * unit_major");
-                vector_type v;
-                adaptor_type b(v);
-                b = tester.a * tester.ua;
-                EXPECT_EQ(tester.res_ru, b);
-            }
-        }
-
-        SUBCASE("a_divide_by_b")
-        {
-            operation_tester<std::divides<>, TypeParam> tester;
-            using adaptor_type = typename TestFixture::adaptor_type;
-
-            {
-                SCOPED_TRACE("row_major / row_major");
-                vector_type v;
-                adaptor_type b(v);
-                b = tester.a / tester.ra;
-                EXPECT_EQ(tester.res_rr, b);
-            }
-
-            {
-                SCOPED_TRACE("row_major / column_major");
-                vector_type v;
-                adaptor_type b(v);
-                b = tester.a / tester.ca;
-                EXPECT_EQ(tester.res_rc, b);
-            }
-
-            {
-                SCOPED_TRACE("row_major / central_major");
-                vector_type v;
-                adaptor_type b(v);
-                b = tester.a / tester.cta;
-                EXPECT_EQ(tester.res_rct, b);
-            }
-
-            {
-                SCOPED_TRACE("row_major / unit_major");
-                vector_type v;
-                adaptor_type b(v);
-                b = tester.a / tester.ua;
-                EXPECT_EQ(tester.res_ru, b);
-            }
-        }
-
-        SUBCASE("a_plus_equal_b")
-        {
-            operation_tester<std::plus<>, TypeParam> tester;
-            using adaptor_type = typename TestFixture::adaptor_type;
-
-            {
-                SCOPED_TRACE("row_major += row_major");
-                vector_type v;
-                adaptor_type b(v);
-                b = tester.a;
-                b += tester.ra;
-                EXPECT_EQ(tester.res_rr, b);
-            }
-
-            {
-                SCOPED_TRACE("row_major += column_major");
-                vector_type v;
-                adaptor_type b(v);
-                b = tester.a;
-                b += tester.ca;
-                EXPECT_EQ(tester.res_rc, b);
-            }
-
-            {
-                SCOPED_TRACE("row_major += central_major");
-                vector_type v;
-                adaptor_type b(v);
-                b = tester.a;
-                b += tester.cta;
-                EXPECT_EQ(tester.res_rct, b);
-            }
-
-            {
-                SCOPED_TRACE("row_major += unit_major");
-                vector_type v;
-                adaptor_type b(v);
-                b = tester.a;
-                b += tester.ua;
-                EXPECT_EQ(tester.res_ru, b);
-            }
-        }
-
-        SUBCASE("a_minus_equal_b")
-        {
-            operation_tester<std::minus<>, TypeParam> tester;
-            using adaptor_type = typename TestFixture::adaptor_type;
-
-            {
-                SCOPED_TRACE("row_major -= row_major");
-                vector_type v;
-                adaptor_type b(v);
-                b = tester.a;
-                b -= tester.ra;
-                EXPECT_EQ(tester.res_rr, b);
-            }
-
-            {
-                SCOPED_TRACE("row_major -= column_major");
-                vector_type v;
-                adaptor_type b(v);
-                b = tester.a;
-                b -= tester.ca;
-                EXPECT_EQ(tester.res_rc, b);
-            }
-
-            {
-                SCOPED_TRACE("row_major -= central_major");
-                vector_type v;
-                adaptor_type b(v);
-                b = tester.a;
-                b -= tester.cta;
-                EXPECT_EQ(tester.res_rct, b);
-            }
-
-            {
-                SCOPED_TRACE("row_major -= unit_major");
-                vector_type v;
-                adaptor_type b(v);
-                b = tester.a;
-                b -= tester.ua;
-                EXPECT_EQ(tester.res_ru, b);
-            }
-        }
-
-        SUBCASE("a_times_equal_b")
-        {
-            operation_tester<std::multiplies<>, TypeParam> tester;
-            using adaptor_type = typename TestFixture::adaptor_type;
-
-            {
-                SCOPED_TRACE("row_major *= row_major");
-                vector_type v;
-                adaptor_type b(v);
-                b = tester.a;
-                b *= tester.ra;
-                EXPECT_EQ(tester.res_rr, b);
-            }
-
-            {
-                SCOPED_TRACE("row_major *= column_major");
-                vector_type v;
-                adaptor_type b(v);
-                b = tester.a;
-                b *= tester.ca;
-                EXPECT_EQ(tester.res_rc, b);
-            }
-
-            {
-                SCOPED_TRACE("row_major *= central_major");
-                vector_type v;
-                adaptor_type b(v);
-                b = tester.a;
-                b *= tester.cta;
-                EXPECT_EQ(tester.res_rct, b);
-            }
-
-            {
-                SCOPED_TRACE("row_major *= unit_major");
-                vector_type v;
-                adaptor_type b(v);
-                b = tester.a;
-                b *= tester.ua;
-                EXPECT_EQ(tester.res_ru, b);
-            }
-        }
-
-        SUBCASE("a_divide_by_equal_b")
-        {
-            operation_tester<std::divides<>, TypeParam> tester;
-            using adaptor_type = typename TestFixture::adaptor_type;
-
-            {
-                SCOPED_TRACE("row_major /= row_major");
-                vector_type v;
-                adaptor_type b(v);
-                b = tester.a;
-                b /= tester.ra;
-                EXPECT_EQ(tester.res_rr, b);
-            }
-
-            {
-                SCOPED_TRACE("row_major /= column_major");
-                vector_type v;
-                adaptor_type b(v);
-                b = tester.a;
-                b /= tester.ca;
-                EXPECT_EQ(tester.res_rc, b);
-            }
-
-            {
-                SCOPED_TRACE("row_major /= central_major");
-                vector_type v;
-                adaptor_type b(v);
-                b = tester.a;
-                b /= tester.cta;
-                EXPECT_EQ(tester.res_rct, b);
-            }
-
-            {
-                SCOPED_TRACE("row_major /= unit_major");
-                vector_type v;
-                adaptor_type b(v);
-                b = tester.a;
-                b /= tester.ua;
-                EXPECT_EQ(tester.res_ru, b);
-            }
+            SCOPED_TRACE("row_major + unit_major");
+            vector_type v;
+            adaptor_type b(v);
+            b = tester.a + tester.ua;
+            EXPECT_EQ(tester.res_ru, b);
         }
     }
+
+    TEST_CASE_TEMPLATE("a_minus_b", TypeParam, ADAPTOR_SEMANTIC_TYPES)
+    {
+        operation_tester<std::minus<>, TypeParam> tester;
+        using adaptor_type = typename adaptor_semantic<TypeParam>::adaptor_type;
+
+        {
+            SCOPED_TRACE("row_major - row_major");
+            vector_type v;
+            adaptor_type b(v);
+            b = tester.a - tester.ra;
+            EXPECT_EQ(tester.res_rr, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major - column_major");
+            vector_type v;
+            adaptor_type b(v);
+            b = tester.a - tester.ca;
+            EXPECT_EQ(tester.res_rc, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major - central_major");
+            vector_type v;
+            adaptor_type b(v);
+            b = tester.a - tester.cta;
+            EXPECT_EQ(tester.res_rct, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major - unit_major");
+            vector_type v;
+            adaptor_type b(v);
+            b = tester.a - tester.ua;
+            EXPECT_EQ(tester.res_ru, b);
+        }
+    }
+
+    TEST_CASE_TEMPLATE("a_times_b", TypeParam, ADAPTOR_SEMANTIC_TYPES)
+    {
+        operation_tester<std::multiplies<>, TypeParam> tester;
+        using adaptor_type = typename adaptor_semantic<TypeParam>::adaptor_type;
+
+        {
+            SCOPED_TRACE("row_major * row_major");
+            vector_type v;
+            adaptor_type b(v);
+            b = tester.a * tester.ra;
+            EXPECT_EQ(tester.res_rr, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major * column_major");
+            vector_type v;
+            adaptor_type b(v);
+            b = tester.a * tester.ca;
+            EXPECT_EQ(tester.res_rc, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major * central_major");
+            vector_type v;
+            adaptor_type b(v);
+            b = tester.a * tester.cta;
+            EXPECT_EQ(tester.res_rct, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major * unit_major");
+            vector_type v;
+            adaptor_type b(v);
+            b = tester.a * tester.ua;
+            EXPECT_EQ(tester.res_ru, b);
+        }
+    }
+
+    TEST_CASE_TEMPLATE("a_divide_by_b", TypeParam, ADAPTOR_SEMANTIC_TYPES)
+    {
+        operation_tester<std::divides<>, TypeParam> tester;
+        using adaptor_type = typename adaptor_semantic<TypeParam>::adaptor_type;
+
+        {
+            SCOPED_TRACE("row_major / row_major");
+            vector_type v;
+            adaptor_type b(v);
+            b = tester.a / tester.ra;
+            EXPECT_EQ(tester.res_rr, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major / column_major");
+            vector_type v;
+            adaptor_type b(v);
+            b = tester.a / tester.ca;
+            EXPECT_EQ(tester.res_rc, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major / central_major");
+            vector_type v;
+            adaptor_type b(v);
+            b = tester.a / tester.cta;
+            EXPECT_EQ(tester.res_rct, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major / unit_major");
+            vector_type v;
+            adaptor_type b(v);
+            b = tester.a / tester.ua;
+            EXPECT_EQ(tester.res_ru, b);
+        }
+    }
+
+    TEST_CASE_TEMPLATE("a_plus_equal_b", TypeParam, ADAPTOR_SEMANTIC_TYPES)
+    {
+        operation_tester<std::plus<>, TypeParam> tester;
+        using adaptor_type = typename adaptor_semantic<TypeParam>::adaptor_type;
+
+        {
+            SCOPED_TRACE("row_major += row_major");
+            vector_type v;
+            adaptor_type b(v);
+            b = tester.a;
+            b += tester.ra;
+            EXPECT_EQ(tester.res_rr, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major += column_major");
+            vector_type v;
+            adaptor_type b(v);
+            b = tester.a;
+            b += tester.ca;
+            EXPECT_EQ(tester.res_rc, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major += central_major");
+            vector_type v;
+            adaptor_type b(v);
+            b = tester.a;
+            b += tester.cta;
+            EXPECT_EQ(tester.res_rct, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major += unit_major");
+            vector_type v;
+            adaptor_type b(v);
+            b = tester.a;
+            b += tester.ua;
+            EXPECT_EQ(tester.res_ru, b);
+        }
+    }
+
+    TEST_CASE_TEMPLATE("a_minus_equal_b", TypeParam, ADAPTOR_SEMANTIC_TYPES)
+    {
+        operation_tester<std::minus<>, TypeParam> tester;
+        using adaptor_type = typename adaptor_semantic<TypeParam>::adaptor_type;
+
+        {
+            SCOPED_TRACE("row_major -= row_major");
+            vector_type v;
+            adaptor_type b(v);
+            b = tester.a;
+            b -= tester.ra;
+            EXPECT_EQ(tester.res_rr, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major -= column_major");
+            vector_type v;
+            adaptor_type b(v);
+            b = tester.a;
+            b -= tester.ca;
+            EXPECT_EQ(tester.res_rc, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major -= central_major");
+            vector_type v;
+            adaptor_type b(v);
+            b = tester.a;
+            b -= tester.cta;
+            EXPECT_EQ(tester.res_rct, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major -= unit_major");
+            vector_type v;
+            adaptor_type b(v);
+            b = tester.a;
+            b -= tester.ua;
+            EXPECT_EQ(tester.res_ru, b);
+        }
+    }
+
+    TEST_CASE_TEMPLATE("a_times_equal_b", TypeParam, ADAPTOR_SEMANTIC_TYPES)
+    {
+        operation_tester<std::multiplies<>, TypeParam> tester;
+        using adaptor_type = typename adaptor_semantic<TypeParam>::adaptor_type;
+
+        {
+            SCOPED_TRACE("row_major *= row_major");
+            vector_type v;
+            adaptor_type b(v);
+            b = tester.a;
+            b *= tester.ra;
+            EXPECT_EQ(tester.res_rr, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major *= column_major");
+            vector_type v;
+            adaptor_type b(v);
+            b = tester.a;
+            b *= tester.ca;
+            EXPECT_EQ(tester.res_rc, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major *= central_major");
+            vector_type v;
+            adaptor_type b(v);
+            b = tester.a;
+            b *= tester.cta;
+            EXPECT_EQ(tester.res_rct, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major *= unit_major");
+            vector_type v;
+            adaptor_type b(v);
+            b = tester.a;
+            b *= tester.ua;
+            EXPECT_EQ(tester.res_ru, b);
+        }
+    }
+
+    TEST_CASE_TEMPLATE("a_divide_by_equal_b", TypeParam, ADAPTOR_SEMANTIC_TYPES)
+    {
+        operation_tester<std::divides<>, TypeParam> tester;
+        using adaptor_type = typename adaptor_semantic<TypeParam>::adaptor_type;
+
+        {
+            SCOPED_TRACE("row_major /= row_major");
+            vector_type v;
+            adaptor_type b(v);
+            b = tester.a;
+            b /= tester.ra;
+            EXPECT_EQ(tester.res_rr, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major /= column_major");
+            vector_type v;
+            adaptor_type b(v);
+            b = tester.a;
+            b /= tester.ca;
+            EXPECT_EQ(tester.res_rc, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major /= central_major");
+            vector_type v;
+            adaptor_type b(v);
+            b = tester.a;
+            b /= tester.cta;
+            EXPECT_EQ(tester.res_rct, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major /= unit_major");
+            vector_type v;
+            adaptor_type b(v);
+            b = tester.a;
+            b /= tester.ua;
+            EXPECT_EQ(tester.res_ru, b);
+        }
+    }
+    #undef ADAPTOR_SEMANTIC_TYPES
 }
+TEST_SUITE_END();
