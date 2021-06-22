@@ -11,7 +11,7 @@
 #warning "test_xdatesupport.cpp has been deactivated because it leads to internal compiler error"
 #else
 
-#include "gtest/gtest.h"
+#include "test_common_macros.hpp"
 
 #include <chrono>
 

@@ -7,7 +7,7 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#include "gtest/gtest.h"
+#include "test_common_macros.hpp"
 #include "xtensor/xnoalias.hpp"
 #include "test_xsemantic.hpp"
 
@@ -28,270 +28,274 @@ namespace xt
         using storage_type = C;
     };
 
-    using testing_types = ::testing::Types<xarray_dynamic, xtensor_dynamic>;
-    TYPED_TEST_SUITE(scalar_semantic, testing_types);
+    #define SCALAR_SEMANTIC_TEST_TYPES xarray_dynamic, xtensor_dynamic
 
-    TYPED_TEST(scalar_semantic, a_plus_equal_b)
+    TEST_SUITE("scalar_semantic")
     {
-        scalar_operation_tester<std::plus<>, TypeParam> tester;
-
+        TEST_CASE_TEMPLATE("a_plus_equal_b", TypeParam, SCALAR_SEMANTIC_TEST_TYPES)
         {
-            SCOPED_TRACE("row_major += scalar");
-            TypeParam a = tester.ra;
-            a += tester.b;
-            EXPECT_TRUE(full_equal(tester.res_r, a));
+            scalar_operation_tester<std::plus<>, TypeParam> tester;
+
+            SUBCASE("row_major += scalar")
+            {
+                TypeParam a = tester.ra;
+                a += tester.b;
+                EXPECT_TRUE(full_equal(tester.res_r, a));
+            }
+
+            SUBCASE("column_major += scalar")
+            {
+                TypeParam a = tester.ca;
+                a += tester.b;
+                EXPECT_TRUE(full_equal(tester.res_c, a));
+            }
+
+            SUBCASE("central_major += scalar")
+            {
+                TypeParam a = tester.cta;
+                a += tester.b;
+                EXPECT_TRUE(full_equal(tester.res_ct, a));
+            }
+
+            SUBCASE("unit_major += scalar")
+            {
+                TypeParam a = tester.ua;
+                a += tester.b;
+                EXPECT_TRUE(full_equal(tester.res_u, a));
+            }
         }
 
+        TEST_CASE_TEMPLATE("a_minus_equal_b", TypeParam, SCALAR_SEMANTIC_TEST_TYPES)
         {
-            SCOPED_TRACE("column_major += scalar");
-            TypeParam a = tester.ca;
-            a += tester.b;
-            EXPECT_TRUE(full_equal(tester.res_c, a));
+            scalar_operation_tester<std::minus<>, TypeParam> tester;
+
+            SUBCASE("row_major -= scalar")
+            {
+                TypeParam a = tester.ra;
+                a -= tester.b;
+                EXPECT_TRUE(full_equal(tester.res_r, a));
+            }
+
+            SUBCASE("column_major -= scalar")
+            {
+                TypeParam a = tester.ca;
+                a -= tester.b;
+                EXPECT_TRUE(full_equal(tester.res_c, a));
+            }
+
+            SUBCASE("central_major -= scalar")
+            {
+                TypeParam a = tester.cta;
+                a -= tester.b;
+                EXPECT_TRUE(full_equal(tester.res_ct, a));
+            }
+
+            SUBCASE("unit_major -= scalar")
+            {
+                TypeParam a = tester.ua;
+                a -= tester.b;
+                EXPECT_TRUE(full_equal(tester.res_u, a));
+            }
         }
 
+        TEST_CASE_TEMPLATE("a_times_equal_b", TypeParam, SCALAR_SEMANTIC_TEST_TYPES)
         {
-            SCOPED_TRACE("central_major += scalar");
-            TypeParam a = tester.cta;
-            a += tester.b;
-            EXPECT_TRUE(full_equal(tester.res_ct, a));
+            scalar_operation_tester<std::multiplies<>, TypeParam> tester;
+
+            SUBCASE("row_major *= scalar")
+            {
+                TypeParam a = tester.ra;
+                a *= tester.b;
+                EXPECT_TRUE(full_equal(tester.res_r, a));
+            }
+
+            SUBCASE("column_major *= scalar")
+            {
+                TypeParam a = tester.ca;
+                a *= tester.b;
+                EXPECT_TRUE(full_equal(tester.res_c, a));
+            }
+
+            SUBCASE("central_major *= scalar")
+            {
+                TypeParam a = tester.cta;
+                a *= tester.b;
+                EXPECT_TRUE(full_equal(tester.res_ct, a));
+            }
+
+            SUBCASE("unit_major *= scalar")
+            {
+                TypeParam a = tester.ua;
+                a *= tester.b;
+                EXPECT_TRUE(full_equal(tester.res_u, a));
+            }
         }
 
+        TEST_CASE_TEMPLATE("a_divide_by_equal_b", TypeParam, SCALAR_SEMANTIC_TEST_TYPES)
         {
-            SCOPED_TRACE("unit_major += scalar");
-            TypeParam a = tester.ua;
-            a += tester.b;
-            EXPECT_TRUE(full_equal(tester.res_u, a));
+            scalar_operation_tester<std::divides<>, TypeParam> tester;
+
+            SUBCASE("row_major /= scalar")
+            {
+                TypeParam a = tester.ra;
+                a /= tester.b;
+                EXPECT_TRUE(full_equal(tester.res_r, a));
+            }
+
+            SUBCASE("column_major /= scalar")
+            {
+                TypeParam a = tester.ca;
+                a /= tester.b;
+                EXPECT_TRUE(full_equal(tester.res_c, a));
+            }
+
+            SUBCASE("central_major /= scalar")
+            {
+                TypeParam a = tester.cta;
+                a /= tester.b;
+                EXPECT_TRUE(full_equal(tester.res_ct, a));
+            }
+
+            SUBCASE("unit_major /= scalar")
+            {
+                TypeParam a = tester.ua;
+                a /= tester.b;
+                EXPECT_TRUE(full_equal(tester.res_u, a));
+            }
+        }
+
+        TEST_CASE_TEMPLATE("assign_a_plus_b", TypeParam, SCALAR_SEMANTIC_TEST_TYPES)
+        {
+            scalar_operation_tester<std::plus<>, TypeParam> tester;
+
+            SUBCASE("row_major + scalar")
+            {
+                TypeParam a(tester.ra.shape(), tester.ra.strides(), 0);
+                noalias(a) = tester.ra + tester.b;
+                EXPECT_TRUE(full_equal(tester.res_r, a));
+            }
+
+            SUBCASE("column_major + scalar")
+            {
+                TypeParam a(tester.ca.shape(), tester.ca.strides(), 0);
+                noalias(a) = tester.ca + tester.b;
+                EXPECT_TRUE(full_equal(tester.res_c, a));
+            }
+
+            SUBCASE("central_major + scalar")
+            {
+                TypeParam a(tester.cta.shape(), tester.cta.strides(), 0);
+                noalias(a) = tester.cta + tester.b;
+                EXPECT_TRUE(full_equal(tester.res_ct, a));
+            }
+
+            SUBCASE("unit_major + scalar")
+            {
+                TypeParam a(tester.ua.shape(), tester.ua.strides(), 0);
+                noalias(a) = tester.ua + tester.b;
+                EXPECT_TRUE(full_equal(tester.res_u, a));
+            }
+        }
+
+        TEST_CASE_TEMPLATE("assign_a_minus_b", TypeParam, SCALAR_SEMANTIC_TEST_TYPES)
+        {
+            scalar_operation_tester<std::minus<>, TypeParam> tester;
+
+            SUBCASE("row_major - scalar")
+            {
+                TypeParam a(tester.ra.shape(), tester.ra.strides(), 0);
+                noalias(a) = tester.ra - tester.b;
+                EXPECT_TRUE(full_equal(tester.res_r, a));
+            }
+
+            SUBCASE("column_major - scalar")
+            {
+                TypeParam a(tester.ca.shape(), tester.ca.strides(), 0);
+                noalias(a) = tester.ca - tester.b;
+                EXPECT_TRUE(full_equal(tester.res_c, a));
+            }
+
+            SUBCASE("central_major - scalar")
+            {
+                TypeParam a(tester.cta.shape(), tester.cta.strides(), 0);
+                noalias(a) = tester.cta - tester.b;
+                EXPECT_TRUE(full_equal(tester.res_ct, a));
+            }
+
+            SUBCASE("unit_major - scalar")
+            {
+                TypeParam a(tester.ua.shape(), tester.ua.strides(), 0);
+                noalias(a) = tester.ua - tester.b;
+                EXPECT_TRUE(full_equal(tester.res_u, a));
+            }
+        }
+
+        TEST_CASE_TEMPLATE("assign_a_times_b", TypeParam, SCALAR_SEMANTIC_TEST_TYPES)
+        {
+            scalar_operation_tester<std::multiplies<>, TypeParam> tester;
+
+            SUBCASE("row_major * scalar")
+            {
+                TypeParam a(tester.ra.shape(), tester.ra.strides(), 0);
+                noalias(a) = tester.ra * tester.b;
+                EXPECT_TRUE(full_equal(tester.res_r, a));
+            }
+
+            SUBCASE("column_major * scalar")
+            {
+                TypeParam a(tester.ca.shape(), tester.ca.strides(), 0);
+                noalias(a) = tester.ca * tester.b;
+                EXPECT_TRUE(full_equal(tester.res_c, a));
+            }
+
+            SUBCASE("central_major * scalar")
+            {
+                TypeParam a(tester.cta.shape(), tester.cta.strides(), 0);
+                noalias(a) = tester.cta * tester.b;
+                EXPECT_TRUE(full_equal(tester.res_ct, a));
+            }
+
+            SUBCASE("unit_major * scalar")
+            {
+                TypeParam a(tester.ua.shape(), tester.ua.strides(), 0);
+                noalias(a) = tester.ua * tester.b;
+                EXPECT_TRUE(full_equal(tester.res_u, a));
+            }
+        }
+
+        TEST_CASE_TEMPLATE("assign_a_divide_by_b", TypeParam, SCALAR_SEMANTIC_TEST_TYPES)
+        {
+            scalar_operation_tester<std::divides<>, TypeParam> tester;
+
+            SUBCASE("row_major / scalar")
+            {
+                TypeParam a(tester.ra.shape(), tester.ra.strides(), 0);
+                noalias(a) = tester.ra / tester.b;
+                EXPECT_TRUE(full_equal(tester.res_r, a));
+            }
+
+            SUBCASE("column_major / scalar")
+            {
+                TypeParam a(tester.ca.shape(), tester.ca.strides(), 0);
+                noalias(a) = tester.ca / tester.b;
+                EXPECT_TRUE(full_equal(tester.res_c, a));
+            }
+
+            SUBCASE("central_major / scalar")
+            {
+                TypeParam a(tester.cta.shape(), tester.cta.strides(), 0);
+                noalias(a) = tester.cta / tester.b;
+                EXPECT_TRUE(full_equal(tester.res_ct, a));
+            }
+
+            SUBCASE("unit_major / scalar")
+            {
+                TypeParam a(tester.ua.shape(), tester.ua.strides(), 0);
+                noalias(a) = tester.ua / tester.b;
+                EXPECT_TRUE(full_equal(tester.res_u, a));
+            }
         }
     }
 
-    TYPED_TEST(scalar_semantic, a_minus_equal_b)
-    {
-        scalar_operation_tester<std::minus<>, TypeParam> tester;
-
-        {
-            SCOPED_TRACE("row_major -= scalar");
-            TypeParam a = tester.ra;
-            a -= tester.b;
-            EXPECT_TRUE(full_equal(tester.res_r, a));
-        }
-
-        {
-            SCOPED_TRACE("column_major -= scalar");
-            TypeParam a = tester.ca;
-            a -= tester.b;
-            EXPECT_TRUE(full_equal(tester.res_c, a));
-        }
-
-        {
-            SCOPED_TRACE("central_major -= scalar");
-            TypeParam a = tester.cta;
-            a -= tester.b;
-            EXPECT_TRUE(full_equal(tester.res_ct, a));
-        }
-
-        {
-            SCOPED_TRACE("unit_major -= scalar");
-            TypeParam a = tester.ua;
-            a -= tester.b;
-            EXPECT_TRUE(full_equal(tester.res_u, a));
-        }
-    }
-
-    TYPED_TEST(scalar_semantic, a_times_equal_b)
-    {
-        scalar_operation_tester<std::multiplies<>, TypeParam> tester;
-
-        {
-            SCOPED_TRACE("row_major *= scalar");
-            TypeParam a = tester.ra;
-            a *= tester.b;
-            EXPECT_TRUE(full_equal(tester.res_r, a));
-        }
-
-        {
-            SCOPED_TRACE("column_major *= scalar");
-            TypeParam a = tester.ca;
-            a *= tester.b;
-            EXPECT_TRUE(full_equal(tester.res_c, a));
-        }
-
-        {
-            SCOPED_TRACE("central_major *= scalar");
-            TypeParam a = tester.cta;
-            a *= tester.b;
-            EXPECT_TRUE(full_equal(tester.res_ct, a));
-        }
-
-        {
-            SCOPED_TRACE("unit_major *= scalar");
-            TypeParam a = tester.ua;
-            a *= tester.b;
-            EXPECT_TRUE(full_equal(tester.res_u, a));
-        }
-    }
-
-    TYPED_TEST(scalar_semantic, a_divide_by_equal_b)
-    {
-        scalar_operation_tester<std::divides<>, TypeParam> tester;
-
-        {
-            SCOPED_TRACE("row_major /= scalar");
-            TypeParam a = tester.ra;
-            a /= tester.b;
-            EXPECT_TRUE(full_equal(tester.res_r, a));
-        }
-
-        {
-            SCOPED_TRACE("column_major /= scalar");
-            TypeParam a = tester.ca;
-            a /= tester.b;
-            EXPECT_TRUE(full_equal(tester.res_c, a));
-        }
-
-        {
-            SCOPED_TRACE("central_major /= scalar");
-            TypeParam a = tester.cta;
-            a /= tester.b;
-            EXPECT_TRUE(full_equal(tester.res_ct, a));
-        }
-
-        {
-            SCOPED_TRACE("unit_major /= scalar");
-            TypeParam a = tester.ua;
-            a /= tester.b;
-            EXPECT_TRUE(full_equal(tester.res_u, a));
-        }
-    }
-
-    TYPED_TEST(scalar_semantic, assign_a_plus_b)
-    {
-        scalar_operation_tester<std::plus<>, TypeParam> tester;
-
-        {
-            SCOPED_TRACE("row_major + scalar");
-            TypeParam a(tester.ra.shape(), tester.ra.strides(), 0);
-            noalias(a) = tester.ra + tester.b;
-            EXPECT_TRUE(full_equal(tester.res_r, a));
-        }
-
-        {
-            SCOPED_TRACE("column_major + scalar");
-            TypeParam a(tester.ca.shape(), tester.ca.strides(), 0);
-            noalias(a) = tester.ca + tester.b;
-            EXPECT_TRUE(full_equal(tester.res_c, a));
-        }
-
-        {
-            SCOPED_TRACE("central_major + scalar");
-            TypeParam a(tester.cta.shape(), tester.cta.strides(), 0);
-            noalias(a) = tester.cta + tester.b;
-            EXPECT_TRUE(full_equal(tester.res_ct, a));
-        }
-
-        {
-            SCOPED_TRACE("unit_major + scalar");
-            TypeParam a(tester.ua.shape(), tester.ua.strides(), 0);
-            noalias(a) = tester.ua + tester.b;
-            EXPECT_TRUE(full_equal(tester.res_u, a));
-        }
-    }
-
-    TYPED_TEST(scalar_semantic, assign_a_minus_b)
-    {
-        scalar_operation_tester<std::minus<>, TypeParam> tester;
-
-        {
-            SCOPED_TRACE("row_major - scalar");
-            TypeParam a(tester.ra.shape(), tester.ra.strides(), 0);
-            noalias(a) = tester.ra - tester.b;
-            EXPECT_TRUE(full_equal(tester.res_r, a));
-        }
-
-        {
-            SCOPED_TRACE("column_major - scalar");
-            TypeParam a(tester.ca.shape(), tester.ca.strides(), 0);
-            noalias(a) = tester.ca - tester.b;
-            EXPECT_TRUE(full_equal(tester.res_c, a));
-        }
-
-        {
-            SCOPED_TRACE("central_major - scalar");
-            TypeParam a(tester.cta.shape(), tester.cta.strides(), 0);
-            noalias(a) = tester.cta - tester.b;
-            EXPECT_TRUE(full_equal(tester.res_ct, a));
-        }
-
-        {
-            SCOPED_TRACE("unit_major - scalar");
-            TypeParam a(tester.ua.shape(), tester.ua.strides(), 0);
-            noalias(a) = tester.ua - tester.b;
-            EXPECT_TRUE(full_equal(tester.res_u, a));
-        }
-    }
-
-    TYPED_TEST(scalar_semantic, assign_a_times_b)
-    {
-        scalar_operation_tester<std::multiplies<>, TypeParam> tester;
-
-        {
-            SCOPED_TRACE("row_major * scalar");
-            TypeParam a(tester.ra.shape(), tester.ra.strides(), 0);
-            noalias(a) = tester.ra * tester.b;
-            EXPECT_TRUE(full_equal(tester.res_r, a));
-        }
-
-        {
-            SCOPED_TRACE("column_major * scalar");
-            TypeParam a(tester.ca.shape(), tester.ca.strides(), 0);
-            noalias(a) = tester.ca * tester.b;
-            EXPECT_TRUE(full_equal(tester.res_c, a));
-        }
-
-        {
-            SCOPED_TRACE("central_major * scalar");
-            TypeParam a(tester.cta.shape(), tester.cta.strides(), 0);
-            noalias(a) = tester.cta * tester.b;
-            EXPECT_TRUE(full_equal(tester.res_ct, a));
-        }
-
-        {
-            SCOPED_TRACE("unit_major * scalar");
-            TypeParam a(tester.ua.shape(), tester.ua.strides(), 0);
-            noalias(a) = tester.ua * tester.b;
-            EXPECT_TRUE(full_equal(tester.res_u, a));
-        }
-    }
-
-    TYPED_TEST(scalar_semantic, assign_a_divide_by_b)
-    {
-        scalar_operation_tester<std::divides<>, TypeParam> tester;
-
-        {
-            SCOPED_TRACE("row_major / scalar");
-            TypeParam a(tester.ra.shape(), tester.ra.strides(), 0);
-            noalias(a) = tester.ra / tester.b;
-            EXPECT_TRUE(full_equal(tester.res_r, a));
-        }
-
-        {
-            SCOPED_TRACE("column_major / scalar");
-            TypeParam a(tester.ca.shape(), tester.ca.strides(), 0);
-            noalias(a) = tester.ca / tester.b;
-            EXPECT_TRUE(full_equal(tester.res_c, a));
-        }
-
-        {
-            SCOPED_TRACE("central_major / scalar");
-            TypeParam a(tester.cta.shape(), tester.cta.strides(), 0);
-            noalias(a) = tester.cta / tester.b;
-            EXPECT_TRUE(full_equal(tester.res_ct, a));
-        }
-
-        {
-            SCOPED_TRACE("unit_major / scalar");
-            TypeParam a(tester.ua.shape(), tester.ua.strides(), 0);
-            noalias(a) = tester.ua / tester.b;
-            EXPECT_TRUE(full_equal(tester.res_u, a));
-        }
-    }
+    #undef SCALAR_SEMANTIC_TEST_TYPES
 }

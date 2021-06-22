@@ -7,7 +7,7 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#include "gtest/gtest.h"
+#include "test_common_macros.hpp"
 #include "xtensor/xview.hpp"
 #include "test_xsemantic.hpp"
 #include "xtensor/xnoalias.hpp"
@@ -79,387 +79,391 @@ namespace xt
         using storage_type = C;
     };
 
-    using testing_types = ::testing::Types<xarray_dynamic, xtensor_dynamic>;
-    TYPED_TEST_SUITE(view_semantic, testing_types);
+    #define VIEW_SEMANTIC_TEST_TYPES  xarray_dynamic, xtensor_dynamic
 
-    TYPED_TEST(view_semantic, a_plus_b)
+    TEST_SUITE("view_semantic")
     {
-        view_op_tester<std::plus<>, TypeParam> t;
-        auto viewa = view(t.a, t.x_slice, t.y_slice, t.z_slice);
-
+        TEST_CASE_TEMPLATE("a_plus_b", TypeParam, VIEW_SEMANTIC_TEST_TYPES)
         {
-            SCOPED_TRACE("row_major + row_major");
-            TypeParam b = t.a;
-            auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
-            auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
-            viewb = viewa + viewra;
-            EXPECT_EQ(t.vres_rr, b);
+            view_op_tester<std::plus<>, TypeParam> t;
+            auto viewa = view(t.a, t.x_slice, t.y_slice, t.z_slice);
+
+            SUBCASE("row_major + row_major")
+            {
+                TypeParam b = t.a;
+                auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
+                auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
+                viewb = viewa + viewra;
+                EXPECT_EQ(t.vres_rr, b);
+            }
+
+            SUBCASE("row_major + column_major")
+            {
+                TypeParam b = t.a;
+                auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
+                auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
+                viewb = viewa + viewca;
+                EXPECT_EQ(t.vres_rc, b);
+            }
+
+            SUBCASE("row_major + central_major")
+            {
+                TypeParam b = t.a;
+                auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
+                auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
+                viewb = viewa + viewcta;
+                EXPECT_EQ(t.vres_rct, b);
+            }
+
+            SUBCASE("row_major + unit_major")
+            {
+                TypeParam b = t.a;
+                auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
+                auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
+                viewb = viewa + viewua;
+                EXPECT_EQ(t.vres_ru, b);
+            }
         }
 
+        TEST_CASE_TEMPLATE("a_minus_b", TypeParam, VIEW_SEMANTIC_TEST_TYPES)
         {
-            SCOPED_TRACE("row_major + column_major");
-            TypeParam b = t.a;
-            auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
-            auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
-            viewb = viewa + viewca;
-            EXPECT_EQ(t.vres_rc, b);
+            view_op_tester<std::minus<>, TypeParam> t;
+            auto viewa = view(t.a, t.x_slice, t.y_slice, t.z_slice);
+
+            SUBCASE("row_major - row_major")
+            {
+                TypeParam b = t.a;
+                auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
+                auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
+                viewb = viewa - viewra;
+                EXPECT_EQ(t.vres_rr, b);
+            }
+
+            SUBCASE("row_major - column_major")
+            {
+                TypeParam b = t.a;
+                auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
+                auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
+                viewb = viewa - viewca;
+                EXPECT_EQ(t.vres_rc, b);
+            }
+
+            SUBCASE("row_major - central_major")
+            {
+                TypeParam b = t.a;
+                auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
+                auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
+                viewb = viewa - viewcta;
+                EXPECT_EQ(t.vres_rct, b);
+            }
+
+            SUBCASE("row_major - unit_major")
+            {
+                TypeParam b = t.a;
+                auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
+                auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
+                viewb = viewa - viewua;
+                EXPECT_EQ(t.vres_ru, b);
+            }
         }
 
+        TEST_CASE_TEMPLATE("a_times_b", TypeParam, VIEW_SEMANTIC_TEST_TYPES)
         {
-            SCOPED_TRACE("row_major + central_major");
-            TypeParam b = t.a;
-            auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
-            auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
-            viewb = viewa + viewcta;
-            EXPECT_EQ(t.vres_rct, b);
+            view_op_tester<std::multiplies<>, TypeParam> t;
+            auto viewa = view(t.a, t.x_slice, t.y_slice, t.z_slice);
+
+            SUBCASE("row_major * row_major")
+            {
+                TypeParam b = t.a;
+                auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
+                auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
+                viewb = viewa * viewra;
+                EXPECT_EQ(t.vres_rr, b);
+            }
+
+            SUBCASE("row_major * column_major")
+            {
+                TypeParam b = t.a;
+                auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
+                auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
+                viewb = viewa * viewca;
+                EXPECT_EQ(t.vres_rc, b);
+            }
+
+            SUBCASE("row_major * central_major")
+            {
+                TypeParam b = t.a;
+                auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
+                auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
+                viewb = viewa * viewcta;
+                EXPECT_EQ(t.vres_rct, b);
+            }
+
+            SUBCASE("row_major * unit_major")
+            {
+                TypeParam b = t.a;
+                auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
+                auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
+                viewb = viewa * viewua;
+                EXPECT_EQ(t.vres_ru, b);
+            }
         }
 
+        TEST_CASE_TEMPLATE("a_divdide_by_b", TypeParam, VIEW_SEMANTIC_TEST_TYPES)
         {
-            SCOPED_TRACE("row_major + unit_major");
-            TypeParam b = t.a;
-            auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
-            auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
-            viewb = viewa + viewua;
-            EXPECT_EQ(t.vres_ru, b);
+            view_op_tester<std::divides<>, TypeParam> t;
+            auto viewa = view(t.a, t.x_slice, t.y_slice, t.z_slice);
+
+            SUBCASE("row_major / row_major")
+            {
+                TypeParam b = t.a;
+                auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
+                auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
+                viewb = viewa / viewra;
+                EXPECT_EQ(t.vres_rr, b);
+            }
+
+            SUBCASE("row_major / column_major")
+            {
+                TypeParam b = t.a;
+                auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
+                auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
+                viewb = viewa / viewca;
+                EXPECT_EQ(t.vres_rc, b);
+            }
+
+            SUBCASE("row_major / central_major")
+            {
+                TypeParam b = t.a;
+                auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
+                auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
+                viewb = viewa / viewcta;
+                EXPECT_EQ(t.vres_rct, b);
+            }
+
+            SUBCASE("row_major / unit_major")
+            {
+                TypeParam b = t.a;
+                auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
+                auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
+                viewb = viewa / viewua;
+                EXPECT_EQ(t.vres_ru, b);
+            }
+        }
+
+        TEST_CASE_TEMPLATE("a_plus_equal_b", TypeParam, VIEW_SEMANTIC_TEST_TYPES)
+        {
+            view_op_tester<std::plus<>, TypeParam> t;
+
+            SUBCASE("row_major += row_major")
+            {
+                TypeParam b = t.a;
+                auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
+                auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
+                viewb += viewra;
+                EXPECT_EQ(t.vres_rr, b);
+            }
+
+            SUBCASE("row_major += column_major")
+            {
+                TypeParam b = t.a;
+                auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
+                auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
+                viewb += viewca;
+                EXPECT_EQ(t.vres_rc, b);
+            }
+
+            SUBCASE("row_major += central_major")
+            {
+                TypeParam b = t.a;
+                auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
+                auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
+                viewb += viewcta;
+                EXPECT_EQ(t.vres_rct, b);
+            }
+
+            SUBCASE("row_major += unit_major")
+            {
+                TypeParam b = t.a;
+                auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
+                auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
+                viewb += viewua;
+                EXPECT_EQ(t.vres_ru, b);
+            }
+        }
+
+        TEST_CASE_TEMPLATE("a_minus_equal_b", TypeParam, VIEW_SEMANTIC_TEST_TYPES)
+        {
+            view_op_tester<std::minus<>, TypeParam> t;
+
+            SUBCASE("row_major -= row_major")
+            {
+                TypeParam b = t.a;
+                auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
+                auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
+                viewb -= viewra;
+                EXPECT_EQ(t.vres_rr, b);
+            }
+
+            SUBCASE("row_major -= column_major")
+            {
+                TypeParam b = t.a;
+                auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
+                auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
+                viewb -= viewca;
+                EXPECT_EQ(t.vres_rc, b);
+            }
+
+            SUBCASE("row_major -= central_major")
+            {
+                TypeParam b = t.a;
+                auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
+                auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
+                viewb -= viewcta;
+                EXPECT_EQ(t.vres_rct, b);
+            }
+
+            SUBCASE("row_major -= unit_major")
+            {
+                TypeParam b = t.a;
+                auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
+                auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
+                viewb -= viewua;
+                EXPECT_EQ(t.vres_ru, b);
+            }
+        }
+
+        TEST_CASE_TEMPLATE("a_times_equal_b", TypeParam, VIEW_SEMANTIC_TEST_TYPES)
+        {
+            view_op_tester<std::multiplies<>, TypeParam> t;
+
+            SUBCASE("row_major *= row_major")
+            {
+                TypeParam b = t.a;
+                auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
+                auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
+                viewb *= viewra;
+                EXPECT_EQ(t.vres_rr, b);
+            }
+
+            SUBCASE("row_major *= column_major")
+            {
+                TypeParam b = t.a;
+                auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
+                auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
+                viewb *= viewca;
+                EXPECT_EQ(t.vres_rc, b);
+            }
+
+            SUBCASE("row_major *= central_major")
+            {
+                TypeParam b = t.a;
+                auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
+                auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
+                viewb *= viewcta;
+                EXPECT_EQ(t.vres_rct, b);
+            }
+
+            SUBCASE("row_major *= unit_major")
+            {
+                TypeParam b = t.a;
+                auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
+                auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
+                viewb *= viewua;
+                EXPECT_EQ(t.vres_ru, b);
+            }
+        }
+
+        TEST_CASE_TEMPLATE("a_divide_by_equal_b", TypeParam, VIEW_SEMANTIC_TEST_TYPES)
+        {
+            view_op_tester<std::divides<>, TypeParam> t;
+
+            SUBCASE("row_major /= row_major")
+            {
+                TypeParam b = t.a;
+                auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
+                auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
+                viewb /= viewra;
+                EXPECT_EQ(t.vres_rr, b);
+            }
+
+            SUBCASE("row_major /= column_major")
+            {
+                TypeParam b = t.a;
+                auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
+                auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
+                viewb /= viewca;
+                EXPECT_EQ(t.vres_rc, b);
+            }
+
+            SUBCASE("row_major /= central_major")
+            {
+                TypeParam b = t.a;
+                auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
+                auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
+                viewb /= viewcta;
+                EXPECT_EQ(t.vres_rct, b);
+            }
+
+            SUBCASE("row_major /= unit_major")
+            {
+                TypeParam b = t.a;
+                auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
+                auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
+                viewb /= viewua;
+                EXPECT_EQ(t.vres_ru, b);
+            }
+        }
+
+        TEST_CASE_TEMPLATE("broadcast_equal", TypeParam, VIEW_SEMANTIC_TEST_TYPES)
+        {
+            using container_1d = redim_container_t<TypeParam, 1>;
+            using container_2d = redim_container_t<TypeParam, 2>;
+            container_2d a = {{1,  2,  3,  4},
+                              {5,  6,  7,  8},
+                              {9, 10, 11, 12}};
+            container_2d b = a;
+            auto viewa = view(a, all(), range(1, 4));
+            auto viewb = view(b, all(), range(1, 4));
+            container_1d c = {1, 2, 3};
+            viewa = c;
+            noalias(viewb) = c;
+            container_2d res = {{1, 1, 2, 3},
+                                {5, 1, 2, 3},
+                                {9, 1, 2, 3}};
+
+            EXPECT_EQ(res, a);
+            EXPECT_EQ(res, b);
+        }
+
+        TEST_CASE_TEMPLATE("scalar_equal", TypeParam, VIEW_SEMANTIC_TEST_TYPES)
+        {
+            using container_2d = redim_container_t<TypeParam, 2>;
+            container_2d a = {{1, 2, 3, 4},
+                              {5, 6, 7, 8},
+                              {9, 10, 11, 12}};
+            auto viewa = view(a, all(), range(1, 4));
+            int b = 1;
+            viewa = b;
+            container_2d res = {{1, 1, 1, 1},
+                                {5, 1, 1, 1},
+                                {9, 1, 1, 1}};
+
+            EXPECT_EQ(res, a);
+        }
+
+        TEST_CASE_TEMPLATE("higher_dimension_broadcast", TypeParam, VIEW_SEMANTIC_TEST_TYPES)
+        {
+            using container_2d = redim_container_t<TypeParam, 2>;
+
+            container_2d a = { {1, 2, 3}, {4, 5, 6} };
+            container_2d b = { {11, 12, 13} };
+            container_2d res = { { 11, 12, 13 }, { 4, 5, 6 } };
+
+            auto viewa = view(a, 0, all());
+            XT_EXPECT_ANY_THROW(viewa = b);
         }
     }
 
-    TYPED_TEST(view_semantic, a_minus_b)
-    {
-        view_op_tester<std::minus<>, TypeParam> t;
-        auto viewa = view(t.a, t.x_slice, t.y_slice, t.z_slice);
-
-        {
-            SCOPED_TRACE("row_major - row_major");
-            TypeParam b = t.a;
-            auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
-            auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
-            viewb = viewa - viewra;
-            EXPECT_EQ(t.vres_rr, b);
-        }
-
-        {
-            SCOPED_TRACE("row_major - column_major");
-            TypeParam b = t.a;
-            auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
-            auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
-            viewb = viewa - viewca;
-            EXPECT_EQ(t.vres_rc, b);
-        }
-
-        {
-            SCOPED_TRACE("row_major - central_major");
-            TypeParam b = t.a;
-            auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
-            auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
-            viewb = viewa - viewcta;
-            EXPECT_EQ(t.vres_rct, b);
-        }
-
-        {
-            SCOPED_TRACE("row_major - unit_major");
-            TypeParam b = t.a;
-            auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
-            auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
-            viewb = viewa - viewua;
-            EXPECT_EQ(t.vres_ru, b);
-        }
-    }
-
-    TYPED_TEST(view_semantic, a_times_b)
-    {
-        view_op_tester<std::multiplies<>, TypeParam> t;
-        auto viewa = view(t.a, t.x_slice, t.y_slice, t.z_slice);
-
-        {
-            SCOPED_TRACE("row_major * row_major");
-            TypeParam b = t.a;
-            auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
-            auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
-            viewb = viewa * viewra;
-            EXPECT_EQ(t.vres_rr, b);
-        }
-
-        {
-            SCOPED_TRACE("row_major * column_major");
-            TypeParam b = t.a;
-            auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
-            auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
-            viewb = viewa * viewca;
-            EXPECT_EQ(t.vres_rc, b);
-        }
-
-        {
-            SCOPED_TRACE("row_major * central_major");
-            TypeParam b = t.a;
-            auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
-            auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
-            viewb = viewa * viewcta;
-            EXPECT_EQ(t.vres_rct, b);
-        }
-
-        {
-            SCOPED_TRACE("row_major * unit_major");
-            TypeParam b = t.a;
-            auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
-            auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
-            viewb = viewa * viewua;
-            EXPECT_EQ(t.vres_ru, b);
-        }
-    }
-
-    TYPED_TEST(view_semantic, a_divdide_by_b)
-    {
-        view_op_tester<std::divides<>, TypeParam> t;
-        auto viewa = view(t.a, t.x_slice, t.y_slice, t.z_slice);
-
-        {
-            SCOPED_TRACE("row_major / row_major");
-            TypeParam b = t.a;
-            auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
-            auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
-            viewb = viewa / viewra;
-            EXPECT_EQ(t.vres_rr, b);
-        }
-
-        {
-            SCOPED_TRACE("row_major / column_major");
-            TypeParam b = t.a;
-            auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
-            auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
-            viewb = viewa / viewca;
-            EXPECT_EQ(t.vres_rc, b);
-        }
-
-        {
-            SCOPED_TRACE("row_major / central_major");
-            TypeParam b = t.a;
-            auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
-            auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
-            viewb = viewa / viewcta;
-            EXPECT_EQ(t.vres_rct, b);
-        }
-
-        {
-            SCOPED_TRACE("row_major / unit_major");
-            TypeParam b = t.a;
-            auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
-            auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
-            viewb = viewa / viewua;
-            EXPECT_EQ(t.vres_ru, b);
-        }
-    }
-
-    TYPED_TEST(view_semantic, a_plus_equal_b)
-    {
-        view_op_tester<std::plus<>, TypeParam> t;
-
-        {
-            SCOPED_TRACE("row_major += row_major");
-            TypeParam b = t.a;
-            auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
-            auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
-            viewb += viewra;
-            EXPECT_EQ(t.vres_rr, b);
-        }
-
-        {
-            SCOPED_TRACE("row_major += column_major");
-            TypeParam b = t.a;
-            auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
-            auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
-            viewb += viewca;
-            EXPECT_EQ(t.vres_rc, b);
-        }
-
-        {
-            SCOPED_TRACE("row_major += central_major");
-            TypeParam b = t.a;
-            auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
-            auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
-            viewb += viewcta;
-            EXPECT_EQ(t.vres_rct, b);
-        }
-
-        {
-            SCOPED_TRACE("row_major += unit_major");
-            TypeParam b = t.a;
-            auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
-            auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
-            viewb += viewua;
-            EXPECT_EQ(t.vres_ru, b);
-        }
-    }
-
-    TYPED_TEST(view_semantic, a_minus_equal_b)
-    {
-        view_op_tester<std::minus<>, TypeParam> t;
-
-        {
-            SCOPED_TRACE("row_major -= row_major");
-            TypeParam b = t.a;
-            auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
-            auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
-            viewb -= viewra;
-            EXPECT_EQ(t.vres_rr, b);
-        }
-
-        {
-            SCOPED_TRACE("row_major -= column_major");
-            TypeParam b = t.a;
-            auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
-            auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
-            viewb -= viewca;
-            EXPECT_EQ(t.vres_rc, b);
-        }
-
-        {
-            SCOPED_TRACE("row_major -= central_major");
-            TypeParam b = t.a;
-            auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
-            auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
-            viewb -= viewcta;
-            EXPECT_EQ(t.vres_rct, b);
-        }
-
-        {
-            SCOPED_TRACE("row_major -= unit_major");
-            TypeParam b = t.a;
-            auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
-            auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
-            viewb -= viewua;
-            EXPECT_EQ(t.vres_ru, b);
-        }
-    }
-
-    TYPED_TEST(view_semantic, a_times_equal_b)
-    {
-        view_op_tester<std::multiplies<>, TypeParam> t;
-
-        {
-            SCOPED_TRACE("row_major *= row_major");
-            TypeParam b = t.a;
-            auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
-            auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
-            viewb *= viewra;
-            EXPECT_EQ(t.vres_rr, b);
-        }
-
-        {
-            SCOPED_TRACE("row_major *= column_major");
-            TypeParam b = t.a;
-            auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
-            auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
-            viewb *= viewca;
-            EXPECT_EQ(t.vres_rc, b);
-        }
-
-        {
-            SCOPED_TRACE("row_major *= central_major");
-            TypeParam b = t.a;
-            auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
-            auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
-            viewb *= viewcta;
-            EXPECT_EQ(t.vres_rct, b);
-        }
-
-        {
-            SCOPED_TRACE("row_major *= unit_major");
-            TypeParam b = t.a;
-            auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
-            auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
-            viewb *= viewua;
-            EXPECT_EQ(t.vres_ru, b);
-        }
-    }
-
-    TYPED_TEST(view_semantic, a_divide_by_equal_b)
-    {
-        view_op_tester<std::divides<>, TypeParam> t;
-
-        {
-            SCOPED_TRACE("row_major /= row_major");
-            TypeParam b = t.a;
-            auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
-            auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
-            viewb /= viewra;
-            EXPECT_EQ(t.vres_rr, b);
-        }
-
-        {
-            SCOPED_TRACE("row_major /= column_major");
-            TypeParam b = t.a;
-            auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
-            auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
-            viewb /= viewca;
-            EXPECT_EQ(t.vres_rc, b);
-        }
-
-        {
-            SCOPED_TRACE("row_major /= central_major");
-            TypeParam b = t.a;
-            auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
-            auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
-            viewb /= viewcta;
-            EXPECT_EQ(t.vres_rct, b);
-        }
-
-        {
-            SCOPED_TRACE("row_major /= unit_major");
-            TypeParam b = t.a;
-            auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
-            auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
-            viewb /= viewua;
-            EXPECT_EQ(t.vres_ru, b);
-        }
-    }
-
-    TYPED_TEST(view_semantic, broadcast_equal)
-    {
-        using container_1d = redim_container_t<TypeParam, 1>;
-        using container_2d = redim_container_t<TypeParam, 2>;
-        container_2d a = {{1,  2,  3,  4},
-                          {5,  6,  7,  8},
-                          {9, 10, 11, 12}};
-        container_2d b = a;
-        auto viewa = view(a, all(), range(1, 4));
-        auto viewb = view(b, all(), range(1, 4));
-        container_1d c = {1, 2, 3};
-        viewa = c;
-        noalias(viewb) = c;
-        container_2d res = {{1, 1, 2, 3},
-                            {5, 1, 2, 3},
-                            {9, 1, 2, 3}};
-
-        EXPECT_EQ(res, a);
-        EXPECT_EQ(res, b);
-    }
-
-    TYPED_TEST(view_semantic, scalar_equal)
-    {
-        using container_2d = redim_container_t<TypeParam, 2>;
-        container_2d a = {{1, 2, 3, 4},
-                          {5, 6, 7, 8},
-                          {9, 10, 11, 12}};
-        auto viewa = view(a, all(), range(1, 4));
-        int b = 1;
-        viewa = b;
-        container_2d res = {{1, 1, 1, 1},
-                            {5, 1, 1, 1},
-                            {9, 1, 1, 1}};
-
-        EXPECT_EQ(res, a);
-    }
-
-    TYPED_TEST(view_semantic, higher_dimension_broadcast)
-    {
-        using container_2d = redim_container_t<TypeParam, 2>;
-
-        container_2d a = { {1, 2, 3}, {4, 5, 6} };
-        container_2d b = { {11, 12, 13} };
-        container_2d res = { { 11, 12, 13 }, { 4, 5, 6 } };
-
-        auto viewa = view(a, 0, all());
-        XT_EXPECT_ANY_THROW(viewa = b);
-    }
+    #undef VIEW_SEMANTIC_TEST_TYPES
 }

@@ -7,7 +7,7 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#include "gtest/gtest.h"
+#include "test_common_macros.hpp"
 
 #include "xtensor/xarray.hpp"
 #include "xtensor/xio.hpp"
@@ -25,22 +25,22 @@ namespace xt
 
     TEST(xoptional_assembly, shaped_constructor)
     {
+        SUBCASE("row_major constructor")
         {
-            SCOPED_TRACE("row_major constructor");
             row_major_result<> rm;
             dyn_opt_ass_type ra(rm.m_shape, layout_type::row_major);
             compare_shape(ra, rm);
         }
 
+        SUBCASE("column_major constructor")
         {
-            SCOPED_TRACE("column_major constructor");
             column_major_result<> cm;
             cm_opt_ass_type ca(cm.m_shape);
             compare_shape(ca, cm);
         }
 
+        SUBCASE("from shape")
         {
-            SCOPED_TRACE("from shape");
             std::array<std::size_t, 3> shp = {5, 4, 2};
             std::vector<std::size_t> shp_as_vec = {5, 4, 2};
             auto ca = cm_opt_ass_type::from_shape({3, 2, 1});
@@ -60,8 +60,8 @@ namespace xt
 
     TEST(xoptional_assembly, valued_constructor)
     {
+        SUBCASE("row_major valued constructor")
         {
-            SCOPED_TRACE("row_major valued constructor");
             row_major_result<> rm;
             int value = 2;
             dyn_opt_ass_type ra(rm.m_shape, value, layout_type::row_major);
@@ -70,8 +70,8 @@ namespace xt
             EXPECT_EQ(ra.value().storage(), vec);
         }
 
+        SUBCASE("column_major valued constructor")
         {
-            SCOPED_TRACE("column_major valued constructor");
             column_major_result<> cm;
             int value = 2;
             cm_opt_ass_type ca(cm.m_shape, value);
@@ -141,15 +141,15 @@ namespace xt
         int value = 2;
         dyn_opt_ass_type a(res.m_shape, res.m_strides, value);
 
+        SUBCASE("copy constructor")
         {
-            SCOPED_TRACE("copy constructor");
             dyn_opt_ass_type b(a);
             compare_shape(a, b);
             EXPECT_EQ(a.storage(), b.storage());
         }
 
+        SUBCASE("assignment operator")
         {
-            SCOPED_TRACE("assignment operator");
             row_major_result<> r;
             dyn_opt_ass_type c(r.m_shape, dyn_opt_ass_type::value_type(0, false));
             EXPECT_NE(a.storage(), c.storage());
@@ -165,16 +165,16 @@ namespace xt
         int value = 2;
         dyn_opt_ass_type a(res.m_shape, res.m_strides, value);
 
+        SUBCASE("move constructor")
         {
-            SCOPED_TRACE("move constructor");
             dyn_opt_ass_type tmp(a);
             dyn_opt_ass_type b(std::move(tmp));
             compare_shape(a, b);
             EXPECT_EQ(a.storage(), b.storage());
         }
 
+        SUBCASE("move assignment")
         {
-            SCOPED_TRACE("move assignment");
             row_major_result<> r;
             dyn_opt_ass_type c(r.m_shape, dyn_opt_ass_type::value_type(0, false));
             EXPECT_NE(a.value().storage(), c.value().storage());
@@ -280,16 +280,16 @@ namespace xt
         shape_type s = {3, 1, 4, 2};
         opt_ass_type vec(s);
 
+        SUBCASE("same shape")
         {
-            SCOPED_TRACE("same shape");
             shape_type s1 = s;
             bool res = vec.broadcast_shape(s1);
             EXPECT_EQ(s1, s);
             EXPECT_TRUE(res);
         }
 
+        SUBCASE("different shape")
         {
-            SCOPED_TRACE("different shape");
             shape_type s2 = {3, 5, 1, 2};
             shape_type s2r = {3, 5, 4, 2};
             bool res = vec.broadcast_shape(s2);
@@ -297,16 +297,16 @@ namespace xt
             EXPECT_FALSE(res);
         }
 
+        SUBCASE("incompatible shapes")
         {
-            SCOPED_TRACE("incompatible shapes");
             shape_type s4 = {2, 1, 3, 2};
             XT_EXPECT_THROW(vec.broadcast_shape(s4), broadcast_error);
         }
 
         {
             shape_type s2 = {3, 1, 4, 2};
+        SUBCASE("different dimensions")
             vec.resize(s2);
-            SCOPED_TRACE("different dimensions");
             shape_type s3 = {5, 3, 1, 4, 2};
             shape_type s3r = s3;
             bool res = vec.broadcast_shape(s3);
@@ -320,8 +320,8 @@ namespace xt
         using opt = xtl::xoptional<int>;
         std::vector<opt> vec = {opt(1), opt(2, false), opt(3, false), opt(4)};
 
+        SUBCASE("row_major storage iterator")
         {
-            SCOPED_TRACE("row_major storage iterator");
             opt_ass_type rma(opt_ass_type::shape_type({2, 2}));
             std::copy(vec.cbegin(), vec.cend(), rma.begin<layout_type::row_major>());
             EXPECT_EQ(vec[0], rma(0, 0));
@@ -331,8 +331,8 @@ namespace xt
             EXPECT_EQ(vec.size(), std::size_t(std::distance(rma.begin<layout_type::row_major>(), rma.end<layout_type::row_major>())));
         }
 
+        SUBCASE("column_major storage iterator")
         {
-            SCOPED_TRACE("column_major storage iterator");
             cm_opt_ass_type cma(opt_ass_type::shape_type({2, 2}));
             std::copy(vec.cbegin(), vec.cend(), cma.begin<layout_type::column_major>());
             EXPECT_EQ(vec[0], cma(0, 0));

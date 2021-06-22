@@ -15,7 +15,6 @@
 // an easy way to prevent compilation
 #ifndef VS_SKIP_XFIXED
 
-#include "gtest/gtest.h"
 #include "test_common_macros.hpp"
 #include "xtensor/xadapt.hpp"
 #include "xtensor/xarray.hpp"

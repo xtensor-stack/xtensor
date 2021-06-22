@@ -10,7 +10,7 @@
 // Warning: This file should not be modified directly! Instead, modify the `*.cppy` file.
 
 
-#include "gtest/gtest.h"
+#include "test_common_macros.hpp"
 
 #include <xtensor/xarray.hpp>
 #include <xtensor/xio.hpp>

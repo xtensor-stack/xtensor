@@ -7,7 +7,7 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#include "gtest/gtest.h"
+#include "test_common_macros.hpp"
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xarray.hpp"
 #include "test_common.hpp"
@@ -44,22 +44,22 @@ namespace xt
 
     TEST(xtensor, shaped_constructor)
     {
+        SUBCASE("row_major constructor")
         {
-            SCOPED_TRACE("row_major constructor");
             row_major_result<storage_type> rm;
             xtensor_dynamic ra(rm.m_shape, layout_type::row_major);
             compare_shape(ra, rm);
         }
 
+        SUBCASE("column_major constructor")
         {
-            SCOPED_TRACE("column_major constructor");
             column_major_result<storage_type> cm;
             xtensor_dynamic ca(cm.m_shape, layout_type::column_major);
             compare_shape(ca, cm);
         }
 
+        SUBCASE("from shape")
         {
-            SCOPED_TRACE("from shape");
             std::array<std::size_t, 3> shp = {5, 4, 2};
             std::vector<std::size_t> shp_as_vec = {5, 4, 2};
             auto ca = xtensor<int, 3>::from_shape({3, 2, 1});
@@ -79,8 +79,8 @@ namespace xt
 
     TEST(xtensor, valued_constructor)
     {
+        SUBCASE("row_major valued constructor")
         {
-            SCOPED_TRACE("row_major valued constructor");
             row_major_result<storage_type> rm;
             int value = 2;
             xtensor_dynamic ra(rm.m_shape, value, layout_type::row_major);
@@ -89,8 +89,8 @@ namespace xt
             EXPECT_EQ(ra.storage(), vec);
         }
 
+        SUBCASE("column_major valued constructor")
         {
-            SCOPED_TRACE("column_major valued constructor");
             column_major_result<storage_type> cm;
             int value = 2;
             xtensor_dynamic ca(cm.m_shape, value, layout_type::column_major);
@@ -123,15 +123,15 @@ namespace xt
         int value = 2;
         xtensor_dynamic a(res.m_shape, res.m_strides, value);
 
+        SUBCASE("copy constructor")
         {
-            SCOPED_TRACE("copy constructor");
             xtensor_dynamic b(a);
             compare_shape(a, b);
             EXPECT_EQ(a.storage(), b.storage());
         }
 
+        SUBCASE("assignment operator")
         {
-            SCOPED_TRACE("assignment operator");
             row_major_result<storage_type> r;
             xtensor_dynamic c(r.m_shape, 0);
             EXPECT_NE(a.storage(), c.storage());
@@ -147,16 +147,16 @@ namespace xt
         int value = 2;
         xtensor_dynamic a(res.m_shape, res.m_strides, value);
 
+        SUBCASE("move constructor")
         {
-            SCOPED_TRACE("move constructor");
             xtensor_dynamic tmp(a);
             xtensor_dynamic b(std::move(tmp));
             compare_shape(a, b);
             EXPECT_EQ(a.storage(), b.storage());
         }
 
+        SUBCASE("move assignment")
         {
-            SCOPED_TRACE("move assignment");
             row_major_result<storage_type> r;
             xtensor_dynamic c(r.m_shape, 0);
             EXPECT_NE(a.storage(), c.storage());

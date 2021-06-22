@@ -6,8 +6,10 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#include "gtest/gtest.h"
+#include "test_common_macros.hpp"
 #include "test_xsemantic.hpp"
+
+TEST_SUITE_BEGIN("container_semantic");
 
 namespace xt
 {
@@ -19,671 +21,673 @@ namespace xt
         using storage_type = C;
     };
 
-    using testing_types = ::testing::Types<xarray_dynamic, xtensor_dynamic>;
-    TYPED_TEST_SUITE(container_semantic, testing_types);
+    #define CONTAINER_SEMANTIC_TYPES xarray_dynamic, xtensor_dynamic
 
-    TYPED_TEST(container_semantic, a_plus_b)
+    TEST_CASE_TEMPLATE("a_plus_b",TypeParam, xarray_dynamic, xtensor_dynamic)
     {
         operation_tester<std::plus<>, TypeParam> tester;
 
+        SUBCASE("row_major + row_major")
         {
-            SCOPED_TRACE("row_major + row_major");
             TypeParam b = tester.a + tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major + column_major")
         {
-            SCOPED_TRACE("row_major + column_major");
             TypeParam b = tester.a + tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major + central_major")
         {
-            SCOPED_TRACE("row_major + central_major");
             TypeParam b = tester.a + tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major + unit_major")
         {
-            SCOPED_TRACE("row_major + unit_major");
             TypeParam b = tester.a + tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
     }
 
-    TYPED_TEST(container_semantic, a_minus_b)
+    TEST_CASE_TEMPLATE("a_minus_b",TypeParam, xarray_dynamic, xtensor_dynamic)
     {
         operation_tester<std::minus<>, TypeParam> tester;
 
+        SUBCASE("row_major - row_major")
         {
-            SCOPED_TRACE("row_major - row_major");
             TypeParam b = tester.a - tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major - column_major")
         {
-            SCOPED_TRACE("row_major - column_major");
             TypeParam b = tester.a - tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major - central_major")
         {
-            SCOPED_TRACE("row_major - central_major");
             TypeParam b = tester.a - tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major - unit_major")
         {
-            SCOPED_TRACE("row_major - unit_major");
             TypeParam b = tester.a - tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
     }
 
-    TYPED_TEST(container_semantic, a_times_b)
+    TEST_CASE_TEMPLATE("a_times_b",TypeParam, xarray_dynamic, xtensor_dynamic)
     {
         operation_tester<std::multiplies<>, TypeParam> tester;
 
+        SUBCASE("row_major * row_major")
         {
-            SCOPED_TRACE("row_major * row_major");
             TypeParam b = tester.a * tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major * column_major")
         {
-            SCOPED_TRACE("row_major * column_major");
             TypeParam b = tester.a * tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major * central_major")
         {
-            SCOPED_TRACE("row_major * central_major");
             TypeParam b = tester.a * tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major * unit_major")
         {
-            SCOPED_TRACE("row_major * unit_major");
             TypeParam b = tester.a * tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
     }
 
-    TYPED_TEST(container_semantic, a_divide_by_b)
+    TEST_CASE_TEMPLATE("a_divide_by_b",TypeParam, xarray_dynamic, xtensor_dynamic)
     {
         operation_tester<std::divides<>, TypeParam> tester;
 
+        SUBCASE("row_major / row_major")
         {
-            SCOPED_TRACE("row_major / row_major");
             TypeParam b = tester.a / tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major / column_major")
         {
-            SCOPED_TRACE("row_major / column_major");
             TypeParam b = tester.a / tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major / central_major")
         {
-            SCOPED_TRACE("row_major / central_major");
             TypeParam b = tester.a / tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major / unit_major")
         {
-            SCOPED_TRACE("row_major / unit_major");
             TypeParam b = tester.a / tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
     }
 
-    TYPED_TEST(container_semantic, a_bitwise_and_b)
+    TEST_CASE_TEMPLATE("a_bitwise_and_b",TypeParam, xarray_dynamic, xtensor_dynamic)
     {
         operation_tester<std::bit_and<>, TypeParam> tester;
 
+        SUBCASE("row_major & row_major")
         {
-            SCOPED_TRACE("row_major & row_major");
             TypeParam b = tester.a & tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major & column_major")
         {
-            SCOPED_TRACE("row_major & column_major");
             TypeParam b = tester.a & tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major & central_major")
         {
-            SCOPED_TRACE("row_major & central_major");
             TypeParam b = tester.a & tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major & unit_major")
         {
-            SCOPED_TRACE("row_major & unit_major");
             TypeParam b = tester.a & tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
     }
 
-    TYPED_TEST(container_semantic, a_bitwise_or_b)
+    TEST_CASE_TEMPLATE("a_bitwise_or_b",TypeParam, xarray_dynamic, xtensor_dynamic)
     {
         operation_tester<std::bit_or<>, TypeParam> tester;
 
+        SUBCASE("row_major | row_major")
         {
-            SCOPED_TRACE("row_major | row_major");
             TypeParam b = tester.a | tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major | column_major")
         {
-            SCOPED_TRACE("row_major | column_major");
             TypeParam b = tester.a | tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major | central_major")
         {
-            SCOPED_TRACE("row_major | central_major");
             TypeParam b = tester.a | tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major | unit_major")
         {
-            SCOPED_TRACE("row_major | unit_major");
             TypeParam b = tester.a | tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
     }
 
-    TYPED_TEST(container_semantic, a_bitwise_xor_b)
+    TEST_CASE_TEMPLATE("a_bitwise_xor_b",TypeParam, xarray_dynamic, xtensor_dynamic)
     {
         operation_tester<std::bit_xor<>, TypeParam> tester;
 
+        SUBCASE("row_major ^ row_major")
         {
-            SCOPED_TRACE("row_major ^ row_major");
             TypeParam b = tester.a ^ tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major ^ column_major")
         {
-            SCOPED_TRACE("row_major ^ column_major");
             TypeParam b = tester.a ^ tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major ^ central_major")
         {
-            SCOPED_TRACE("row_major ^ central_major");
             TypeParam b = tester.a ^ tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major ^ unit_major")
         {
-            SCOPED_TRACE("row_major ^ unit_major");
             TypeParam b = tester.a ^ tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
     }
 
-    TYPED_TEST(container_semantic, a_plus_equal_b)
+    TEST_CASE_TEMPLATE("a_plus_equal_b",TypeParam, xarray_dynamic, xtensor_dynamic)
     {
         operation_tester<std::plus<>, TypeParam> tester;
 
+        SUBCASE("row_major += row_major")
         {
-            SCOPED_TRACE("row_major += row_major");
             TypeParam b = tester.a;
             b += tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major += column_major")
         {
-            SCOPED_TRACE("row_major += column_major");
             TypeParam b = tester.a;
             b += tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major += central_major")
         {
-            SCOPED_TRACE("row_major += central_major");
             TypeParam b = tester.a;
             b += tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major += unit_major")
         {
-            SCOPED_TRACE("row_major += unit_major");
             TypeParam b = tester.a;
             b += tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
     }
 
-    TYPED_TEST(container_semantic, a_minus_equal_b)
+    TEST_CASE_TEMPLATE("a_minus_equal_b",TypeParam, xarray_dynamic, xtensor_dynamic)
     {
         operation_tester<std::minus<>, TypeParam> tester;
 
+        SUBCASE("row_major -= row_major")
         {
-            SCOPED_TRACE("row_major -= row_major");
             TypeParam b = tester.a;
             b -= tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major -= column_major")
         {
-            SCOPED_TRACE("row_major -= column_major");
             TypeParam b = tester.a;
             b -= tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major -= central_major")
         {
-            SCOPED_TRACE("row_major -= central_major");
             TypeParam b = tester.a;
             b -= tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major -= unit_major")
         {
-            SCOPED_TRACE("row_major -= unit_major");
             TypeParam b = tester.a;
             b -= tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
     }
 
-    TYPED_TEST(container_semantic, a_times_equal_b)
+    TEST_CASE_TEMPLATE("a_times_equal_b",TypeParam, xarray_dynamic, xtensor_dynamic)
     {
         operation_tester<std::multiplies<>, TypeParam> tester;
 
+        SUBCASE("row_major *= row_major")
         {
-            SCOPED_TRACE("row_major *= row_major");
             TypeParam b = tester.a;
             b *= tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major *= column_major")
         {
-            SCOPED_TRACE("row_major *= column_major");
             TypeParam b = tester.a;
             b *= tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major *= central_major")
         {
-            SCOPED_TRACE("row_major *= central_major");
             TypeParam b = tester.a;
             b *= tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major *= unit_major")
         {
-            SCOPED_TRACE("row_major *= unit_major");
             TypeParam b = tester.a;
             b *= tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
     }
 
-    TYPED_TEST(container_semantic, a_divide_by_equal_b)
+    TEST_CASE_TEMPLATE("a_divide_by_equal_b",TypeParam, xarray_dynamic, xtensor_dynamic)
     {
         operation_tester<std::divides<>, TypeParam> tester;
 
+        SUBCASE("row_major /= row_major")
         {
-            SCOPED_TRACE("row_major /= row_major");
             TypeParam b = tester.a;
             b /= tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major /= column_major")
         {
-            SCOPED_TRACE("row_major /= column_major");
             TypeParam b = tester.a;
             b /= tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major /= central_major")
         {
-            SCOPED_TRACE("row_major /= central_major");
             TypeParam b = tester.a;
             b /= tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major /= unit_major")
         {
-            SCOPED_TRACE("row_major /= unit_major");
             TypeParam b = tester.a;
             b /= tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
     }
 
-    TYPED_TEST(container_semantic, a_bitwise_and_equal_b)
+    TEST_CASE_TEMPLATE("a_bitwise_and_equal_b",TypeParam, xarray_dynamic, xtensor_dynamic)
     {
         operation_tester<std::bit_and<>, TypeParam> tester;
 
+        SUBCASE("row_major &= row_major")
         {
-            SCOPED_TRACE("row_major &= row_major");
             TypeParam b = tester.a;
             b &= tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major &= column_major")
         {
-            SCOPED_TRACE("row_major &= column_major");
             TypeParam b = tester.a;
             b &= tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major &= central_major")
         {
-            SCOPED_TRACE("row_major &= central_major");
             TypeParam b = tester.a;
             b &= tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major &= unit_major")
         {
-            SCOPED_TRACE("row_major &= unit_major");
             TypeParam b = tester.a;
             b &= tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
     }
 
-    TYPED_TEST(container_semantic, a_bitwise_or_equal_b)
+    TEST_CASE_TEMPLATE("a_bitwise_or_equal_b",TypeParam, xarray_dynamic, xtensor_dynamic)
     {
         operation_tester<std::bit_or<>, TypeParam> tester;
 
+        SUBCASE("row_major |= row_major")
         {
-            SCOPED_TRACE("row_major |= row_major");
             TypeParam b = tester.a;
             b |= tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major |= column_major")
         {
-            SCOPED_TRACE("row_major |= column_major");
             TypeParam b = tester.a;
             b |= tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major |= central_major")
         {
-            SCOPED_TRACE("row_major |= central_major");
             TypeParam b = tester.a;
             b |= tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major |= unit_major")
         {
-            SCOPED_TRACE("row_major |= unit_major");
             TypeParam b = tester.a;
             b |= tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
     }
 
-    TYPED_TEST(container_semantic, a_bitwise_xor_equal_b)
+    TEST_CASE_TEMPLATE("a_bitwise_xor_equal_b",TypeParam, xarray_dynamic, xtensor_dynamic)
     {
         operation_tester<std::bit_xor<>, TypeParam> tester;
 
+        SUBCASE("row_major ^= row_major")
         {
-            SCOPED_TRACE("row_major ^= row_major");
             TypeParam b = tester.a;
             b ^= tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major ^= column_major")
         {
-            SCOPED_TRACE("row_major ^= column_major");
             TypeParam b = tester.a;
             b ^= tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major ^= central_major")
         {
-            SCOPED_TRACE("row_major ^= central_major");
             TypeParam b = tester.a;
             b ^= tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major ^= unit_major")
         {
-            SCOPED_TRACE("row_major ^= unit_major");
             TypeParam b = tester.a;
             b ^= tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
     }
 
-    TYPED_TEST(container_semantic, assign_a_plus_b)
+    TEST_CASE_TEMPLATE("assign_a_plus_b",TypeParam, xarray_dynamic, xtensor_dynamic)
     {
         operation_tester<std::plus<>, TypeParam> tester;
 
+        SUBCASE("row_major + row_major")
         {
-            SCOPED_TRACE("row_major + row_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a + tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major + column_major")
         {
-            SCOPED_TRACE("row_major + column_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a + tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major + central_major")
         {
-            SCOPED_TRACE("row_major + central_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a + tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major + unit_major")
         {
-            SCOPED_TRACE("row_major + unit_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a + tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
     }
 
-    TYPED_TEST(container_semantic, assign_a_minus_b)
+    TEST_CASE_TEMPLATE("assign_a_minus_b",TypeParam, xarray_dynamic, xtensor_dynamic)
     {
         operation_tester<std::minus<>, TypeParam> tester;
 
+        SUBCASE("row_major - row_major")
         {
-            SCOPED_TRACE("row_major - row_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a - tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major - column_major")
         {
-            SCOPED_TRACE("row_major - column_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a - tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major - central_major")
         {
-            SCOPED_TRACE("row_major - central_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a - tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major - unit_major")
         {
-            SCOPED_TRACE("row_major - unit_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a - tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
     }
 
-    TYPED_TEST(container_semantic, assign_a_multiplies_b)
+    TEST_CASE_TEMPLATE("assign_a_multiplies_b",TypeParam, xarray_dynamic, xtensor_dynamic)
     {
         operation_tester<std::multiplies<>, TypeParam> tester;
 
+        SUBCASE("row_major * row_major")
         {
-            SCOPED_TRACE("row_major * row_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a * tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major * column_major")
         {
-            SCOPED_TRACE("row_major * column_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a * tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major * central_major")
         {
-            SCOPED_TRACE("row_major * central_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a * tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major * unit_major")
         {
-            SCOPED_TRACE("row_major * unit_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a * tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
     }
 
-    TYPED_TEST(container_semantic, assign_a_divides_by_b)
+    TEST_CASE_TEMPLATE("assign_a_divides_by_b",TypeParam, xarray_dynamic, xtensor_dynamic)
     {
         operation_tester<std::divides<>, TypeParam> tester;
 
+        SUBCASE("row_major / row_major")
         {
-            SCOPED_TRACE("row_major / row_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a / tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major / column_major")
         {
-            SCOPED_TRACE("row_major / column_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a / tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major / central_major")
         {
-            SCOPED_TRACE("row_major / central_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a / tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major / unit_major")
         {
-            SCOPED_TRACE("row_major / unit_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a / tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
     }
 
-    TYPED_TEST(container_semantic, assign_a_bitwise_and_b)
+    TEST_CASE_TEMPLATE("assign_a_bitwise_and_b",TypeParam, xarray_dynamic, xtensor_dynamic)
     {
         operation_tester<std::bit_and<>, TypeParam> tester;
 
+        SUBCASE("row_major & row_major")
         {
-            SCOPED_TRACE("row_major & row_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a & tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major & column_major")
         {
-            SCOPED_TRACE("row_major & column_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a & tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major & central_major")
         {
-            SCOPED_TRACE("row_major & central_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a & tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major & unit_major")
         {
-            SCOPED_TRACE("row_major & unit_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a & tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
     }
 
-    TYPED_TEST(container_semantic, assign_a_bitwise_or_b)
+    TEST_CASE_TEMPLATE("assign_a_bitwise_or_b",TypeParam, xarray_dynamic, xtensor_dynamic)
     {
         operation_tester<std::bit_or<>, TypeParam> tester;
 
+        SUBCASE("row_major | row_major")
         {
-            SCOPED_TRACE("row_major | row_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a | tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major | column_major")
         {
-            SCOPED_TRACE("row_major | column_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a | tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major | central_major")
         {
-            SCOPED_TRACE("row_major | central_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a | tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major | unit_major")
         {
-            SCOPED_TRACE("row_major | unit_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a | tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
     }
 
-    TYPED_TEST(container_semantic, assign_a_bitwise_xor_b)
+    TEST_CASE_TEMPLATE("assign_a_bitwise_xor_b",TypeParam, xarray_dynamic, xtensor_dynamic)
     {
         operation_tester<std::bit_xor<>, TypeParam> tester;
 
+        SUBCASE("row_major ^ row_major")
         {
-            SCOPED_TRACE("row_major ^ row_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a ^ tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
+        SUBCASE("row_major ^ column_major")
         {
-            SCOPED_TRACE("row_major ^ column_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a ^ tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
+        SUBCASE("row_major ^ central_major")
         {
-            SCOPED_TRACE("row_major ^ central_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a ^ tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
+        SUBCASE("row_major ^ unit_major")
         {
-            SCOPED_TRACE("row_major ^ unit_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a ^ tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
     }
+
+    #undef CONTAINER_SEMANTIC_TYPES
 }
+TEST_SUITE_END();

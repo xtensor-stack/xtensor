@@ -12,7 +12,7 @@
 #include <tuple>
 #include <complex>
 
-#include "gtest/gtest.h"
+#include "test_common_macros.hpp"
 #include "test_common_macros.hpp"
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xarray.hpp"

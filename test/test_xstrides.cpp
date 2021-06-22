@@ -7,7 +7,7 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#include "gtest/gtest.h"
+#include "test_common_macros.hpp"
 #include "xtensor/xarray.hpp"
 #include "test_common.hpp"
 
@@ -52,8 +52,8 @@ namespace xt
 
     TEST(xstrides, unravel_from_strides)
     {
+        SUBCASE("row_major strides")
         {
-            SCOPED_TRACE("row_major strides");
             row_major_result<> rm;
             using index_type = xt::dynamic_shape<std::ptrdiff_t>;
             index_type index = { 2, 1, 1 };
@@ -62,8 +62,8 @@ namespace xt
             EXPECT_TRUE(std::equal(unrav_index.cbegin(), unrav_index.cend(), index.cbegin()));
         }
 
+        SUBCASE("column_major strides")
         {
-            SCOPED_TRACE("column_major strides");
             column_major_result<> cm;
             using index_type = xt::dynamic_shape<std::ptrdiff_t>;
             index_type index = { 2, 1, 1 };
@@ -72,8 +72,8 @@ namespace xt
             EXPECT_TRUE(std::equal(unrav_index.cbegin(), unrav_index.cend(), index.cbegin()));
         }
 
+        SUBCASE("unit_major strides")
         {
-            SCOPED_TRACE("unit_major strides");
             unit_shape_result<> um;
             using index_type = xt::dynamic_shape<std::ptrdiff_t>;
             index_type index = { 2, 0, 1 };
@@ -85,8 +85,8 @@ namespace xt
 
     TEST(xstrides, unravel_index)
     {
+        SUBCASE("row_major strides")
         {
-            SCOPED_TRACE("row_major strides");
             row_major_result<> rm;
             using index_type = xt::dynamic_shape<std::ptrdiff_t>;
             index_type index = { 2, 1, 1 };
@@ -95,8 +95,8 @@ namespace xt
             EXPECT_TRUE(std::equal(unrav_index.cbegin(), unrav_index.cend(), index.cbegin()));
         }
 
+        SUBCASE("column_major strides")
         {
-            SCOPED_TRACE("column_major strides");
             column_major_result<> cm;
             using index_type = xt::dynamic_shape<std::ptrdiff_t>;
             index_type index = { 2, 1, 1 };
@@ -105,8 +105,8 @@ namespace xt
             EXPECT_TRUE(std::equal(unrav_index.cbegin(), unrav_index.cend(), index.cbegin()));
         }
 
+        SUBCASE("unit_major strides")
         {
-            SCOPED_TRACE("unit_major strides");
             unit_shape_result<> um;
             using index_type = xt::dynamic_shape<std::ptrdiff_t>;
             index_type index = { 2, 0, 1 };

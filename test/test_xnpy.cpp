@@ -7,7 +7,7 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#include "gtest/gtest.h"
+#include "test_common_macros.hpp"
 
 #include "xtensor/xnpy.hpp"
 #include "xtensor/xarray.hpp"
@@ -65,8 +65,7 @@ namespace xt
 
         std::ifstream dstream(get_load_filename("files/xnpy_files/double"));
         auto darr_loaded_stream = load_npy<double>(dstream);
-        EXPECT_TRUE(all(isclose(darr, darr_loaded_stream)))
-            << "Loading double numpy array from stream failed";
+        CHECK_MESSAGE(all(isclose(darr, darr_loaded_stream)),"Loading double numpy array from stream failed");
         dstream.close();
 
         auto barr_loaded = load_npy<bool>(get_load_filename("files/xnpy_files/bool"));
@@ -74,8 +73,7 @@ namespace xt
 
         std::ifstream bstream(get_load_filename("files/xnpy_files/bool"));
         auto barr_loaded_stream = load_npy<bool>(bstream);
-        EXPECT_TRUE(all(equal(barr, barr_loaded_stream)))
-            << "Loading boolean numpy array from stream failed";
+        CHECK_MESSAGE(all(equal(barr, barr_loaded_stream)),"Loading boolean numpy array from stream failed");
         bstream.close();
 
         auto dfarr_loaded = load_npy<double, layout_type::column_major>(get_load_filename("files/xnpy_files/double_fortran"));
@@ -132,7 +130,7 @@ namespace xt
 
         std::string barr_str = dump_npy(barr);
         std::string barr_disk = read_file(compare_name);
-        EXPECT_EQ(barr_str, barr_disk) << "Dumping boolean numpy file to string failed";
+        CHECK_MESSAGE(barr_str==barr_disk,"Dumping boolean numpy file to string failed");
 
         std::remove(filename.c_str());
 
@@ -147,7 +145,7 @@ namespace xt
 
         std::string ularr_str = dump_npy(ularr);
         std::string ularr_disk = read_file(compare_name);
-        EXPECT_EQ(ularr_str, ularr_disk) << "Dumping boolean numpy file to string failed";
+        CHECK_MESSAGE(ularr_str==ularr_disk,"Dumping boolean numpy file to string failed");
 
         std::remove(filename.c_str());
     }

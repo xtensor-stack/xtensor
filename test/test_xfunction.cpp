@@ -7,7 +7,7 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#include "gtest/gtest.h"
+#include "test_common_macros.hpp"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xview.hpp"
 #include "test_common.hpp"
@@ -76,24 +76,24 @@ namespace xt
         using shape_type = layout_result<>::shape_type;
         xfunction_features f;
 
+        SUBCASE("same shape")
         {
-            SCOPED_TRACE("same shape");
             shape_type sh = uninitialized_shape<shape_type>(3);
             bool trivial = (f.m_a + f.m_a).broadcast_shape(sh);
             EXPECT_EQ(sh, f.m_a.shape());
             ASSERT_TRUE(trivial);
         }
 
+        SUBCASE("different shape")
         {
-            SCOPED_TRACE("different shape");
             shape_type sh = uninitialized_shape<shape_type>(3);
             bool trivial = (f.m_a + f.m_b).broadcast_shape(sh);
             EXPECT_EQ(sh, f.m_a.shape());
             ASSERT_FALSE(trivial);
         }
 
+        SUBCASE("different dimensions")
         {
-            SCOPED_TRACE("different dimensions");
             shape_type sh = uninitialized_shape<shape_type>(4);
             bool trivial = (f.m_a + f.m_c).broadcast_shape(sh);
             EXPECT_EQ(sh, f.m_c.shape());
@@ -170,22 +170,22 @@ namespace xt
         size_t j = f.m_a.shape()[1] - 1;
         size_t k = f.m_a.shape()[2] - 1;
 
+        SUBCASE("same shape")
         {
-            SCOPED_TRACE("same shape");
             int a = (f.m_a + f.m_a)(i, j, k);
             int b = f.m_a(i, j, k) + f.m_a(i, j, k);
             EXPECT_EQ(a, b);
         }
 
+        SUBCASE("different shape")
         {
-            SCOPED_TRACE("different shape");
             int a = (f.m_a + f.m_b)(i, j, k);
             int b = f.m_a(i, j, k) + f.m_b(i, 0, k);
             EXPECT_EQ(a, b);
         }
 
+        SUBCASE("different dimensions")
         {
-            SCOPED_TRACE("different dimensions");
             int a = (f.m_a + f.m_c)(1, i, j, k);
             int b = f.m_a(i, j, k) + f.m_c(1, i, j, k);
             EXPECT_EQ(a, b);
@@ -199,15 +199,15 @@ namespace xt
         size_t j = f.m_a.shape()[1] - 1;
         size_t k = f.m_a.shape()[2] - 1;
 
+        SUBCASE("same shape")
         {
-            SCOPED_TRACE("same shape");
             int a = (f.m_a + f.m_a)(i, j, k);
             int b = (f.m_a + f.m_a).unchecked(i, j, k);
             EXPECT_EQ(a, b);
         }
 
+        SUBCASE("different shape")
         {
-            SCOPED_TRACE("different shape");
             int a = (f.m_a + f.m_b)(i, j, k);
             int b = (f.m_a + f.m_b).unchecked(i, j, k);
             EXPECT_EQ(a, b);
@@ -221,8 +221,8 @@ namespace xt
         size_t j = f.m_a.shape()[1] - 1;
         size_t k = f.m_a.shape()[2] - 1;
 
+        SUBCASE("same shape")
         {
-            SCOPED_TRACE("same shape");
             int a = (f.m_a + f.m_a).at(i, j, k);
             int b = f.m_a.at(i, j, k) + f.m_a.at(i, j, k);
             EXPECT_EQ(a, b);
@@ -230,8 +230,8 @@ namespace xt
             XT_EXPECT_ANY_THROW((f.m_a + f.m_a).at(10, 10, 10));
         }
 
+        SUBCASE("different shape")
         {
-            SCOPED_TRACE("different shape");
             int a = (f.m_a + f.m_b).at(i, j, k);
             int b = f.m_a.at(i, j, k) + f.m_b.at(i, 0, k);
             EXPECT_EQ(a, b);
@@ -239,8 +239,8 @@ namespace xt
             XT_EXPECT_ANY_THROW((f.m_a + f.m_a).at(10, 10, 10));
         }
 
+        SUBCASE("different dimensions")
         {
-            SCOPED_TRACE("different dimensions");
             int a = (f.m_a + f.m_c).at(1, i, j, k);
             int b = f.m_a.at(i, j, k) + f.m_c.at(1, i, j, k);
             EXPECT_EQ(a, b);
@@ -256,15 +256,15 @@ namespace xt
         size_t j = f.m_a.shape()[1];
         size_t k = f.m_a.shape()[2];
 
+        SUBCASE("same shape")
         {
-            SCOPED_TRACE("same shape");
             int a = (f.m_a + f.m_a)(0, 0, 0);
             int b = (f.m_a + f.m_a).periodic(i, j, k);
             EXPECT_EQ(a, b);
         }
 
+        SUBCASE("different shape")
         {
-            SCOPED_TRACE("different shape");
             int a = (f.m_a + f.m_b)(0, 0, 0);
             int b = (f.m_a + f.m_b).periodic(i, j, k);
             EXPECT_EQ(a, b);
@@ -302,14 +302,14 @@ namespace xt
         size_t j = f.m_a.shape()[1];
         size_t k = f.m_a.shape()[2];
 
+        SUBCASE("same shape")
         {
-            SCOPED_TRACE("same shape");
             EXPECT_TRUE((f.m_a + f.m_a).in_bounds(0, 0, 0) == true);
             EXPECT_TRUE((f.m_a + f.m_a).in_bounds(i, j, k) == false);
         }
 
+        SUBCASE("different shape")
         {
-            SCOPED_TRACE("different shape");
             EXPECT_TRUE((f.m_a + f.m_b).in_bounds(0, 0, 0) == true);
             EXPECT_TRUE((f.m_a + f.m_b).in_bounds(i, j, k) == false);
         }
@@ -323,16 +323,16 @@ namespace xt
         index[1] = f.m_a.shape()[1] - 1;
         index[2] = f.m_a.shape()[2] - 1;
 
+        SUBCASE("same shape")
         {
-            SCOPED_TRACE("same shape");
             int a = (f.m_a + f.m_a)[index];
             int b = f.m_a[index] + f.m_a[index];
             EXPECT_EQ(a, b);
             EXPECT_EQ(((f.m_a + f.m_a)[{0, 0, 0}]), (f.m_a[{0, 0, 0}] + f.m_a[{0, 0, 0}]));
         }
 
+        SUBCASE("different shape")
         {
-            SCOPED_TRACE("different shape");
             int a = (f.m_a + f.m_b)[index];
             xindex index2 = index;
             index2[1] = 0;
@@ -341,8 +341,8 @@ namespace xt
             EXPECT_EQ(((f.m_a + f.m_b)[{0, 0, 0}]), (f.m_a[{0, 0, 0}] + f.m_b[{0, 0, 0}]));
         }
 
+        SUBCASE("different dimensions")
         {
-            SCOPED_TRACE("different dimensions");
             xindex index2(f.m_c.dimension());
             index2[0] = 1;
             index2[1] = index[0];
@@ -374,18 +374,18 @@ namespace xt
     {
         xfunction_features f;
 
+        SUBCASE("same shape")
         {
-            SCOPED_TRACE("same shape");
             test_xfunction_iterator(f.m_a, f.m_a);
         }
 
+        SUBCASE("different shape")
         {
-            SCOPED_TRACE("different shape");
             test_xfunction_iterator(f.m_a, f.m_b);
         }
 
+        SUBCASE("different dimensions")
         {
-            SCOPED_TRACE("different dimensions");
             test_xfunction_iterator(f.m_c, f.m_a);
         }
     }
@@ -407,18 +407,18 @@ namespace xt
     {
         xfunction_features f;
 
+        SUBCASE("same shape")
         {
-            SCOPED_TRACE("same shape");
             test_xfunction_iterator_end(f.m_a, f.m_a);
         }
 
+        SUBCASE("different shape")
         {
-            SCOPED_TRACE("different shape");
             test_xfunction_iterator_end(f.m_a, f.m_b);
         }
 
+        SUBCASE("different dimensions")
         {
-            SCOPED_TRACE("different dimensions");
             test_xfunction_iterator_end(f.m_c, f.m_a);
         }
     }

@@ -12,7 +12,7 @@
 
 #include <algorithm>
 
-#include "gtest/gtest.h"
+#include "test_common_macros.hpp"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xfixed.hpp"
 #include "xtensor/xnoalias.hpp"

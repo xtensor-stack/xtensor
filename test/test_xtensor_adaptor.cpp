@@ -7,7 +7,7 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#include "gtest/gtest.h"
+#include "test_common_macros.hpp"
 #include "xtensor/xtensor.hpp"
 #include "test_common.hpp"
 
@@ -19,16 +19,16 @@ namespace xt
 
     TEST(xtensor_adaptor, shaped_constructor)
     {
+        SUBCASE("row_major constructor")
         {
-            SCOPED_TRACE("row_major constructor");
             row_major_result<storage_type> rm;
             vec_type v;
             adaptor_type a(v, rm.shape(), layout_type::row_major);
             compare_shape(a, rm);
         }
 
+        SUBCASE("column_major constructor")
         {
-            SCOPED_TRACE("column_major constructor");
             column_major_result<storage_type> cm;
             vec_type v;
             adaptor_type a(v, cm.shape(), layout_type::column_major);
@@ -51,15 +51,15 @@ namespace xt
         vec_type v(res.size(), value);
         adaptor_type a(v, res.shape(), res.strides());
 
+        SUBCASE("copy constructor")
         {
-            SCOPED_TRACE("copy constructor");
             adaptor_type b(a);
             compare_shape(a, b);
             EXPECT_EQ(a.storage(), b.storage());
         }
 
+        SUBCASE("assignment operator")
         {
-            SCOPED_TRACE("assignment operator");
             row_major_result<storage_type> r;
             vec_type v2(r.size(), 0);
             adaptor_type c(v2, r.shape());
@@ -77,16 +77,16 @@ namespace xt
         vec_type v(res.size(), value);
         adaptor_type a(v, res.shape(), res.strides());
 
+        SUBCASE("move constructor")
         {
-            SCOPED_TRACE("move constructor");
             adaptor_type tmp(a);
             adaptor_type b(std::move(tmp));
             compare_shape(a, b);
             EXPECT_EQ(a.storage(), b.storage());
         }
 
+        SUBCASE("move assignment")
         {
-            SCOPED_TRACE("move assignment");
             row_major_result<storage_type> r;
             vec_type v2(r.size(), 0);
             adaptor_type c(v2, r.shape());
