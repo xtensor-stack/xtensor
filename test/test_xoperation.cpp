@@ -117,11 +117,11 @@ namespace xt
     using xarray_type = xarray<double>;
     using xtensor_2_type =  xtensor<double, 2>;
 
+    #define XOPERATION_TEST_TYPES xarray_type, xtensor_2_type
 
-
-    TEST_CASE_TEMPLATE("operation", TypeParam, xarray_type, xtensor_2_type)
+    TEST_SUITE("operation")
     {
-        SUBCASE("plus")
+        TEST_CASE_TEMPLATE("plus", TypeParam, XOPERATION_TEST_TYPES)
         {
             using shape_type = typename TypeParam::shape_type;
             shape_type shape = {3, 2};
@@ -131,7 +131,7 @@ namespace xt
             EXPECT_EQ(ref, actual);
         }
 
-        SUBCASE("minus")
+        TEST_CASE_TEMPLATE("minus", TypeParam, XOPERATION_TEST_TYPES)
         {
             using shape_type = typename TypeParam::shape_type;
             shape_type shape = {3, 2};
@@ -141,7 +141,7 @@ namespace xt
             EXPECT_EQ(ref, actual);
         }
 
-        SUBCASE("add")
+        TEST_CASE_TEMPLATE("add", TypeParam, XOPERATION_TEST_TYPES)
         {
             using shape_type = typename TypeParam::shape_type;
             shape_type shape = {3, 2};
@@ -156,7 +156,7 @@ namespace xt
             EXPECT_EQ((sa + b)(0, 0), sa + b(0, 0));
         }
 
-        SUBCASE("subtract")
+        TEST_CASE_TEMPLATE("subtract", TypeParam, XOPERATION_TEST_TYPES)
         {
             using shape_type = typename TypeParam::shape_type;
             shape_type shape = {3, 2};
@@ -171,7 +171,7 @@ namespace xt
             EXPECT_EQ((sa - b)(0, 0), sa - b(0, 0));
         }
 
-        SUBCASE("multiply")
+        TEST_CASE_TEMPLATE("multiply", TypeParam, XOPERATION_TEST_TYPES)
         {
             using shape_type = typename TypeParam::shape_type;
             shape_type shape = {3, 2};
@@ -186,7 +186,7 @@ namespace xt
             EXPECT_EQ((sa * b)(0, 0), sa * b(0, 0));
         }
 
-        SUBCASE("divide")
+        TEST_CASE_TEMPLATE("divide", TypeParam, XOPERATION_TEST_TYPES)
         {
             using shape_type = typename TypeParam::shape_type;
             shape_type shape = {3, 2};
@@ -201,7 +201,7 @@ namespace xt
             EXPECT_EQ((sa / b)(0, 0), sa / b(0, 0));
         }
 
-        SUBCASE("modulus")
+        TEST_CASE_TEMPLATE("modulus", TypeParam, XOPERATION_TEST_TYPES)
         {
             using int_container = xop_test::rebind_container_t<TypeParam, int>;
             using shape_type = typename int_container::shape_type;
@@ -219,7 +219,7 @@ namespace xt
         }
 
 
-        SUBCASE("bitwise_and")
+        TEST_CASE_TEMPLATE("bitwise_and", TypeParam, XOPERATION_TEST_TYPES)
         {
             using int_tensor = int_rebind_t<TypeParam>;
             using shape_type = typename int_tensor::shape_type;
@@ -235,7 +235,7 @@ namespace xt
             EXPECT_EQ((sa & b)(0, 0), sa & b(0, 0));
         }
 
-        SUBCASE("bitwise_or")
+        TEST_CASE_TEMPLATE("bitwise_or", TypeParam, XOPERATION_TEST_TYPES)
         {
             using int_tensor = int_rebind_t<TypeParam>;
             using shape_type = typename int_tensor::shape_type;
@@ -251,7 +251,7 @@ namespace xt
             EXPECT_EQ((sa | b)(0, 0), sa | b(0, 0));
         }
 
-        SUBCASE("bitwise_xor")
+        TEST_CASE_TEMPLATE("bitwise_xor", TypeParam, XOPERATION_TEST_TYPES)
         {
             using int_tensor = int_rebind_t<TypeParam>;
             using shape_type = typename int_tensor::shape_type;
@@ -267,7 +267,7 @@ namespace xt
             EXPECT_EQ((sa ^ b)(0, 0), sa ^ b(0, 0));
         }
 
-        SUBCASE("bitwise_not")
+        TEST_CASE_TEMPLATE("bitwise_not", TypeParam, XOPERATION_TEST_TYPES)
         {
             using int_tensor = int_rebind_t<TypeParam>;
             using shape_type = typename int_tensor::shape_type;
@@ -276,7 +276,7 @@ namespace xt
             EXPECT_EQ((~a)(0, 0), ~(a(0, 0)));
         }
 
-        SUBCASE("less")
+        TEST_CASE_TEMPLATE("less", TypeParam, XOPERATION_TEST_TYPES)
         {
             using container_1d = redim_container_t<TypeParam, 1>;
             using bool_container = xop_test::rebind_container_t<container_1d, bool>;
@@ -288,7 +288,7 @@ namespace xt
             EXPECT_EQ(expected, b2);
         }
 
-        SUBCASE("less_equal")
+        TEST_CASE_TEMPLATE("less_equal", TypeParam, XOPERATION_TEST_TYPES)
         {
             using container_1d = redim_container_t<TypeParam, 1>;
             using bool_container = xop_test::rebind_container_t<container_1d, bool>;
@@ -300,7 +300,7 @@ namespace xt
             EXPECT_EQ(expected, b2);
         }
 
-        SUBCASE("greater")
+        TEST_CASE_TEMPLATE("greater", TypeParam, XOPERATION_TEST_TYPES)
         {
             using container_1d = redim_container_t<TypeParam, 1>;
             using bool_container = xop_test::rebind_container_t<container_1d, bool>;
@@ -312,7 +312,7 @@ namespace xt
             EXPECT_EQ(expected, b2);
         }
 
-        SUBCASE("greater_equal")
+        TEST_CASE_TEMPLATE("greater_equal", TypeParam, XOPERATION_TEST_TYPES)
         {
             using container_1d = redim_container_t<TypeParam, 1>;
             using bool_container = xop_test::rebind_container_t<container_1d, bool>;
@@ -324,7 +324,7 @@ namespace xt
             EXPECT_EQ(expected, b2);
         }
 
-        SUBCASE("negate")
+        TEST_CASE_TEMPLATE("negate", TypeParam, XOPERATION_TEST_TYPES)
         {
             using container_1d = redim_container_t<TypeParam, 1>;
             using bool_container = xop_test::rebind_container_t<container_1d, bool>;
@@ -334,7 +334,7 @@ namespace xt
             EXPECT_EQ(expected, b);
         }
 
-        SUBCASE("equal")
+        TEST_CASE_TEMPLATE("equal", TypeParam, XOPERATION_TEST_TYPES)
         {
             using container_1d = redim_container_t<TypeParam, 1>;
             using bool_container = xop_test::rebind_container_t<container_1d, bool>;
@@ -349,7 +349,7 @@ namespace xt
             EXPECT_EQ(expected_2, b_2);
         }
 
-        SUBCASE("not_equal")
+        TEST_CASE_TEMPLATE("not_equal", TypeParam, XOPERATION_TEST_TYPES)
         {
             using container_1d = redim_container_t<TypeParam, 1>;
             using bool_container = xop_test::rebind_container_t<container_1d, bool>;
@@ -364,7 +364,7 @@ namespace xt
             EXPECT_EQ(expected_2, b_2);
         }
 
-        SUBCASE("logical_and")
+        TEST_CASE_TEMPLATE("logical_and", TypeParam, XOPERATION_TEST_TYPES)
         {
             using container_1d = redim_container_t<TypeParam, 1>;
             using bool_container = xop_test::rebind_container_t<container_1d, bool>;
@@ -376,7 +376,7 @@ namespace xt
             EXPECT_EQ(c, a);
         }
 
-        SUBCASE("logical_or")
+        TEST_CASE_TEMPLATE("logical_or", TypeParam, XOPERATION_TEST_TYPES)
         {
             using container_1d = redim_container_t<TypeParam, 1>;
             using bool_container = xop_test::rebind_container_t<container_1d, bool>;
@@ -392,7 +392,7 @@ namespace xt
             EXPECT_EQ(expected, d);
         }
 
-        SUBCASE("any")
+        TEST_CASE_TEMPLATE("any", TypeParam, XOPERATION_TEST_TYPES)
         {
             using container_1d = redim_container_t<TypeParam, 1>;
             using int_container = xop_test::rebind_container_t<container_1d, int>;
@@ -403,7 +403,7 @@ namespace xt
             EXPECT_EQ(false, any(b));
         }
 
-        SUBCASE("minimum")
+        TEST_CASE_TEMPLATE("minimum", TypeParam, XOPERATION_TEST_TYPES)
         {
             using container_1d = redim_container_t<TypeParam, 1>;
             using int_container = xop_test::rebind_container_t<container_1d, int>;
@@ -413,7 +413,7 @@ namespace xt
             EXPECT_TRUE(all(equal(minimum(a, b), expected)));
         }
 
-        SUBCASE("maximum")
+        TEST_CASE_TEMPLATE("maximum", TypeParam, XOPERATION_TEST_TYPES)
         {
             using container_1d = redim_container_t<TypeParam, 1>;
             using int_container = xop_test::rebind_container_t<container_1d, int>;
@@ -425,7 +425,7 @@ namespace xt
             EXPECT_TRUE(all(equal(maximum(arange(0, 3), b), expected_2)));
         }
 
-        SUBCASE("amax")
+        TEST_CASE_TEMPLATE("amax", TypeParam, XOPERATION_TEST_TYPES)
         {
             using int_container_2d = xop_test::rebind_container_t<TypeParam, int>;
             using container_1d = redim_container_t<TypeParam, 1>;
@@ -438,7 +438,7 @@ namespace xt
             EXPECT_EQ(e2, amax(a, {1}));
         }
 
-        SUBCASE("amin")
+        TEST_CASE_TEMPLATE("amin", TypeParam, XOPERATION_TEST_TYPES)
         {
             using int_container_2d = xop_test::rebind_container_t<TypeParam, int>;
             using container_1d = redim_container_t<TypeParam, 1>;
@@ -451,7 +451,7 @@ namespace xt
             EXPECT_EQ(e2, amin(a, {1}));
         }
 
-        SUBCASE("all")
+        TEST_CASE_TEMPLATE("all", TypeParam, XOPERATION_TEST_TYPES)
         {
             using int_container_2d = xop_test::rebind_container_t<TypeParam, int>;
             using container_1d = redim_container_t<TypeParam, 1>;
@@ -462,7 +462,7 @@ namespace xt
             EXPECT_EQ(false, all(b));
         }
 
-        SUBCASE("all_layout")
+        TEST_CASE_TEMPLATE("all_layout", TypeParam, XOPERATION_TEST_TYPES)
         {
             xarray<int, layout_type::row_major> a = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
             xarray<int, layout_type::column_major> b = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
@@ -470,7 +470,7 @@ namespace xt
             EXPECT_TRUE(all(equal(a, b)));
         }
 
-        SUBCASE("nonzero")
+        TEST_CASE_TEMPLATE("nonzero", TypeParam, XOPERATION_TEST_TYPES)
         {
             using int_container_2d = xop_test::rebind_container_t<TypeParam, int>;
             using container_1d = redim_container_t<TypeParam, 1>;
@@ -500,7 +500,7 @@ namespace xt
             EXPECT_EQ(size_t(27 * 27 * 27), d_nz[0].size() * d_nz[1].size() * d_nz[2].size());
         }
 
-        SUBCASE("where_only_condition")
+        TEST_CASE_TEMPLATE("where_only_condition", TypeParam, XOPERATION_TEST_TYPES)
         {
             using int_container_2d = xop_test::rebind_container_t<TypeParam, int>;
             int_container_2d a = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
@@ -508,7 +508,7 @@ namespace xt
             EXPECT_EQ(expected, where(a));
         }
 
-        SUBCASE("where")
+        TEST_CASE_TEMPLATE("where", TypeParam, XOPERATION_TEST_TYPES)
         {
             TypeParam a = { { 1, 2, 3 },{ 0, 1, 0 },{ 0, 4, 1 } };
             double b = 1.0;
@@ -528,7 +528,7 @@ namespace xt
     #endif
         }
 
-        SUBCASE("where_optional")
+        TEST_CASE_TEMPLATE("where_optional", TypeParam, XOPERATION_TEST_TYPES)
         {
             using opt_type = xoptional_assembly<TypeParam, xtensor<bool, 2>>;
             auto missing = xtl::missing<double>();
@@ -544,7 +544,7 @@ namespace xt
             EXPECT_EQ(expected1, res1);
         }
 
-        SUBCASE("where_cast")
+        TEST_CASE_TEMPLATE("where_cast", TypeParam, XOPERATION_TEST_TYPES)
         {
             using int_container_2d = xop_test::rebind_container_t<TypeParam, int>;
             int_container_2d a = {{0, 1, 0}, {3, 0, 5}};
@@ -554,7 +554,7 @@ namespace xt
             EXPECT_EQ(b, expected);
         }
 
-        SUBCASE("argwhere")
+        TEST_CASE_TEMPLATE("argwhere", TypeParam, XOPERATION_TEST_TYPES)
         {
             using int_container_2d = xop_test::rebind_container_t<TypeParam, int>;
             using container_1d = redim_container_t<TypeParam, 1>;
@@ -585,7 +585,7 @@ namespace xt
             EXPECT_EQ(last_idx, d_nz.back());
         }
 
-        SUBCASE("cast")
+        TEST_CASE_TEMPLATE("cast", TypeParam, XOPERATION_TEST_TYPES)
         {
             using int_container_t = xop_test::rebind_container_t<TypeParam, int>;
             using shape_type = typename int_container_t::shape_type;
@@ -596,7 +596,7 @@ namespace xt
             EXPECT_EQ(ref, actual);
         }
 
-        SUBCASE("cast_custom_type")
+        TEST_CASE_TEMPLATE("cast_custom_type", TypeParam, XOPERATION_TEST_TYPES)
         {
             using vtype_container_t = xop_test::rebind_container_t<TypeParam, vtype>;
             using shape_type = typename vtype_container_t::shape_type;
@@ -607,7 +607,7 @@ namespace xt
             EXPECT_EQ(ref, actual);
         }
 
-        SUBCASE("mixed_arithmetic")
+        TEST_CASE_TEMPLATE("mixed_arithmetic", TypeParam, XOPERATION_TEST_TYPES)
         {
             using int_container_t = xop_test::rebind_container_t<TypeParam, int>;
             TypeParam a = {{0., 1., 2.}, {3., 4., 5.}};
@@ -618,7 +618,7 @@ namespace xt
             EXPECT_EQ(res, expected);
         }
 
-        SUBCASE("assign_traits")
+        TEST_CASE_TEMPLATE("assign_traits", TypeParam, XOPERATION_TEST_TYPES)
         {
             TypeParam a = { { 0., 1., 2. },{ 3., 4., 5. } };
             TypeParam b = { { 0., 1., 2. },{ 3., 4., 5. } };
@@ -745,114 +745,117 @@ namespace xt
         }
 
 
-    }
 
-    TEST(operation, mixed_assign)
-    {
-        xt::xarray<double> asrc = { 1., 2. };
-        xt::xarray<std::size_t> bsrc = { std::size_t(3), std::size_t(4) };
 
-        xt::xarray<double> a(asrc);
-        xt::xarray<double> aexp = { 3., 4. };
-        a = bsrc;
-
-        xt::xarray<std::size_t> b(bsrc);
-        xt::xarray<std::size_t> bexp = { std::size_t(1), std::size_t(2) };
-        b = asrc;
-        EXPECT_EQ(b, bexp);
-    }
-
-    TEST(operation, mixed_bool_assign)
-    {
-        xt::xarray<double> a = { 1., 6. };
-        xt::xarray<double> b = { 2., 3. };
-        using uchar = unsigned char;
-        xt::xarray<uchar> res = a > b;
-        xt::xarray<uchar> exp = { uchar(0), uchar(1) };
-        EXPECT_EQ(res, exp);
-    }
-
-    TEST(operation, dynamic_simd_assign)
-    {
-        using array_type = xt::xarray<double, layout_type::dynamic>;
-        array_type a({2, 3}, layout_type::row_major);
-        array_type b({2, 3}, layout_type::column_major);
-
-        auto frr = a + a;
-        auto frc = a + b;
-        auto fcc = b + b;
-
-        using frr_traits = xassign_traits<array_type, decltype(frr)>;
-        using frc_traits = xassign_traits<array_type, decltype(frc)>;
-        using fcc_traits = xassign_traits<array_type, decltype(fcc)>;
-
-        EXPECT_FALSE(frr_traits::simd_linear_assign());
-        EXPECT_FALSE(frc_traits::simd_linear_assign());
-        EXPECT_FALSE(fcc_traits::simd_linear_assign());
-
+        TEST(operation, mixed_assign)
         {
-            SCOPED_TRACE("row_major + row_major");
-#if XTENSOR_USE_XSIMD
-            EXPECT_TRUE(frr_traits::simd_linear_assign(a, frr));
-#else
-            EXPECT_FALSE(frr_traits::simd_linear_assign(a, frr));
-#endif
-            EXPECT_FALSE(frr_traits::simd_linear_assign(b, frr));
+            xt::xarray<double> asrc = { 1., 2. };
+            xt::xarray<std::size_t> bsrc = { std::size_t(3), std::size_t(4) };
+
+            xt::xarray<double> a(asrc);
+            xt::xarray<double> aexp = { 3., 4. };
+            a = bsrc;
+
+            xt::xarray<std::size_t> b(bsrc);
+            xt::xarray<std::size_t> bexp = { std::size_t(1), std::size_t(2) };
+            b = asrc;
+            EXPECT_EQ(b, bexp);
         }
 
+        TEST(operation, mixed_bool_assign)
         {
-            SCOPED_TRACE("row_major + column_major");
-            EXPECT_FALSE(frc_traits::simd_linear_assign(a, frc));
-            EXPECT_FALSE(frc_traits::simd_linear_assign(b, frc));
+            xt::xarray<double> a = { 1., 6. };
+            xt::xarray<double> b = { 2., 3. };
+            using uchar = unsigned char;
+            xt::xarray<uchar> res = a > b;
+            xt::xarray<uchar> exp = { uchar(0), uchar(1) };
+            EXPECT_EQ(res, exp);
         }
 
+        TEST(operation, dynamic_simd_assign)
         {
-            SCOPED_TRACE("row_major + column_major");
-            EXPECT_FALSE(fcc_traits::simd_linear_assign(a, fcc));
-#if XTENSOR_USE_XSIMD
-            EXPECT_TRUE(fcc_traits::simd_linear_assign(b, fcc));
-#else
-            EXPECT_FALSE(fcc_traits::simd_linear_assign(b, fcc));
-#endif
+            using array_type = xt::xarray<double, layout_type::dynamic>;
+            array_type a({2, 3}, layout_type::row_major);
+            array_type b({2, 3}, layout_type::column_major);
+
+            auto frr = a + a;
+            auto frc = a + b;
+            auto fcc = b + b;
+
+            using frr_traits = xassign_traits<array_type, decltype(frr)>;
+            using frc_traits = xassign_traits<array_type, decltype(frc)>;
+            using fcc_traits = xassign_traits<array_type, decltype(fcc)>;
+
+            EXPECT_FALSE(frr_traits::simd_linear_assign());
+            EXPECT_FALSE(frc_traits::simd_linear_assign());
+            EXPECT_FALSE(fcc_traits::simd_linear_assign());
+
+            {
+                SCOPED_TRACE("row_major + row_major");
+    #if XTENSOR_USE_XSIMD
+                EXPECT_TRUE(frr_traits::simd_linear_assign(a, frr));
+    #else
+                EXPECT_FALSE(frr_traits::simd_linear_assign(a, frr));
+    #endif
+                EXPECT_FALSE(frr_traits::simd_linear_assign(b, frr));
+            }
+
+            {
+                SCOPED_TRACE("row_major + column_major");
+                EXPECT_FALSE(frc_traits::simd_linear_assign(a, frc));
+                EXPECT_FALSE(frc_traits::simd_linear_assign(b, frc));
+            }
+
+            {
+                SCOPED_TRACE("row_major + column_major");
+                EXPECT_FALSE(fcc_traits::simd_linear_assign(a, fcc));
+    #if XTENSOR_USE_XSIMD
+                EXPECT_TRUE(fcc_traits::simd_linear_assign(b, fcc));
+    #else
+                EXPECT_FALSE(fcc_traits::simd_linear_assign(b, fcc));
+    #endif
+            }
+
+        }
+
+        TEST_CASE("left_shift")
+        {
+            xarray<int> arr({5,1, 1000});
+            xarray<int> arr2({2,1, 3});
+            xarray<int> res1 = left_shift(arr, 4);
+            xarray<int> res2 = left_shift(arr, arr2);
+            EXPECT_EQ(left_shift(arr, 4)(1), 16);
+            xarray<int> expected1 = {80, 16, 16000};
+            xarray<int> expected2 = {20, 2, 8000};
+
+            EXPECT_EQ(expected1, res1);
+            EXPECT_EQ(expected2, res2);
+
+            xarray<int> res3 = arr << 4;
+            xarray<int> res4 = arr << arr2;
+            EXPECT_EQ(expected1, res3);
+            EXPECT_EQ(expected2, res4);
+        }
+
+        TEST_CASE("right_shift")
+        {
+            xarray<int> arr({5,1, 1000});
+            xarray<int> arr2({2,1, 3});
+            xarray<int> res1 = right_shift(arr, 4);
+            xarray<int> res2 = right_shift(arr, arr2);
+            EXPECT_EQ(right_shift(arr, 4)(1), 0);
+            xarray<int> expected1 = {0, 0, 62};
+            xarray<int> expected2 = {1, 0, 125};
+
+            EXPECT_EQ(expected1, res1);
+            EXPECT_EQ(expected2, res2);
+
+            xarray<int> res3 = arr >> 4;
+            xarray<int> res4 = arr >> arr2;
+            EXPECT_EQ(expected1, res3);
+            EXPECT_EQ(expected2, res4);
         }
     }
-
-    TEST(operation, left_shift)
-    {
-        xarray<int> arr({5,1, 1000});
-        xarray<int> arr2({2,1, 3});
-        xarray<int> res1 = left_shift(arr, 4);
-        xarray<int> res2 = left_shift(arr, arr2);
-        EXPECT_EQ(left_shift(arr, 4)(1), 16);
-        xarray<int> expected1 = {80, 16, 16000};
-        xarray<int> expected2 = {20, 2, 8000};
-
-        EXPECT_EQ(expected1, res1);
-        EXPECT_EQ(expected2, res2);
-
-        xarray<int> res3 = arr << 4;
-        xarray<int> res4 = arr << arr2;
-        EXPECT_EQ(expected1, res3);
-        EXPECT_EQ(expected2, res4);
-    }
-
-    TEST(operation, right_shift)
-    {
-        xarray<int> arr({5,1, 1000});
-        xarray<int> arr2({2,1, 3});
-        xarray<int> res1 = right_shift(arr, 4);
-        xarray<int> res2 = right_shift(arr, arr2);
-        EXPECT_EQ(right_shift(arr, 4)(1), 0);
-        xarray<int> expected1 = {0, 0, 62};
-        xarray<int> expected2 = {1, 0, 125};
-
-        EXPECT_EQ(expected1, res1);
-        EXPECT_EQ(expected2, res2);
-
-        xarray<int> res3 = arr >> 4;
-        xarray<int> res4 = arr >> arr2;
-        EXPECT_EQ(expected1, res3);
-        EXPECT_EQ(expected2, res4);
-    }
+    #undef XOPERATION_TEST_TYPES
 
 }

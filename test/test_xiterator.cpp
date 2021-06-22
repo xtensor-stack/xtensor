@@ -181,13 +181,17 @@ namespace xt
         CHECK_MESSAGE(iter==last, "reverse iterator doesn't reach the end");
     }
 
-    TEST_CASE_TEMPLATE("xiterator_test", TypeParam,
-        row_major_result<>, column_major_result<>,
-        central_major_result<>, unit_shape_result<>)
+    #define XITERATOR_TEST_TYPES\
+        row_major_result<>,\
+        column_major_result<>,\
+        central_major_result<>,\
+        unit_shape_result<>
+
+    TEST_SUITE("xiterator_test")
     {
-        using TestFixture = xiterator_test<TypeParam>;
-        SUBCASE("increment")
+        TEST_CASE_TEMPLATE("increment", TypeParam, XITERATOR_TEST_TYPES)
         {
+            using TestFixture = xiterator_test<TypeParam>;
             typename TestFixture::result_type rm;
             {
                 SCOPED_TRACE("same shape - row_major iterator");
@@ -217,8 +221,9 @@ namespace xt
         }
 
 
-        SUBCASE("random_increment")
+        TEST_CASE_TEMPLATE("random_increment", TypeParam, XITERATOR_TEST_TYPES)
         {
+            using TestFixture = xiterator_test<TypeParam>;
             typename TestFixture::result_type rm;
             {
                 SCOPED_TRACE("same shape - row_major iterator");
@@ -248,8 +253,9 @@ namespace xt
         }
 
 
-        SUBCASE("end")
+        TEST_CASE_TEMPLATE("end", TypeParam, XITERATOR_TEST_TYPES)
         {
+            using TestFixture = xiterator_test<TypeParam>;
             typename TestFixture::result_type rm;
             {
                 SCOPED_TRACE("same shape - row_major iterator");
@@ -279,8 +285,9 @@ namespace xt
         }
 
 
-        SUBCASE("decrement")
+        TEST_CASE_TEMPLATE("decrement", TypeParam, XITERATOR_TEST_TYPES)
         {
+            using TestFixture = xiterator_test<TypeParam>;
             typename TestFixture::result_type rm;
             {
                 SCOPED_TRACE("same shape - row_major iterator");
@@ -309,8 +316,9 @@ namespace xt
             }
         }
 
-        SUBCASE("random_decrement")
+        TEST_CASE_TEMPLATE("random_decrement", TypeParam, XITERATOR_TEST_TYPES)
         {
+            using TestFixture = xiterator_test<TypeParam>;
             typename TestFixture::result_type rm;
             {
                 SCOPED_TRACE("same shape - row_major iterator");
@@ -340,8 +348,9 @@ namespace xt
         }
 
 
-        SUBCASE("reverse_end")
+        TEST_CASE_TEMPLATE("reverse_end", TypeParam, XITERATOR_TEST_TYPES)
         {
+            using TestFixture = xiterator_test<TypeParam>;
             typename TestFixture::result_type rm;
             {
                 SCOPED_TRACE("same shape - row_major iterator");

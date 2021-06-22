@@ -14,6 +14,10 @@
 #include "xtensor/xmanipulation.hpp"
 #include "test_common_macros.hpp"
 
+// the tests used to be implemented with gtest
+// testing::Types<...> and testing::Test
+// where introduced to keep compatible
+// with the gtest test where we can
 namespace testing
 {
     template<class ... ARGS>

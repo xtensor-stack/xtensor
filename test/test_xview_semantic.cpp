@@ -79,10 +79,11 @@ namespace xt
         using storage_type = C;
     };
 
+    #define VIEW_SEMANTIC_TEST_TYPES  xarray_dynamic, xtensor_dynamic
 
-    TEST_CASE_TEMPLATE("view_semantic", TypeParam, xarray_dynamic, xtensor_dynamic)
+    TEST_SUITE("view_semantic")
     {
-        SUBCASE("a_plus_b")
+        TEST_CASE_TEMPLATE("a_plus_b", TypeParam, VIEW_SEMANTIC_TEST_TYPES)
         {
             view_op_tester<std::plus<>, TypeParam> t;
             auto viewa = view(t.a, t.x_slice, t.y_slice, t.z_slice);
@@ -124,7 +125,7 @@ namespace xt
             }
         }
 
-        SUBCASE("a_minus_b")
+        TEST_CASE_TEMPLATE("a_minus_b", TypeParam, VIEW_SEMANTIC_TEST_TYPES)
         {
             view_op_tester<std::minus<>, TypeParam> t;
             auto viewa = view(t.a, t.x_slice, t.y_slice, t.z_slice);
@@ -166,7 +167,7 @@ namespace xt
             }
         }
 
-        SUBCASE("a_times_b")
+        TEST_CASE_TEMPLATE("a_times_b", TypeParam, VIEW_SEMANTIC_TEST_TYPES)
         {
             view_op_tester<std::multiplies<>, TypeParam> t;
             auto viewa = view(t.a, t.x_slice, t.y_slice, t.z_slice);
@@ -208,7 +209,7 @@ namespace xt
             }
         }
 
-        SUBCASE("a_divdide_by_b")
+        TEST_CASE_TEMPLATE("a_divdide_by_b", TypeParam, VIEW_SEMANTIC_TEST_TYPES)
         {
             view_op_tester<std::divides<>, TypeParam> t;
             auto viewa = view(t.a, t.x_slice, t.y_slice, t.z_slice);
@@ -250,7 +251,7 @@ namespace xt
             }
         }
 
-        SUBCASE("a_plus_equal_b")
+        TEST_CASE_TEMPLATE("a_plus_equal_b", TypeParam, VIEW_SEMANTIC_TEST_TYPES)
         {
             view_op_tester<std::plus<>, TypeParam> t;
 
@@ -291,7 +292,7 @@ namespace xt
             }
         }
 
-        SUBCASE("a_minus_equal_b")
+        TEST_CASE_TEMPLATE("a_minus_equal_b", TypeParam, VIEW_SEMANTIC_TEST_TYPES)
         {
             view_op_tester<std::minus<>, TypeParam> t;
 
@@ -332,7 +333,7 @@ namespace xt
             }
         }
 
-        SUBCASE("a_times_equal_b")
+        TEST_CASE_TEMPLATE("a_times_equal_b", TypeParam, VIEW_SEMANTIC_TEST_TYPES)
         {
             view_op_tester<std::multiplies<>, TypeParam> t;
 
@@ -373,7 +374,7 @@ namespace xt
             }
         }
 
-        SUBCASE("a_divide_by_equal_b")
+        TEST_CASE_TEMPLATE("a_divide_by_equal_b", TypeParam, VIEW_SEMANTIC_TEST_TYPES)
         {
             view_op_tester<std::divides<>, TypeParam> t;
 
@@ -414,7 +415,7 @@ namespace xt
             }
         }
 
-        SUBCASE("broadcast_equal")
+        TEST_CASE_TEMPLATE("broadcast_equal", TypeParam, VIEW_SEMANTIC_TEST_TYPES)
         {
             using container_1d = redim_container_t<TypeParam, 1>;
             using container_2d = redim_container_t<TypeParam, 2>;
@@ -435,7 +436,7 @@ namespace xt
             EXPECT_EQ(res, b);
         }
 
-        SUBCASE("scalar_equal")
+        TEST_CASE_TEMPLATE("scalar_equal", TypeParam, VIEW_SEMANTIC_TEST_TYPES)
         {
             using container_2d = redim_container_t<TypeParam, 2>;
             container_2d a = {{1, 2, 3, 4},
@@ -451,7 +452,7 @@ namespace xt
             EXPECT_EQ(res, a);
         }
 
-        SUBCASE("higher_dimension_broadcast")
+        TEST_CASE_TEMPLATE("higher_dimension_broadcast", TypeParam, VIEW_SEMANTIC_TEST_TYPES)
         {
             using container_2d = redim_container_t<TypeParam, 2>;
 
@@ -463,4 +464,6 @@ namespace xt
             XT_EXPECT_ANY_THROW(viewa = b);
         }
     }
+
+    #undef VIEW_SEMANTIC_TEST_TYPES
 }
