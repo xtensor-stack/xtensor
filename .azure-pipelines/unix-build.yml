@@ -26,6 +26,7 @@ steps:
       source activate xtensor
       mkdir build
       cd build
+      CMAKE_EXTRA_ARGS="$CMAKE_EXTRA_ARGS -DBUILD_TESTS=ON";
       if [[ $(bound_checks) == 1 ]]; then
         CMAKE_EXTRA_ARGS="$CMAKE_EXTRA_ARGS -DXTENSOR_ENABLE_ASSERT=ON";
       fi
@@ -53,7 +54,7 @@ steps:
         CMAKE_EXTA_ARGS="$CMAKE_EXTRA_ARGS -DBUILD_BENCHMARK=ON";
       fi
 
-      cmake -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX $CMAKE_EXTRA_ARGS -DDOWNLOAD_GTEST=ON $(Build.SourcesDirectory)
+      cmake -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX $CMAKE_EXTRA_ARGS $(Build.SourcesDirectory)
     displayName: Configure xtensor
     workingDirectory: $(Build.BinariesDirectory)
       
