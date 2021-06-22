@@ -3,5 +3,3 @@
     #define DOCTEST_CONFIG_NO_EXCEPTIONS
 #endif
 #include "doctest/doctest.h"
-
-
