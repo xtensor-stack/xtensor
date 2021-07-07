@@ -10,8 +10,12 @@
 #ifndef TEST_COMMON_HPP
 #define TEST_COMMON_HPP
 
+#include <sstream>
+
 #include "xtensor/xlayout.hpp"
 #include "xtensor/xmanipulation.hpp"
+#include "xtensor/xreducer.hpp" // tuple_idx_of
+
 #include "test_common_macros.hpp"
 
 // the tests used to be implemented with gtest
@@ -28,6 +32,28 @@ namespace testing
 
 namespace xt
 {
+    template<class C>
+    std::string stringify(const C & container)
+    {
+        std::size_t i = 0;
+        std::stringstream ss;
+        ss << "[";
+        for(auto && c : container)
+        {
+            if(i + 1 == container.size())
+            {
+                ss<<c;
+            }
+            else
+            {
+                ss<<c<<",";
+            }
+            ++i;
+        }
+        ss << "]";
+        return ss.str();
+    }
+
     template <class T, class A, class AV>
     bool operator==(const uvector<T, A>& lhs, const std::vector<T, AV>& rhs)
     {

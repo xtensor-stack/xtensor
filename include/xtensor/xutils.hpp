@@ -332,9 +332,74 @@ namespace xt
     }
 
     /***********************************
+     * construct_container_with_size implementation *
+     ***********************************/
+    namespace detail
+    {
+
+        template<class C>
+        struct construct_container_with_size_impl
+        {
+            static C op(typename C::size_type size)
+            {
+                C c;
+                const bool success = resize_container(c, size);
+                if(!success)
+                {
+                    XTENSOR_THROW(std::runtime_error, "cannot resize container to given size");
+                }
+                c.resize(size);
+                return c;
+            }
+        };
+
+        template <class T, class A>
+        struct construct_container_with_size_impl<std::vector<T,A>>
+        {
+            using container_type = std::vector<T,A>;
+            static container_type op(typename container_type::size_type size)
+            {
+                return container_type(size);
+            }
+        };
+
+        template <class T, std::size_t N>
+        struct construct_container_with_size_impl<std::array<T, N>>
+        {
+            using container_type = std::array<T, N>;
+            static container_type op(typename container_type::size_type size)
+            {
+                if(size != N)
+                {
+                    XTENSOR_THROW(std::runtime_error, "cannot resize container to given size");
+                }
+                return container_type{};
+            }
+        };
+
+        template <std::size_t... I>
+        struct construct_container_with_size_impl<xt::fixed_shape<I...>>
+        {
+            using container_type = xt::fixed_shape<I...>;
+            static container_type op(std::size_t size)
+            {
+                if(sizeof...(I) != size)
+                {
+                    XTENSOR_THROW(std::runtime_error, "cannot resize container to given size");
+                }
+                return container_type{};
+            }
+        };
+    }
+
+    template <class C, class S>
+    inline C construct_container_with_size(S size)
+    {
+        return detail::construct_container_with_size_impl<C>::op(size);
+    }
+    /***********************************
      * resize_container implementation *
      ***********************************/
-
     template <class C>
     inline bool resize_container(C& c, typename C::size_type size)
     {

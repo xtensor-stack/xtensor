@@ -135,7 +135,7 @@ namespace xt
         struct xchunk_iterator_base
             : std::conditional_t<is_xchunked_array<std::decay_t<T>>::value,
                                  xchunk_iterator_array<T>,
-                                 std::conditional_t<is_xchunked_view<T>::value,
+                                 std::conditional_t<is_xchunked_view<std::decay_t<T>>::value,
                                                     xchunk_iterator_view<T>,
                                                     invalid_chunk_iterator>>
         {
@@ -171,6 +171,8 @@ namespace xt
 
         bool operator==(const self_type& rhs) const;
         bool operator!=(const self_type& rhs) const;
+
+        const shape_type& chunk_index() const;
 
         const slice_vector& get_slice_vector() const;
         slice_vector get_chunk_slice_vector() const;
@@ -337,6 +339,12 @@ namespace xt
     inline auto xchunk_iterator<E>::get_slice_vector() const -> const slice_vector& 
     {
         return m_slice_vector;
+    }
+    
+    template <class E>
+    auto xchunk_iterator<E>::chunk_index() const -> const shape_type& 
+    {
+        return m_chunk_index;
     }
 
     template <class E>

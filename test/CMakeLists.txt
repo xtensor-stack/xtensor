@@ -133,6 +133,7 @@ set(COMMON_BASE
     test_xadaptor_semantic.cpp
     test_xarray_adaptor.cpp
     test_xarray.cpp
+    test_xblockwise_reducer.cpp
     test_xbroadcast.cpp
     test_xbuilder.cpp
     test_xcontainer_semantic.cpp
@@ -142,6 +143,7 @@ set(COMMON_BASE
     test_xexpression_traits.cpp
     test_xfunction.cpp
     test_xfunc_on_xexpression.cpp
+    test_xgrid_iterator.cpp
     test_xiterator.cpp
     test_xmath.cpp
     test_xoperation.cpp

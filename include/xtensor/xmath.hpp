@@ -365,46 +365,46 @@ namespace detail {
     }
 }
 
-#define XTENSOR_REDUCER_FUNCTION(NAME, FUNCTOR, INIT_VALUE_TYPE, INIT)                                               \
-    template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,                               \
-              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::negation<xtl::is_integral<X>>)>                \
-    inline auto NAME(E&& e, X&& axes, EVS es = EVS())                                                                \
-    {                                                                                                                \
-        using init_value_type = std::conditional_t<std::is_same<T, void>::value, INIT_VALUE_TYPE, T>;                \
-        using functor_type = FUNCTOR;                                                                                \
-        using init_value_fct = xt::const_value<init_value_type>;                                                     \
-        return xt::reduce(make_xreducer_functor(functor_type(),                                                      \
-                          init_value_fct(detail::fill_init<init_value_type>(INIT))),                                 \
-                          std::forward<E>(e),                                                                        \
-                          std::forward<X>(axes), es);                                                                \
-    }                                                                                                                \
-                                                                                                                     \
-    template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,                               \
-              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::is_integral<X>)>                               \
-    inline auto NAME(E&& e, X axis, EVS es = EVS())                                                                  \
-    {                                                                                                                \
-        return NAME(std::forward<E>(e), {axis}, es);                                                                 \
-    }                                                                                                                \
-                                                                                                                     \
-    template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,                                        \
-              XTL_REQUIRES(is_reducer_options<EVS>)>                                                                 \
-    inline auto NAME(E&& e, EVS es = EVS())                                                                          \
-    {                                                                                                                \
-        using init_value_type  = std::conditional_t<std::is_same<T, void>::value, INIT_VALUE_TYPE, T>;               \
-        using functor_type = FUNCTOR;                                                                                \
-        using init_value_fct = xt::const_value<init_value_type >;                                                    \
-        return xt::reduce(make_xreducer_functor(functor_type(),                                                      \
-                          init_value_fct(detail::fill_init<init_value_type >(INIT))), std::forward<E>(e), es);       \
-    }                                                                                                                \
-                                                                                                                     \
-    template <class T = void, class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>                \
-    inline auto NAME(E&& e, const I (&axes)[N], EVS es = EVS())                                                      \
-    {                                                                                                                \
-        using init_value_type  = std::conditional_t<std::is_same<T, void>::value, INIT_VALUE_TYPE, T>;               \
-        using functor_type = FUNCTOR;                                                                                \
-        using init_value_fct = xt::const_value<init_value_type >;                                                    \
-        return xt::reduce(make_xreducer_functor(functor_type(),                                                      \
-                          init_value_fct(detail::fill_init<init_value_type >(INIT))), std::forward<E>(e), axes, es); \
+#define XTENSOR_REDUCER_FUNCTION(NAME, FUNCTOR, INIT_VALUE_TYPE, INIT)                                                  \
+    template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,                                  \
+              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::negation<xtl::is_integral<std::decay_t<X> >> )>   \
+    inline auto NAME(E&& e, X&& axes, EVS es = EVS())                                                                   \
+    {                                                                                                                   \
+        using init_value_type = std::conditional_t<std::is_same<T, void>::value, INIT_VALUE_TYPE, T>;                   \
+        using functor_type = FUNCTOR;                                                                                   \
+        using init_value_fct = xt::const_value<init_value_type>;                                                        \
+        return xt::reduce(make_xreducer_functor(functor_type(),                                                         \
+                          init_value_fct(detail::fill_init<init_value_type>(INIT))),                                    \
+                          std::forward<E>(e),                                                                           \
+                          std::forward<X>(axes), es);                                                                   \
+    }                                                                                                                   \
+                                                                                                                        \
+    template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,                                  \
+              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::is_integral<std::decay_t<X>>)>                    \
+    inline auto NAME(E&& e, X axis, EVS es = EVS())                                                                     \
+    {                                                                                                                   \
+        return NAME(std::forward<E>(e), {axis}, es);                                                                    \
+    }                                                                                                                   \
+                                                                                                                        \
+    template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,                                           \
+              XTL_REQUIRES(is_reducer_options<EVS>)>                                                                    \
+    inline auto NAME(E&& e, EVS es = EVS())                                                                             \
+    {                                                                                                                   \
+        using init_value_type  = std::conditional_t<std::is_same<T, void>::value, INIT_VALUE_TYPE, T>;                  \
+        using functor_type = FUNCTOR;                                                                                   \
+        using init_value_fct = xt::const_value<init_value_type >;                                                       \
+        return xt::reduce(make_xreducer_functor(functor_type(),                                                         \
+                          init_value_fct(detail::fill_init<init_value_type >(INIT))), std::forward<E>(e), es);          \
+    }                                                                                                                   \
+                                                                                                                        \
+    template <class T = void, class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>                   \
+    inline auto NAME(E&& e, const I (&axes)[N], EVS es = EVS())                                                         \
+    {                                                                                                                   \
+        using init_value_type  = std::conditional_t<std::is_same<T, void>::value, INIT_VALUE_TYPE, T>;                  \
+        using functor_type = FUNCTOR;                                                                                   \
+        using init_value_fct = xt::const_value<init_value_type >;                                                       \
+        return xt::reduce(make_xreducer_functor(functor_type(),                                                         \
+                          init_value_fct(detail::fill_init<init_value_type >(INIT))), std::forward<E>(e), axes, es);    \
     }
 
     /*******************
