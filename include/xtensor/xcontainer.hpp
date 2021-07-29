@@ -648,6 +648,12 @@ namespace xt
         return storage()[i];
     }
 
+    /**
+     * Returns a reference to the element at the specified position in the containter
+     * storage (as if it was one dimensional).
+     * @param i index specifying the position in the storage.
+     * Must be smaller than the number of elements in the container.
+     */
     template <class D>
     inline auto xcontainer<D>::flat(size_type i) -> reference
     {
@@ -655,6 +661,12 @@ namespace xt
         return storage()[i];
     }
 
+    /**
+     * Returns a constant reference to the element at the specified position in the containter
+     * storage (as if it was one dimensional).
+     * @param i index specifying the position in the storage.
+     * Must be smaller than the number of elements in the container.
+     */
     template <class D>
     inline auto xcontainer<D>::flat(size_type i) const -> const_reference
     {
