@@ -11,46 +11,36 @@ NaN functions
 
 Defined in ``xtensor/xmath.hpp``
 
-.. _nan-to-num-function-reference:
 .. doxygenfunction:: nan_to_num(E&&)
    :project: xtensor
 
-.. _nanmin-function-reference:
 .. doxygenfunction:: nanmin(E&&, X&&, EVS)
    :project: xtensor
 
-.. _nanmax-function-reference:
 .. doxygenfunction:: nanmax(E&&, X&&, EVS)
    :project: xtensor
 
-.. _nansum-function-reference:
 .. doxygenfunction:: nansum(E&&, X&&, EVS)
    :project: xtensor
 
-.. _nanmean-function-reference:
 .. doxygenfunction:: nanmean(E&&, X&&, EVS)
    :project: xtensor
 
-.. _nanvar-function-reference:
 .. doxygenfunction:: nanvar(E&&, X&&, EVS)
    :project: xtensor
 
-.. _nanstd-function-reference:
 .. doxygenfunction:: nanstd(E&&, X&&, EVS)
    :project: xtensor
 
-.. _nanprod-function-reference:
 .. doxygenfunction:: nanprod(E&&, X&&, EVS)
    :project: xtensor
 
-.. _nancumsum-function-reference:
 .. doxygenfunction:: nancumsum(E&&)
    :project: xtensor
 
 .. doxygenfunction:: nancumsum(E&&, std::ptrdiff_t)
    :project: xtensor
 
-.. _nancumprod-function-reference:
 .. doxygenfunction:: nancumprod(E&&)
    :project: xtensor
 

@@ -12,7 +12,6 @@ Power functions
 
 Defined in ``xtensor/xmath.hpp``
 
-.. _pow-function-reference:
 .. doxygenfunction:: pow(E1&&, E2&&)
    :project: xtensor
 
@@ -25,15 +24,12 @@ Defined in ``xtensor/xmath.hpp``
 .. doxygenfunction:: cube(E1&&)
    :project: xtensor
 
-.. _sqrt-function-reference:
 .. doxygenfunction:: sqrt(E&&)
    :project: xtensor
 
-.. _cbrt-function-reference:
 .. doxygenfunction:: cbrt(E&&)
    :project: xtensor
 
-.. _hypot-func-ref:
 .. doxygenfunction:: hypot(E1&&, E2&&)
    :project: xtensor
 
