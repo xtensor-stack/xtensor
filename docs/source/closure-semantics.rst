@@ -12,8 +12,8 @@ Closure semantics
 The ``xtensor`` library is a tensor expression library implementing numpy-style broadcasting and universal functions but in a lazy fashion.
 
 If ``x`` and ``y`` are two tensor expressions with compatible shapes, the result of ``x + y`` is not a tensor but an expression that does
-not hold any value. Values of ``x + y`` are computed upon access or when the result is assigned to a container such as ``xt::xtensor`` or
-``xt::xarray``. The same holds for most functions in xtensor, views, broadcasting views, etc.
+not hold any value. Values of ``x + y`` are computed upon access or when the result is assigned to a container such as :cpp:type:`xt::xtensor` or
+:cpp:type:`xt::xarray`. The same holds for most functions in xtensor, views, broadcasting views, etc.
 
 In order to be able to perform the differed computation of ``x + y``, the returned expression must hold references, const references or
 copies of the members ``x`` and ``y``, depending on how arguments were passed to ``operator+``. The actual types held by the expressions

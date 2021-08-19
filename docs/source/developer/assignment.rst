@@ -9,14 +9,14 @@
 Assignment
 ==========
 
-In this section, we consider the class ``xarray`` and its semantic bases (``xcontainer_semantic`` and
+In this section, we consider the class :cpp:type:`xt::xarray` and its semantic bases (``xcontainer_semantic`` and
 ``xsemantic_base``) to illustrate how the assignment works. `xtensor` provides different mechanics of
 assignment depending on the type of expression.
 
 Extended copy semantic
 ~~~~~~~~~~~~~~~~~~~~~~
 
-``xarray`` provides an extended copy constructor and an extended assignment operator:
+:cpp:type:`xt::xarray` provides an extended copy constructor and an extended assignment operator:
 
 .. code::
 
@@ -37,8 +37,8 @@ The assignment operator forwards to ``xsemantic_base::operator=`` whose implemen
         return this->derived_cast().assign_temporary(std::move(tmp));
     }
 
-Here ``temporary_type`` is ``xarray``, the assignment operator computes the result of the expression in
-a temporary variable and then assigns it to the ``xarray`` instance. This temporary variable avoids aliasing
+Here ``temporary_type`` is :cpp:type:`xt::xarray`, the assignment operator computes the result of the expression in
+a temporary variable and then assigns it to the :cpp:type:`xt::xarray` instance. This temporary variable avoids aliasing
 when the array is involved in the rhs expression where broadcasting happens:
 
 .. code::

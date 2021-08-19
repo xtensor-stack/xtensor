@@ -22,13 +22,13 @@ It is strictly equivalent to
 
     xt::xarray<double> a = {1, 3, 4, 2};
 
-To initialize a 4D-array with the given shape, use the ``from_shape`` static method:
+To initialize a 4D-array with the given shape, use the :cpp:func:`xt::xarray::from_shape` static method:
 
 .. code::
 
     auto a = xt::xarray<double>::from_shape({1, 3, 4, 2});
 
-The confusion often comes from the way ``xtensor`` can be initialized:
+The confusion often comes from the way :cpp:type:`xt::xtensor` can be initialized:
 
 .. code::
 
@@ -61,7 +61,7 @@ be tempted to simplify it a bit:
         return (1 - tmp) / (1 + tmp);
     }
 
-Unfortunately, you introduced a bug; indeed, expressions in ``xtensor`` are not evaluated
+Unfortunately, you introduced a bug; indeed, expressions in `xtensor` are not evaluated
 immediately, they capture their arguments by reference or copy depending on their nature,
 for future evaluation. Since ``tmp`` is an lvalue, it is captured by reference in the last
 statement; when the function returns, ``tmp`` is destroyed, leading to a dangling reference
@@ -85,20 +85,19 @@ generator does not give the same random number if called twice.
 
     // a0 != a1 !!!
 
-You need to explicitly assign or eval a random number generator, 
-like so:
+You need to explicitly assign or eval a random number generator, like so:
 
 .. code::
 
     xt::xarray<double> xr = xt::random::rand<double>({10, 10});
-    auto xr2 = eval(xt::random::rand<double>({10, 10}));
+    auto xr2 = xt::eval(xt::random::rand<double>({10, 10}));
 
     // now xr(0, 0) == xr(0, 0) is true.
 
 variance arguments
 ------------------
 
-When ``variance`` is passed an expression and an integer parameter, this latter
+When :cpp:func:`xt::variance` is passed an expression and an integer parameter, this latter
 is not the axis along which the variance must be computed, but the degree of freedom:
 
 .. code::
@@ -118,7 +117,7 @@ If you want to specify an axis, you need to pass an initializer list:
 fixed_shape on Windows
 ----------------------
 
-Builder functions such as ``empty`` or ``ones`` accept an initializer list
+Builder functions such as :cpp:func:`xt::empty` or :cpp:func:`xt::ones` accept an initializer list
 as argument. If the elements of this list do not have the same type, a
 curious compilation error may occur on Windows:
 
@@ -140,7 +139,7 @@ Alignment of fixed-size members
 
     If you are using ``C++ >= 17`` you should not have to worry about this.
 
-When building with ``xsimd`` (see :ref:`external-dependencies`), if you define a structure
+When building with `xsimd` (see :ref:`external-dependencies`), if you define a structure
 having members of fixed-size xtensor types, you must ensure that the buffers properly
 aligned. For this you can use the macro ``XTENSOR_FIXED_ALIGN`` available in
 ``xtensor/xtensor_config.hpp``.

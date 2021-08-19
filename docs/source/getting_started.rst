@@ -214,7 +214,7 @@ Outputs:
 Fourth example: broadcasting
 ----------------------------
 
-This last example shows how to broadcast the ``xt::pow`` universal function:
+This last example shows how to broadcast the :cpp:func:`xt::pow` universal function:
 
 .. code::
 

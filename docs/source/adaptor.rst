@@ -76,7 +76,7 @@ ownership of the array:
         // prints 0 2 (data is still available here)
     }
 
-However if you replace ``xt::no_ownership`` with ``xt::acquire_ownership``, the adaptor will take
+However if you replace :cpp:enumerator:`xt::no_ownership` with :cpp:enumerator:`xt::acquire_ownership`, the adaptor will take
 the ownership of the array, meaning it will be deleted when the adaptor is destroyed:
 
 .. code::
@@ -179,8 +179,8 @@ Adapting C++ smart pointers
 ---------------------------
 
 If you want to manage your data with shared or unique pointers, you can use the
-``adapt_smart_ptr`` function of xtensor. It will automatically increment the
-reference count of shared pointers upon creation, and decrement upon deletion.
+:cpp:func:`xt::adapt_smart_ptr` function of xtensor.
+It will automatically increment the reference count of shared pointers upon creation, and decrement upon deletion.
 
 .. code::
 

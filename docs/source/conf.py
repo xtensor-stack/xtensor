@@ -46,4 +46,5 @@ intersphinx_mapping = {
     "numpy": ("https://numpy.org/doc/stable/", None),
     "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
     "xtensor-blas": ("https://xtensor-blas.readthedocs.io/en/stable", None),
+    "xtl": ("https://xtl.readthedocs.io/en/stable", None),
 }

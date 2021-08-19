@@ -12,7 +12,7 @@ Requirements
 
 An implementation class in `xtensor` is a final class that models a specific
 kind of expression. It must inherit (either directly or indirectly) from
-``xexpression`` and define (or inherit from classes that define) the following
+:cpp:type:`xt::xexpression` and define (or inherit from classes that define) the following
 types:
 
 **container types**
@@ -129,8 +129,8 @@ inheriting classes only provide constructors and assignment operators for the va
 The container classes are generally used through type aliases which set many of the template
 arguments:
 
-- ``xarray``
-- ``xtensor``
+- :cpp:type:`xt::xarray`
+- :cpp:type:`xt::xtensor`
 - ``xfixed_tensor``
 
 The classes for adaptors can be instantiated through the many overloads of ``xt::adapt`` function,
@@ -149,7 +149,7 @@ Most of the mehtods of these classes are defined in their base class ``xoptional
 
 **Views**
 
-- ``xview``: N-dimensional view with static number of slices, supporting all kind of slices
+- :cpp:type:`xt::xview`: N-dimensional view with static number of slices, supporting all kind of slices
 - ``xstrided_view``: N-dimensional view with dynamic number of slices, supporting strided slices only (see below)
 - ``xdynamic_view``: N-dimensional view with dynamic number of slices, supporting all kind of slices
 - ``xfunctor_view``: N-dimensional view applying a functor to its underlying elements (e.g. ``imag``, ``real``)
@@ -181,16 +181,16 @@ Contrary to containers and views, the functional expressions are immutable.
 xarray and xtensor
 ~~~~~~~~~~~~~~~~~~
 
-Although they represent different concepts, ``xarray`` and ``xtensor`` have really similar
-implementations so only ``xarray`` will be covered.
+Although they represent different concepts, :cpp:type:`xt::xarray` and :cpp:type:`xt::xtensor` have really similar
+implementations so only :cpp:type:`xt::xarray` will be covered.
 
-``xarray`` is a strided array expression that can be assigned to. Everything ``xarray`` needs
-is already defined in classes modeling :ref:`concepts-label`, so ``xarray`` only has to inherit
+:cpp:type:`xt::xarray` is a strided array expression that can be assigned to. Everything :cpp:type:`xt::xarray` needs
+is already defined in classes modeling :ref:`concepts-label`, so :cpp:type:`xt::xarray` only has to inherit
 from these classes and define constructors and assignment operators:
 
 .. image:: xarray_uml.svg
 
-Besides implementing the methods that define value semantic, ``xarray`` and ``xtensor`` hold
+Besides implementing the methods that define value semantic, :cpp:type:`xt::xarray` and :cpp:type:`xt::xtensor` hold
 the data container. Since the ``xcontainer`` base class implements all the logic for accessing
 the data, it must me able to access the data container. This is achieved by requiring that
 every class inheriting from ``xcontainer`` provides the following methods:
@@ -201,7 +201,7 @@ every class inheriting from ``xcontainer`` provides the following methods:
     const storage_type& storage_impl() const noexcept;
 
 These are the implementation methods of the ``storage()`` interface methods defined in ``xcontainer``,
-and thus are defined in the private section of ``xarray`` and ``xtensor``. In order to grant access
+and thus are defined in the private section of :cpp:type:`xt::xarray` and :cpp:type:`xt::xtensor`. In order to grant access
 to ``xcontainer``, this last one is declared as ``friend``:
 
 .. code::
@@ -233,8 +233,8 @@ Although the base classes use the types defined in the Requirement section, they
 define them; first because different base classes may need the same types and we want
 to avoid duplication of type definitions. The second reason is that most of the types
 may rely on other types specific to the implementation classes. For instance,
-``value_type``, ``reference``, etc,  of ``xarray`` are simply the types defined in the
-container type hold by ``xarray``:
+``value_type``, ``reference``, etc,  of :cpp:type:`xt::xarray` are simply the types defined in the
+container type hold by :cpp:type:`xt::xarray`:
 
 .. code::
 
