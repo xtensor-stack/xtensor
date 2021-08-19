@@ -27,7 +27,7 @@ In the following example, we define new container and adaptor types for user-spe
     using my_tensor_type = xt::xtensor_container<container_type, 3>;
     using my_adaptor_type = xt::xtensor_adaptor<container_type, 3>;
 
-These new types will have all the features of the core ``xt::xtensor`` and ``xt::xarray`` types.
+These new types will have all the features of the core :cpp:type:`xt::xtensor` and :cpp:type:`xt::xarray` types.
 ``xt::xarray_container`` and ``xt::xtensor_container`` embed the data container, while
 ``xt::xarray_adaptor`` and ``xt::xtensor_adaptor`` hold a reference on an already initialized
 container.

@@ -8,7 +8,7 @@ Containers and views
 ====================
 
 Containers are in-memory expressions that share a common implementation of most of the methods of the xexpression API.
-The final container classes (``xarray``, ``xtensor``) mainly implement constructors and value semantic, most of the
+The final container classes (:cpp:type:`xt::xarray`, :cpp:type:`xt::xtensor`) mainly implement constructors and value semantic, most of the
 xexpression API is actually implemented in ``xstrided_container`` and ``xcontainer``.
 
 .. toctree::

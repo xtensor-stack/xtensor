@@ -18,7 +18,7 @@ Tensor types
 .. note::
 
    Except if mentioned otherwise, the methods described below are available for the
-   three kinds of containers, even if the examples show ``xarray`` usage only.
+   three kinds of containers, even if the examples show :cpp:type:`xt::xarray` usage only.
 
 Initialization
 --------------
@@ -107,7 +107,7 @@ Print the shape
 Reshape
 -------
 
-The number of elements of an ``xarray`` must remain the same:
+The number of elements of an :cpp:type:`xt::xarray` must remain the same:
 
 .. code::
 
@@ -116,7 +116,7 @@ The number of elements of an ``xarray`` must remain the same:
     std::cout << a0 << std::endl;
     // outputs {{1., 2., 3.}, {4., 5., 6. }}
 
-For ``xtensor`` the number of elements and the number of dimensions
+For :cpp:type:`xt::xtensor` the number of elements and the number of dimensions
 must remain the same:
 
 .. code::
@@ -151,7 +151,7 @@ Resize
     xt::xarray<double> a0 = {1., 2., 3, 4.};
     a0.resize({2, 3});
 
-When resizing an ``xtensor`` object, the number of dimensions must remain
+When resizing an :cpp:type:`xt::xtensor` object, the number of dimensions must remain
 the same:
 
 .. code::
