@@ -861,10 +861,12 @@ namespace xt
     }
 
     /**
-     * Find position of minimal value in xexpression
+     * Find position of minimal value in xexpression.
+     * By default, the returned index is into the flattened array.
+     * If `axis` is specified, the indices are along the specified axis.
      *
      * @param e input xexpression
-     * @param axis select axis (or none)
+     * @param axis select axis (optional)
      *
      * @return returns xarray with positions of minimal value
      */
@@ -887,9 +889,11 @@ namespace xt
 
     /**
      * Find position of maximal value in xexpression
+     * By default, the returned index is into the flattened array.
+     * If `axis` is specified, the indices are along the specified axis.
      *
      * @param e input xexpression
-     * @param axis select axis (or none)
+     * @param axis select axis (optional)
      *
      * @return returns xarray with positions of maximal value
      */
