@@ -1,18 +1,18 @@
 #include "test_common.hpp"
 #include <vector>
 
-#include "xtensor/xgrid_iterator.hpp"
+#include "xtensor/xmultiindex_iterator.hpp"
 
 namespace xt
 {
 
-TEST_SUITE("xgrid_iterator")
+TEST_SUITE("xmultiindex_iterator")
 {
 
     TEST_CASE("sum")
     {   
         using shape_type = std::vector<std::size_t>;
-        using iter_type = xsubgrid_iterator<shape_type>;
+        using iter_type = xmultiindex_iterator<shape_type>;
 
         shape_type roi_begin{2,3,4};
         shape_type roi_end{3,5,6};

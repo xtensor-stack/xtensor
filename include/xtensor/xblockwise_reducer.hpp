@@ -6,7 +6,7 @@
 
 #include "xshape.hpp"
 #include "xblockwise_reducer_functors.hpp"
-#include "xgrid_iterator.hpp"
+#include "xmultiindex_iterator.hpp"
 #include "xreducer.hpp"
 
 namespace xt
@@ -50,12 +50,13 @@ private:
     using mapping_type = filter_fixed_shape_t<shape_type>;
     using input_chunked_view_type = xchunked_view<const std::decay_t<CT> &>;
     using input_const_chunked_iterator_type = typename input_chunked_view_type::const_chunk_iterator;
+    using input_chunk_range_type = std::array<xmultiindex_iterator<input_chunk_index_type>, 2>;
 
     template<class CI>
     void assign_to_chunk(CI & result_chunk_iter) const;
 
     template<class CI>
-    std::array<xsubgrid_iterator<input_chunk_index_type>, 2> compute_input_chunk_range(CI & result_chunk_iter) const;
+    input_chunk_range_type compute_input_chunk_range(CI & result_chunk_iter) const;
 
     input_const_chunked_iterator_type get_input_chunk_iter(input_chunk_index_type  input_chunk_index) const;
     void init_shapes();
@@ -184,12 +185,14 @@ void xblockwise_reducer<CT, F, X, O>::assign_to_chunk(CI & result_chunk_iter) co
 
 template<class CT, class F, class X, class O>
 template<class CI>
-auto xblockwise_reducer<CT, F, X, O>::compute_input_chunk_range(CI & result_chunk_iter) const -> std::array<xsubgrid_iterator<input_chunk_index_type>, 2>
+auto xblockwise_reducer<CT, F, X, O>::compute_input_chunk_range(CI & result_chunk_iter) const -> input_chunk_range_type
 {
-    auto input_chunks_begin = construct_container_with_size<input_chunk_index_type>(m_e_chunked_view.dimension());
-    auto input_chunks_end = construct_container_with_size<input_chunk_index_type>(m_e_chunked_view.dimension());
+    auto input_chunks_begin = xtl::make_sequence<input_chunk_index_type>(m_e_chunked_view.dimension(), 0);
+    auto input_chunks_end = xtl::make_sequence<input_chunk_index_type>(m_e_chunked_view.dimension());
 
-    std::fill(input_chunks_begin.begin(), input_chunks_begin.end(), 0);
+    XTENSOR_ASSERT(input_chunks_begin.size() == m_e_chunked_view.dimension());
+    XTENSOR_ASSERT(input_chunks_end.size() == m_e_chunked_view.dimension());
+
     std::copy(m_e_chunked_view.grid_shape().begin(), m_e_chunked_view.grid_shape().end(),  input_chunks_end.begin());
 
     const auto & chunk_index = result_chunk_iter.chunk_index();
@@ -202,9 +205,9 @@ auto xblockwise_reducer<CT, F, X, O>::compute_input_chunk_range(CI & result_chun
             input_chunks_end[input_ax_index] = chunk_index[result_ax_index] + 1;
         }
     }
-    return std::array<xsubgrid_iterator<input_chunk_index_type>, 2>{
-        subgrid_iterator_begin<input_chunk_index_type>(input_chunks_begin, input_chunks_end), 
-        subgrid_iterator_end<input_chunk_index_type>(input_chunks_begin, input_chunks_end)
+    return input_chunk_range_type{
+        multiindex_iterator_begin<input_chunk_index_type>(input_chunks_begin, input_chunks_end), 
+        multiindex_iterator_end<input_chunk_index_type>(input_chunks_begin, input_chunks_end)
     };
 }
 
@@ -318,7 +321,8 @@ namespace blockwise
         {\
             using input_expression_type = std::decay_t<E>;\
             using axes_type = filter_fixed_shape_t<typename input_expression_type::shape_type>;\
-            axes_type axes = construct_container_with_size<axes_type>(e.dimension());\
+            axes_type axes = xtl::make_sequence<axes_type>(e.dimension());\
+            XTENSOR_ASSERT(axes.dimension() == e.dimension());\
             std::iota(axes.begin(), axes.end(), 0);\
             using functor_type = FUNCTOR <typename input_expression_type::value_type, T>;\
             return blockwise_reducer(\
@@ -392,7 +396,8 @@ namespace blockwise
         {\
             using input_expression_type = std::decay_t<E>;\
             using axes_type = filter_fixed_shape_t<typename input_expression_type::shape_type>;\
-            axes_type axes = construct_container_with_size<axes_type>(e.dimension());\
+            axes_type axes = xtl::make_sequence<axes_type>(e.dimension());\
+            XTENSOR_ASSERT(axes.dimension() == e.dimension());\
             std::iota(axes.begin(), axes.end(), 0);\
             using functor_type = FUNCTOR <typename input_expression_type::value_type>;\
             return blockwise_reducer(\
@@ -462,7 +467,8 @@ namespace blockwise
         {\
             using input_expression_type = std::decay_t<E>;\
             using axes_type = filter_fixed_shape_t<typename input_expression_type::shape_type>;\
-            axes_type axes = construct_container_with_size<axes_type>(e.dimension());\
+            axes_type axes = xtl::make_sequence<axes_type>(e.dimension());\
+            XTENSOR_ASSERT(axes.dimension() == e.dimension());\
             std::iota(axes.begin(), axes.end(), 0);\
             using functor_type = FUNCTOR <typename input_expression_type::value_type>;\
             return blockwise_reducer(\

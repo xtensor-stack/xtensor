@@ -7,8 +7,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XTENSOR_XGRID_ITERATOR
-#define XTENSOR_XGRID_ITERATOR
+#ifndef XTENSOR_XMULTIINDEX_ITERATOR
+#define XTENSOR_XMULTIINDEX_ITERATOR
 
 #include "xtl/xsequence.hpp"
 
@@ -19,10 +19,10 @@ namespace xt
 {
 
     template<class S>
-    class xsubgrid_iterator
+    class xmultiindex_iterator
     {
     public:
-        using self_type = xsubgrid_iterator<S>;
+        using self_type = xmultiindex_iterator<S>;
         using shape_type = S;
 
         using value_type = shape_type;
@@ -31,14 +31,10 @@ namespace xt
         using difference_type = std::size_t;
         using iterator_category = std::forward_iterator_tag;
 
-        xsubgrid_iterator() = default;
-        xsubgrid_iterator(const xsubgrid_iterator&) = default;
-        xsubgrid_iterator(xsubgrid_iterator&&) = default;
-        xsubgrid_iterator& operator=(const xsubgrid_iterator&) = default;
-        xsubgrid_iterator& operator=(xsubgrid_iterator&&) = default;    
+        xmultiindex_iterator() = default;
 
         template<class B, class E, class C>
-        xsubgrid_iterator(B && begin, E && end, C && current, const std::size_t linear_index)
+        xmultiindex_iterator(B && begin, E && end, C && current, const std::size_t linear_index)
         :   m_begin(std::forward<B>(begin)),
             m_end(std::forward<E>(end)),
             m_current(std::forward<C>(current)),
@@ -100,12 +96,12 @@ namespace xt
 
 
     template<class S, class B, class E>
-    auto subgrid_iterator_begin(B && roi_begin, E && roi_end)
+    auto multiindex_iterator_begin(B && roi_begin, E && roi_end)
     {
         S current;
         resize_container(current, roi_begin.size());
         std::copy(roi_begin.begin(), roi_begin.end(), current.begin());
-        return xsubgrid_iterator<S>(
+        return xmultiindex_iterator<S>(
             std::forward<B>(roi_begin),
             std::forward<E>(roi_end),
             std::move(current),
@@ -114,7 +110,7 @@ namespace xt
     }
 
     template<class S, class B, class E>
-    auto subgrid_iterator_end(B && roi_begin, E && roi_end)
+    auto multiindex_iterator_end(B && roi_begin, E && roi_end)
     {
         S current;
         resize_container(current, roi_begin.size());
@@ -126,7 +122,7 @@ namespace xt
             linear_index *= roi_end[i] - roi_begin[i];
         }
 
-        return xsubgrid_iterator<S>(
+        return xmultiindex_iterator<S>(
             std::forward<B>(roi_begin),
             std::forward<E>(roi_end),
             std::move(current),
