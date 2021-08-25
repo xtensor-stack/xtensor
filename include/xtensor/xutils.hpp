@@ -334,7 +334,6 @@ namespace xt
     /***********************************
      * resize_container implementation *
      ***********************************/
-
     template <class C>
     inline bool resize_container(C& c, typename C::size_type size)
     {

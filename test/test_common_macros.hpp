@@ -27,7 +27,6 @@
 #define XT_ASSERT_NO_THROW(x) x;
 #endif
 
-#endif
 
 #define EXPECT_NO_THROW(x) XT_EXPECT_NO_THROW(x)
 #define EXPECT_THROW(x, y) XT_EXPECT_THROW(x,y)
@@ -55,3 +54,11 @@
 
 #define TEST_F(FIXTURE_CLASS, NAME)\
     TEST_CASE_FIXTURE(FIXTURE_CLASS, #NAME)
+
+#define HETEROGEN_PARAMETRIZED_DEFINE(ID)\
+    TEST_CASE_TEMPLATE_DEFINE(#ID, TypeParam, ID)
+
+#define HETEROGEN_PARAMETRIZED_TEST_APPLY(ID, TEST_FUNC)\
+    TEST_CASE_TEMPLATE_APPLY(ID, augment_t<std::decay_t<decltype(TEST_FUNC())>>)
+    
+#endif
