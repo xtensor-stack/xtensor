@@ -2,10 +2,6 @@ jobs:
   - job: 'Linux_0'
     strategy:
       matrix:
-        clang_4:
-          llvm_version: '4.0'
-        clang_5:
-          llvm_version: '5.0'
         clang_6:
           llvm_version: '6.0'
         clang_7:
@@ -18,7 +14,7 @@ jobs:
           llvm_version: '10'
           disable_xsimd: 1
     pool:
-      vmImage: ubuntu-16.04
+      vmImage: ubuntu-18.04
     variables:
       CC: clang-$(llvm_version)
       CXX: clang++-$(llvm_version)

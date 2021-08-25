@@ -160,35 +160,17 @@ namespace xt
                 return std::complex<T>(c.real(), -c.imag());
             }
 
+            template <class T>
+            constexpr std::complex<T> conj_impl(const T & real)
+            {
+                return std::complex<T>(real, 0);
+            }
+            
 #ifdef XTENSOR_USE_XSIMD
-            template <class X>
-            constexpr X conj_impl(const xsimd::simd_complex_batch<X>& z)
+            template <class T, class A>
+            xsimd::complex_batch_type_t< xsimd::batch<T, A>> conj_impl(const xsimd::batch<T, A>& z)
             {
                 return xsimd::conj(z);
-            }
-
-            template <class T>
-            struct not_complex_batch
-                : xtl::negation<std::is_base_of<xsimd::simd_complex_batch<T>, T>>
-            {
-            };
-
-            // libc++ (OSX) conj is unfortunately broken and returns
-            // std::complex<T> instead of T.
-            // This function must be deactivated for complex batches,
-            // otherwise it will be a better match than the previous one.
-            template <class T, XTL_REQUIRES(not_complex_batch<T>)>
-            constexpr T conj_impl(const T& c)
-            {
-                return c;
-            }
-#else
-            // libc++ (OSX) conj is unfortunately broken and returns
-            // std::complex<T> instead of T.
-            template <class T>
-            constexpr T conj_impl(const T& c)
-            {
-                return c;
             }
 #endif
         }

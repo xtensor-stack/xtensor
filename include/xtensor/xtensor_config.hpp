@@ -57,6 +57,12 @@
     xt::svector<typename XTENSOR_DEFAULT_DATA_CONTAINER(T, EA)::size_type, 4, SA, true>
 #endif
 
+#ifdef XTENSOR_USE_XSIMD
+    #include <xsimd/xsimd.hpp>
+    #define XSIMD_DEFAULT_ALIGNMENT xsimd::default_arch::alignment()
+#endif
+
+
 #ifndef XTENSOR_DEFAULT_ALLOCATOR
 #ifdef XTENSOR_ALLOC_TRACKING
     #ifndef XTENSOR_ALLOC_TRACKING_POLICY
@@ -72,7 +78,7 @@
     #endif
 #else
     #ifdef XTENSOR_USE_XSIMD
-        #include <xsimd/xsimd.hpp>
+        
         #define XTENSOR_DEFAULT_ALLOCATOR(T) \
             xsimd::aligned_allocator<T, XSIMD_DEFAULT_ALIGNMENT>
     #else

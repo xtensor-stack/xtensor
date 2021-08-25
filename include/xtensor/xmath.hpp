@@ -266,21 +266,21 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         // VS2015 STL defines isnan, isinf and isfinite as template
         // functions, breaking ADL.
 #if defined(_WIN32) && defined(XTENSOR_USE_XSIMD)
-        template <class T, std::size_t N>
-        inline xsimd::batch_bool<T, N> isinf(const xsimd::batch<T, N>& b)
+        /*template <class T, class A>
+        inline xsimd::batch_bool<T, A> isinf(const xsimd::batch<T, A>& b)
         {
             return xsimd::isinf(b);
         }
-        template <class T, std::size_t N>
-        inline xsimd::batch_bool<T, N> isnan(const xsimd::batch<T, N>& b)
+        template <class T, class A>
+        inline xsimd::batch_bool<T, A> isnan(const xsimd::batch<T, A>& b)
         {
             return xsimd::isnan(b);
         }
-        template <class T, std::size_t N>
-        inline xsimd::batch_bool<T, N> isfinite(const xsimd::batch<T, N>& b)
+        template <class T, class A>
+        inline xsimd::batch_bool<T, A> isfinite(const xsimd::batch<T, A>& b)
         {
             return xsimd::isfinite(b);
-        }
+        }*/
 #endif
         // The following specializations are needed to avoid 'ambiguous overload' errors,
         // whereas 'unsigned char' and 'unsigned short' are automatically converted to 'int'.

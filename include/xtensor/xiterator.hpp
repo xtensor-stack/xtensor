@@ -557,8 +557,8 @@ namespace xt
             static R apply(const It& it)
             {
                 R reg;
-                reg.load_unaligned(&(*it));
-                return reg;
+                return reg.load_unaligned(&(*it));
+                //return reg;
             }
         };
 
