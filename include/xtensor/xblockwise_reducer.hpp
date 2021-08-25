@@ -322,7 +322,7 @@ namespace blockwise
             using input_expression_type = std::decay_t<E>;\
             using axes_type = filter_fixed_shape_t<typename input_expression_type::shape_type>;\
             axes_type axes = xtl::make_sequence<axes_type>(e.dimension());\
-            XTENSOR_ASSERT(axes.dimension() == e.dimension());\
+            XTENSOR_ASSERT(axes.size() == e.dimension());\
             std::iota(axes.begin(), axes.end(), 0);\
             using functor_type = FUNCTOR <typename input_expression_type::value_type, T>;\
             return blockwise_reducer(\
@@ -397,7 +397,7 @@ namespace blockwise
             using input_expression_type = std::decay_t<E>;\
             using axes_type = filter_fixed_shape_t<typename input_expression_type::shape_type>;\
             axes_type axes = xtl::make_sequence<axes_type>(e.dimension());\
-            XTENSOR_ASSERT(axes.dimension() == e.dimension());\
+            XTENSOR_ASSERT(axes.size() == e.dimension());\
             std::iota(axes.begin(), axes.end(), 0);\
             using functor_type = FUNCTOR <typename input_expression_type::value_type>;\
             return blockwise_reducer(\
@@ -468,7 +468,7 @@ namespace blockwise
             using input_expression_type = std::decay_t<E>;\
             using axes_type = filter_fixed_shape_t<typename input_expression_type::shape_type>;\
             axes_type axes = xtl::make_sequence<axes_type>(e.dimension());\
-            XTENSOR_ASSERT(axes.dimension() == e.dimension());\
+            XTENSOR_ASSERT(axes.size() == e.dimension());\
             std::iota(axes.begin(), axes.end(), 0);\
             using functor_type = FUNCTOR <typename input_expression_type::value_type>;\
             return blockwise_reducer(\
