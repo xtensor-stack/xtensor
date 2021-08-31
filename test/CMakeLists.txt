@@ -10,16 +10,17 @@
 cmake_minimum_required(VERSION 3.1)
 
 find_package(doctest            REQUIRED)
-find_package(Threads)
 
 if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-    project(xtensor-test)
+    project(xtensor-test C CXX)
 
     enable_testing()
 
     find_package(xtensor REQUIRED CONFIG)
     set(XTENSOR_INCLUDE_DIR ${xtensor_INCLUDE_DIRS})
 endif ()
+
+find_package(Threads)
 
 if(NOT CMAKE_BUILD_TYPE)
     message(STATUS "Setting tests build type to Release")
