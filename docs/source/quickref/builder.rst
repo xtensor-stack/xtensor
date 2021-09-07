@@ -229,7 +229,7 @@ Returns a 2D-expression using the input value as its diagonal:
     xt::xarray<double> a = {1, 5, 7};
     auto b = xt::diag(a);
     std::cout << b << std::endl;
-    // Outputs {{1, 0, 0} {0, 5, 0}, {5, 0, 7}}
+    // Outputs {{1, 0, 0} {0, 5, 0}, {0, 0, 7}}
 
 Diagonal
 --------
