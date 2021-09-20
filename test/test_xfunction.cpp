@@ -458,13 +458,13 @@ namespace xt
                 *(resit4++) = *it;
             }
 
-            EXPECT_EQ(res2, res5);
-            EXPECT_EQ(res4, res5);
+            EXPECT_TENSOR_EQ(res2, res5);
+            EXPECT_TENSOR_EQ(res4, res5);
         }
 
-        EXPECT_EQ(res1, res5);
-        EXPECT_EQ(res3, res5);
-        EXPECT_EQ(func, res5);
+        EXPECT_TENSOR_EQ(res1, res5);
+        EXPECT_TENSOR_EQ(res3, res5);
+        EXPECT_TENSOR_EQ(func, res5);
     }
 
     TEST(xfunction, all_iterators)
@@ -475,7 +475,7 @@ namespace xt
         auto f1 = 2.0 * x;
         auto f2 = x * 2.0 * x;
         iterator_tester(f1);
-// For an unknown reason, MSVC is cannot correctly generate
+// For an unknown reason, MSVC cannot correctly generate
 // storage_cbegin() for a function of function. Moreover,
 // a simple SFINAE deduction like has_storage_iterator
 // harcoded and tested here fails (while it builds fine in any
