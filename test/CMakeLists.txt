@@ -127,6 +127,8 @@ endif()
 # Therefore, we need keep this small but complete for analysis.
 set(TEST_HEADERS
     test_common.hpp
+    test_common_macros.hpp
+    test_utils.hpp
     test_xsemantic.hpp
 )
 set(COMMON_BASE

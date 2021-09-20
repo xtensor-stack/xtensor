@@ -187,34 +187,34 @@ namespace xt
     {
         auto as = nanmean(nantest::aN)();
         auto ase = nanmean(nantest::aN, evaluation_strategy::immediate)();
-        EXPECT_EQ(as, 17.125);
-        EXPECT_EQ(ase, 17.125);
+        EXPECT_DOUBLE_EQ(as, 17.125);
+        EXPECT_DOUBLE_EQ(ase, 17.125);
 
         xarray<double> eaN0 = {1.0, 1.5, 123, 3};
         xarray<double> eaN1 = {63.0, 2.0, 5.0/3.0};
 
-        EXPECT_EQ(nanmean(nantest::aN, {0}), eaN0);
-        EXPECT_EQ(nanmean(nantest::aN, {1}), eaN1);
+        EXPECT_TENSOR_EQ(nanmean(nantest::aN, {0}), eaN0);
+        EXPECT_TENSOR_EQ(nanmean(nantest::aN, {1}), eaN1);
 
         std::array<std::size_t, 1> axis{0};
         EXPECT_EQ(nanmean(nantest::aN, axis), eaN0);
 
-        EXPECT_EQ(nanmean(nantest::aN, {0}, evaluation_strategy::immediate), eaN0);
-        EXPECT_EQ(nanmean(nantest::aN, {1}, evaluation_strategy::immediate), eaN1);
+        EXPECT_TENSOR_EQ(nanmean(nantest::aN, {0}, evaluation_strategy::immediate), eaN0);
+        EXPECT_TENSOR_EQ(nanmean(nantest::aN, {1}, evaluation_strategy::immediate), eaN1);
 
         auto cs = nanmean(nantest::cN)();
         auto cse = nanmean(nantest::cN, evaluation_strategy::immediate)();
-        EXPECT_EQ(cs, std::complex<double>(1.4, 0.6));
-        EXPECT_EQ(cse, std::complex<double>(1.4, 0.6));
+        EXPECT_DOUBLE_EQ(cs, std::complex<double>(1.4, 0.6));
+        EXPECT_DOUBLE_EQ(cse, std::complex<double>(1.4, 0.6));
 
         xarray<std::complex<double>> ecN0 = {1.0 + 0.0i, 1.0+0.5i, 3.0+2.0i};
         xarray<std::complex<double>> ecN1 = {1.0 + 1.0i, (5.0 + 1.0i) / 3.0};
 
-        EXPECT_EQ(nanmean(nantest::cN, {0}), ecN0);
-        EXPECT_EQ(nanmean(nantest::cN, {1}), ecN1);
+        EXPECT_TENSOR_EQ(nanmean(nantest::cN, {0}), ecN0);
+        EXPECT_TENSOR_EQ(nanmean(nantest::cN, {1}), ecN1);
 
-        EXPECT_EQ(nanmean(nantest::cN, {0}, evaluation_strategy::immediate), ecN0);
-        EXPECT_EQ(nanmean(nantest::cN, {1}, evaluation_strategy::immediate), ecN1);
+        EXPECT_TENSOR_EQ(nanmean(nantest::cN, {0}, evaluation_strategy::immediate), ecN0);
+        EXPECT_TENSOR_EQ(nanmean(nantest::cN, {1}, evaluation_strategy::immediate), ecN1);
     }
 
 

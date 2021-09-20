@@ -7,6 +7,7 @@
 
 #include "doctest/doctest.h"
 #include "xtensor/xtensor_config.hpp"
+#include "test_utils.hpp"
 
 #if defined(XTENSOR_DISABLE_EXCEPTIONS)
 
@@ -50,7 +51,8 @@
 #define ASSERT_TRUE(A) REQUIRE_EQ(A, true)
 #define ASSERT_FALSE(A) REQUIRE_FALSE(A)
 
-#define EXPECT_DOUBLE_EQ(x,y)   CHECK(x == doctest::Approx(y));
+#define EXPECT_DOUBLE_EQ(x,y)   CHECK(xt::scalar_near(x,y));
+#define EXPECT_TENSOR_EQ(x,y) CHECK(xt::tensor_near(x,y));
 
 #define TEST_F(FIXTURE_CLASS, NAME)\
     TEST_CASE_FIXTURE(FIXTURE_CLASS, #NAME)

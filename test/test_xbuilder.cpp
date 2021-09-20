@@ -294,7 +294,7 @@ namespace xt
         double at_end = 99.78730976641236;
         xt::xarray<double> a = xt::linspace(0., at_end, 100);
         auto b = xt::linspace(0., at_end, 100);
-        EXPECT_EQ(a, b);
+        EXPECT_TENSOR_EQ(a, b);
     }
 
     TEST(xbuilder, logspace)
