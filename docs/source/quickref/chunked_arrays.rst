@@ -25,7 +25,7 @@ In-memory chunked arrays
 ------------------------
 
 This may not look very useful at first sight, since each chunk (and thus the
-whole array) is hold in memory. It means that it cannot work with very large
+whole array) is held in memory. It means that it cannot work with very large
 arrays, but it may be used to parallelize an algorithm, by processing several
 chunks at the same time.
 
