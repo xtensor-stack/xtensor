@@ -7,6 +7,22 @@
 Changelog
 =========
 
+0.24.0
+------
+
+- Comparison of shapes with differnt types is now supported
+  `#2393 https://github.com/xtensor-stack/xtensor/pull/2393`
+- Ported tests to doctest
+  `#2405 https://github.com/xtensor-stack/xtensor/pull/2405`
+- Updated docs of argmin and argmax
+  `#2425 https://github.com/xtensor-stack/xtensor/pull/2425`
+- blockwise reducers intital implementation
+  `#2415 https://github.com/xtensor-stack/xtensor/pull/2415`
+- Fixed comparison of double in some tests
+  `#2436 https://github.com/xtensor-stack/xtensor/pull/2436`
+- Upgraded to xsimd 8
+  `#2438 https://github.com/xtensor-stack/xtensor/pull/2438`
+
 0.23.10
 -------
 
