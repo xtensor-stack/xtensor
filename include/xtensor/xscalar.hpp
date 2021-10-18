@@ -961,7 +961,7 @@ namespace xt
     inline auto xscalar<CT>::load_simd(size_type) const
         -> xt_simd::simd_return_type<value_type, requested_type>
     {
-        return xt_simd::set_simd<value_type, requested_type>(m_value);
+        return xt_simd::broadcast_as<requested_type>(m_value);
     }
 
     template <class T>

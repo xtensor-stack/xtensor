@@ -34,6 +34,8 @@ string(TOUPPER "${CMAKE_BUILD_TYPE}" U_CMAKE_BUILD_TYPE)
 
 include(set_compiler_flag.cmake)
 
+
+
 if(CPP17)
   # User requested C++17, but compiler might not oblige.
   set_compiler_flag(
@@ -69,12 +71,13 @@ endif()
 
 OPTION(XTENSOR_ENABLE_WERROR "Turn on -Werror" OFF)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DXSIMD_ENABLE_XTL_COMPLEX=1")
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR (CMAKE_CXX_COMPILER_ID MATCHES "Intel" AND NOT WIN32))
   CHECK_CXX_COMPILER_FLAG(-march=native arch_native_supported)
   if(arch_native_supported AND NOT CMAKE_CXX_FLAGS MATCHES "-march")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
   endif()
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_cxx_std_flag} -Wunused-parameter -Wextra -Wreorder -Wconversion -Wsign-conversion")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_cxx_std_flag} -Wunused-parameter -Wextra -Wreorder -Wconversion -Wno-sign-conversion ")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wold-style-cast -Wunused-variable -ftemplate-backtrace-limit=0")
   if (XTENSOR_DISABLE_EXCEPTIONS)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions")
@@ -163,6 +166,7 @@ set(COMMON_BASE
     test_xview.cpp
     test_xview_semantic.cpp
     test_xutils.cpp
+    test_xsimd8.cpp
 )
 
 set(XTENSOR_TESTS

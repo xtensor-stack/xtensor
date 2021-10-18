@@ -18,10 +18,11 @@
 #ifdef XTENSOR_USE_XSIMD
 
 #include <xsimd/xsimd.hpp>
+//#include <xsimd/memory/xsimd_load_store.hpp>
 
 #if defined(_MSV_VER) && (_MSV_VER < 1910)
-template <class T, std::size_t N>
-inline xsimd::batch_bool<T, N> isnan(const xsimd::batch<T, N>& b)
+template <class T, class A>
+inline xsimd::batch_bool<T, A> isnan(const xsimd::batch<T, A>& b)
 {
     return xsimd::isnan(b);
 }
@@ -62,14 +63,14 @@ namespace xt_simd
     template <class T>
     using revert_simd_type = xsimd::revert_simd_type<T>;
 
-    using xsimd::set_simd;
-    using xsimd::load_simd;
-    using xsimd::store_simd;
-    using xsimd::select;
-    using xsimd::get_alignment_offset;
-
     template <class T1, class T2>
     using simd_return_type = xsimd::simd_return_type<T1, T2>;
+
+    using xsimd::load_as;
+    using xsimd::store_as;
+    using xsimd::broadcast_as;
+    using xsimd::select;
+    using xsimd::get_alignment_offset;
 
     template <class V>
     using is_batch_bool = xsimd::is_batch_bool<V>;
@@ -139,32 +140,32 @@ namespace xt_simd
     template <class T>
     using revert_simd_type = typename revert_simd_traits<T>::type;
 
-    template <class T, class V>
-    inline simd_type<T> set_simd(const T& value)
+    template <class R, class T>
+    inline simd_type<R> broadcast_as(const T& value)
     {
         return value;
     }
 
-    template <class T, class V>
-    inline simd_type<T> load_simd(const T* src, aligned_mode)
+    template <class R, class T>
+    inline simd_type<R> load_as(const T* src, aligned_mode)
     {
         return *src;
     }
 
-    template <class T, class V>
-    inline simd_type<T> load_simd(const T* src, unaligned_mode)
+    template <class R, class T>
+    inline simd_type<R> load_as(const T* src, unaligned_mode)
     {
         return *src;
     }
 
-    template <class T>
-    inline void store_simd(T* dst, const simd_type<T>& src, aligned_mode)
+    template <class R, class T>
+    inline void store_as(R* dst, const simd_type<T>& src, aligned_mode)
     {
         *dst = src;
     }
 
-    template <class T>
-    inline void store_simd(T* dst, const simd_type<T>& src, unaligned_mode)
+    template <class R, class T>
+    inline void store_as(R* dst, const simd_type<T>& src, unaligned_mode)
     {
         *dst = src;
     }

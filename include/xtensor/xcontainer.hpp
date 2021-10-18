@@ -725,17 +725,16 @@ namespace xt
     inline void xcontainer<D>::store_simd(size_type i, const simd& e)
     {
         using align_mode = driven_align_mode_t<alignment, data_alignment>;
-        xt_simd::store_simd<value_type, typename simd::value_type>(std::addressof(storage()[i]), e, align_mode());
+        xt_simd::store_as(std::addressof(storage()[i]), e, align_mode());
     }
 
     template <class D>
     template <class alignment, class requested_type, std::size_t N>
     inline auto xcontainer<D>::load_simd(size_type i) const
         -> container_simd_return_type_t<storage_type, value_type, requested_type>
-        //-> simd_return_type<requested_type>
     {
         using align_mode = driven_align_mode_t<alignment, data_alignment>;
-        return xt_simd::load_simd<value_type, requested_type>(std::addressof(storage()[i]), align_mode());
+        return xt_simd::load_as<requested_type>(std::addressof(storage()[i]), align_mode());
     }
 
     template <class D>

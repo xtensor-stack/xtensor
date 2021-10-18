@@ -39,7 +39,7 @@ jobs:
                         doctest ^
                         nlohmann_json ^
                         xtl==0.7.0 ^
-                        xsimd==7.4.8 ^
+                        xsimd==8.0.3 ^
                         python=3.6
           conda list
         displayName: "Install conda packages"
