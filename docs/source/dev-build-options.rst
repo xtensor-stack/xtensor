@@ -22,6 +22,9 @@ Build
   on your system.
 - ``XTENSOR_USE_TBB``: enables parallel assignment loop. This requires that you have you have tbb_ installed
   on your system.
+
+ - Optionally use ``XTENSOR_TBB_THRESHOLD`` to set a minimum size to trigger parallel assignment (default is 0)
+
 - ``XTENSOR_USE_OPENMP``: enables parallel assignment loop using OpenMP. This requires that OpenMP is available on your system.
 
 All these options are disabled by default. Enabling ``DOWNLOAD_GTEST`` or
