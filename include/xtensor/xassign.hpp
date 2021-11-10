@@ -641,10 +641,20 @@ namespace xt
         }
 
 #if defined(XTENSOR_USE_TBB)
-        tbb::parallel_for(align_begin, align_end, simd_size, [&e1, &e2](size_t i)
+        if (size >= XTENSOR_TBB_THRESHOLD)
         {
-            e1.template store_simd<lhs_align_mode>(i, e2.template load_simd<rhs_align_mode, value_type>(i));
-        });
+            tbb::parallel_for(align_begin, align_end, simd_size, [&e1, &e2](size_t i)
+            {
+                e1.template store_simd<lhs_align_mode>(i, e2.template load_simd<rhs_align_mode, value_type>(i));
+            });
+        }
+        else
+        {
+            for (size_type i = align_begin; i < align_end; i += simd_size)
+            {
+                e1.template store_simd<lhs_align_mode>(i, e2.template load_simd<rhs_align_mode, value_type>(i));
+            }
+        }
 #elif defined(XTENSOR_USE_OPENMP)
         if (size >= XTENSOR_OPENMP_TRESHOLD)
         {
