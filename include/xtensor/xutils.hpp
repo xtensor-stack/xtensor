@@ -637,9 +637,14 @@ namespace xt
      * xtrivial_default_construct implemenation *
      ********************************************/
 
+#if defined(_GLIBCXX_RELEASE) && _GLIBCXX_RELEASE >= 7
+// has_trivial_default_constructor has not been available since libstdc++-7.
+#define XTENSOR_GLIBCXX_USE_CXX11_ABI 1
+#else
 #if defined(_GLIBCXX_USE_CXX11_ABI)
 #if _GLIBCXX_USE_CXX11_ABI || (defined(_GLIBCXX_USE_DUAL_ABI) && !_GLIBCXX_USE_DUAL_ABI)
 #define XTENSOR_GLIBCXX_USE_CXX11_ABI 1
+#endif
 #endif
 #endif
 
