@@ -120,6 +120,8 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xassign.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xaxis_iterator.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xaxis_slice_iterator.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xblockwise_reducer.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xblockwise_reducer_functors.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xbroadcast.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xbuffer_adaptor.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xbuilder.hpp
@@ -151,6 +153,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xmasked_view.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xmath.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xmime.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xmultiindex_iterator.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xnoalias.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xnorm.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xnpy.hpp
