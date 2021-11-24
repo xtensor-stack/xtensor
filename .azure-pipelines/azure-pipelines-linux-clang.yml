@@ -13,6 +13,8 @@ jobs:
         clang_10:
           llvm_version: '10'
           disable_xsimd: 1
+        clang_11:
+          llvm_version: '11'
     pool:
       vmImage: ubuntu-18.04
     variables:
