@@ -10,7 +10,7 @@ Scalars and 0-D expressions
 Assignment
 ----------
 
-In `xtensor`, scalars are handled as if they were 0-dimensional expressions.
+In *xtensor*, scalars are handled as if they were 0-dimensional expressions.
 This means that when assigning a scalar value to an :cpp:type:`xt::xarray`, the array is **not filled** with that value,
 but resized to become a 0-D array containing the scalar value:
 

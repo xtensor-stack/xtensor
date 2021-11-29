@@ -11,7 +11,7 @@ Views
 
 Views are used to adapt the shape of an :cpp:type:`xt::xexpression` without changing it, nor copying it. Views are 
 convenient tools for assigning parts of an expression: since they do not copy the underlying expression,
-assigning to the view actually assigns to the underlying expression. `xtensor` provides many kinds of views.
+assigning to the view actually assigns to the underlying expression. *xtensor* provides many kinds of views.
 
 Sliced views
 ------------
@@ -166,7 +166,7 @@ The :cpp:type:`xt::xstrided_view` is very efficient on contigous memory
 Transposed views
 ----------------
 
-``xtensor`` provides a lazy transposed view on any expression, whose layout is either row-major order or column major order.
+*xtensor* provides a lazy transposed view on any expression, whose layout is either row-major order or column major order.
 Trying to build a transposed view on a expression with a dynamic layout throws an exception.
 
 .. code::
@@ -188,7 +188,7 @@ Flatten views
 -------------
 
 It is sometimes useful to have a one-dimensional view of all the elements of an expression.
-``xtensor`` provides two functions for that, :cpp:func:`xt::ravel` and :cpp:func:`xt::flatten`.
+*xtensor* provides two functions for that, :cpp:func:`xt::ravel` and :cpp:func:`xt::flatten`.
 The former one lets you specify the order used to read the elements while the latter one
 uses the layout of the expression.
 
@@ -314,7 +314,7 @@ Filtration
 
 Sometimes, the only thing you want to do with a filter is to assign it a scalar.
 Though this can be done as shown in the previous section, this is not the *optimal* way to do it.
-`xtensor` provides a specially optimized mechanism for that, called filtration.
+*xtensor* provides a specially optimized mechanism for that, called filtration.
 A filtration IS NOT an :cpp:type:`xt::xexpression`, the only methods it provides are scalar and
 computed scalar assignments.
 
@@ -349,7 +349,7 @@ Masked views are multidimensional views that apply a mask on an :cpp:type:`xt::x
 Broadcasting views
 ------------------
 
-Another type of view provided by `xtensor` is *broadcasting view*.
+Another type of view provided by *xtensor* is *broadcasting view*.
 Such a view broadcasts an expression to the specified shape.
 As long as the view is not assigned to an array, no memory allocation or copy occurs.
 Broadcasting views should be built with the :cpp:func:`xt::broadcast` helper function.
@@ -370,7 +370,7 @@ Broadcasting views should be built with the :cpp:func:`xt::broadcast` helper fun
 Complex views
 -------------
 
-In the case of a tensor containing complex numbers, `xtensor` provides views returning
+In the case of a tensor containing complex numbers, *xtensor* provides views returning
 :cpp:type:`xt::xexpression` corresponding to the real and imaginary parts of the complex numbers.
 Like for other views, the elements of the underlying :cpp:type:`xt::xexpression` are not copied.
 

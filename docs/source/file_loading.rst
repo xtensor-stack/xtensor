@@ -7,8 +7,8 @@
 File input and output
 =====================
 
-`xtensor` has some built-in mechanisms to make loading and saving data easy.
-The base `xtensor` package allows to save and load data in the ``.csv``, ``.json`` and ``.npy``
+*xtensor* has some built-in mechanisms to make loading and saving data easy.
+The base *xtensor* package allows to save and load data in the ``.csv``, ``.json`` and ``.npy``
 format.
 Please note that many more input and output formats are available in the `xtensor-io
 <https://github.com/xtensor-stack/xtensor-io>`_ package.

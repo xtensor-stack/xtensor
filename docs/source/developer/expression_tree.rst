@@ -7,14 +7,14 @@
 Expression tree
 ===============
 
-Most of the expressions in `xtensor` are lazy-evaluated, they do not hold any value, the values are computed upon
-access or when the expression is assigned to a container. This means that `xtensor` needs somehow to keep track of
+Most of the expressions in *xtensor* are lazy-evaluated, they do not hold any value, the values are computed upon
+access or when the expression is assigned to a container. This means that *xtensor* needs somehow to keep track of
 the expression tree.
 
 xfunction
 ~~~~~~~~~
 
-A node in the expression tree may be represented by different classes in `xtensor`; here we focus on basic arithmetic
+A node in the expression tree may be represented by different classes in *xtensor*; here we focus on basic arithmetic
 operations and mathematical functions, which are represented by an instance of ``xfunction``. This is a template
 class whose parameters are:
 
@@ -105,7 +105,7 @@ This latter is responsible for setting the remaining template parameters of ``xf
     }
 
 The first line computes the ``expression_tag`` of the expression. This tag is used for selecting the right class
-class modeling a function. In `xtensor`, two tags are provided, with the following mapping:
+class modeling a function. In *xtensor*, two tags are provided, with the following mapping:
 
 - ``xtensor_expression_tag`` -> ``xfunction``
 - ``xoptional_expression_tag`` -> ``xfunction``
@@ -114,7 +114,7 @@ In the case of ``xfunction``, the tag is also used to select a mixin base class 
 
 Any expression may define a tag as its ``expression_tag`` inner type. If not, ``xtensor_expression_tag`` is used by default.
 Tags have different priorities so that a resulting tag can be computed for expressions involving different tag types. As we
-will see in the next section, this system of tags and mapping make it easy to plug new functions types in `xtensor` and have
+will see in the next section, this system of tags and mapping make it easy to plug new functions types in *xtensor* and have
 them working with all the mathematical functions already implemented.
 
 The function class mapped to the expression tag is retrieved in the third line of ``make_xfunction``, that is:
@@ -135,7 +135,7 @@ Once all the types are known, ``make_xfunction`` can instantiate the right funct
 Plugging new function types
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-As mentioned in the section above, one can define a new function class and have it used by `xtensor`'s expression system. Let's
+As mentioned in the section above, one can define a new function class and have it used by *xtensor*'s expression system. Let's
 illustrate this with an hypothetical  ``xmapped_function`` class, which provides additional mapping access operators.
 The first thing to do is to define a new tag:
 
@@ -170,7 +170,7 @@ This is done by specializing the ``expression_tag_and`` metafunction available i
 
 The second specialization simply forwards to the first one so we don't duplicate code. Note that when plugging your own
 function class, these specializations can be skipped if the new function class (and its corresponding tag) is not compatible,
-and thus not supposed to be mixed, with the function classes provided by `xtensor`.
+and thus not supposed to be mixed, with the function classes provided by *xtensor*.
 
 The last requirement is to specialize the ``select_xfunction_expression`` metafunction, as it is shown below:
 

@@ -7,8 +7,8 @@
 Expression builders
 ===================
 
-`xtensor` provides functions to ease the build of common N-dimensional expressions. The expressions
-returned by these functions implement the laziness of `xtensor`, that is, they don't hold any value.
+*xtensor* provides functions to ease the build of common N-dimensional expressions. The expressions
+returned by these functions implement the laziness of *xtensor*, that is, they don't hold any value.
 Values are computed upon request.
 
 Ones and zeros

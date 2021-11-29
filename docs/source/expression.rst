@@ -10,7 +10,7 @@
 Expressions and lazy evaluation
 ===============================
 
-`xtensor` is more than an N-dimensional array library: it is an expression engine that allows numerical computation on any object implementing the expression interface.
+*xtensor* is more than an N-dimensional array library: it is an expression engine that allows numerical computation on any object implementing the expression interface.
 These objects can be in-memory containers such as :cpp:type:`xt::xarray\<T\>` and :cpp:type:`xt::xtensor\<T\>`, but can also be backed by a database or a representation on the file system.
 This also enables creating adaptors as expressions for other data structures.
 
@@ -90,7 +90,7 @@ Broadcasting
 
 The number of dimensions of an :cpp:type:`xt::xexpression` and the sizes of these dimensions are provided by the :cpp:func:`~xt::xexpression::shape` method, which returns a sequence of unsigned integers
 specifying the size of each dimension. We can operate on expressions of different shapes of dimensions in an elementwise fashion.
-Broadcasting rules of `xtensor` are similar to those of Numpy_ and libdynd_.
+Broadcasting rules of *xtensor* are similar to those of Numpy_ and libdynd_.
 
 In an operation involving two arrays of different dimensions, the array with the lesser dimensions is broadcast across the leading dimensions of the other.
 For example, if ``A`` has shape ``(2, 3)``, and ``B`` has shape ``(4, 2, 3)``, the result of a broadcast operation with ``A`` and ``B`` has shape ``(4, 2, 3)``.

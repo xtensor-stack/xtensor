@@ -214,7 +214,7 @@ Fill
 Iterators
 ---------
 
-``xtensor`` containers provide iterators compatible with algorithms from the STL:
+*xtensor* containers provide iterators compatible with algorithms from the STL:
 
 .. code::
 

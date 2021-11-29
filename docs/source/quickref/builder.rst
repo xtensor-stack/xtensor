@@ -7,8 +7,8 @@
 Builders
 ========
 
-Most of ``xtensor`` builders return unevaluated expressions (see :ref:`lazy-evaluation`
-for more details) that can be assigned to any kind of ``xtensor`` container.
+Most of *xtensor* builders return unevaluated expressions (see :ref:`lazy-evaluation`
+for more details) that can be assigned to any kind of *xtensor* container.
 
 Ones
 ----

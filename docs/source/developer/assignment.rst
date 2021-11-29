@@ -10,7 +10,7 @@ Assignment
 ==========
 
 In this section, we consider the class :cpp:type:`xt::xarray` and its semantic bases (``xcontainer_semantic`` and
-``xsemantic_base``) to illustrate how the assignment works. `xtensor` provides different mechanics of
+``xsemantic_base``) to illustrate how the assignment works. *xtensor* provides different mechanics of
 assignment depending on the type of expression.
 
 Extended copy semantic
@@ -159,7 +159,7 @@ tag:
         // ...
     };
 
-`xtensor` provides specializations for ``xtensor_expression_tag`` and ``xoptional_expression_tag``.
+*xtensor* provides specializations for ``xtensor_expression_tag`` and ``xoptional_expression_tag``.
 When implementing a new function type whose API is unrelated to the one of ``xfunction_base``,
 the ``xexpression_assigner`` should be specialized so that the assignment relies on this specific API.
 
@@ -172,10 +172,10 @@ during the resize phase, is the nature of the assignment: trivial or not. The as
 trivial when the memory layout of the lhs and rhs are such that assignment can be done by iterating over
 a 1-D sequence on both sides. In that case, two options are possible:
 
-- if ``xtensor`` is compiled with the optional ``xsimd`` dependency, and if the layout and the
+- if *xtensor* is compiled with the optional *xsimd* dependency, and if the layout and the
   ``value_type`` of each expression allows it, the assignment is a vectorized index-based loop
   operating on the expression buffers. 
-- if the ``xsimd`` assignment is not possible (for any reason), an iterator-based loop operating
+- if the *xsimd* assignment is not possible (for any reason), an iterator-based loop operating
   on the expresion buffers is used instead.
 
 These methods are implemented in specializations of the ``trivial_assigner`` class.

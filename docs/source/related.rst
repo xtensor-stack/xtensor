@@ -24,7 +24,7 @@ xtensor-python
    :alt: xtensor-python
 
 The xtensor-python_ project provides the implementation of container types
-compatible with ``xtensor``'s expression system, ``pyarray`` and ``pytensor``
+compatible with *xtensor*'s expression system, ``pyarray`` and ``pytensor``
 which effectively wrap numpy arrays, allowing operating on numpy arrays
 in-place.
 
@@ -135,7 +135,7 @@ xtensor-python-cookiecutter
    :width: 50%
 
 The xtensor-python-cookiecutter_ project helps extension authors create Python
-extension modules making use of `xtensor`.
+extension modules making use of *xtensor*.
 
 It takes care of the initial work of generating a project skeleton with
 
@@ -155,7 +155,7 @@ xtensor-julia
    :alt: xtensor-julia
 
 The xtensor-julia_ project provides the implementation of container types
-compatible with ``xtensor``'s expression system, ``jlarray`` and ``jltensor``
+compatible with *xtensor*'s expression system, ``jlarray`` and ``jltensor``
 which effectively wrap Julia arrays, allowing operating on Julia arrays
 in-place.
 
@@ -249,7 +249,7 @@ xtensor-julia-cookiecutter
    :width: 50%
 
 The xtensor-julia-cookiecutter_ project helps extension authors create Julia
-extension modules making use of `xtensor`.
+extension modules making use of *xtensor*.
 
 It takes care of the initial work of generating a project skeleton with
 
@@ -269,7 +269,7 @@ xtensor-r
    :alt: xtensor-r
 
 The xtensor-r_ project provides the implementation of container types
-compatible with ``xtensor``'s expression system, ``rarray`` and ``rtensor``
+compatible with *xtensor*'s expression system, ``rarray`` and ``rtensor``
 which effectively wrap R arrays, allowing operating on R arrays in-place.
 
 Example 1: Use an algorithm of the C++ library on a R array in-place
@@ -406,7 +406,7 @@ The xsimd_ project provides a unified API for making use of the SIMD features
 of modern preprocessors for C++ library authors. It also provides accelerated
 implementation of common mathematical functions operating on batches.
 
-xsimd_ is an optional dependency to ``xtensor`` which enable SIMD vectorization
+xsimd_ is an optional dependency to *xtensor* which enable SIMD vectorization
 of xtensor operations. This feature is enabled with the ``XTENSOR_USE_XSIMD``
 compilation flag, which is set to ``false`` by default.
 
@@ -416,7 +416,7 @@ xtl
 .. image:: xtl.svg
    :alt: xtl
 
-The xtl_ project, the only dependency of ``xtensor`` is a C++ template library
+The xtl_ project, the only dependency of *xtensor* is a C++ template library
 holding the implementation of basic tools used across the libraries in the ecosystem.
 
 xframe
@@ -426,7 +426,7 @@ xframe
    :alt: xframe
 
 The xframe_ project provides multi-dimensional labeled arrays and a data frame for C++,
-based on ``xtensor`` and ``xtl``.
+based on *xtensor* and *xtl*.
 
 `xframe` provides
 
@@ -443,7 +443,7 @@ The z5_ project implements the zarr_ and n5_ storage specifications in C++.
 Both specifications describe chunked nd-array storage similar to HDF5, but
 use the filesystem to store chunks. This design allows for parallel write access
 and efficient cloud based storage, crucial requirements in modern big data applications.
-The project uses ``xtensor`` to represent arrays in memory
+The project uses *xtensor* to represent arrays in memory
 and also provides a python wrapper based on ``xtensor-python``.
 
 .. _xtensor-python: https://github.com/xtensor-stack/xtensor-python

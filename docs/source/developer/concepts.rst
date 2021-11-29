@@ -9,7 +9,7 @@
 Concepts
 ========
 
-`xtensor`'s core is built upon key concepts captured in interfaces that are put together in derived
+*xtensor*'s core is built upon key concepts captured in interfaces that are put together in derived
 classes through CRTP (`Curiously Recurring Template Pattern
 <https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern>`_) and multiple inheritance.
 Interfaces and classes that model expressions implement *value semantic*. CRTP and value semantic
@@ -89,13 +89,13 @@ you to iterate over a N-dimensional expression in row-major order or column-majo
     const_reverse_iterator crend() const noexcept;
 
 This template parameter is defaulted to ``XTENSOR_DEFAULT_TRAVERSAL`` (see :ref:`configuration-label`), so
-that `xtensor` expressions can be used in generic code such as:
+that *xtensor* expressions can be used in generic code such as:
 
 .. code::
 
     std::copy(a.cbegin(), a.cend(), b.begin());
 
-where ``a`` and ``b`` can be arbitrary types (from `xtensor`, the STL or any external library)
+where ``a`` and ``b`` can be arbitrary types (from *xtensor*, the STL or any external library)
 supporting standard iteration.
 
 ``xiterable`` inherits from ``xconst_iterable`` and provides non-const counterpart of methods
