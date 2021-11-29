@@ -104,7 +104,7 @@ The logic for this is encoded into xtensor's ``xclosure`` type trait.
     using xclosure_t = typename xclosure<E>::type;
 
 In doing so, we ensure const-correctness, we avoid dangling reference, and ensure that lvalues remain lvalues.
-The `const_xclosure` follows the same scheme:
+The ``const_xclosure`` follows the same scheme:
 
 .. code:: cpp
 

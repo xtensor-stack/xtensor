@@ -53,7 +53,7 @@ is:
 
     g++ -I /path/to/xtensor/ -I /path/to/xtl/ example.cpp -o example
 
-Note that if you installed *xtensor* and *xtl* with `cmake`, their headers will be located in the same
+Note that if you installed *xtensor* and *xtl* with *Cmake*, their headers will be located in the same
 directory, so you will need to provide only one path with the ``-I`` option.
 
 When you run the program, it produces the following output:
@@ -65,7 +65,7 @@ When you run the program, it produces the following output:
 Building with cmake
 -------------------
 
-A better alternative for building programs using *xtensor* is to use `cmake`, especially if you are
+A better alternative for building programs using *xtensor* is to use *Cmake*, especially if you are
 developing for several platforms. Assuming the following folder structure:
 
 .. code:: bash

@@ -16,7 +16,7 @@ unsigned integers to the location of an element in the buffer. The range in whic
 
 The scheme used to map indices into a location in the buffer is a strided indexing scheme. In such a scheme, the index
 ``(i0, ..., in)`` corresponds to the offset ``sum(ik * sk)`` from the beginning of the one-dimensional buffer, where
-``(s0, ..., sn)`` are the `strides` of the array. Some particular cases of strided schemes implement well-known memory layouts:
+``(s0, ..., sn)`` are the ``strides`` of the array. Some particular cases of strided schemes implement well-known memory layouts:
 
 - the row-major layout (or C layout) is a strided index scheme where the strides grow from right to left
 - the column-major layout (or Fortran layout) is a strided index scheme where the strides grow from left to right

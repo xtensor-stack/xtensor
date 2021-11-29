@@ -40,7 +40,7 @@ An in-memory chunked array has the following type:
     using inmemory_chunked_array = xt::xchunked_array<xarray<xarray<data_type>>>;
 
 But you should not directly use this type to create a chunked array. Instead,
-use the `chunked_array` factory function:
+use the ``chunked_array`` factory function:
 
 .. code::
 

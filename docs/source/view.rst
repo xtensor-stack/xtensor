@@ -73,7 +73,7 @@ The range function supports the placeholder ``_`` syntax:
     #include <xtensor/xarray.hpp>
     #include <xtensor/xview.hpp>
 
-    using namespace xt::placeholders;  // required for `_` to work
+    using namespace xt::placeholders;  // required for ``_`` to work
 
     auto a = xt::xarray<int>::from_shape({3, 2, 4});
     auto v1 = xt::view(a, xt::range(_, 2), xt::all(), xt::range(1, _));
