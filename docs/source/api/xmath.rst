@@ -85,7 +85,7 @@ Mathematical functions
    +-------------------------------+------------------------------------------+
    | :cpp:func:`xt::greater_equal` | element-wise greater or equal            |
    +-------------------------------+------------------------------------------+
-   | :cpp:func:`xt::cast`          | element-wise `static_cast`               |
+   | :cpp:func:`xt::cast`          | element-wise ``static_cast``             |
    +-------------------------------+------------------------------------------+
    | :cpp:func:`xt::operator&`     | bitwise and                              |
    +-------------------------------+------------------------------------------+

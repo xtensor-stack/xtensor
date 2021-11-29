@@ -102,7 +102,7 @@ For example, if ``A`` has shape ``(2, 3)``, and ``B`` has shape ``(4, 2, 3)``, t
     ---------
     (4, 2, 3) # Result
 
-The same rule holds for scalars, which are handled as 0-D expressions. If `A` is a scalar, the equation becomes:
+The same rule holds for scalars, which are handled as 0-D expressions. If ``A`` is a scalar, the equation becomes:
 
 .. code:: none
 

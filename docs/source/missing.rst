@@ -58,7 +58,7 @@ same way as regular scalars.
     xt::xtensor<double, 1> b
         { 1.0, 2.0 };
 
-    // `b` is broadcasted to match the shape of `a`
+    // ``b`` is broadcasted to match the shape of ``a``
     std::cout << a + b << std::endl;
 
 outputs:
