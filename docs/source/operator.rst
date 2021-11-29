@@ -10,7 +10,7 @@ Operators and functions
 Arithmetic operators
 --------------------
 
-`xtensor` provides overloads of traditional arithmetic operators for
+*xtensor* provides overloads of traditional arithmetic operators for
 :cpp:type:`xt::xexpression` objects:
 
 - unary :cpp:func:`~xt::xexpression::operator+`
@@ -37,7 +37,7 @@ rules explained in a previous section.
 Logical operators
 -----------------
 
-`xtensor` also provides overloads of the logical operators:
+*xtensor* also provides overloads of the logical operators:
 
 - :cpp:func:`~xt::xexpression::operator!`
 - :cpp:func:`~xt::xexpression::operator||`
@@ -45,7 +45,7 @@ Logical operators
 
 Like arithmetic operators, these logical operators are element-wise operators
 and apply the lazy broadcasting rules. In addition to these element-wise
-logical operators, `xtensor` provides two reducing boolean functions:
+logical operators, *xtensor* provides two reducing boolean functions:
 
 - :cpp:func:`xt::any(E&& e) <xt::any>` returns ``true`` if any of ``e`` elements is truthy, ``false`` otherwise.
 - :cpp:func:`xt::all(E&& e) <xt::all>` returns ``true`` if all elements of ``e`` are truthy, ``false`` otherwise.
@@ -68,12 +68,12 @@ and an element-wise ternary function (similar to the ``: ?`` ternary operator):
     // => res = { 11, 2, 3, 14 }
 
 Unlike in :any:`numpy.where`, :cpp:func:`xt::where` takes full advantage of the lazyness
-of `xtensor`.
+of *xtensor*.
 
 Comparison operators
 --------------------
 
-`xtensor` provides overloads of the inequality operators:
+*xtensor* provides overloads of the inequality operators:
 
 - :cpp:func:`~xt::xexpression::operator\<`
 - :cpp:func:`~xt::xexpression::operator\<=`
@@ -119,7 +119,7 @@ function.
 Bitwise operators
 -----------------
 
-`xtensor` also contains the following bitwise operators:
+*xtensor* also contains the following bitwise operators:
 
 - Bitwise and: :cpp:func:`~xt::xexpression::operator&`
 - Bitwise or: :cpp:func:`~xt::xexpression::operator|`
@@ -130,7 +130,7 @@ Bitwise operators
 Mathematical functions
 ----------------------
 
-`xtensor` provides overloads for many of the standard mathematical functions:
+*xtensor* provides overloads for many of the standard mathematical functions:
 
 - basic functions: :cpp:func:`xt::abs`, :cpp:func:`xt::remainder`, :cpp:func:`xt::fma`, ...
 - exponential functions: :cpp:func:`xt::exp`, :cpp:func:`xt::expm1`, :cpp:func:`xt::log`, :cpp:func:`xt::log1p`, ...
@@ -147,7 +147,7 @@ lazy broadcasting rules.
 Casting
 -------
 
-`xtensor` will implicitly promote and/or cast tensor expression elements as
+*xtensor* will implicitly promote and/or cast tensor expression elements as
 needed, which suffices for most use-cases. But explicit casting can be
 performed via :cpp:func:`xt::cast`, which performs an element-wise ``static_cast``.
 
@@ -166,7 +166,7 @@ performed via :cpp:func:`xt::cast`, which performs an element-wise ``static_cast
 Reducers
 --------
 
-`xtensor` provides reducers, that is, means for accumulating values of tensor
+*xtensor* provides reducers, that is, means for accumulating values of tensor
 expressions over prescribed axes. The return value of a reducer is an
 :cpp:type:`xt::xexpression` with the same shape as the input expression, with the specified
 axes removed.
@@ -209,7 +209,7 @@ A generator is provided to build the :cpp:type:`xt::xreducer_functors` object, t
                                         {1, 3});
 
 If no axes are provided, the reduction is performed over all the axes, and the result is a 0-D expression.
-Since `xtensor`'s expressions are lazy evaluated, you need to explicitely call the access operator to trigger
+Since *xtensor*'s expressions are lazy evaluated, you need to explicitely call the access operator to trigger
 the evaluation and get the result:
 
 .. code::
@@ -256,7 +256,7 @@ as shown below:
 Accumulators
 ------------
 
-Similar to reducers, `xtensor` provides accumulators which are used to
+Similar to reducers, *xtensor* provides accumulators which are used to
 implement cumulative functions such as :cpp:func:`xt::cumsum` or :cpp:func:`xt::cumprod`. Accumulators
 can currently only work on a single axis. Additionally, the accumulators are
 not lazy and do not return an xexpression, but rather an evaluated :cpp:type:`xt::xarray`
@@ -304,7 +304,7 @@ with the same rules as those for reducers:
 Evaluation strategy
 -------------------
 
-Generally, `xtensor` implements a :ref:`lazy execution model <lazy-evaluation>`,
+Generally, *xtensor* implements a :ref:`lazy execution model <lazy-evaluation>`,
 but under certain circumstances, a *greedy* execution model with immediate
 execution can be favorable. For example, reusing (and recomputing) the same
 values of a reducer over and over again if you use them in a loop can cost a
@@ -337,11 +337,11 @@ strategy is currently implemented.
 Universal functions and vectorization
 -------------------------------------
 
-`xtensor` provides utilities to **vectorize any scalar function** (taking
+*xtensor* provides utilities to **vectorize any scalar function** (taking
 multiple scalar arguments) into a function that will perform on
 :cpp:type:`xt::xexpression` s, applying the lazy broadcasting rules which we described in a
 previous section. These functions are called :cpp:type:`xt::xfunction` s.
-They are `xtensor`'s counterpart to numpy's universal functions.
+They are *xtensor*'s counterpart to numpy's universal functions.
 
 Actually, all arithmetic and logical operators, inequality operator and
 mathematical functions we described before are :cpp:type:`xt::xfunction` s.

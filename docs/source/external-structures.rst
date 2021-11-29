@@ -7,14 +7,14 @@
 Extending xtensor
 =================
 
-``xtensor`` provides means to plug external data structures into its expression engine without
+*xtensor* provides means to plug external data structures into its expression engine without
 copying any data.
 
 Adapting one-dimensional containers
 -----------------------------------
 
 You may want to use your own one-dimensional container as a backend for tensor data containers
-and even for the shape or the strides. This is the simplest structure to plug into ``xtensor``.
+and even for the shape or the strides. This is the simplest structure to plug into *xtensor*.
 In the following example, we define new container and adaptor types for user-specified storage and shape types.
 
 .. code::
@@ -39,7 +39,7 @@ A requirement for the user-specified containers is to provide a minimal ``std::v
 - iterator methods (``begin``, ``end``, ``cbegin``, ``cend``)
 - ``size`` and ``reshape``, ``resize`` methods
 
-``xtensor`` does not require that the container has a contiguous memory layout, only that it
+*xtensor* does not require that the container has a contiguous memory layout, only that it
 provides the aforementioned interface. In fact, the container could even be backed by a
 file on the disk, a database or a binary message.
 
@@ -47,7 +47,7 @@ Structures that embed shape and strides
 ---------------------------------------
 
 Some structures may gather data container, shape and strides, making them impossible to plug
-into ``xtensor`` with the method above. This section illustrates how to adapt such structures
+into *xtensor* with the method above. This section illustrates how to adapt such structures
 with the following simple example:
 
 .. code::
@@ -71,7 +71,7 @@ with the following simple example:
 Define inner types
 ~~~~~~~~~~~~~~~~~~
 
-The following tells ``xtensor`` which types must be used for getting shape, strides, and data:
+The following tells *xtensor* which types must be used for getting shape, strides, and data:
 
 .. code::
 
@@ -117,13 +117,13 @@ Next step is to inherit from the ``xcontainer`` and the ``xcontainer_semantic`` 
     };
 
 Thanks to definition of the previous structures, inheriting from ``xcontainer`` brings almost all the container
-API available in the other entities of ``xtensor``, while  inheriting from ``xtensor_semantic`` brings the support
+API available in the other entities of *xtensor*, while  inheriting from ``xtensor_semantic`` brings the support
 for mathematical operations.
 
 Define semantic
 ~~~~~~~~~~~~~~~
 
-``xtensor`` classes have full value semantic, so you may define the constructors specific to your structures,
+*xtensor* classes have full value semantic, so you may define the constructors specific to your structures,
 and use the default copy and move constructors and assign operators. Note these last ones *must* be declared as
 they are declared as ``protected`` in the base class.
 
@@ -174,7 +174,7 @@ The last two methods are extended copy constructor and assign operator. They all
 Implement the resize methods
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The next methods to define are the overloads of ``resize``. ``xtensor`` provides utility functions to compute
+The next methods to define are the overloads of ``resize``. *xtensor* provides utility functions to compute
 strides based on the shape and the layout, so the implementation of the ``resize`` overloads is straightforward:
 
 .. code::
@@ -368,7 +368,7 @@ constructor and assign operator.
 Implement access operators
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``xtensor`` requires that the following access operators are defined
+*xtensor* requires that the following access operators are defined
 
 .. code::
 

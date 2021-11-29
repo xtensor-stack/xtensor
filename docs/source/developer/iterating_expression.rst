@@ -12,7 +12,7 @@ Iterating over expressions
 xiterable and inner types
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`xtensor` provides two base classes for making expressions iterable: ``xconst_iterable`` and ``xiterable``. They define
+*xtensor* provides two base classes for making expressions iterable: ``xconst_iterable`` and ``xiterable``. They define
 the API for iterating as described in :ref:`concepts-label`. For an expression to be iterable, it must inherit directly
 or indirectly from one of these classes. For instance, the ``xbroadcast`` class is defined as following:
 
@@ -137,7 +137,7 @@ in row-major order. Thus, if we assume that ``p`` is a pointer to the last eleme
 of the stepper are ``p + 1`` in row-major, and ``p + 3`` in column-major order.
 
 A stepper is specific to an expression type, therefore implementing a new kind of expression usually requires to implement a new
-kind of stepper. However `xtensor` provides a generic ``xindexed_stepper`` class, that can be used with any kind of expressions.
+kind of stepper. However *xtensor* provides a generic ``xindexed_stepper`` class, that can be used with any kind of expressions.
 Even though it is generally not optimal, authors of new expression types can make use of the generic index stepper in a
 first implementation.
 
@@ -200,7 +200,7 @@ with different dimension arguments.
 Iterators
 ~~~~~~~~~
 
-`xtensor` iterator is implemented in the ``xiterator`` class. This latter provides a STL compliant iterator interface, and is built
+*xtensor* iterator is implemented in the ``xiterator`` class. This latter provides a STL compliant iterator interface, and is built
 upon the steppers. Whereas the steppers are tied to the expression they refer to, ``xiterator`` is generic enough to work with any
 kind of stepper.
 

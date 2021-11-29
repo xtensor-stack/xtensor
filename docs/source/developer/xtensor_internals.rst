@@ -7,8 +7,8 @@
 Internals of xtensor
 ====================
 
-This section provides information about `xtensor`'s internals and its architecture. It is intended for developers
-who want to contribute to `xtensor` or simply understand how it works under the hood. `xtensor` makes heavy use
+This section provides information about *xtensor*'s internals and its architecture. It is intended for developers
+who want to contribute to *xtensor* or simply understand how it works under the hood. *xtensor* makes heavy use
 of the CRTP pattern, template meta-programming, universal references and perfect forwarding. One should be familiar
 with these notions before going any further.
 

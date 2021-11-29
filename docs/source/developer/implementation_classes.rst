@@ -10,7 +10,7 @@ Implementation classes
 Requirements
 ~~~~~~~~~~~~
 
-An implementation class in `xtensor` is a final class that models a specific
+An implementation class in *xtensor* is a final class that models a specific
 kind of expression. It must inherit (either directly or indirectly) from
 :cpp:type:`xt::xexpression` and define (or inherit from classes that define) the following
 types:
@@ -112,7 +112,7 @@ methods, and inherits from a semantic class to provide assignment operators.
 List of available expression classes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`xtensor` provides the following expression classes:
+*xtensor* provides the following expression classes:
 
 **Containers**
 
@@ -138,7 +138,7 @@ so that their templates parameters are deduced.
 
 **Scalar**
 
-`xtensor` provides the ``xscalar`` class to adapt scalar values and give them the required API.
+*xtensor* provides the ``xscalar`` class to adapt scalar values and give them the required API.
 
 **Optional containers**
 
@@ -157,7 +157,7 @@ Most of the mehtods of these classes are defined in their base class ``xoptional
 - ``xmasked_view`` : View on optional expression hiding values depending on a mask
 
 When the index of an element in the underlying expression of a view can be computed thanks to a strided scheme,
-the slice used in this view is said to be a strided slice. `xtensor` provides the following strided slices:
+the slice used in this view is said to be a strided slice. *xtensor* provides the following strided slices:
 
 - ``xrange``
 - ``xstepped_range``

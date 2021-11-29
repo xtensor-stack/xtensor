@@ -544,7 +544,7 @@ Other changes
   `#1888 <https://github.com/xtensor-stack/xtensor/pull/1888>`_
 - Fixed ``reshape`` return
   `#1886 <https://github.com/xtensor-stack/xtensor/pull/1886>`_
-- Enabled ``add_subdirectory`` for ``xsimd``
+- Enabled ``add_subdirectory`` for *xsimd*
   `#1889 <https://github.com/xtensor-stack/xtensor/pull/1889>`_
 - Support ``ddof`` argument for ``xt::variance``
   `#1893 <https://github.com/xtensor-stack/xtensor/pull/1893>`_
@@ -827,7 +827,7 @@ Other changes
   `#1556 <https://github.com/xtensor-stack/xtensor/pull/1556>`_
 - Fixed ``real``, ``imag``, and ``functor_view``
   `#1554 <https://github.com/xtensor-stack/xtensor/pull/1554>`_
-- Allows to include ``xsimd`` without defining ``XTENSOR_USE_XSIMD``
+- Allows to include *xsimd* without defining ``XTENSOR_USE_XSIMD``
   `#1548 <https://github.com/xtensor-stack/xtensor/pull/1548>`_
 - Fixed ``argsort`` in column major
   `#1547 <https://github.com/xtensor-stack/xtensor/pull/1547>`_
@@ -863,7 +863,7 @@ Other changes
   `#1497 <https://github.com/xtensor-stack/xtensor/pull/1497>`_
 - Removed unused capture
   `#1499 <https://github.com/xtensor-stack/xtensor/pull/1499>`_
-- Upgraded to ``xtl`` 0.6.2
+- Upgraded to *xtl* 0.6.2
   `#1502 <https://github.com/xtensor-stack/xtensor/pull/1502>`_
 - Added missing methods in ``xshared_expression``
   `#1503 <https://github.com/xtensor-stack/xtensor/pull/1503>`_
@@ -908,7 +908,7 @@ Breaking changes
   `#1389 <https://github.com/xtensor-stack/xtensor/pull/1389>`_
 - Removed deprecated type ``slice_vector``
   `#1459 <https://github.com/xtensor-stack/xtensor/pull/1459>`_
-- Upgraded to ``xtl`` 0.6.1
+- Upgraded to *xtl* 0.6.1
   `#1468 <https://github.com/xtensor-stack/xtensor/pull/1465>`_
 - Added ``keep_dims`` option to reducers
   `#1474 <https://github.com/xtensor-stack/xtensor/pull/1474>`_
@@ -1080,7 +1080,7 @@ Other changes
   `#1339 <https://github.com/xtensor-stack/xtensor/pull/1339>`_.
 - Prevent embiguity with `xsimd::reduce`
   `#1343 <https://github.com/xtensor-stack/xtensor/pull/1343>`_.
-- Require `xtl` 0.5.3
+- Require *xtl* 0.5.3
   `#1346 <https://github.com/xtensor-stack/xtensor/pull/1346>`_.
 - Use concepts instead of SFINAE
   `#1347 <https://github.com/xtensor-stack/xtensor/pull/1347>`_.
@@ -1330,7 +1330,7 @@ Other changes
   `#1074 <https://github.com/xtensor-stack/xtensor/pull/1074>`_.
 - Clean documentation for views
   `#1131 <https://github.com/xtensor-stack/xtensor/pull/1131>`_.
-- Build with ``xsimd`` on Windows fixed
+- Build with *xsimd* on Windows fixed
   `#1127 <https://github.com/xtensor-stack/xtensor/pull/1127>`_.
 - Implement ``mime_bundle_repr`` for ``xmasked_view``
   `#1132 <https://github.com/xtensor-stack/xtensor/pull/1132>`_.
@@ -2013,7 +2013,7 @@ Breaking changes
   `#482 <https://github.com/xtensor-stack/xtensor/pull/482>`_.
 - Change ``edge_items`` print option to ``edgeitems`` for better numpy consistency
   `#489 <https://github.com/xtensor-stack/xtensor/pull/489>`_.
-- xtensor now depends on ``xtl`` version `~0.3.3`
+- *xtensor* now depends on *xtl* version `~0.3.3`
   `#508 <https://github.com/xtensor-stack/xtensor/pull/508>`_.
 
 New features
@@ -2063,13 +2063,13 @@ Other changes
 Breaking changes
 ~~~~~~~~~~~~~~~~
 
-- ``xtensor`` now depends on ``xtl`` version `0.2.x`
+- *xtensor* now depends on *xtl* version `0.2.x`
   `#421 <https://github.com/xtensor-stack/xtensor/pull/421>`_.
 
 New features
 ~~~~~~~~~~~~
 
-- ``xtensor`` has an optional dependency on ``xsimd`` for enabling simd acceleration
+- *xtensor* has an optional dependency on *xsimd* for enabling simd acceleration
   `#426 <https://github.com/xtensor-stack/xtensor/pull/426>`_.
 
 - All expressions have an additional safe access function (``at``)
@@ -2082,7 +2082,7 @@ New features
   correctly defined
   `#446 <https://github.com/xtensor-stack/xtensor/pull/446>`_.
 
-- expressions tags added so ``xtensor`` expression system can be extended
+- expressions tags added so *xtensor* expression system can be extended
   `#447 <https://github.com/xtensor-stack/xtensor/pull/447>`_.
 
 Other changes

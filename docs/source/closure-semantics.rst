@@ -9,7 +9,7 @@
 Closure semantics
 =================
 
-The ``xtensor`` library is a tensor expression library implementing numpy-style broadcasting and universal functions but in a lazy fashion.
+The *xtensor* library is a tensor expression library implementing numpy-style broadcasting and universal functions but in a lazy fashion.
 
 If ``x`` and ``y`` are two tensor expressions with compatible shapes, the result of ``x + y`` is not a tensor but an expression that does
 not hold any value. Values of ``x + y`` are computed upon access or when the result is assigned to a container such as :cpp:type:`xt::xtensor` or
@@ -19,7 +19,7 @@ In order to be able to perform the differed computation of ``x + y``, the return
 copies of the members ``x`` and ``y``, depending on how arguments were passed to ``operator+``. The actual types held by the expressions
 are the **closure types**.
 
-The concept of closure type is key in the implementation of ``xtensor`` and appears in all the expressions defined in xtensor, and the utility functions and metafunctions complement the tools of the standard library for the move semantics.
+The concept of closure type is key in the implementation of *xtensor* and appears in all the expressions defined in xtensor, and the utility functions and metafunctions complement the tools of the standard library for the move semantics.
 
 Basic rules for determining closure types
 -----------------------------------------
@@ -78,7 +78,7 @@ Using this mechanism, we were able to
 Closure types and scalar wrappers
 ---------------------------------
 
-A requirement for ``xtensor`` is the ability to mix scalars and tensors in tensor expressions. In order to do so,
+A requirement for *xtensor* is the ability to mix scalars and tensors in tensor expressions. In order to do so,
 scalar values are wrapped into the ``xscalar`` wrapper, which is a cheap 0-D tensor expression holding a single
 scalar value.
 
@@ -209,7 +209,7 @@ utility to achieve this:
     }
 
 Note: writing a lambda is just sugar for writing a functor.
-Also, using `auto x` as the function argument enables automatic `xsimd` acceleration.
+Also, using ``auto x`` as the function argument enables automatic *xsimd* acceleration.
 
 As the data flow through the lambda is entirely transparent to the compiler, using this construct
 is generally faster than using ``xshared_expressions``. The usage of ``xshared_expression`` also

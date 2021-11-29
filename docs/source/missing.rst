@@ -7,7 +7,7 @@
 Missing values
 ==============
 
-`xtensor` handles missing values and provides specialized container types for an optimized support of missing values.
+*xtensor* handles missing values and provides specialized container types for an optimized support of missing values.
 
 Optional expressions
 --------------------

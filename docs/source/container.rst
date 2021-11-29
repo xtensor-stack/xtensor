@@ -10,7 +10,7 @@ Arrays and tensors
 Internal memory layout
 ----------------------
 
-A multi-dimensional array of `xtensor` consists of a contiguous one-dimensional buffer combined with an indexing scheme that maps
+A multi-dimensional array of *xtensor* consists of a contiguous one-dimensional buffer combined with an indexing scheme that maps
 unsigned integers to the location of an element in the buffer. The range in which the indices can vary is specified by the
 `shape` of the array.
 
@@ -21,7 +21,7 @@ The scheme used to map indices into a location in the buffer is a strided indexi
 - the row-major layout (or C layout) is a strided index scheme where the strides grow from right to left
 - the column-major layout (or Fortran layout) is a strided index scheme where the strides grow from left to right
 
-`xtensor` provides a :cpp:enum:`xt::layout_type` enum that helps to specify the layout used by multidimensional arrays.
+*xtensor* provides a :cpp:enum:`xt::layout_type` enum that helps to specify the layout used by multidimensional arrays.
 This enum can be used in two ways:
 
 - at compile time, as a template argument. The value :cpp:enumerator:`xt::layout_type::dynamic` allows specifying any
@@ -174,11 +174,11 @@ Instead, it has to be assigned to a temporary variable before being copied into 
 A typical case where this happens is when the destination container is involved in the expression and has to be resized.
 This phenomenon is known as *aliasing*.
 
-To prevent this, `xtensor` assigns the expression to a temporary variable before copying it.
+To prevent this, *xtensor* assigns the expression to a temporary variable before copying it.
 In the case of :cpp:type:`xt::xarray`, this results in an extra dynamic memory allocation and copy.
 
 However, if the left-hand side is not involved in the expression being assigned, no temporary variable should be required.
-`xtensor` cannot detect such cases automatically and applies the "temporary variable rule" by default.
+*xtensor* cannot detect such cases automatically and applies the "temporary variable rule" by default.
 A mechanism is provided to forcibly prevent usage of a temporary variable:
 
 .. code::

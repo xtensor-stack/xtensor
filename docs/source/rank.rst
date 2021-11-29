@@ -12,7 +12,7 @@ Tensor Rank
 Rank overload
 -------------
 
-All `xtensor`'s classes have a member ``rank`` that can be used
+All *xtensor*'s classes have a member ``rank`` that can be used
 to overload based on rank using *SFINAE*.
 Consider the following example:
 

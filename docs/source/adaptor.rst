@@ -7,14 +7,14 @@
 Adapting 1-D containers
 =======================
 
-`xtensor` can adapt one-dimensional containers in place, and provide them a tensor interface.
+*xtensor* can adapt one-dimensional containers in place, and provide them a tensor interface.
 Only random access containers can be adapted.
 
 Adapting std::vector
 --------------------
 
 The following example shows how to bring an ``std::vector`` into the expression system of
-`xtensor`:
+*xtensor*:
 
 .. code::
 
@@ -44,7 +44,7 @@ the corresponding value in ``v``:
 Adapting C-style arrays
 -----------------------
 
-`xtensor` provides two ways for adapting a C-style array; the first one does not take the
+*xtensor* provides two ways for adapting a C-style array; the first one does not take the
 ownership of the array:
 
 .. code::

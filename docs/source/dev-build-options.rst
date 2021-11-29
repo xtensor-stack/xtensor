@@ -10,15 +10,15 @@ Build and configuration
 Build
 -----
 
-``xtensor`` build supports the following options:
+*xtensor* build supports the following options:
 
 - ``BUILD_TESTS``: enables the ``xtest`` and ``xbenchmark`` targets (see below).
 - ``DOWNLOAD_GTEST``: downloads ``gtest`` and builds it locally instead of using a binary installation.
 - ``GTEST_SRC_DIR``: indicates where to find the ``gtest`` sources instead of downloading them.
-- ``XTENSOR_ENABLE_ASSERT``: activates the assertions in ``xtensor``.
-- ``XTENSOR_CHECK_DIMENSION``: turns on ``XTENSOR_ENABLE_ASSERT`` and activates dimension checks in ``xtensor``.
+- ``XTENSOR_ENABLE_ASSERT``: activates the assertions in *xtensor*.
+- ``XTENSOR_CHECK_DIMENSION``: turns on ``XTENSOR_ENABLE_ASSERT`` and activates dimension checks in *xtensor*.
   Note that the dimensions check should not be activated if you expect ``operator()`` to perform broadcasting.
-- ``XTENSOR_USE_XSIMD``: enables simd acceleration in ``xtensor``. This requires that you have xsimd_ installed
+- ``XTENSOR_USE_XSIMD``: enables simd acceleration in *xtensor*. This requires that you have xsimd_ installed
   on your system.
 - ``XTENSOR_USE_TBB``: enables parallel assignment loop. This requires that you have you have tbb_ installed
   on your system.
@@ -35,7 +35,7 @@ If the ``BUILD_TESTS`` option is enabled, the following targets are available:
 - xtest: builds an run the test suite.
 - xbenchmark: builds and runs the benchmarks.
 
-For instance, building the test suite of ``xtensor`` with assertions enabled:
+For instance, building the test suite of *xtensor* with assertions enabled:
 
 .. code::
 
@@ -44,7 +44,7 @@ For instance, building the test suite of ``xtensor`` with assertions enabled:
     cmake -DBUILD_TESTS=ON -DXTENSOR_ENABLE_ASSERT=ON ../
     make xtest
 
-Building the test suite of ``xtensor`` where the sources of ``gtest`` are
+Building the test suite of *xtensor* where the sources of ``gtest`` are
 located in e.g. ``/usr/share/gtest``:
 
 .. code::
@@ -59,13 +59,13 @@ located in e.g. ``/usr/share/gtest``:
 Configuration
 -------------
 
-``xtensor`` can be configured via macros, which must be defined *before*
+*xtensor* can be configured via macros, which must be defined *before*
 including any of its header. Here is a list of available macros:
 
 - ``XTENSOR_ENABLE_ASSERT``: enables assertions in xtensor, such as bound check.
-- ``XTENSOR_ENABLE_CHECK_DIMENSION``: enables the dimensions check in ``xtensor``. Note that this option should not be turned
+- ``XTENSOR_ENABLE_CHECK_DIMENSION``: enables the dimensions check in *xtensor*. Note that this option should not be turned
   on if you expect ``operator()`` to perform broadcasting.
-- ``XTENSOR_USE_XSIMD``: enables SIMD acceleration in ``xtensor``. This requires that you have xsimd_ installed
+- ``XTENSOR_USE_XSIMD``: enables SIMD acceleration in *xtensor*. This requires that you have xsimd_ installed
   on your system.
 - ``XTENSOR_USE_TBB``: enables parallel assignment loop. This requires that you have you have tbb_ installed
   on your system.

@@ -61,7 +61,7 @@ be tempted to simplify it a bit:
         return (1 - tmp) / (1 + tmp);
     }
 
-Unfortunately, you introduced a bug; indeed, expressions in `xtensor` are not evaluated
+Unfortunately, you introduced a bug; indeed, expressions in *xtensor* are not evaluated
 immediately, they capture their arguments by reference or copy depending on their nature,
 for future evaluation. Since ``tmp`` is an lvalue, it is captured by reference in the last
 statement; when the function returns, ``tmp`` is destroyed, leading to a dangling reference
@@ -139,7 +139,7 @@ Alignment of fixed-size members
 
     If you are using ``C++ >= 17`` you should not have to worry about this.
 
-When building with `xsimd` (see :ref:`external-dependencies`), if you define a structure
+When building with *xsimd* (see :ref:`external-dependencies`), if you define a structure
 having members of fixed-size xtensor types, you must ensure that the buffers properly
 aligned. For this you can use the macro ``XTENSOR_FIXED_ALIGN`` available in
 ``xtensor/xtensor_config.hpp``.

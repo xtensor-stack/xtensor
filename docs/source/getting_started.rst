@@ -7,7 +7,7 @@
 Getting started
 ===============
 
-This short guide explains how to get started with `xtensor` once you have installed it with one of
+This short guide explains how to get started with *xtensor* once you have installed it with one of
 the methods described in the installation section.
 
 First example
@@ -43,8 +43,8 @@ array.
 Compiling the first example
 ---------------------------
 
-`xtensor` is a header-only library, so there is no library to link with. The only constraint
-is that the compiler must be able to find the headers of `xtensor` (and `xtl`), this is usually done
+*xtensor* is a header-only library, so there is no library to link with. The only constraint
+is that the compiler must be able to find the headers of *xtensor* (and *xtl*), this is usually done
 by having the directory containing the headers in the include path. With G++, use the ``-I`` option
 to achieve this. Assuming the first example code is located in ``example.cpp``, the compilation command
 is:
@@ -53,7 +53,7 @@ is:
 
     g++ -I /path/to/xtensor/ -I /path/to/xtl/ example.cpp -o example
 
-Note that if you installed `xtensor` and `xtl` with `cmake`, their headers will be located in the same
+Note that if you installed *xtensor* and *xtl* with `cmake`, their headers will be located in the same
 directory, so you will need to provide only one path with the ``-I`` option.
 
 When you run the program, it produces the following output:
@@ -65,7 +65,7 @@ When you run the program, it produces the following output:
 Building with cmake
 -------------------
 
-A better alternative for building programs using `xtensor` is to use `cmake`, especially if you are
+A better alternative for building programs using *xtensor* is to use `cmake`, especially if you are
 developing for several platforms. Assuming the following folder structure:
 
 .. code:: bash
