@@ -8,7 +8,7 @@
 ############################################################################
 
 cmake_minimum_required(VERSION 3.1)
-project(xtensor)
+project(xtensor CXX)
 
 set(XTENSOR_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 

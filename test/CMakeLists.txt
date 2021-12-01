@@ -13,7 +13,7 @@ find_package(doctest            REQUIRED)
 find_package(Threads)
 
 if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-    project(xtensor-test)
+    project(xtensor-test CXX)
 
     enable_testing()
 
