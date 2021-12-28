@@ -1068,7 +1068,10 @@ namespace xt
     TEST(xreducer, double_axis)
     {
         xt::xarray<int> a = xt::ones<int>({ 3, 2});
-        XT_EXPECT_ANY_THROW(xt::sum(a, {1, 1}));
+        XT_EXPECT_NO_THROW(xt::sum(a, {0, 1})); // correct
+        XT_EXPECT_ANY_THROW(xt::sum(a, {0, 0})); // duplicate indices
+        XT_EXPECT_ANY_THROW(xt::sum(a, {1, 0})); // unordered indices
+        XT_EXPECT_ANY_THROW(xt::sum(a, {1, 1})); // duplicate indices
     }
 
     TEST(xreducer, sum_xtensor_of_fixed)

@@ -298,7 +298,11 @@ namespace xt
         // Therefore less is required to detect duplicates.
         if (!std::is_sorted(axes.cbegin(), axes.cend(), std::less<>()))
         {
-            XTENSOR_THROW(std::runtime_error, "Reducing axes should be sorted and should not contain duplicates");
+            XTENSOR_THROW(std::runtime_error, "Reducing axes should be sorted.");
+        }
+        if (std::adjacent_find(axes.cbegin(), axes.cend()) != axes.cend())
+        {
+            XTENSOR_THROW(std::runtime_error, "Reducing axes should not contain duplicates.");
         }
         if (axes.size() != 0 && axes[axes.size() - 1] > e.dimension() - 1)
         {
@@ -1307,7 +1311,11 @@ namespace xt
         // Therefore less is required to detect duplicates.
         if (!std::is_sorted(m_axes.cbegin(), m_axes.cend(), std::less<>()))
         {
-            XTENSOR_THROW(std::runtime_error, "Reducing axes should be sorted and should not contain duplicates");
+            XTENSOR_THROW(std::runtime_error, "Reducing axes should be sorted.");
+        }
+        if (std::adjacent_find(m_axes.cbegin(), m_axes.cend()) != m_axes.cend())
+        {
+            XTENSOR_THROW(std::runtime_error, "Reducing axes should not contain duplicates.");
         }
         if (m_axes.size() != 0 && m_axes[m_axes.size() - 1] > m_e.dimension() - 1)
         {
