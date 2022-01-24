@@ -135,10 +135,11 @@ set(TEST_HEADERS
     test_xsemantic.hpp
 )
 set(COMMON_BASE
-    test_xadaptor_semantic.cpp
-    test_xarray_adaptor.cpp
+    #    test_xadaptor_semantic.cpp
+    #test_xarray_adaptor.cpp
     test_xarray.cpp
-    test_xblockwise_reducer.cpp
+    test_xreducer.cpp
+    #[[    test_xblockwise_reducer.cpp
     test_xbroadcast.cpp
     test_xbuilder.cpp
     test_xcontainer_semantic.cpp
@@ -165,13 +166,13 @@ set(COMMON_BASE
     test_xtensor_semantic.cpp
     test_xview.cpp
     test_xview_semantic.cpp
-    test_xutils.cpp
+    test_xutils.cpp]]
     test_xsimd8.cpp
 )
 
 set(XTENSOR_TESTS
     main.cpp
-    test_xaccumulator.cpp
+    #[[    test_xaccumulator.cpp
     test_xadapt.cpp
     test_xassign.cpp
     test_xaxis_iterator.cpp
@@ -212,7 +213,7 @@ set(XTENSOR_TESTS
     test_extended_xmath_reducers.cpp
     test_extended_xhistogram.cpp
     test_extended_xsort.cpp
-    test_sfinae.cpp
+    test_sfinae.cpp]]
 )
 
 if(nlohmann_json_FOUND)
@@ -280,7 +281,8 @@ foreach(filename IN LISTS COMMON_BASE XTENSOR_TESTS)
     add_test(NAME ${targetname} COMMAND ${targetname})
 endforeach()
 
-add_executable(test_xtensor_lib  main.cpp ${COMMON_BASE} ${XTENSOR_TESTS} ${TEST_HEADERS} ${XTENSOR_HEADERS})
+#add_executable(test_xtensor_lib  main.cpp ${COMMON_BASE} ${XTENSOR_TESTS} ${TEST_HEADERS} ${XTENSOR_HEADERS})
+add_executable(test_xtensor_lib  main.cpp ${COMMON_BASE} ${TEST_HEADERS} ${XTENSOR_HEADERS})
 if(XTENSOR_USE_XSIMD)
     target_compile_definitions(test_xtensor_lib
                                PRIVATE
