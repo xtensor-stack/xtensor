@@ -31,16 +31,18 @@ jobs:
           conda info
         displayName: "Configure Miniconda"
 
+      - script:
+          conda install mamba
       # Create conda enviroment
       # Note: conda activate doesn't work here, because it creates a new shell!
       - script: |
-          conda install cmake==3.14.0 ^
+          mamba install cmake==3.14.0 ^
                         ninja ^
-                        doctest ^
+                        doctest==2.4.7 ^
                         nlohmann_json ^
                         xtl==0.7.0 ^
                         xsimd==8.0.3 ^
-                        python=3.6
+                        python=3.9
           conda list
         displayName: "Install conda packages"
 
