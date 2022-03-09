@@ -2,7 +2,7 @@
 jobs:
   - job: 'Windows_clangcl'
     pool:
-      vmImage: 'vs2017-win2016'
+      vmImage: 'windows-2019'
     timeoutInMinutes: 360
     steps:
 
@@ -31,12 +31,10 @@ jobs:
           conda info
         displayName: "Configure Miniconda"
 
-      - script:
-          conda install mamba
       # Create conda enviroment
       # Note: conda activate doesn't work here, because it creates a new shell!
       - script: |
-          mamba install cmake==3.14.0 ^
+          conda install cmake==3.14.0 ^
                         ninja ^
                         doctest==2.4.7 ^
                         nlohmann_json ^
