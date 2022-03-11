@@ -50,6 +50,92 @@ namespace xt
         EXPECT_TRUE(t5);
     }
 
+    TEST(xstrides, free_function_2d_row_major)
+    {
+        xt::xarray<int, xt::layout_type::row_major> a = xt::ones<int>({1, 3});
+        using stype = std::vector<std::ptrdiff_t>;
+        std::ptrdiff_t sof = sizeof(int);
+
+        EXPECT_EQ(xt::strides(a), stype({3, 1}));
+        EXPECT_EQ(xt::strides(a, xt::stride_type::normal), stype({3, 1}));
+        EXPECT_EQ(xt::strides(a, xt::stride_type::internal), stype({0, 1}));
+        EXPECT_EQ(xt::strides(a, xt::stride_type::bytes), stype({3 * sof, sof}));
+
+        EXPECT_TRUE(xt::strides(a, 0) == 3);
+        EXPECT_TRUE(xt::strides(a, 0, xt::stride_type::normal) == 3);
+        EXPECT_TRUE(xt::strides(a, 0, xt::stride_type::internal) == 0);
+        EXPECT_TRUE(xt::strides(a, 0, xt::stride_type::bytes) == 3 * sof);
+
+        EXPECT_TRUE(xt::strides(a, 1) == 1);
+        EXPECT_TRUE(xt::strides(a, 1, xt::stride_type::normal) == 1);
+        EXPECT_TRUE(xt::strides(a, 1, xt::stride_type::internal) == 1);
+        EXPECT_TRUE(xt::strides(a, 1, xt::stride_type::bytes) == sof);
+    }
+
+    TEST(xstrides, free_function_4d_row_major)
+    {
+        xt::xarray<int, xt::layout_type::row_major> a = xt::ones<int>({5, 4, 1, 4});
+        using stype = std::vector<std::ptrdiff_t>;
+        std::ptrdiff_t sof = sizeof(int);
+
+        EXPECT_EQ(xt::strides(a), stype({16, 4, 4, 1}));
+        EXPECT_EQ(xt::strides(a, xt::stride_type::normal), stype({16, 4, 4, 1}));
+        EXPECT_EQ(xt::strides(a, xt::stride_type::internal), stype({16, 4, 0, 1}));
+        EXPECT_EQ(xt::strides(a, xt::stride_type::bytes), stype({16 * sof, 4 * sof, 4 * sof, 1 * sof}));
+
+        EXPECT_TRUE(xt::strides(a, 0) == 16);
+        EXPECT_TRUE(xt::strides(a, 0, xt::stride_type::normal) == 16);
+        EXPECT_TRUE(xt::strides(a, 0, xt::stride_type::internal) == 16);
+        EXPECT_TRUE(xt::strides(a, 0, xt::stride_type::bytes) == 16 * sof);
+
+        EXPECT_TRUE(xt::strides(a, 1) == 4);
+        EXPECT_TRUE(xt::strides(a, 1, xt::stride_type::normal) == 4);
+        EXPECT_TRUE(xt::strides(a, 1, xt::stride_type::internal) == 4);
+        EXPECT_TRUE(xt::strides(a, 1, xt::stride_type::bytes) == 4 * sof);
+
+        EXPECT_TRUE(xt::strides(a, 2) == 4);
+        EXPECT_TRUE(xt::strides(a, 2, xt::stride_type::normal) == 4);
+        EXPECT_TRUE(xt::strides(a, 2, xt::stride_type::internal) == 0);
+        EXPECT_TRUE(xt::strides(a, 2, xt::stride_type::bytes) == 4 * sof);
+
+        EXPECT_TRUE(xt::strides(a, 3) == 1);
+        EXPECT_TRUE(xt::strides(a, 3, xt::stride_type::normal) == 1);
+        EXPECT_TRUE(xt::strides(a, 3, xt::stride_type::internal) == 1);
+        EXPECT_TRUE(xt::strides(a, 3, xt::stride_type::bytes) == sof);
+    }
+
+    TEST(xstrides, free_function_4d_column_major)
+    {
+        xt::xarray<int, xt::layout_type::column_major> a = xt::ones<int>({5, 4, 1, 4});
+        using stype = std::vector<std::ptrdiff_t>;
+        std::ptrdiff_t sof = sizeof(int);
+
+        EXPECT_EQ(xt::strides(a), stype({1, 5, 20, 20}));
+        EXPECT_EQ(xt::strides(a, xt::stride_type::normal), stype({1, 5, 20, 20}));
+        EXPECT_EQ(xt::strides(a, xt::stride_type::internal), stype({1, 5, 0, 20}));
+        EXPECT_EQ(xt::strides(a, xt::stride_type::bytes), stype({sof, 5 * sof, 20 * sof, 20 * sof}));
+
+        EXPECT_TRUE(xt::strides(a, 0) == 1);
+        EXPECT_TRUE(xt::strides(a, 0, xt::stride_type::normal) == 1);
+        EXPECT_TRUE(xt::strides(a, 0, xt::stride_type::internal) == 1);
+        EXPECT_TRUE(xt::strides(a, 0, xt::stride_type::bytes) == sof);
+
+        EXPECT_TRUE(xt::strides(a, 1) == 5);
+        EXPECT_TRUE(xt::strides(a, 1, xt::stride_type::normal) == 5);
+        EXPECT_TRUE(xt::strides(a, 1, xt::stride_type::internal) == 5);
+        EXPECT_TRUE(xt::strides(a, 1, xt::stride_type::bytes) == 5 * sof);
+
+        EXPECT_TRUE(xt::strides(a, 2) == 20);
+        EXPECT_TRUE(xt::strides(a, 2, xt::stride_type::normal) == 20);
+        EXPECT_TRUE(xt::strides(a, 2, xt::stride_type::internal) == 0);
+        EXPECT_TRUE(xt::strides(a, 2, xt::stride_type::bytes) == 20 * sof);
+
+        EXPECT_TRUE(xt::strides(a, 3) == 20);
+        EXPECT_TRUE(xt::strides(a, 3, xt::stride_type::normal) == 20);
+        EXPECT_TRUE(xt::strides(a, 3, xt::stride_type::internal) == 20);
+        EXPECT_TRUE(xt::strides(a, 3, xt::stride_type::bytes) == 20 * sof);
+    }
+
     TEST(xstrides, unravel_from_strides)
     {
         SUBCASE("row_major strides")

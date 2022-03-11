@@ -98,6 +98,20 @@ Strides
 Strided containers of xtensor and numpy having the same exact memory layout may have different strides when accessing them through the ``strides`` attribute.
 The reason is an optimization in xtensor, which is to set the strides to ``0`` in dimensions of length ``1``, which simplifies the implementation of broadcasting of universal functions.
 
+.. tip::
+
+    Use the free function ``xt::strides`` to switch between representations.
+
+    .. code-block:: cpp
+
+        xt::strides(a); // strides of ``a`` corresponding to storage
+        xt::strides(a, xt::stride_type::normal); // same
+
+        xt::strides(a, xt::stride_type::internal); // ``== a.strides()``
+
+        xt::strides(a, xt::stride_type::bytes) // strides in bytes, as in numpy
+
+
 Array indices
 -------------
 

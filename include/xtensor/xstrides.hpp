@@ -142,6 +142,127 @@ namespace xt
         return begin;
     }
 
+
+    /***********
+     * strides *
+     ***********/
+
+    namespace detail
+    {
+        template <class return_type, class S, class T, class D>
+        inline return_type compute_stride_impl(layout_type layout, const S& shape, T axis, D default_stride)
+        {
+            if (layout == layout_type::row_major)
+            {
+                return std::accumulate(
+                    shape.cbegin() + axis + 1,
+                    shape.cend(),
+                    static_cast<return_type>(1),
+                    std::multiplies<return_type>()
+                );
+            }
+            if (layout == layout_type::column_major)
+            {
+                return std::accumulate(
+                   shape.cbegin(),
+                    shape.cbegin() + axis,
+                    static_cast<return_type>(1),
+                    std::multiplies<return_type>()
+                );
+            }
+            return default_stride;
+        }
+    }
+
+    /**
+    * @ingroup strides
+    * @brief strides_type
+    *
+    * Choose stride type
+    */
+    enum class stride_type
+    {
+        internal = 0, ///< As used internally (with `stride(axis) == 0` if `shape(axis) == 1`)
+        normal = 1, ///< Normal stride corresponding to storage.
+        bytes = 2, ///< Normal stride in bytes.
+    };
+
+    /**
+    * @ingroup strides
+    * @brief strides
+    *
+    * Get strides of an object.
+    * @param a an array
+    * @return array
+    */
+    template <class E>
+    inline auto strides(const E& e, stride_type type = stride_type::normal) noexcept
+    {
+        using strides_type = typename E::strides_type;
+        using return_type = typename strides_type::value_type;
+        strides_type ret = e.strides();
+        auto shape = e.shape();
+
+        if (type == stride_type::internal)
+        {
+            return ret;
+        }
+
+        for (std::size_t i = 0; i < ret.size(); ++i)
+        {
+            if (shape[i] == 1)
+            {
+                ret[i] = detail::compute_stride_impl<return_type>(e.layout(), shape, i, ret[i]);
+            }
+        }
+
+        if (type == stride_type::bytes)
+        {
+            return_type f = static_cast<return_type>(sizeof(typename E::value_type));
+            std::for_each(ret.begin(), ret.end(), [f](auto& c){ c *= f; });
+        }
+
+        return ret;
+    }
+
+    /**
+    * @ingroup strides
+    * @brief strides
+    *
+    * Get stride of an object along an axis.
+    * @param a an array
+    * @return integer
+    */
+    template <class E>
+    inline auto strides(const E& e, std::size_t axis, stride_type type = stride_type::normal) noexcept
+    {
+        using strides_type = typename E::strides_type;
+        using return_type = typename strides_type::value_type;
+
+        return_type ret = e.strides()[axis];
+
+        if (type == stride_type::internal)
+        {
+            return ret;
+        }
+
+        if (ret == 0)
+        {
+            if (e.shape(axis) == 1)
+            {
+                ret = detail::compute_stride_impl<return_type>(e.layout(), e.shape(), axis, ret);
+            }
+        }
+
+        if (type == stride_type::bytes)
+        {
+            return_type f = static_cast<return_type>(sizeof(typename E::value_type));
+            ret *= f;
+        }
+
+        return ret;
+    }
+
     /******************
      * Implementation *
      ******************/
