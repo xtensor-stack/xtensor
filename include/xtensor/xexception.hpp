@@ -14,11 +14,36 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <iostream>
 
 #include "xtensor_config.hpp"
+#include <xtl/xsequence.hpp>
+#include <xtl/xspan_impl.hpp>
 
 namespace xt
 {
+    struct missing_type {};
+    namespace {
+        missing_type missing;
+    }
+
+    namespace detail
+    {
+        template <class... Args>
+        struct last_type_is_missing_impl
+            : std::is_same<missing_type, xtl::mpl::back_t<xtl::mpl::vector<Args...>>>
+        {
+        };
+
+        template <>
+        struct last_type_is_missing_impl<>
+            : std::false_type
+        {
+        };
+
+        template <class... Args>
+        constexpr bool last_type_is_missing = last_type_is_missing_impl<Args...>::value;
+    }
 
     /*******************
      * broadcast_error *
@@ -147,6 +172,11 @@ namespace xt
         {
         }
 
+        template <class S, std::size_t dim>
+        inline void check_index_impl(const S&, missing_type)
+        {
+        }
+
         template <class S, std::size_t dim, class T, class... Args>
         inline void check_index_impl(const S& shape, T arg, Args... args)
         {
@@ -165,6 +195,11 @@ namespace xt
     {
     }
 
+    template <class S>
+    inline void check_index(const S&, missing_type)
+    {
+    }
+
     template <class S, class Arg, class... Args>
     inline void check_index(const S& shape, Arg arg, Args... args)
     {
@@ -177,6 +212,11 @@ namespace xt
         {
             // Too many arguments: drop the first
             check_index(shape, args...);
+        }
+        else if (detail::last_type_is_missing<Args...>)
+        {
+            // Too few arguments & last argument xt::missing: postfix index with zeros
+            detail::check_index_impl<S, 0>(shape, arg, args...);
         }
         else
         {
@@ -194,7 +234,7 @@ namespace xt
         auto dst = static_cast<size_type>(last - first);
         It efirst = last - static_cast<std::ptrdiff_t>((std::min)(shape.size(), dst));
         std::size_t axis = 0;
-        
+
         while (efirst != last)
         {
             if (*efirst >= value_type(shape[axis]) && shape[axis] != 1)

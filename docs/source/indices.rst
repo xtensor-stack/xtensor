@@ -52,11 +52,15 @@ To this end the following operators are at your disposal:
 Returns a (constant) reference to the element,
 specified by an *array index* given by a number of unsigned integers.
 
-.. note::
-
-    If the number of indices is less that the dimension of the array,
+*   If the number of indices is less that the dimension of the array,
     the indices are pre-padded with zeros until the dimension is matched
     (example: ``a(2) == a(0, 2) == 2``).
+
+*   If the number of indices is greater than the dimension of the array,
+    the first ``#indices - dimension`` indices are ignored.
+
+*   To post-pad an arbitrary number of zeros use ``xt::missing``
+    (example ``a(2, xt::missing) == a(2, 0) == 8``.
 
 ``at(args...)``
 ^^^^^^^^^^^^^^^

@@ -169,8 +169,16 @@ namespace xt
 
     namespace detail
     {
+
         template <std::size_t dim, class S>
         inline auto raw_data_offset(const S&) noexcept
+        {
+            using strides_value_type = std::decay_t<decltype(std::declval<S>()[0])>;
+            return strides_value_type(0);
+        }
+
+        template <std::size_t dim, class S>
+        inline auto raw_data_offset(const S&, missing_type) noexcept
         {
             using strides_value_type = std::decay_t<decltype(std::declval<S>()[0])>;
             return strides_value_type(0);
@@ -179,7 +187,7 @@ namespace xt
         template <std::size_t dim, class S, class Arg, class... Args>
         inline auto raw_data_offset(const S& strides, Arg arg, Args... args) noexcept
         {
-            return arg * strides[dim] + raw_data_offset<dim + 1>(strides, args...);
+            return static_cast<std::ptrdiff_t>(arg) * strides[dim] + raw_data_offset<dim + 1>(strides, args...);
         }
 
         template <layout_type L, std::ptrdiff_t static_dim>
@@ -270,11 +278,17 @@ namespace xt
             // Too many arguments: drop the first
             return data_offset<offset_type, S>(strides, args...);
         }
+        else if (detail::last_type_is_missing<Args...>)
+        {
+            // Too few arguments & last argument xt::missing: postfix index with zeros
+            return static_cast<offset_type>(detail::raw_data_offset<0>(strides, arg, args...));
+        }
         else
         {
             // Too few arguments: right to left scalar product
             auto view = strides.cend() - nargs;
             return static_cast<offset_type>(detail::raw_data_offset<0>(view, arg, args...));
+
         }
     }
 
