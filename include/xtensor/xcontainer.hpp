@@ -438,7 +438,7 @@ namespace xt
     {
         XTENSOR_TRY(check_index(shape(), args...));
         XTENSOR_CHECK_DIMENSION(shape(), args...);
-        size_type index = xt::data_offset<size_type>(strides(), static_cast<std::ptrdiff_t>(args)...);
+        size_type index = xt::data_offset<size_type>(strides(), args...);
         return storage()[index];
     }
 
@@ -454,7 +454,7 @@ namespace xt
     {
         XTENSOR_TRY(check_index(shape(), args...));
         XTENSOR_CHECK_DIMENSION(shape(), args...);
-        size_type index = xt::data_offset<size_type>(strides(), static_cast<std::ptrdiff_t>(args)...);
+        size_type index = xt::data_offset<size_type>(strides(), args...);
         return storage()[index];
     }
 

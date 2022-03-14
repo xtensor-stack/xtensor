@@ -167,6 +167,43 @@ namespace xt
         }
     }
 
+    TEST(xtensor, missign)
+    {
+        xt::xtensor<int, 2> a
+           {{0, 1, 2},
+            {3, 4, 5},
+            {6, 7, 8}};
+
+        EXPECT_EQ(a(0), 0);
+        EXPECT_EQ(a(1), 1);
+        EXPECT_EQ(a(2), 2);
+        EXPECT_EQ(a(0, 0), 0);
+        EXPECT_EQ(a(1, 0), 3);
+        EXPECT_EQ(a(2, 0), 6);
+        EXPECT_EQ(a(xt::missing), 0);
+        EXPECT_EQ(a(0, xt::missing), 0);
+        EXPECT_EQ(a(1, xt::missing), 3);
+        EXPECT_EQ(a(2, xt::missing), 6);
+        EXPECT_EQ(a(0, 0), 0);
+        EXPECT_EQ(a(0, 1), 1);
+        EXPECT_EQ(a(0, 2), 2);
+        EXPECT_EQ(a(1, 0), 3);
+        EXPECT_EQ(a(1, 1), 4);
+        EXPECT_EQ(a(1, 2), 5);
+        EXPECT_EQ(a(2, 0), 6);
+        EXPECT_EQ(a(2, 1), 7);
+        EXPECT_EQ(a(2, 2), 8);
+        EXPECT_EQ(a(9, 9, 9, 0, 0), 0);
+        EXPECT_EQ(a(9, 9, 9, 0, 1), 1);
+        EXPECT_EQ(a(9, 9, 9, 0, 2), 2);
+        EXPECT_EQ(a(9, 9, 9, 1, 0), 3);
+        EXPECT_EQ(a(9, 9, 9, 1, 1), 4);
+        EXPECT_EQ(a(9, 9, 9, 1, 2), 5);
+        EXPECT_EQ(a(9, 9, 9, 2, 0), 6);
+        EXPECT_EQ(a(9, 9, 9, 2, 1), 7);
+        EXPECT_EQ(a(9, 9, 9, 2, 2), 8);
+    }
+
     TEST(xtensor, resize)
     {
         xtensor_dynamic a;
