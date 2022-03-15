@@ -351,7 +351,7 @@ namespace xt
     inline auto xrepeat<CT, R>::element(It first, It last) const -> const_reference
     {
         auto s = stepper_begin(m_e.shape());
-        auto dimension = 0;
+        std::size_t dimension = 0;
         auto iter = first;
         while (iter != last)
         {

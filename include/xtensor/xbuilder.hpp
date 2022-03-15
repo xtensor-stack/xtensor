@@ -941,20 +941,20 @@ namespace xt
                 {
                     if (i != m_axis_1 && i != m_axis_2)
                     {
-                        idx[i] = *begin++;
+                        idx[i] = static_cast<std::size_t>(*begin++);
                     }
                 }
                 using it_vtype = typename std::iterator_traits<It>::value_type;
                 it_vtype uoffset = static_cast<it_vtype>(m_offset);
                 if (m_offset >= 0)
                 {
-                    idx[m_axis_1] = *(begin);
-                    idx[m_axis_2] = *(begin) + uoffset;
+                    idx[m_axis_1] = static_cast<std::size_t>(*(begin));
+                    idx[m_axis_2] = static_cast<std::size_t>(*(begin) + uoffset);
                 }
                 else
                 {
-                    idx[m_axis_1] = *(begin) - uoffset;
-                    idx[m_axis_2] = *(begin);
+                    idx[m_axis_1] = static_cast<std::size_t>(*(begin) - uoffset);
+                    idx[m_axis_2] = static_cast<std::size_t>(*(begin));
                 }
                 return m_source[idx];
             }
