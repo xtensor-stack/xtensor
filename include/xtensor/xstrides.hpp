@@ -642,6 +642,12 @@ namespace xt
             return true;
         }
 
+        template <class S, std::size_t dim>
+        inline bool check_in_bounds_impl(const S&, missing_type)
+        {
+            return true;
+        }
+
         template <class S, std::size_t dim, class T, class... Args>
         inline bool check_in_bounds_impl(const S& shape, T& arg, Args&... args)
         {
@@ -666,6 +672,11 @@ namespace xt
     {
         template <class S, std::size_t dim>
         inline void normalize_periodic_impl(const S&)
+        {
+        }
+
+        template <class S, std::size_t dim>
+        inline void normalize_periodic_impl(const S&, missing_type)
         {
         }
 
