@@ -7,6 +7,34 @@
 Changelog
 =========
 
+0.24.1
+------
+
+- Define tbb threshold 
+  `#2455 https://github.com/xtensor-stack/xtensor/pull/2455`
+- Export link interface to tbb
+  `#2456 https://github.com/xtensor-stack/xtensor/pull/2456`
+- has_trivial_default_constructor has been removed from libstdc++ since version 7.
+  `#2459 https://github.com/xtensor-stack/xtensor/pull/2459`
+- Added missing headers in CMake
+  `#2462 https://github.com/xtensor-stack/xtensor/pull/2462`
+- Workaround for CMake implementations that do not use C and CXX languages
+  `#2467 https://github.com/xtensor-stack/xtensor/pull/2467`
+- Fix erroneous less_equal usage in is_sorted calls 
+  `#2471 https://github.com/xtensor-stack/xtensor/pull/2471`
+- Adding xt::missing to operator()
+  `#2488 https://github.com/xtensor-stack/xtensor/pull/2488`
+- Silence unused variable warning GCC
+  `#2494 https://github.com/xtensor-stack/xtensor/pull/2494`
+- Adding xt::missing functionality to .periodic(...), .at(...), and .in_bounds(...)
+  `#2493 https://github.com/xtensor-stack/xtensor/pull/2493`
+- Fixing internal types
+  `#2492 https://github.com/xtensor-stack/xtensor/pull/2492`
+- Adding size assertion .flat(i) + adding a few tests on size assertions
+  `#2388 https://github.com/xtensor-stack/xtensor/pull/2388`
+- Adding free function xt::strides
+  `#2489 https://github.com/xtensor-stack/xtensor/pull/2489`
+
 0.24.0
 ------
 
