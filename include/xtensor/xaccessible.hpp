@@ -174,7 +174,7 @@ namespace xt
     template <class... Args>
     inline auto xconst_accessible<D>::at(Args... args) const -> const_reference
     {
-        check_access(derived_cast().shape(), static_cast<size_type>(args)...);
+        check_access(derived_cast().shape(), args...);
         return derived_cast().operator()(args...);
     }
 
@@ -273,7 +273,7 @@ namespace xt
     template <class... Args>
     inline auto xaccessible<D>::at(Args... args) -> reference
     {
-        check_access(derived_cast().shape(), static_cast<size_type>(args)...);
+        check_access(derived_cast().shape(), args...);
         return derived_cast().operator()(args...);
     }
 
@@ -316,7 +316,7 @@ namespace xt
     inline auto xaccessible<D>::periodic(Args... args) -> reference
     {
         normalize_periodic(derived_cast().shape(), args...);
-        return derived_cast()(static_cast<size_type>(args)...);
+        return derived_cast()(args...);
     }
 
     /**

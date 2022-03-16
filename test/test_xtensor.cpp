@@ -167,7 +167,7 @@ namespace xt
         }
     }
 
-    TEST(xtensor, missign)
+    TEST(xtensor, missing)
     {
         xt::xtensor<int, 2> a
            {{0, 1, 2},
@@ -202,6 +202,19 @@ namespace xt
         EXPECT_EQ(a(9, 9, 9, 2, 0), 6);
         EXPECT_EQ(a(9, 9, 9, 2, 1), 7);
         EXPECT_EQ(a(9, 9, 9, 2, 2), 8);
+
+        EXPECT_EQ(a.periodic(-1, xt::missing), a(2, xt::missing));
+        EXPECT_EQ(a.periodic(-2, xt::missing), a(1, xt::missing));
+        EXPECT_EQ(a.periodic(-3, xt::missing), a(0, xt::missing));
+
+        EXPECT_EQ(a.at(0, xt::missing), a.at(0, 0));
+        EXPECT_EQ(a.at(1, xt::missing), a.at(1, 0));
+        EXPECT_EQ(a.at(2, xt::missing), a.at(2, 0));
+
+        EXPECT_TRUE(a.in_bounds(0, xt::missing));
+        EXPECT_TRUE(a.in_bounds(1, xt::missing));
+        EXPECT_TRUE(a.in_bounds(2, xt::missing));
+        EXPECT_FALSE(a.in_bounds(3, xt::missing));
     }
 
     TEST(xtensor, resize)
