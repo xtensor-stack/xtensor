@@ -20,11 +20,17 @@
 #include <xtl/xsequence.hpp>
 #include <xtl/xspan_impl.hpp>
 
+#ifdef __GNUC__
+#define XTENSOR_UNUSED_VARIABLE __attribute__ ((unused))
+#else
+#define XTENSOR_UNUSED_VARIABLE
+#endif
+
 namespace xt
 {
     struct missing_type {};
     namespace {
-        missing_type missing;
+        missing_type XTENSOR_UNUSED_VARIABLE missing;
     }
 
     namespace detail
