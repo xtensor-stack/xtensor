@@ -651,12 +651,14 @@ namespace xt
     template <class D>
     inline auto xcontainer<D>::flat(size_type i) -> reference
     {
+        XTENSOR_ASSERT(i < size());
         return storage()[i];
     }
 
     template <class D>
     inline auto xcontainer<D>::flat(size_type i) const -> const_reference
     {
+        XTENSOR_ASSERT(i < size());
         return storage()[i];
     }
 
