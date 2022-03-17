@@ -47,6 +47,7 @@ namespace xt
     {
         return std::forward<T>(t);
     }
+    /// @endcond
 
     namespace detail
     {
@@ -144,7 +145,6 @@ namespace xt
         return e;
     }
 
-    /// @cond DOXYGEN_INCLUDE_SFINAE
     template <layout_type L = layout_type::any, class E>
     inline auto as_strided(E&& e)
         -> std::enable_if_t<(!(has_data_interface<std::decay_t<E>>::value
@@ -154,6 +154,7 @@ namespace xt
     {
         return e;
     }
+    /// @endcond
 }
 
 #endif

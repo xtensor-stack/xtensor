@@ -1,6 +1,6 @@
 PROJECT_NAME = "xtensor"
 XML_OUTPUT = xml
-INPUT = missing_macro.hpp ../include
+INPUT = ../include
 GENERATE_LATEX = NO
 GENERATE_MAN = NO
 GENERATE_RTF = NO
