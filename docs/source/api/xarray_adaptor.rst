@@ -13,8 +13,8 @@ Defined in ``xtensor/xarray.hpp``
    :project: xtensor
    :members:
 
-adapt (xarray_adaptor)
-=======================
+adapt
+=====
 
 Defined in ``xtensor/xadapt.hpp``
 
@@ -36,8 +36,23 @@ Defined in ``xtensor/xadapt.hpp``
 .. doxygenfunction:: xt::adapt(T (&)[N], SC&&, SS&&)
    :project: xtensor
 
+.. doxygenfunction:: xt::adapt(C&& pointer, const fixed_shape<X...>&);
+   :project: xtensor
+
+.. doxygenfunction:: xt::adapt(C&&, layout_type)
+   :project: xtensor
+
+.. doxygenfunction:: xt::adapt(P&&, typename A::size_type, O, layout_type, const A&)
+   :project: xtensor
+
 .. doxygenfunction:: xt::adapt_smart_ptr(P&&, const SC&, layout_type)
    :project: xtensor
 
 .. doxygenfunction:: xt::adapt_smart_ptr(P&&, const SC&, D&&, layout_type)
+   :project: xtensor
+
+.. doxygenfunction:: xt::adapt_smart_ptr(P&&, const I (&)[N], layout_type)
+   :project: xtensor
+
+.. doxygenfunction:: xt::adapt_smart_ptr(P&&, const I (&)[N], D&&, layout_type)
    :project: xtensor
