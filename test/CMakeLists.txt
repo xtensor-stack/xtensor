@@ -51,7 +51,7 @@ elseif(CPP20)
   set_compiler_flag(
     _cxx_std_flag CXX
     "-std=c++2a"  # this should work with GNU, Intel, PGI
-    "/std:c++2a"  # this should work with MSVC
+    "/std:c++20"  # this should work with MSVC
   )
   if(_cxx_std_flag)
     message(STATUS "Building with C++20")
