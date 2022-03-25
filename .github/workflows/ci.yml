@@ -38,7 +38,7 @@ jobs:
           ninja
 
     - name: Configure using CMake
-      run: cmake -Bbuild -G "Ninja" -DBUILD_TESTS=ON
+      run: cmake -Bbuild -G "Ninja" -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON
 
     - name: Install
       working-directory: build
