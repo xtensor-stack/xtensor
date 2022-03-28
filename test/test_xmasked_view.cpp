@@ -267,6 +267,8 @@ namespace xt
                                  {false, true},
                                  {true, false}};
 
+        masked_view(data_new, mask) = masked_view(2UL*data + 1UL, mask);
+
         xarray<size_t> expected = {{0, 0},
                                    {0, 7},
                                    {9, 0}};
