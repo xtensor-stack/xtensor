@@ -768,31 +768,6 @@ namespace xt
             using type = xtensor<std::size_t, N - 1>;
         };
 
-        template <class IT, class F>
-        inline xtensor<std::size_t, 0> cmp_idx(IT iter, IT end, std::ptrdiff_t inc, F&& cmp)
-        {
-            std::size_t idx = 0;
-            auto min = *iter;
-            iter += inc;
-            for (std::size_t i = 1; iter < end; iter += inc, ++i)
-            {
-                if (cmp(*iter, min))
-                {
-                    min = *iter;
-                    idx = i;
-                }
-            }
-            return xtensor<std::size_t, 0>{idx};
-        }
-
-        template <layout_type L, class E, class F>
-        inline xtensor<std::size_t, 0> arg_func_impl(const E& e, F&& f)
-        {
-            return cmp_idx(e.template begin<L>(),
-                           e.template end<L>(), 1,
-                           std::forward<F>(f));
-        }
-
         template <layout_type L, class E, class F>
         inline typename argfunc_result_type<E>::type
         arg_func_impl(const E& e, std::size_t axis, F&& cmp)
@@ -804,7 +779,10 @@ namespace xt
 
             if (e.dimension() == 1)
             {
-                return arg_func_impl<L>(e, std::forward<F>(cmp));
+                auto begin = e.template begin<L>();
+                auto end = e.template end<L>();
+                std::size_t i = std::distance(begin, std::min_element(begin, end));
+                return xtensor<size_t, 0>{i};
             }
 
             result_shape_type alt_shape;
