@@ -769,7 +769,7 @@ namespace xt
         };
 
         template <class IT, class F>
-        inline std::size_t cmp_idx(IT iter, IT end, std::ptrdiff_t inc, F&& cmp)
+        inline xtensor<std::size_t, 0> cmp_idx(IT iter, IT end, std::ptrdiff_t inc, F&& cmp)
         {
             std::size_t idx = 0;
             auto min = *iter;
@@ -782,7 +782,7 @@ namespace xt
                     idx = i;
                 }
             }
-            return idx;
+            return xtensor<std::size_t, 0>{idx};
         }
 
         template <layout_type L, class E, class F>
@@ -857,7 +857,10 @@ namespace xt
     {
         using value_type = typename E::value_type;
         auto&& ed = eval(e.derived_cast());
-        return detail::arg_func_impl<L>(ed, std::less<value_type>());
+        auto begin = ed.template begin<L>();
+        auto end = ed.template end<L>();
+        std::size_t i = std::distance(begin, std::min_element(begin, end));
+        return xtensor<size_t, 0>{i};
     }
 
     /**
@@ -884,7 +887,10 @@ namespace xt
     {
         using value_type = typename E::value_type;
         auto&& ed = eval(e.derived_cast());
-        return detail::arg_func_impl<L>(ed, std::greater<value_type>());
+        auto begin = ed.template begin<L>();
+        auto end = ed.template end<L>();
+        std::size_t i = std::distance(begin, std::max_element(begin, end));
+        return xtensor<size_t, 0>{i};
     }
 
     /**
