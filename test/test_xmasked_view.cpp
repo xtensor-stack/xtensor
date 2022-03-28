@@ -269,7 +269,7 @@ namespace xt
 
         masked_view(data_new, mask) = masked_view(2UL*data + 1UL, mask);
 
-        xarray<size_t> expected = {{0, 0},
+        xarray<size_t> expected = {{1, 0},
                                    {0, 7},
                                    {9, 0}};
         EXPECT_EQ(data_new, expected);
