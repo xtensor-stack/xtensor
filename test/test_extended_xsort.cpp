@@ -107,7 +107,7 @@ namespace xt
 
         // py_median = np.median(a)
         double py_median = 300.0;
-        EXPECT_EQ(static_cast<decltype(py_a)::value_type>(py_median), xt::median(py_a));
+        EXPECT_EQ(static_cast<std::decay<decltype(py_a)>::type::value_type>(py_median), xt::median(py_a));
     }
 
     /*py
