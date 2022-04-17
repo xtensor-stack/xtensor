@@ -12,12 +12,18 @@ namespace xt
 {
     namespace fft
     {
-        template<typename E1, typename E2, typename T = float>
+        template<typename T = double, typename E1, typename E2>
         xt::xarray<std::complex<T>> fftconvolve(E1&& xvec, E2&& yvec, std::ptrdiff_t axis = -1);
         
         namespace detail
         {
-            constexpr float PI = 3.141592653589793238463;
+            template<typename T>
+            T PI()
+            {
+                constexpr double PI = 3.141592653589793238463;
+                return PI;
+            }
+
             size_t reverseBits(size_t x, int n)
             {
                 size_t result = 0;
@@ -47,7 +53,7 @@ namespace xt
                 //Works in CPP17 and MSVC CPP14
                 //Linker error when using numeric_constants in this header
                 //auto expTable = xt::eval(xt::exp(-2 * i * ::xt::numeric_constants<T>().PI / n));
-                auto expTable = xt::eval(xt::exp(-2 * i * PI / n));
+                auto expTable = xt::eval(xt::exp(-2 * i * PI<T>() / n));
 
                 // Bit-reversed addressing permutation
                 for (size_t i = 0; i < n; i++)
@@ -104,7 +110,7 @@ namespace xt
                 //Works in CPP17 and MSVC CPP14
                 //Linker error when using numeric_constants in this header
                 //auto angles = xt::eval(::xt::numeric_constants<T>::PI * i / n);
-                auto angles = xt::eval(PI * i / n);
+                auto angles = xt::eval(PI<T>() * i / n);
                 auto j = std::complex<T>(0, 1);
                 expTable = xt::exp(-angles * j);
 
@@ -118,7 +124,7 @@ namespace xt
                 xt::view(bv, xt::range(-n + 1, xt::placeholders::_)) = xt::view(xt::conj(xt::flip(expTable)), xt::range(xt::placeholders::_, - 1));
 
                 // Convolution
-                auto cv = xt::fft::fftconvolve(av, bv);
+                auto cv = xt::fft::fftconvolve<T>(av, bv);
 
                 return xt::eval(xt::view(cv, xt::range(0, n)) * expTable);
             }
@@ -246,7 +252,7 @@ namespace xt
             return detail::ifft<typename is_complex_t<typename E1::value_type>::value_type>(e1, axis);
         }
 
-        template<typename E1, typename E2, typename T>
+        template<typename T, typename E1, typename E2>
         xt::xarray<std::complex<T>> fftconvolve(E1&& xvec, E2&& yvec, std::ptrdiff_t axis)
         {
             //we could broadcast but that could get complicated???
