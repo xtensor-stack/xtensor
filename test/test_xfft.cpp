@@ -1,9 +1,7 @@
-
-#include "xtensor/xmath.hpp"
 #include "test_common_macros.hpp"
+#include "xtensor/xmath.hpp"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xfft.hpp"
-
 
 namespace xt
 {
@@ -13,7 +11,7 @@ namespace xt
         size_t n = 8096;
         size_t A = 10;
         auto x = xt::linspace<float>(0, static_cast<float>(n - 1), n);
-        xt::xarray<float> y = A * xt::sin(2 * xt::numeric_constants<double>::PI * x * k / n);
+        xt::xarray<float> y = A * xt::sin(2 * xt::numeric_constants<float>::PI * x * k / n);
         auto res = xt::fft::fft(y) / (n / 2);
         REQUIRE(A == doctest::Approx(std::abs(res(k))).epsilon(.0001));
     }

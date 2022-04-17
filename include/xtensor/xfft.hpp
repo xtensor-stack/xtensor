@@ -1,3 +1,5 @@
+#ifndef XFFT_HPP
+#define XFFT_HPP
 
 #include "xmath.hpp"
 #include "xcomplex.hpp"
@@ -15,7 +17,7 @@ namespace xt
         
         namespace detail
         {
-
+            constexpr float PI = 3.141592653589793238463;
             size_t reverseBits(size_t x, int n)
             {
                 size_t result = 0;
@@ -41,7 +43,11 @@ namespace xt
 
                 // Trignometric table
                 auto i = xt::linspace<T>(0, n / 2 - 1, n / 2) * std::complex<T>(0, 1);
-                auto expTable = xt::eval(xt::exp(-2 * i * xt::numeric_constants<T>::PI / n));
+                //I would like to do this but there appears to be a compiler error in CPP14
+                //Works in CPP17 and MSVC CPP14
+                //Linker error when using numeric_constants in this header
+                //auto expTable = xt::eval(xt::exp(-2 * i * ::xt::numeric_constants<T>().PI / n));
+                auto expTable = xt::eval(xt::exp(-2 * i * PI / n));
 
                 // Bit-reversed addressing permutation
                 for (size_t i = 0; i < n; i++)
@@ -93,7 +99,12 @@ namespace xt
                 xt::xarray<std::complex<T>> expTable = xt::empty<std::complex<T>>({ n });
                 xt::xarray<size_t> i = xt::pow(xt::linspace<size_t>(0, n - 1, n), 2);
                 i %= (n * 2);
-                auto angles = xt::eval(xt::numeric_constants<T>::PI * i / n);
+                
+                //I would like to do this but there appears to be a compiler error in CPP14
+                //Works in CPP17 and MSVC CPP14
+                //Linker error when using numeric_constants in this header
+                //auto angles = xt::eval(::xt::numeric_constants<T>::PI * i / n);
+                auto angles = xt::eval(PI * i / n);
                 auto j = std::complex<T>(0, 1);
                 expTable = xt::exp(-angles * j);
 
@@ -273,3 +284,5 @@ namespace xt
         }
     }
 }
+
+#endif
