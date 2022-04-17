@@ -1,41 +1,19 @@
 
+#include "xtensor/xmath.hpp"
 #include "test_common_macros.hpp"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xfft.hpp"
 
-#ifdef XTENSOR_USE_XSIMD
-#ifdef __GNUC__
-template <class T>
-void print_type(T&& /*t*/)
-{
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
-}
-#endif
-void print_stats()
-{
-    std::cout << "USING XSIMD\nSIMD SIZE: " << xsimd::simd_traits<double>::size << "\n\n";
-#ifdef __GNUC__
-    print_type(xt::xarray<double>());
-    print_type(xt::xtensor<double, 2>());
-#endif
-}
-#else
-void print_stats()
-{
-    std::cout << "NOT USING XSIMD\n\n";
-};
-#endif
 
 namespace xt
 {
     TEST(xfft, fft_power_2)
     {
-        print_stats();
         size_t k = 2;
         size_t n = 8096;
         size_t A = 10;
         auto x = xt::linspace<float>(0, static_cast<float>(n - 1), n);
-        xt::xarray<float> y = A * xt::sin(2 * xt::numeric_constants<float>::PI * x * k / n);
+        xt::xarray<float> y = A * xt::sin(2 * xt::numeric_constants<double>::PI * x * k / n);
         auto res = xt::fft::fft(y) / (n / 2);
         REQUIRE(A == doctest::Approx(std::abs(res(k))).epsilon(.0001));
     }
@@ -46,7 +24,7 @@ namespace xt
         size_t n = 8;
         size_t A = 10;
         auto x = xt::linspace<float> (0, static_cast<float>(n - 1), n);
-        xt::xarray<float> y = A * xt::sin(2 * xt::numeric_constants<float>::PI * x * k / n);
+        xt::xarray<float> y = A * xt::sin(2 * xt::numeric_constants<double>::PI * x * k / n);
         auto res = xt::fft::ifft(y) / (n / 2);
         REQUIRE(A == doctest::Approx(std::abs(res(k))).epsilon(.0001));
     }
@@ -72,7 +50,7 @@ namespace xt
         size_t A = 1;
         size_t dim = 100;
         auto x = xt::linspace<float>(0, n - 1, n) * xt::ones<float>({dim, n});
-        xt::xarray<float> y = A * xt::sin(2 * xt::numeric_constants<float>::PI * x * k / n);
+        xt::xarray<float> y = A * xt::sin(2 * xt::numeric_constants<double>::PI * x * k / n);
         y = xt::transpose(y);
         auto res = xt::fft::fft(y, 0) / (n / 2.0);
         REQUIRE(A == doctest::Approx(std::abs(res(k, 0))).epsilon(.0001));
@@ -86,7 +64,7 @@ namespace xt
         size_t A = 1;
         size_t dim = 2;
         auto x = xt::linspace<float>(0, n - 1, n) * xt::ones<float>({ dim, n });
-        xt::xarray<float> y = A * xt::sin(2 * xt::numeric_constants<float>::PI * x * k / n);
+        xt::xarray<float> y = A * xt::sin(2 * xt::numeric_constants<double>::PI * x * k / n);
         auto res = xt::fft::fft(y) / (n / 2.0);
         REQUIRE(A == doctest::Approx(std::abs(res(0, k))).epsilon(.0001));
         REQUIRE(A == doctest::Approx(std::abs(res(1, k))).epsilon(.0001));
