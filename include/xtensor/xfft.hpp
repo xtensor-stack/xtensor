@@ -40,8 +40,8 @@ namespace xt
                 int levels = std::floor(std::log2(n));
 
                 // Trignometric table
-                auto i = xt::linspace<float>(0, n / 2 - 1, n / 2) * std::complex<float >(0, 1);
-                auto expTable = xt::eval(xt::exp(-2 * i * xt::numeric_constants<float>::PI / n));
+                auto i = xt::linspace<float>(0, n / 2 - 1, n / 2) * std::complex<float>(0, 1);
+                auto expTable = xt::eval(xt::exp(-2 * i * xt::numeric_constants<double>::PI / n));
 
                 // Bit-reversed addressing permutation
                 for (size_t i = 0; i < n; i++)
@@ -93,7 +93,7 @@ namespace xt
                 xt::xarray<std::complex<float>> expTable = xt::empty<std::complex<float>>({ n });
                 xt::xarray<size_t> i = xt::pow(xt::linspace<size_t>(0, n - 1, n), 2);
                 i %= (n * 2);
-                auto angles = xt::eval(xt::numeric_constants<float>::PI * i / n);
+                auto angles = xt::eval(xt::numeric_constants<double>::PI * i / n);
                 auto j = std::complex<float>(0, 1);
                 expTable = xt::exp(-angles * j);
 
