@@ -7,7 +7,7 @@
 Iterators
 =========
 
-In addition to the iterators defined in the different types of expressions, ``xtensor`` provides
+In addition to the iterators defined in the different types of expressions, *xtensor* provides
 classes that allow to iterate over slices of an expression along a specified axis.
 
 .. toctree::

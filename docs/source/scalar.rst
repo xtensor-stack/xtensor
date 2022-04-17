@@ -10,9 +10,9 @@ Scalars and 0-D expressions
 Assignment
 ----------
 
-In ``xtensor``, scalars are handled as if they were 0-dimensional expressions. This means that when assigning
-a scalar value to an ``xarray``, the array is **not filled** with that value, but resized to become a 0-D
-array containing the scalar value:
+In *xtensor*, scalars are handled as if they were 0-dimensional expressions.
+This means that when assigning a scalar value to an :cpp:type:`xt::xarray`, the array is **not filled** with that value,
+but resized to become a 0-D array containing the scalar value:
 
 .. code::
 
@@ -94,9 +94,10 @@ Then, somewhere in your program:
     eval_mean(a, b);
     // Now b is a 0-D container holding 3.5.
 
-After that, ``b`` is a 0-dimensional array containing the mean of the elements of ``a``. Indeed, ``sum(a) / e1.size()`` is a
-0-D expression, thus when assigned to ``b``, this latter is resized. Later, you realize that you also need the sum of the elements
-of ``a``. Since the ``eval_mean`` function already computes it, you decide to return it from that function:
+After that, ``b`` is a 0-dimensional array containing the mean of the elements of ``a``.
+Indeed, ``sum(a) / e1.size()`` is a 0-D expression, thus when assigned to ``b``, this latter is resized.
+Later, you realize that you also need the sum of the elements of ``a``.
+Since the ``eval_mean()`` function already computes it, you decide to return it from that function:
 
 .. code::
 
@@ -120,8 +121,9 @@ And then you change the client code:
     double s = eval_mean(a, b);
     // Now b is a 2-D container!
 
-After that, ``b`` has become a 2-dimensional array! Indeed, since assigning a scalar to an expression does not resize it, the change in
-``eval_mean`` implementation now assigns the mean of ``a`` to each elements of ``b``.
+After that, ``b`` has become a 2-dimensional array!
+Indeed, since assigning a scalar to an expression does not resize it, the change in ``eval_mean()``
+implementation now assigns the mean of ``a`` to each elements of ``b``.
 
 This simple example shows that without consistency between scalars and 0-D expressions, refactoring the code to cache the result
 of some 0-D computation actually *silently* changes the shape of the expressions that this result is assigned to.

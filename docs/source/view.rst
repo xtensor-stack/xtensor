@@ -9,26 +9,26 @@
 Views
 =====
 
-Views are used to adapt the shape of an ``xexpression`` without changing it, nor copying it. Views are 
+Views are used to adapt the shape of an :cpp:type:`xt::xexpression` without changing it, nor copying it. Views are 
 convenient tools for assigning parts of an expression: since they do not copy the underlying expression,
-assigning to the view actually assigns to the underlying expression. `xtensor` provides many kinds of views.
+assigning to the view actually assigns to the underlying expression. *xtensor* provides many kinds of views.
 
 Sliced views
 ------------
 
-Sliced views consist of the combination of the ``xexpression`` to adapt, and a list of ``slice`` that specify how
-the shape must be adapted. Sliced views are implemented by the ``xview`` class. Objects of this type should not be
-instantiated directly, but though the ``view`` helper function.
+Sliced views consist of the combination of the :cpp:type:`xt::xexpression` to adapt, and a list of ``slice`` that specify how
+the shape must be adapted. Sliced views are implemented by the :cpp:type:`xt::xview` class. Objects of this type should not be
+instantiated directly, but though the :cpp:func:`xt::view` helper function.
 
 Slices can be specified in the following ways:
 
 - selection in a dimension by specifying an index (unsigned integer)
-- ``range(min, max)``, a slice representing the interval [min, max)
-- ``range(min, max, step)``, a slice representing the stepped interval [min, max)
-- ``all()``, a slice representing all the elements of a dimension
-- ``newaxis()``, a slice representing an additional dimension of length one
-- ``keep(i0, i1, i2, ...)`` a slice selecting non-contiguous indices to keep on the underlying expression
-- ``drop(i0, i1, i2, ...)`` a slice selecting non-contiguous indices to drop on the underlying expression
+- :cpp:func:`xt::range(min, max) <xt::range>`, a slice representing the interval [min, max)
+- :cpp:func:`xt::range(min, max, step) <xt::range>`, a slice representing the stepped interval [min, max)
+- :cpp:func:`xt::all`, a slice representing all the elements of a dimension
+- :cpp:func:`xt::newaxis`, a slice representing an additional dimension of length one
+- :cpp:func:`xt::keep(i0, i1, i2, ...) <xt::keep>` a slice selecting non-contiguous indices to keep on the underlying expression
+- :cpp:func:`xt::drop(i0, i1, i2, ...) <xt::drop>` a slice selecting non-contiguous indices to drop on the underlying expression
 
 .. code::
 
@@ -73,14 +73,15 @@ The range function supports the placeholder ``_`` syntax:
     #include <xtensor/xarray.hpp>
     #include <xtensor/xview.hpp>
 
-    using namespace xt::placeholders;  // required for `_` to work
+    using namespace xt::placeholders;  // required for ``_`` to work
 
     auto a = xt::xarray<int>::from_shape({3, 2, 4});
     auto v1 = xt::view(a, xt::range(_, 2), xt::all(), xt::range(1, _));
     // The previous line is equivalent to
     auto v2 = xt::view(a, xt::range(0, 2), xt::all(), xt::range(1, 4));
 
-``xview`` does not perform a copy of the underlying expression. This means if you modify an element of the ``xview``,
+:cpp:type:`xt::xview` does not perform a copy of the underlying expression.
+This means if you modify an element of the :cpp:type:`xt::xview`,
 you are actually also altering the underlying expression.
 
 .. code::
@@ -96,7 +97,7 @@ you are actually also altering the underlying expression.
     v1(0, 0) = 1;
     // => a(1, 0, 1) = 1
 
-The convenient methods ``row`` and ``col`` are available for 2-D expressions:
+The convenient methods :cpp:func:`xt::row` and :cpp:func:`xt::col` are available for 2-D expressions:
 
 .. code::
 
@@ -109,14 +110,18 @@ The convenient methods ``row`` and ``col`` are available for 2-D expressions:
     // => r = {1, 2}
     auto c = xt::col(a, -1);
     // => c = { 2, 4 }
-    
+
 Strided views
 -------------
 
-While the ``xt::view`` is a compile-time static expression, xtensor also contains a dynamic strided view in ``xstrided_view.hpp``.
-The strided view and the slice vector allow to dynamically push_back slices, so when the dimension is unknown at compile time, the slice
-vector can be built dynamically at runtime. Note that the slice vector is actually a type-alias for a ``std::vector`` of a ``variant`` for
-all the slice types. The strided view does not support the slices returned by the ``keep`` and ``drop`` functions.
+While the :cpp:func:`xt::view` is a compile-time static expression, xtensor also contains a dynamic
+strided view in ``xstrided_view.hpp``.
+The strided view and the slice vector allow to dynamically push_back slices, so when the dimension
+is unknown at compile time, the slice vector can be built dynamically at runtime.
+Note that the slice vector is actually a type-alias for a ``std::vector`` of a ``variant`` for
+all the slice types.
+The strided view does not support the slices returned by the :cpp:func:`xt::keep` and
+:cpp:func:`xt::drop` functions.
 
 .. code::
 
@@ -154,13 +159,15 @@ Since ``xtensor 0.16.3``, a new range syntax can be used with strided views:
     // The previous line is equivalent to
     auto v2 = xt::strided_view(a, {xt::range(0, 1), 1, xt::range(_, 2), xt::range(_, _, -1)});
 
-The ``xstrided_view`` is very efficient on contigous memory (e.g. ``xtensor`` or ``xarray``) but less efficient on xexpressions.
+The :cpp:type:`xt::xstrided_view` is very efficient on contigous memory
+(e.g. :cpp:type:`xt::xtensor` or :cpp:type:`xt::xarray`) but less efficient on\
+:cpp:type:`xt::xexpression`s.
 
 Transposed views
 ----------------
 
-``xtensor`` provides a lazy transposed view on any expression, whose layout is either row-major order or column major order. Trying to build
-a transposed view on a expression with a dynamic layout throws an exception.
+*xtensor* provides a lazy transposed view on any expression, whose layout is either row-major order or column major order.
+Trying to build a transposed view on a expression with a dynamic layout throws an exception.
 
 .. code::
 
@@ -175,13 +182,14 @@ a transposed view on a expression with a dynamic layout throws an exception.
     auto tr2 = xt::transpose(b);
     // => throw transpose_error
 
-Like the strided view, the transposed view is built upon the ``xstrided_view``.
+Like the strided view, the transposed view is built upon the :cpp:type:`xt::xstrided_view`.
 
 Flatten views
 -------------
 
-It is sometimes useful to have a one-dimensional view of all the elements of an expression. ``xtensor`` provides two functions
-for that, ``ravel`` and ``flatten``. The former one lets you specify the order used to read the elements while the latter one
+It is sometimes useful to have a one-dimensional view of all the elements of an expression.
+*xtensor* provides two functions for that, :cpp:func:`xt::ravel` and :cpp:func:`xt::flatten`.
+The former one lets you specify the order used to read the elements while the latter one
 uses the layout of the expression.
 
 .. code::
@@ -198,7 +206,7 @@ uses the layout of the expression.
     std::cout << fl << std::endl;
     // => prints { 0, 1, 2, 3, 4, 5 }
 
-Like the strided view and the transposed view, the flatten view is built upon the ``xstrided_view``.
+Like the strided view and the transposed view, the flatten view is built upon the :cpp:type:`xt::xstrided_view`.
 
 Reshape views
 -------------
@@ -220,14 +228,15 @@ the view modifies the underlying expression.
     v(0, 2, 0) = 4;
     // a(0, 1, 2) == 4
 
-Like the strided view and the transposed view, the reshape view is built upon the ``xstrided_view``.
+Like the strided view and the transposed view, the reshape view is built upon the :cpp:type:`xt::xstrided_view`.
 
 Dynamic views
 -------------
 
-The dynamic view is like the strided view, but with support of the slices returned by the ``keep`` and ``drop`` functions.
-However, this support has a cost and the dynamic view is slower than the strided view, even when no keeping or dropping of a 
-slice is involved.
+The dynamic view is like the strided view, but with support of the slices returned by the
+:cpp:func:`xt::keep` and :cpp:func:`xt::drop` functions.
+However, this support has a cost and the dynamic view is slower than the strided view, even when no
+keeping or dropping of a slice is involved.
 
 .. code::
 
@@ -250,9 +259,10 @@ slice is involved.
 Index views
 -----------
 
-Index views are one-dimensional views of an ``xexpression``, containing the elements whose positions are specified by a list
-of indices. Like for sliced views, the elements of the underlying ``xexpression`` are not copied. Index views should be built
-with the ``index_view`` helper function.
+Index views are one-dimensional views of an :cpp:type:`xt::xexpression`, containing the elements
+whose positions are specified by a list of indices.
+Like for sliced views, the elements of the underlying :cpp:type:`xt::xexpression` are not copied.
+Index views should be built with the :cpp:func:`xt::index_view` helper function.
 
 .. code::
 
@@ -265,8 +275,8 @@ with the ``index_view`` helper function.
     b += 100;
     // => a = {{101, 5, 3}, {104, 105, 6}}
 
-The type used for representing indices can be any 1-D container providing an std::vector-like API. The same stands for the type
-of the list of indices:
+The type used for representing indices can be any 1-D container providing an ``std::vector``-like API.
+The same stands for the type of the list of indices:
 
 .. code::
 
@@ -284,8 +294,9 @@ of the list of indices:
 Filter views
 ------------
 
-Filters are one-dimensional views holding elements of an ``xexpression`` that verify a given condition. Like for other views,
-the elements of the underlying ``xexpression`` are not copied. Filters should be built with the ``filter`` helper function.
+Filters are one-dimensional views holding elements of an :cpp:type:`xt::xexpression` that verify a given condition.
+Like for other views, the elements of the underlying :cpp:type:`xt::xexpression` are not copied.
+Filters should be built with the :cpp:func:`xt::filter` helper function.
 
 .. code::
 
@@ -301,9 +312,10 @@ the elements of the underlying ``xexpression`` are not copied. Filters should be
 Filtration
 ----------
 
-Sometimes, the only thing you want to do with a filter is to assign it a scalar. Though this can be done as shown
-in the previous section, this is not the *optimal* way to do it. `xtensor` provides a specially optimized mechanism
-for that, called filtration. A filtration IS NOT an ``xexpression``, the only methods it provides are scalar and
+Sometimes, the only thing you want to do with a filter is to assign it a scalar.
+Though this can be done as shown in the previous section, this is not the *optimal* way to do it.
+*xtensor* provides a specially optimized mechanism for that, called filtration.
+A filtration IS NOT an :cpp:type:`xt::xexpression`, the only methods it provides are scalar and
 computed scalar assignments.
 
 .. code::
@@ -318,7 +330,7 @@ computed scalar assignments.
 Masked view
 -----------
 
-Masked views are multidimensional views that apply a mask on an ``xexpression``.
+Masked views are multidimensional views that apply a mask on an :cpp:type:`xt::xexpression`.
 
 .. code::
 
@@ -337,9 +349,10 @@ Masked views are multidimensional views that apply a mask on an ``xexpression``.
 Broadcasting views
 ------------------
 
-Another type of view provided by `xtensor` is *broadcasting view*. Such a view broadcasts an expression to the specified
-shape. As long as the view is not assigned to an array, no memory allocation or copy occurs. Broadcasting views should be
-built with the ``broadcast`` helper function.
+Another type of view provided by *xtensor* is *broadcasting view*.
+Such a view broadcasts an expression to the specified shape.
+As long as the view is not assigned to an array, no memory allocation or copy occurs.
+Broadcasting views should be built with the :cpp:func:`xt::broadcast` helper function.
 
 .. code::
 
@@ -357,16 +370,22 @@ built with the ``broadcast`` helper function.
 Complex views
 -------------
 
-In the case of a tensor containing complex numbers, `xtensor` provides views returning ``xexpression`` corresponding to the real
-and imaginary parts of the complex numbers. Like for other views, the elements of the underlying ``xexpression`` are not copied.
+In the case of a tensor containing complex numbers, *xtensor* provides views returning
+:cpp:type:`xt::xexpression` corresponding to the real and imaginary parts of the complex numbers.
+Like for other views, the elements of the underlying :cpp:type:`xt::xexpression` are not copied.
 
-Functions ``xt::real`` and ``xt::imag`` respectively return views on the real and imaginary part of a complex expression.
+Functions :cpp:func:`xt::real` and :cpp:func:`xt::imag` respectively return views on the real and
+imaginary part of a complex expression.
 The returned value is an expression holding a closure on the passed argument.
 
-- The constness and value category (rvalue / lvalue) of ``real(a)`` is the same as that of ``a``. Hence, if ``a`` is a non-const lvalue,
-  ``real(a)`` is an non-const lvalue reference, to which one can assign a real expression.
-- If ``a`` has complex values, the same holds for ``imag(a)``. The constness and value category of ``imag(a)`` is the same as that of ``a``.
-- If ``a`` has real values, ``imag(a)`` returns ``zeros(a.shape())``.
+- The constness and value category (rvalue / lvalue) of :cpp:func:`xt::real(a) <xt::real>` is the same
+  as that of ``a``.
+  Hence, if ``a`` is a non-const lvalue, :cpp:func:`xt::real(a) <xt::real>` is an non-const lvalue
+  reference, to which one can assign a real expression.
+- If ``a`` has complex values, the same holds for :cpp:func:`xt::imag(a) <xt::imag>`.
+  The constness and value category of :cpp:func:`xt::imag(a) <xt::imag>` is the same as that of ``a``.
+- If ``a`` has real values, :cpp:func:`xt::imag(a) <xt::imag>` returns
+  :cpp:func:`xt::zeros(a.shape()) <xt::zeros>`.
 
 .. code::
 
@@ -386,8 +405,9 @@ The returned value is an expression holding a closure on the passed argument.
 Assigning to a view
 -------------------
 
-When assigning an expression ``rhs`` to a container such as ``xarray``, the container is resized so its shape is the same as the one
-of ``rhs``. However, since views *cannot be resized*, when assigning an expression to a view, broadcasting rules are applied:
+When assigning an expression ``rhs`` to a container such as :cpp:type:`xt::xarray`, the container
+is resized so its shape is the same as the one of ``rhs``.
+However, since views *cannot be resized*, when assigning an expression to a view, broadcasting rules are applied:
 
 .. code::
 

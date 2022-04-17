@@ -10,16 +10,16 @@
 Expressions and lazy evaluation
 ===============================
 
-`xtensor` is more than an N-dimensional array library: it is an expression engine that allows numerical computation on any object implementing the expression interface.
-These objects can be in-memory containers such as ``xarray<T>`` and ``xtensor<T>``, but can also be backed by a database or a representation on the file system. This
-also enables creating adaptors as expressions for other data structures.
+*xtensor* is more than an N-dimensional array library: it is an expression engine that allows numerical computation on any object implementing the expression interface.
+These objects can be in-memory containers such as :cpp:type:`xt::xarray\<T\>` and :cpp:type:`xt::xtensor\<T\>`, but can also be backed by a database or a representation on the file system.
+This also enables creating adaptors as expressions for other data structures.
 
 Expressions
 -----------
 
 Assume ``x``, ``y`` and ``z`` are arrays of *compatible shapes* (we'll come back to that later), the return type of an expression such as ``x + y * sin(z)`` is **not an array**.
-The result is an ``xexpression`` which offers the same interface as an N-dimensional array but does not hold any value. Such expressions can be plugged into others to build
-more complex expressions:
+The result is an :cpp:type:`xt::xexpression` which offers the same interface as an N-dimensional array but does not hold any value.
+Such expressions can be plugged into others to build more complex expressions:
 
 .. code::
 
@@ -71,8 +71,10 @@ and the size of the data, it might be convenient to store the result of the expr
 Forcing evaluation
 ------------------
 
-If you have to force the evaluation of an xexpression for some reason (for example, you want to have all results in memory to perform a sort or use external BLAS functions) then you can use ``xt::eval`` on an xexpression.
-Evaluating will either return a *rvalue* to a newly allocated container in the case of an xexpression, or a reference to a container in case you are evaluating a ``xarray`` or ``xtensor``. Note that, in order to avoid copies, you should use a universal reference on the lefthand side (``auto&&``). For example:
+If you have to force the evaluation of an xexpression for some reason (for example, you want to have all results in memory to perform a sort or use external BLAS functions) then you can use :cpp:func:`xt::eval` on an xexpression.
+Evaluating will either return a *rvalue* to a newly allocated container in the case of an xexpression, or a reference to a container in case you are evaluating a :cpp:type:`xt::xarray` or :cpp:type:`xt::xtensor`.
+Note that, in order to avoid copies, you should use a universal reference on the lefthand side (``auto&&``).
+For example:
 
 .. code::
 
@@ -86,23 +88,23 @@ Evaluating will either return a *rvalue* to a newly allocated container in the c
 Broadcasting
 ------------
 
-The number of dimensions of an ``xexpression`` and the sizes of these dimensions are provided by the ``shape()`` method, which returns a sequence of unsigned integers
-specifying the size of each dimension. We can operate on expressions of different shapes of dimensions in an elementwise fashion. Broadcasting rules of `xtensor` are
-similar to those of Numpy_ and libdynd_.
+The number of dimensions of an :cpp:type:`xt::xexpression` and the sizes of these dimensions are provided by the :cpp:func:`~xt::xexpression::shape` method, which returns a sequence of unsigned integers
+specifying the size of each dimension. We can operate on expressions of different shapes of dimensions in an elementwise fashion.
+Broadcasting rules of *xtensor* are similar to those of Numpy_ and libdynd_.
 
 In an operation involving two arrays of different dimensions, the array with the lesser dimensions is broadcast across the leading dimensions of the other.
 For example, if ``A`` has shape ``(2, 3)``, and ``B`` has shape ``(4, 2, 3)``, the result of a broadcast operation with ``A`` and ``B`` has shape ``(4, 2, 3)``.
 
-.. code::
+.. code:: none
 
        (2, 3) # A
     (4, 2, 3) # B
     ---------
     (4, 2, 3) # Result
 
-The same rule holds for scalars, which are handled as 0-D expressions. If `A` is a scalar, the equation becomes:
+The same rule holds for scalars, which are handled as 0-D expressions. If ``A`` is a scalar, the equation becomes:
 
-.. code::
+.. code:: none
 
            () # A
     (4, 2, 3) # B
@@ -112,7 +114,7 @@ The same rule holds for scalars, which are handled as 0-D expressions. If `A` is
 If matched up dimensions of two input arrays are different, and one of them has size ``1``, it is broadcast to match the size of the other. Let's say B has the shape ``(4, 2, 1)``
 in the previous example, so the broadcasting happens as follows:
 
-.. code::
+.. code:: none
 
        (2, 3) # A
     (4, 2, 1) # B
@@ -122,7 +124,7 @@ in the previous example, so the broadcasting happens as follows:
 Accessing elements
 ------------------
 
-You can access the elements of any ``xexpression`` with ``operator()``:
+You can access the elements of any :cpp:type:`xt::xexpression` with :cpp:func:`~xt::xexpression::operator()()`:
 
 .. code::
 
@@ -134,11 +136,11 @@ You can access the elements of any ``xexpression`` with ``operator()``:
     double d1 = a(0, 2);
     double d2 = f(1, 2);
 
-It is possible to call ``operator()`` with fewer or more arguments than the number of dimensions
+It is possible to call :cpp:func:`~xt::xexpression::operator()()` with fewer or more arguments than the number of dimensions
 of the expression:
 
-- if ``operator()`` is called with too many arguments, we drop the most left ones
-- if ``operator()`` is called with too few arguments, we prepend them with ``0`` values until
+- if :cpp:func:`~xt::xexpression::operator()()` is called with too many arguments, we drop the most left ones
+- if :cpp:func:`~xt::xexpression::operator()()` is called with too few arguments, we prepend them with ``0`` values until
   we match the number of dimensions
 
 .. code::
@@ -156,13 +158,13 @@ i.e. commutativity of element access and broadcasting.
 Expression interface
 --------------------
 
-All ``xexpression`` s in `xtensor` provide at least the following interface:
+All :cpp:type:`xt::xexpression` s in :cpp:type:`xt::xtensor` provide at least the following interface:
 
 Shape
 ~~~~~
 
-- ``dimension()`` returns the number of dimensions of the expression.
-- ``shape()`` returns the shape of the expression.
+- :cpp:func:`~xt::xexpression::dimension`: returns the number of dimensions of the expression.
+- :cpp:func:`~xt::xexpression::shape`: returns the shape of the expression.
 
 .. code::
 
@@ -181,12 +183,18 @@ Shape
 Element access
 ~~~~~~~~~~~~~~
 
-- ``operator()`` is an access operator that can take multiple integral arguments or none.
-- ``at()`` is similar to ``operator()`` but checks that its number of arguments does not exceed the number of dimensions, and performs bounds checking. This should not be used where you expect ``operator()`` to perform broadcasting.
-- ``operator[]`` has two overloads: one that takes a single integral argument and is equivalent to the call of ``operator()`` with one argument, and one with a single multi-index argument, which can be of a size determined at runtime. This operator also supports braced initializer arguments.
-- ``element()`` is an access operator which takes a pair of iterators on a container of indices.
-- ``periodic()`` is the equivalent of ``operator()`` that can deal with periodic indices (for example ``-1`` for the last item along an axis).
-- ``in_bounds()`` returns a ``bool`` that is ``true`` only if indices are valid for the array.
+- :cpp:func:`~xt::xexpression::operator()()` is an access operator that can take multiple integral arguments or none.
+- :cpp:func:`~xt::xexpression::at` is similar to :cpp:func:`~xt::xexpression::operator()()` but checks that its number
+  of arguments does not exceed the number of dimensions, and performs bounds checking.
+  This should not be used where you expect :cpp:func:`~xt::xexpression::operator()()` to perform broadcasting.
+- :cpp:func:`~xt::xexpression::operator[]` has two overloads: one that takes a single integral argument and is
+  equivalent to the call of :cpp:func:`~xt::xexpression::operator()()` with one argument, and one with a single
+  multi-index argument, which can be of a size determined at runtime.
+  This operator also supports braced initializer arguments.
+- :cpp:func:`~xt::xexpression::element` is an access operator which takes a pair of iterators on a container of indices.
+- :cpp:func:`~xt::xexpression::periodic` is the equivalent of :cpp:func:`~xt::xexpression::operator()()` that can deal
+  with periodic indices (for example ``-1`` for the last item along an axis).
+- :cpp:func:`~xt::xexpression::in_bounds` returns a ``bool`` that is ``true`` only if indices are valid for the array.
 
 .. code::
 
@@ -203,12 +211,26 @@ Element access
 Iterators
 ~~~~~~~~~
 
-- ``begin()`` and ``end()`` return instances of ``xiterator`` which can be used to iterate over all the elements of the expression. The layout of the iteration can be specified
-  through the ``layout_type`` template parameter, accepted values are ``layout_type::row_major`` and ``layout_type::column_major``. If not specified, ``XTENSOR_DEFAULT_TRAVERSAL`` is used.
-  This iterator pair permits to use algorithms of the STL with ``xexpression`` as if they were simple containers.
-- ``begin(shape)`` and ``end(shape)`` are similar but take a *broadcasting shape* as an argument. Elements are iterated upon in ``XTENSOR_DEFAULT_TRAVERSAL`` if no ``layout_type`` template parameter is specified. Certain dimensions are repeated to match the provided shape as per the rules described above.
-- ``rbegin()`` and ``rend()`` return instances of ``xiterator`` which can be used to iterate over all the elements of the reversed expression. As ``begin()`` and ``end()``, the layout of the iteration can be specified through the ``layout_type`` parameter.
-- ``rbegin(shape)`` and ``rend(shape)`` are the reversed counterpart of ``begin(shape)`` and ``end(shape)``.
+- :cpp:func:`~xt::xexpression::begin` and :cpp:func:`~xt::xexpression::end` return instances of :cpp:type:`xt::xiterator`
+  which can be used to iterate over all the elements of the expression.
+  The layout of the iteration can be specified through the :cpp:enum:`xt::layout_type` template parameter, accepted values
+  are :cpp:enumerator:`xt::layout_type::row_major` and :cpp:enumerator:`xt::layout_type::column_major`.
+  If not specified, :c:macro:`XTENSOR_DEFAULT_TRAVERSAL` is used.
+  This iterator pair permits to use algorithms of the STL with :cpp:type:`xt::xexpression` as if they were simple containers.
+- :cpp:func:`begin(shape) <xt::xiterator xt::xexpression::begin(xt::xshape)>` and
+  :cpp:func:`end(shape) <xt::xiterator xt::xexpression::end(xt::xshape)>` are similar but take a *broadcasting shape*
+  as an argument.
+  Elements are iterated upon in :c:macro:`XTENSOR_DEFAULT_TRAVERSAL` if no :cpp:enum:`xt::layout_type` template parameter
+  is specified.
+  Certain dimensions are repeated to match the provided shape as per the rules described above.
+- :cpp:func:`~xt::xexpression::rbegin` and :cpp:func:`~xt::xexpression::rend` return instances of :cpp:type:`xt::xiterator`
+  which can be used to iterate over all the elements of the reversed expression.
+  As :cpp:func:`~xt::xexpression::begin` and :cpp:func:`~xt::xexpression::end`, the layout of the iteration can be
+  specified through the :cpp:enum:`xt::layout_type` parameter.
+- :cpp:func:`rbegin(shape) <xt::xiterator xt::xexpression::rbegin(xt::xshape)>` and
+  :cpp:func:`rend(shape) <xt::xiterator xt::xexpression::rend(xt::xshape)>` are the reversed counterpart of
+  :cpp:func:`begin(shape) <xt::xiterator xt::xexpression::begin(xt::xshape)>` and
+  :cpp:func:`end(shape) <xiterator xt::xexpression::end(xt::xshape)>`.
 
 .. _NumPy: http://www.numpy.org
 .. _libdynd: http://libdynd.org

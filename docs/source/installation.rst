@@ -21,7 +21,7 @@
 Installation
 ============
 
-Although ``xtensor`` is a header-only library, we provide standardized means to
+Although *xtensor* is a header-only library, we provide standardized means to
 install it, with package managers or with cmake.
 
 Besides the xtensor headers, all these methods place the ``cmake`` project
@@ -67,7 +67,7 @@ A package for xtensor is available on the Spack package manager.
 From source with cmake
 ----------------------
 
-You can also install ``xtensor`` from source with cmake. This requires that you
+You can also install *xtensor* from source with cmake. This requires that you
 have the xtl_ library installed on your system. On Unix platforms, from the
 source directory:
 
@@ -89,12 +89,12 @@ On Windows platforms, from the source directory:
     nmake install
 
 ``path_to_prefix`` is the absolute path to the folder where cmake searches for
-dependencies and installs libraries. ``xtensor`` installation from cmake assumes
+dependencies and installs libraries. *xtensor* installation from cmake assumes
 this folder contains ``include`` and ``lib`` subfolders.
 
 See the :doc:`build-options` section for more details about cmake options.
 
-Although not officially supported, ``xtensor`` can be installed with MinGW:
+Although not officially supported, *xtensor* can be installed with MinGW:
 
 .. code::
 
@@ -107,8 +107,8 @@ Although not officially supported, ``xtensor`` can be installed with MinGW:
 Including xtensor in your project
 ---------------------------------
 
-The different packages of ``xtensor`` are built with cmake, so whatever the
-installation mode you choose, you can add ``xtensor`` to your project using cmake:
+The different packages of *xtensor* are built with cmake, so whatever the
+installation mode you choose, you can add *xtensor* to your project using cmake:
 
 .. code::
 

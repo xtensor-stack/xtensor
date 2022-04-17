@@ -915,4 +915,27 @@ namespace xt
 
         EXPECT_EQ(expected, xt::cov(x, y));
     }
+
+
+    TEST(xmath, convolve_full)
+    {
+        xt::xarray<double> x = { 1.0, 3.0, 1.0 };
+        xt::xarray<double> y = { 1.0, 1.0, 1.0 };
+        xt::xarray<double> expected = { 1, 4, 5, 4, 1 };
+
+        auto result = xt::convolve(x, y, xt::convolve_mode::full());
+
+        EXPECT_EQ(result, expected);
+    }
+
+    TEST(xmath, convolve_valid)
+    {
+        xt::xarray<double> x = { 3.0, 1.0, 1.0 };
+        xt::xarray<double> y = { 1.0, 1.0, 1.0 };
+        xt::xarray<double> expected = { 5 };
+
+        auto result = xt::convolve(x, y, xt::convolve_mode::valid());
+
+        EXPECT_EQ(result, expected);
+    }
 }

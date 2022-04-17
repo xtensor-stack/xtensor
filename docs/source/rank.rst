@@ -12,7 +12,7 @@ Tensor Rank
 Rank overload
 -------------
 
-All `xtensor`'s classes have a member ``rank`` that can be used
+All *xtensor*'s classes have a member ``rank`` that can be used
 to overload based on rank using *SFINAE*.
 Consider the following example:
 
@@ -81,7 +81,8 @@ Consider the following example:
 Rank as member
 --------------
 
-If you want to use the rank as a member of your own class you can use ``xt::get_rank<E>``.
+If you want to use the rank as a member of your own class you can use
+:cpp:type:`xt::get_rank\<E\> <xt::get_rank>`.
 Consider the following example:
 
 .. code-block:: cpp

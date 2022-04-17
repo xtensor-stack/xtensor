@@ -11,7 +11,7 @@ Motivation
 ----------
 
 Arrays can be very large and may not fit in memory. In this case, you may not be
-able to use an in-memory array such as an ``xarray``. A solution to this problem
+able to use an in-memory array such as an :cpp:type:`xt::xarray`. A solution to this problem
 is to cut up the large array into many small arrays, called chunks. Not only do
 the chunks fit comfortably in memory, but this also allows to process them in
 parallel, including in a distributed environment (although this is not supported
@@ -40,7 +40,7 @@ An in-memory chunked array has the following type:
     using inmemory_chunked_array = xt::xchunked_array<xarray<xarray<data_type>>>;
 
 But you should not directly use this type to create a chunked array. Instead,
-use the `chunked_array` factory function:
+use the ``chunked_array`` factory function:
 
 .. code::
 
@@ -55,7 +55,7 @@ use the `chunked_array` factory function:
     a(3, 9, 2) = 1.;  // this will address the chunk of index (1, 3, 0)
                       // and in this chunk, the element of index (1, 0, 2)
 
-Chunked arrays implement the full semantic of ``xarray``, including lazy
+Chunked arrays implement the full semantic of :cpp:type:`xt::xarray`, including lazy
 evaluation.
 
 Stored chunked arrays

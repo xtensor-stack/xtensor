@@ -9,7 +9,7 @@
 Concepts
 ========
 
-`xtensor`'s core is built upon key concepts captured in interfaces that are put together in derived
+*xtensor*'s core is built upon key concepts captured in interfaces that are put together in derived
 classes through CRTP (`Curiously Recurring Template Pattern
 <https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern>`_) and multiple inheritance.
 Interfaces and classes that model expressions implement *value semantic*. CRTP and value semantic
@@ -19,10 +19,10 @@ dispatching.
 xexpression
 ~~~~~~~~~~~
 
-``xexpression`` is the base class for all expression classes. It is a CRTP base whose template
+:cpp:type:`xt::xexpression` is the base class for all expression classes. It is a CRTP base whose template
 parameter must be the most derived class in the hierarchy. For instance, if ``A`` inherits
-from ``B`` which in turn inherits from ``xexpression``, then ``B`` should be a template
-class whose template parameter is ``A`` and should forward this parameter to ``xexpression``:
+from ``B`` which in turn inherits from :cpp:type:`xt::xexpression`, then ``B`` should be a template
+class whose template parameter is ``A`` and should forward this parameter to :cpp:type:`xt::xexpression`:
 
 .. code::
 
@@ -39,7 +39,7 @@ class whose template parameter is ``A`` and should forward this parameter to ``x
         // ...
     };
 
-``xexpression`` only provides three overloads of a same function, that cast an ``xexpression``
+:cpp:type:`xt::xexpression` only provides three overloads of a same function, that cast an :cpp:type:`xt::xexpression`
 object to the most inheriting type, depending on the nature of the object (*lvalue*,
 *const lvalue* or *rvalue*):
 
@@ -89,17 +89,17 @@ you to iterate over a N-dimensional expression in row-major order or column-majo
     const_reverse_iterator crend() const noexcept;
 
 This template parameter is defaulted to ``XTENSOR_DEFAULT_TRAVERSAL`` (see :ref:`configuration-label`), so
-that `xtensor` expressions can be used in generic code such as:
+that *xtensor* expressions can be used in generic code such as:
 
 .. code::
 
     std::copy(a.cbegin(), a.cend(), b.begin());
 
-where ``a`` and ``b`` can be arbitrary types (from `xtensor`, the STL or any external library)
+where ``a`` and ``b`` can be arbitrary types (from *xtensor*, the STL or any external library)
 supporting standard iteration.
 
 ``xiterable`` inherits from ``xconst_iterable`` and provides non-const counterpart of methods
-defined in ``xconst_iterable``. Like ``xexpression``, both are CRTP classes whose template
+defined in ``xconst_iterable``. Like :cpp:type:`xt::xexpression`, both are CRTP classes whose template
 parameter must be the most derived type.
 
 Besides traditional methods for iterating, ``xconst_iterable`` and ``xiterable`` provide overloads
@@ -160,7 +160,7 @@ The first overload is meant for computed assignment involving a scalar; it allow
 We rely on SFINAE to remove this overload from the overload resolution set when the parameter that we want
 to assign is not a scalar, avoiding ambiguity.
 
-Operator-based methods taking a general ``xexpression`` parameter don't perform a direct assignment. Instead,
+Operator-based methods taking a general :cpp:type:`xt::xexpression` parameter don't perform a direct assignment. Instead,
 the result is assigned to a temporary variable first, in order to prevent issues with aliasing. Thus, if ``a``
 and ``b`` are expressions, the following
 
@@ -191,9 +191,9 @@ Temporaries can be avoided with the assign-based methods:
     derived_type& modulus_assign(const xexpression<E>&);
 
 ``xsemantic_base`` is a CRTP class whose parameter must be the most derived type in the hierarchy. It inherits
-from ``xexpression`` and forwards its template parameter to this latter one.
+from :cpp:type:`xt::xexpression` and forwards its template parameter to this latter one.
 
-``xsemantic_base`` also provides a assignment operator that takes an ``xexpression`` in its protected section:
+``xsemantic_base`` also provides a assignment operator that takes an :cpp:type:`xt::xexpression` in its protected section:
 
 .. code::
 

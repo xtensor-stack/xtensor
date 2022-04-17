@@ -159,7 +159,7 @@ namespace xt
         template <class T, class I, std::size_t L, class E = random::default_engine_type>
         auto chi_squared(const I (&shape)[L], T deg = 1.0,
                          E& engine = random::get_default_random_engine());
-                         
+
         template <class T, class I, std::size_t L, class E = random::default_engine_type>
         auto cauchy(const I (&shape)[L], T a = 0.0, T b = 1.0,
                     E& engine = random::get_default_random_engine());

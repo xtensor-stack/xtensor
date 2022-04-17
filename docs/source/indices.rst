@@ -43,8 +43,8 @@ Operators: array index
 An *array index* can be specified to an operators by a sequence of numbers.
 To this end the following operators are at your disposal:
 
-``operator()(args...)``
-^^^^^^^^^^^^^^^^^^^^^^^
+:cpp:func:`operator()(args...) <xt::xcontainer::operator>`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 *   Example: ``a(1, 2) == 6``.
 *   See also: :cpp:func:`xt::xcontainer::operator()`.
@@ -62,27 +62,27 @@ specified by an *array index* given by a number of unsigned integers.
 *   To post-pad an arbitrary number of zeros use ``xt::missing``
     (example ``a(2, xt::missing) == a(2, 0) == 8``.
 
-``at(args...)``
-^^^^^^^^^^^^^^^
+:cpp:func:`at(args...) <xt::xcontainer::at>`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 *   Example: ``a.at(1, 2) == 6``.
 *   See also: :cpp:func:`xt::xcontainer::at`.
 
-Same as ``operator()``:
+Same as :cpp:func:`~xt::xcontainer::operator()`:
 Returns a (constant) reference to the element,
 specified by an *array index* given by a number of unsigned integers.
 
-``unchecked(args...)``
-^^^^^^^^^^^^^^^^^^^^^^
+:cpp:func:`unchecked(args...) <xt::xcontainer::unchecked>`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 *   Example: ``a.unchecked(1, 2) == 6``.
 *   See also: :cpp:func:`xt::xcontainer::unchecked`.
 
 Returns a (constant) reference to the element,
 specified by an *array index* given by a number of unsigned integers.
-Different than ``operator()`` there are no bounds checks (even when assertions) are turned on,
-and the number of indices is assumed to match the dimension of the array.
-``unchecked`` is thus aimed at performance.
+Different than :cpp:func:`~xt::xcontainer::operator()` there are no bounds checks (even when assertions)
+are turned on, and the number of indices is assumed to match the dimension of the array.
+:cpp:func:`~xt::xcontainer::unchecked` is thus aimed at performance.
 
 .. note::
 
@@ -90,8 +90,8 @@ and the number of indices is assumed to match the dimension of the array.
     post-pad zeros if you specify less indices than the rank of the array.
     Example: ``a.unchecked(1) == a(1, 0)``.
 
-``periodic(args...)``
-^^^^^^^^^^^^^^^^^^^^^
+:cpp:func:`periodic(args...) <xt::xcaontainer::periodic>`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 *   Example: ``a.periodic(-1, -2) == 7``.
 *   See also: :cpp:func:`xt::xcontainer::periodic`.
@@ -103,16 +103,16 @@ For example, for the first axis: ``-1 -> a.shape(0) - 1 = 2``,
 likewise for example ``3 -> 3 - a.shape(0) = 0``.
 Of course this comes as the cost of some extra complexity.
 
-``in_bounds(args...)``
-^^^^^^^^^^^^^^^^^^^^^^
+:cpp:func:`in_bounds(args...) <xt::xcontainer::in_bounds>`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 *   Example: ``a.in_bounds(1, 2) == true``.
 *   See also: :cpp:func:`xt::xcontainer::in_bounds`.
 
 Check if the *array index* is 'in bounds', return ``false`` otherwise.
 
-``operator[]({...})``
-^^^^^^^^^^^^^^^^^^^^^^
+:cpp:func:`operator[]({...}) <xt::xcontainer::operator[]>`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 *   Example: ``a[{1, 2}] == 6``.
 *   See also: :cpp:func:`xt::xcontainer::operator[]`.
@@ -123,8 +123,8 @@ specified by an *array index* given by a list of unsigned integers.
 Operators: flat index
 ---------------------
 
-``flat(i)``
-^^^^^^^^^^^
+:cpp:func:`flat(i) <xt::xcontainer::flat>`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 *   Example: ``a.flat(6) == 6``.
 *   See also: :cpp:func:`xt::xcontainer::flat`.
@@ -144,7 +144,8 @@ given an unsigned integer.
 Array indices
 -------------
 
-Functions like ``xt::argwhere(a < 5)`` return a ``std::vector`` of *array indices*. Using the same matrix as above, we can do
+Functions like :cpp:func:`xt::argwhere(a \< 5) <xt::argwhere>` return a ``std::vector`` of *array indices*.
+Using the same matrix as above, we can do
 
 .. code-block:: cpp
 
@@ -170,12 +171,15 @@ which prints
      {2, 2},
      {2, 3}}
 
-To print the ``std::vector``, it is converted to a ``xt::xtensor<size_t, 2>`` array, which is done using ``xt::from_indices``.
+To print the ``std::vector``, it is converted to a :cpp:type:`xt::xtensor\<size_t, 2\> <xt::xtensor>`
+array, which is done using :cpp:func:`xt::from_indices`.
 
 From array indices to flat indices
 ----------------------------------
 
-To convert the array indices to a ``xt::xtensor<size_t, 1>`` of flat indices, ``xt::ravel_indices`` can be used. For the same example:
+To convert the array indices to a :cpp:type:`xt::xtensor\<size_t, 1\> <xt::xtensor>` of flat indices,
+:cpp:func:`xt::ravel_indices` can be used.
+For the same example:
 
 .. code-block:: cpp
 
@@ -211,7 +215,10 @@ which prints
 1-D arrays: array indices == flat indices
 -----------------------------------------
 
-For 1-D arrays the array indices and flat indices coincide. One can use the generic functions ``xt::flatten_indices`` to get a ``xt::xtensor<size_t, 1>`` of (array/flat) indices. For example:
+For 1-D arrays the array indices and flat indices coincide.
+One can use the generic functions :cpp:func:`xt::flatten_indices` to get a
+:cpp:type:`xt::xtensor\<size_t, 1\> <xt::xtensor>` of (array/flat) indices.
+For example:
 
 .. code-block:: cpp
 
@@ -240,7 +247,8 @@ which prints the indices and the selection (which are in this case identical):
 From flat indices to array indices
 ----------------------------------
 
-To convert *flat indices* to *array_indices* the function ``xt::unravel_indices`` can be used. For example
+To convert *flat indices* to *array_indices* the function :cpp:func:`xt::unravel_indices` can be used.
+For example
 
 .. code-block:: cpp
 
@@ -277,4 +285,5 @@ which prints
      {2, 2},
      {2, 3}}
 
-Notice that once again the function ``xt::from_indices`` has been used to convert a ``std::vector`` of indices to a ``xt::xtensor`` array for printing.
+Notice that once again the function :cpp:func:`xt::from_indices` has been used to convert a
+``std::vector`` of indices to a :cpp:type:`xt::xtensor` array for printing.
