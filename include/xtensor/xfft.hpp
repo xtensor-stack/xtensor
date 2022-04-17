@@ -10,7 +10,7 @@ namespace xt
 {
     namespace fft
     {
-        template<typename T, typename E1, typename E2>
+        template<typename E1, typename E2, typename T = float>
         xt::xarray<std::complex<T>> fftconvolve(E1&& xvec, E2&& yvec, std::ptrdiff_t axis = -1);
         
         namespace detail
@@ -162,7 +162,7 @@ namespace xt
         struct is_complex_t : public std::false_type 
         {
         public:
-            using value_type = typename T;
+            using value_type = T;
         };
         
         //true case
@@ -170,7 +170,7 @@ namespace xt
         struct is_complex_t<std::complex<T>> : public std::true_type 
         {
         public:
-            using value_type = typename T;
+            using value_type = T;
         };
 
         //case for integer types... We will always opt for a single precision
@@ -184,7 +184,7 @@ namespace xt
         template<class E1>
         auto fft(E1 e1, std::ptrdiff_t axis = -1, typename std::enable_if<std::is_floating_point<typename E1::value_type>::value>::type* = nullptr)
         {
-            return detail::fft<E1::value_type>(e1, axis);
+            return detail::fft<typename E1::value_type>(e1, axis);
         }
 
         //Final case for a complex type. We want to know the inner type of the complex value to match precision so we
@@ -192,7 +192,7 @@ namespace xt
         template<class E1>
         auto fft(E1 e1, std::ptrdiff_t axis = -1, typename std::enable_if<is_complex_t<typename E1::value_type>::value>::type* = nullptr)
         {
-            return detail::fft<is_complex_t<typename E1::value_type>::value_type>(e1, axis);
+            return detail::fft<typename is_complex_t<typename E1::value_type>::value_type>(e1, axis);
         }
 
         namespace detail 
@@ -217,7 +217,7 @@ namespace xt
         template<class E1>
         auto ifft(E1 e1, std::ptrdiff_t axis = -1, typename std::enable_if<std::is_floating_point<typename E1::value_type>::value>::type* = nullptr)
         {
-            return detail::ifft<E1::value_type>(e1, axis);
+            return detail::ifft<typename E1::value_type>(e1, axis);
         }
 
         //case for integer types... We will always opt for a single precision
@@ -232,10 +232,10 @@ namespace xt
         template<class E1>
         auto ifft(E1 e1, std::ptrdiff_t axis = -1, typename std::enable_if<is_complex_t<typename E1::value_type>::value>::type* = nullptr)
         {
-            return detail::ifft<is_complex_t<typename E1::value_type>::value_type>(e1, axis);
+            return detail::ifft<typename is_complex_t<typename E1::value_type>::value_type>(e1, axis);
         }
 
-        template<typename T = float, typename E1, typename E2>
+        template<typename E1, typename E2, typename T>
         xt::xarray<std::complex<T>> fftconvolve(E1&& xvec, E2&& yvec, std::ptrdiff_t axis)
         {
             //we could broadcast but that could get complicated???
