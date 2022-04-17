@@ -86,7 +86,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR (CMAKE_CXX_COMPILER_ID MATCHES "Intel"
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -DSKIP_ON_WERROR")
   endif()
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_cxx_std_flag} /MP /bigobj")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_cxx_std_flag} /MP /bigobj /arch:AVX512")
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /MANIFEST:NO")
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
   add_definitions(-D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
@@ -167,6 +167,7 @@ set(COMMON_BASE
     test_xview_semantic.cpp
     test_xutils.cpp
     test_xsimd8.cpp
+    test_xfft.cpp
 )
 
 set(XTENSOR_TESTS

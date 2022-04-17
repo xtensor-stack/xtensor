@@ -138,6 +138,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xexpression_holder.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xexpression_traits.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xfixed.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xfft.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xfunction.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xfunctor_view.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xgenerator.hpp

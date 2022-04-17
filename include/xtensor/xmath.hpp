@@ -20,8 +20,10 @@
 #include <complex>
 #include <type_traits>
 
+
 #include <xtl/xcomplex.hpp>
 #include <xtl/xtype_traits.hpp>
+
 
 #include "xaccumulator.hpp"
 #include "xeval.hpp"
@@ -343,6 +345,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         XTENSOR_UNARY_MATH_FUNCTOR(isfinite);
         XTENSOR_UNARY_MATH_FUNCTOR(isinf);
         XTENSOR_UNARY_MATH_FUNCTOR(isnan);
+        XTENSOR_UNARY_MATH_FUNCTOR(conj);
     }
 
 #undef XTENSOR_UNARY_MATH_FUNCTOR
@@ -1724,6 +1727,7 @@ namespace detail {
     {
         return detail::make_xfunction<math::isnan_fun>(std::forward<E>(e));
     }
+
 
     namespace detail
     {
