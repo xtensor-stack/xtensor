@@ -29,19 +29,19 @@ namespace xt
                 return ((vecSize & (vecSize - 1)) == 0);
             }
 
-            template<typename E1>
+            template<typename T, typename E1>
             auto transformRadix2(const E1& _data)
             {
 
-                xt::xarray<std::complex<float>> data = _data;
+                xt::xarray<std::complex<T>> data = _data;
 
                 // Length variables
                 const size_t n(data.shape(0));
                 int levels = std::floor(std::log2(n));
 
                 // Trignometric table
-                auto i = xt::linspace<float>(0, n / 2 - 1, n / 2) * std::complex<float>(0, 1);
-                auto expTable = xt::eval(xt::exp(-2 * i * xt::numeric_constants<double>::PI / n));
+                auto i = xt::linspace<T>(0, n / 2 - 1, n / 2) * std::complex<T>(0, 1);
+                auto expTable = xt::eval(xt::exp(-2 * i * xt::numeric_constants<T>::PI / n));
 
                 // Bit-reversed addressing permutation
                 for (size_t i = 0; i < n; i++)
@@ -76,10 +76,10 @@ namespace xt
                 return data;
             }
 
-            template<typename E1>
+            template<typename T, typename E1>
             auto transformBluestein(const E1& _data)
             {
-                xt::xarray<std::complex<float>> data = _data;
+                xt::xarray<std::complex<T>> data = _data;
 
                 // Find a power-of-2 convolution length m such that m >= n * 2 + 1
                 const size_t n(data.size());
@@ -90,19 +90,19 @@ namespace xt
                 }
 
                 // Trignometric table
-                xt::xarray<std::complex<float>> expTable = xt::empty<std::complex<float>>({ n });
+                xt::xarray<std::complex<T>> expTable = xt::empty<std::complex<T>>({ n });
                 xt::xarray<size_t> i = xt::pow(xt::linspace<size_t>(0, n - 1, n), 2);
                 i %= (n * 2);
-                auto angles = xt::eval(xt::numeric_constants<double>::PI * i / n);
-                auto j = std::complex<float>(0, 1);
+                auto angles = xt::eval(xt::numeric_constants<T>::PI * i / n);
+                auto j = std::complex<T>(0, 1);
                 expTable = xt::exp(-angles * j);
 
                 // Temporary vectors and preprocessing
-                xt::xarray<std::complex<float>> av = xt::empty<std::complex<float>>({ m });
+                xt::xarray<std::complex<T>> av = xt::empty<std::complex<T>>({ m });
                 xt::view(av, xt::range(0, n)) = data * expTable;
 
 
-                xt::xarray<std::complex<float>> bv = xt::empty<std::complex<float>>({ m });
+                xt::xarray<std::complex<T>> bv = xt::empty<std::complex<T>>({ m });
                 xt::view(bv, xt::range(0, n)) = xt::conj(expTable);
                 xt::view(bv, xt::range(-n + 1, xt::placeholders::_)) = xt::view(xt::conj(xt::flip(expTable)), xt::range(xt::placeholders::_, - 1));
 
@@ -112,7 +112,7 @@ namespace xt
                 return xt::eval(xt::view(cv, xt::range(0, n)) * expTable);
             }
 
-            template<typename E1>
+            template<typename T, typename E1>
             auto fft_impl(const E1& data)
             {
                 //loop through all the next highest axis
@@ -120,12 +120,12 @@ namespace xt
                 // Is power of 2
                 if (detail::IsPower2(data.size())) 
                 {
-                    return detail::transformRadix2(data);
+                    return detail::transformRadix2<T>(data);
                 }
                 //More complicated algorithm for arbitrary sizes
                 else 
                 {
-                    return detail::transformBluestein(data);
+                    return detail::transformBluestein<T>(data);
                 }
             }
 
@@ -149,7 +149,7 @@ namespace xt
 
                 for (auto iter = begin; iter != end; iter++)
                 {
-                    (*iter_out++) = detail::fft_impl(*iter);
+                    (*iter_out++) = detail::fft_impl<T>(*iter);
                 }
 
                 return complex_out;
