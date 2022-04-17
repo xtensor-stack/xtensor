@@ -3048,7 +3048,7 @@ namespace detail {
         }
 
         template <class E1, class E2>
-        inline auto convolve_impl(E1&& e1, E2&& e2, convolve_mode::full mode)
+        inline auto convolve_impl(E1&& e1, E2&& e2, convolve_mode::full)
         {
             using value_type = typename std::decay<E1>::type::value_type;
 
