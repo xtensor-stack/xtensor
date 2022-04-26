@@ -61,6 +61,23 @@ namespace xt
         delete[] data;
     }
 
+    TEST(xarray_adaptor, pointer_no_ownership_replace)
+    {
+        size_t size = 4;
+        int* data = new int[3 * size];
+        using shape_type = std::vector<vec_type::size_type>;
+        shape_type s({2, 2});
+
+        auto a1 = adapt(data, size, no_ownership(), s);
+        size_t st = static_cast<size_t>(a1.strides()[0]);
+
+        for (size_t i = 0; i < 3; ++i) {
+            a1.reset_buffer(&data[i * size], size);
+            a1(1, 0) = static_cast<int>(i);
+            EXPECT_EQ(i, data[i * size + st]);
+        }
+    }
+
     TEST(xarray_adaptor, pointer_acquire_ownership)
     {
         size_t size = 4;
@@ -209,6 +226,22 @@ namespace xt
         EXPECT_EQ(1, data[2]);
 
         delete[] data;
+    }
+
+    TEST(xtensor_adaptor, pointer_no_ownership_replace)
+    {
+        size_t size = 4;
+        int* data = new int[3 * size];
+        std::array<size_t, 2> shape = {2, 2};
+
+        auto a1 = adapt(data, size, no_ownership(), shape);
+        size_t st = static_cast<size_t>(a1.strides()[0]);
+
+        for (size_t i = 0; i < 3; ++i) {
+            a1.reset_buffer(&data[i * size], size);
+            a1(1, 0) = static_cast<int>(i);
+            EXPECT_EQ(i, data[i * size + st]);
+        }
     }
 
     TEST(xtensor_adaptor, pointer_const_no_ownership)

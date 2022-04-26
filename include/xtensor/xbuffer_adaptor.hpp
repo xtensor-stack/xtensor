@@ -77,6 +77,9 @@ namespace xt
 
             void swap(self_type& rhs) noexcept;
 
+            template <class P>
+            void reset_data(P&& data, size_type size) noexcept;
+
         private:
 
             pointer p_data;
@@ -116,6 +119,9 @@ namespace xt
             const_pointer data() const noexcept;
 
             void swap(self_type& rhs) noexcept;
+
+            template <class P, class DT>
+            void reset_data(P&& data, size_type size, DT&& destruct) noexcept;
 
         private:
 
@@ -168,6 +174,9 @@ namespace xt
 
             void swap(self_type& rhs) noexcept;
 
+            template <class P>
+            void reset_data(P&& data, size_type size, const allocator_type& alloc = allocator_type()) noexcept;
+
         private:
 
             xtl::xclosure_wrapper<CP> m_data;
@@ -177,7 +186,7 @@ namespace xt
         };
 
         // Workaround for MSVC2015: using void_t results in some
-        // template instantiation caching that leads to wrong 
+        // template instantiation caching that leads to wrong
         // type deduction later in xfunction.
         template <class T>
         struct msvc2015_void
@@ -393,6 +402,7 @@ namespace xt
         using base_type::resize;
         using base_type::data;
         using base_type::swap;
+        using base_type::reset_data;
     };
 
     template <class CP, class O, class A>
@@ -421,7 +431,7 @@ namespace xt
         using difference_type = std::common_type_t<typename traits::difference_type,
                                                    typename const_traits::difference_type>;
         using size_type = std::make_unsigned_t<difference_type>;
-        
+
         using iterator = I;
         using const_iterator = CI;
         using reverse_iterator = std::reverse_iterator<iterator>;
@@ -440,7 +450,7 @@ namespace xt
         using allocator_type = std::allocator<value_type>;
         using size_type = typename base_type::size_type;
         using iterator = typename base_type::iterator;
-        using const_iterator = typename base_type::const_iterator; 
+        using const_iterator = typename base_type::const_iterator;
         using temporary_type = uvector<value_type, allocator_type>;
 
         xiterator_adaptor() = default;
@@ -459,12 +469,12 @@ namespace xt
 
         size_type size() const noexcept;
         void resize(size_type size);
-        
+
         iterator data() noexcept;
         const_iterator data() const noexcept;
 
         void swap(self_type& rhs) noexcept;
-    
+
     private:
 
         I m_it;
@@ -523,7 +533,7 @@ namespace xt
         using allocator_type = std::allocator<value_type>;
         using size_type = typename base_type::size_type;
         using iterator = typename base_type::iterator;
-        using const_iterator = typename base_type::const_iterator; 
+        using const_iterator = typename base_type::const_iterator;
         using temporary_type = uvector<value_type, allocator_type>;
 
         xiterator_owner_adaptor(C&& c);
@@ -541,7 +551,7 @@ namespace xt
 
         size_type size() const noexcept;
         void resize(size_type size);
-        
+
         iterator data() noexcept;
         const_iterator data() const noexcept;
 
@@ -658,6 +668,14 @@ namespace xt
             swap(p_data, rhs.p_data);
             swap(m_size, rhs.m_size);
         }
+
+        template <class CP, class A>
+        template <class P>
+        inline void xbuffer_storage<CP, A>::reset_data(P&& data, size_type size) noexcept
+        {
+            p_data = std::forward<P>(data);
+            m_size = size;
+        }
     }
 
     /****************************************
@@ -767,6 +785,14 @@ namespace xt
             swap(m_size, rhs.m_size);
             swap(m_allocator, rhs.m_allocator);
         }
+
+        template <class CP, class A>
+        template <class P>
+        inline void xbuffer_owner_storage<CP, A>::reset_data(P&& data, size_type size, const allocator_type& alloc) noexcept
+        {
+            xbuffer_owner_storage<CP, A> tmp(std::forward<P>(data), size, alloc);
+            this->swap(tmp);
+        }
     }
 
     /****************************************
@@ -793,7 +819,7 @@ namespace xt
         {
             if (m_size != size)
             {
-                XTENSOR_THROW(std::runtime_error, "xbuffer_storage not resizable");
+                XTENSOR_THROW(std::runtime_error, "xbuffer_storage not resizeable");
             }
         }
 
@@ -815,6 +841,15 @@ namespace xt
             swap(p_data, rhs.p_data);
             swap(m_size, rhs.m_size);
             swap(m_destruct, rhs.m_destruct);
+        }
+
+        template <class CP, class D>
+        template <class P, class DT>
+        void xbuffer_smart_pointer<CP, D>::reset_data(P&& data, size_type size, DT&& destruct) noexcept
+        {
+            p_data = std::forward<P>(data);
+            m_size = size;
+            m_destruct = destruct;
         }
     }
 
@@ -1020,7 +1055,7 @@ namespace xt
     /************************************
      * xiterator_adaptor implementation *
      ************************************/
-    
+
     template <class I, class CI>
     inline xiterator_adaptor<I, CI>::xiterator_adaptor(I it, CI cit, size_type size)
         : m_it(it), m_cit(cit), m_size(size)
@@ -1040,7 +1075,7 @@ namespace xt
     {
         return (*this = rhs);
     }
-    
+
     template <class I, class CI>
     inline auto xiterator_adaptor<I, CI>::size() const noexcept -> size_type
     {
@@ -1052,7 +1087,7 @@ namespace xt
     {
         if (m_size != size)
         {
-            XTENSOR_THROW(std::runtime_error, "xiterator_adaptor not resizable");
+            XTENSOR_THROW(std::runtime_error, "xiterator_adaptor not resizeable");
         }
     }
 
@@ -1076,7 +1111,7 @@ namespace xt
         swap(m_cit, rhs.m_cit);
         swap(m_size, rhs.m_size);
     }
-    
+
     template <class I, class CI>
     inline void swap(xiterator_adaptor<I, CI>& lhs,
                      xiterator_adaptor<I, CI>& rhs) noexcept
@@ -1087,7 +1122,7 @@ namespace xt
     /******************************************
      * xiterator_owner_adaptor implementation *
      ******************************************/
-    
+
     template <class C, class IG>
     inline xiterator_owner_adaptor<C, IG>::xiterator_owner_adaptor(C&& c)
         : m_container(std::move(c))
@@ -1148,10 +1183,10 @@ namespace xt
     {
         if (m_size != size)
         {
-            XTENSOR_THROW(std::runtime_error, "xiterator_owner_adaptor not resizable");
+            XTENSOR_THROW(std::runtime_error, "xiterator_owner_adaptor not resizeable");
         }
     }
-        
+
     template <class C, class IG>
     inline auto xiterator_owner_adaptor<C, IG>:: data() noexcept -> iterator
     {
