@@ -2240,7 +2240,7 @@ namespace detail {
     inline auto cumsum(E&& e, std::ptrdiff_t axis)
     {
         using init_value_type = std::conditional_t<std::is_same<T, void>::value, typename std::decay_t<E>::value_type, T>;
-        return accumulate(make_xaccumulator_functor(detail::plus(), detail::accumulator_identity<init_value_type>()), 
+        return accumulate(make_xaccumulator_functor(detail::plus(), detail::accumulator_identity<init_value_type>()),
                           std::forward<E>(e),
                           axis);
     }
@@ -2249,7 +2249,7 @@ namespace detail {
     inline auto cumsum(E&& e)
     {
         using init_value_type = std::conditional_t<std::is_same<T, void>::value, typename std::decay_t<E>::value_type, T>;
-        return accumulate(make_xaccumulator_functor(detail::plus(), detail::accumulator_identity<init_value_type>()), 
+        return accumulate(make_xaccumulator_functor(detail::plus(), detail::accumulator_identity<init_value_type>()),
                           std::forward<E>(e));
     }
 
@@ -2271,8 +2271,8 @@ namespace detail {
     inline auto cumprod(E&& e, std::ptrdiff_t axis)
     {
         using init_value_type = std::conditional_t<std::is_same<T, void>::value, typename std::decay_t<E>::value_type, T>;
-        return accumulate(make_xaccumulator_functor(detail::multiplies(), detail::accumulator_identity<init_value_type>()), 
-                          std::forward<E>(e), 
+        return accumulate(make_xaccumulator_functor(detail::multiplies(), detail::accumulator_identity<init_value_type>()),
+                          std::forward<E>(e),
                           axis);
     }
 
@@ -2280,7 +2280,7 @@ namespace detail {
     inline auto cumprod(E&& e)
     {
         using init_value_type = std::conditional_t<std::is_same<T, void>::value, typename std::decay_t<E>::value_type, T>;
-        return accumulate(make_xaccumulator_functor(detail::multiplies(), detail::accumulator_identity<init_value_type>()), 
+        return accumulate(make_xaccumulator_functor(detail::multiplies(), detail::accumulator_identity<init_value_type>()),
                           std::forward<E>(e));
     }
 
@@ -3026,20 +3026,20 @@ namespace detail {
         struct valid{};
         struct full{};
     }
-    
+
     namespace detail {
         template <class E1, class E2>
         inline auto convolve_impl(E1&& e1, E2&& e2, convolve_mode::valid)
         {
             using value_type = typename std::decay<E1>::type::value_type;
 
-            size_t const na = e1.size();
-            size_t const nv = e2.size();
-            size_t const n = na - nv + 1;
+            std::size_t const na = e1.size();
+            std::size_t const nv = e2.size();
+            std::size_t const n = na - nv + 1;
             xt::xtensor<value_type, 1> out = xt::zeros<value_type>({ n });
-            for (size_t i = 0; i < n; i++) 
+            for (std::size_t i = 0; i < n; i++)
             {
-                for (int j = 0; j < nv; j++)
+                for (std::size_t j = 0; j < nv; j++)
                 {
                     out(i) += e1(j) * e2(j + i);
                 }
@@ -3052,15 +3052,15 @@ namespace detail {
         {
             using value_type = typename std::decay<E1>::type::value_type;
 
-            size_t const na = e1.size();
-            size_t const nv = e2.size();
-            size_t const n = na + nv - 1;
+            std::size_t const na = e1.size();
+            std::size_t const nv = e2.size();
+            std::size_t const n = na + nv - 1;
             xt::xtensor<value_type, 1> out = xt::zeros<value_type>({ n });
-            for (size_t i = 0; i < n; i++) 
+            for (std::size_t i = 0; i < n; i++)
             {
-                size_t const jmn = (i >= nv - 1) ? i - (nv - 1) : 0;
-                size_t const jmx = (i < na - 1) ? i : na - 1;
-                for (size_t j = jmn; j <= jmx; ++j) 
+                std::size_t const jmn = (i >= nv - 1) ? i - (nv - 1) : 0;
+                std::size_t const jmx = (i < na - 1) ? i : na - 1;
+                for (std::size_t j = jmn; j <= jmx; ++j)
                 {
                     out(i) += e1(j) * e2(i - j);
                 }
@@ -3075,7 +3075,7 @@ namespace detail {
     * @param a 1D expression
     * @param v 1D expression
     * @param mode placeholder Select algorithm #convolve_mode
-    * 
+    *
     * @detail the algorithm convolves a with v and will incur a copy overhead
     *   should v be longer than a.
     */
