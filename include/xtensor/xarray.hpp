@@ -230,6 +230,7 @@ namespace xt
         using backstrides_type = typename base_type::backstrides_type;
         using temporary_type = typename semantic_base::temporary_type;
         using expression_tag = Tag;
+        constexpr static std::size_t rank = SIZE_MAX;
 
         xarray_adaptor(storage_type&& storage);
         xarray_adaptor(const storage_type& storage);
