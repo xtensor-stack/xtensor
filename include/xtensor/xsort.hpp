@@ -781,7 +781,7 @@ namespace xt
             {
                 auto begin = e.template begin<L>();
                 auto end = e.template end<L>();
-                std::size_t i = std::distance(begin, std::min_element(begin, end));
+                std::size_t i = static_cast<std::size_t>(std::distance(begin, std::min_element(begin, end)));
                 return xtensor<size_t, 0>{i};
             }
 
@@ -837,7 +837,7 @@ namespace xt
         auto&& ed = eval(e.derived_cast());
         auto begin = ed.template begin<L>();
         auto end = ed.template end<L>();
-        std::size_t i = std::distance(begin, std::min_element(begin, end));
+        std::size_t i = static_cast<std::size_t>(std::distance(begin, std::min_element(begin, end)));
         return xtensor<size_t, 0>{i};
     }
 
@@ -867,7 +867,7 @@ namespace xt
         auto&& ed = eval(e.derived_cast());
         auto begin = ed.template begin<L>();
         auto end = ed.template end<L>();
-        std::size_t i = std::distance(begin, std::max_element(begin, end));
+        std::size_t i = static_cast<std::size_t>(std::distance(begin, std::max_element(begin, end)));
         return xtensor<size_t, 0>{i};
     }
 
