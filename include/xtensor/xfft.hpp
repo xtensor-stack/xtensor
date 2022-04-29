@@ -12,39 +12,43 @@ namespace xt
 {
     namespace fft
     {
-        template<typename T = double, typename E1, typename E2>
-        xt::xarray<std::complex<T>> fftconvolve(E1&& xvec, E2&& yvec, std::ptrdiff_t axis = -1);
+        template<
+            typename T = double, 
+            typename E1, 
+            typename E2
+        >
+        xt::xarray<std::complex<T>> fft_convolve(E1&& xvec, E2&& yvec, std::ptrdiff_t axis = -1);
         
         namespace detail
         {
             template<typename T>
-            T PI()
+            T pi()
             {
                 constexpr double PI = 3.141592653589793238463;
                 return PI;
             }
 
-            size_t reverseBits(size_t x, int n)
+            std::size_t reverse_bits(std::size_t x, int n)
             {
-                size_t result = 0;
+                std::size_t result = 0;
                 for (int i = 0; i < n; i++, x >>= 1)
                     result = (result << 1) | (x & 1U);
                 return result;
             }
 
-            bool IsPower2(size_t vecSize) noexcept
+            template<typename E1>
+            bool is_power2(const E1& data) noexcept
             {
-                return ((vecSize & (vecSize - 1)) == 0);
+                return ((data.size() & (data.size() - 1)) == 0);
             }
 
-            template<typename T, typename E1>
-            auto transformRadix2(const E1& _data)
+            template<
+                typename T
+            >
+            auto transform_radix2(xt::xarray<std::complex<T>> data)
             {
-
-                xt::xarray<std::complex<T>> data = _data;
-
                 // Length variables
-                const size_t n(data.shape(0));
+                const std::size_t n = data.shape(0);
                 int levels = std::floor(std::log2(n));
 
                 // Trignometric table
@@ -53,12 +57,12 @@ namespace xt
                 //Works in CPP17 and MSVC CPP14
                 //Linker error when using numeric_constants in this header
                 //auto expTable = xt::eval(xt::exp(-2 * i * ::xt::numeric_constants<T>().PI / n));
-                auto expTable = xt::eval(xt::exp(-2 * i * PI<T>() / n));
+                auto expTable = xt::eval(xt::exp(-2 * i * pi<T>() / n));
 
                 // Bit-reversed addressing permutation
-                for (size_t i = 0; i < n; i++)
+                for (std::size_t i = 0; i < n; i++)
                 {
-                    const size_t j = reverseBits(i, levels);
+                    const std::size_t j = reverse_bits(i, levels);
                     if (j > i)
                     {
                         std::swap(data(i), data(j));
@@ -67,13 +71,13 @@ namespace xt
 
                 // Cooley-Tukey decimation-in-time radix-2 FFT
                 // Could probably be reimplemented using stride views...
-                for (size_t size = 2; size <= n; size *= 2)
+                for (std::size_t size = 2; size <= n; size *= 2)
                 {
-                    const size_t halfsize = size / 2;
-                    const size_t tablestep = n / size;
-                    for (size_t i = 0; i < n; i += size)
+                    const std::size_t halfsize = size / 2;
+                    const std::size_t tablestep = n / size;
+                    for (std::size_t i = 0; i < n; i += size)
                     {
-                        for (size_t j = i, k = 0; j < i + halfsize; j++, k += tablestep)
+                        for (std::size_t j = i, k = 0; j < i + halfsize; j++, k += tablestep)
                         {
                             const auto temp = data(j + halfsize) * expTable(k);
                             data(j + halfsize) = data(j) - temp;
@@ -88,29 +92,29 @@ namespace xt
                 return data;
             }
 
-            template<typename T, typename E1>
-            auto transformBluestein(const E1& _data)
+            template<
+                typename T
+                >
+            auto transform_bluestein(xt::xarray<std::complex<T>> data)
             {
-                xt::xarray<std::complex<T>> data = _data;
-
                 // Find a power-of-2 convolution length m such that m >= n * 2 + 1
-                const size_t n(data.size());
-                size_t m = 1;
+                const std::size_t n = data.size();
+                std::size_t m = 1;
                 while (m / 2 <= n) 
                 {
                     m *= 2;
                 }
 
                 // Trignometric table
-                xt::xarray<std::complex<T>> expTable = xt::empty<std::complex<T>>({ n });
-                xt::xarray<size_t> i = xt::pow(xt::linspace<size_t>(0, n - 1, n), 2);
+                auto expTable = xt::xtensor<std::complex<T>, 1>::from_shape({ n });
+                xt::xtensor<std::size_t, 1> i = xt::pow(xt::linspace<std::size_t>(0, n - 1, n), 2);
                 i %= (n * 2);
                 
                 //I would like to do this but there appears to be a compiler error in CPP14
                 //Works in CPP17 and MSVC CPP14
                 //Linker error when using numeric_constants in this header
                 //auto angles = xt::eval(::xt::numeric_constants<T>::PI * i / n);
-                auto angles = xt::eval(PI<T>() * i / n);
+                auto angles = xt::eval(pi<T>() * i / n);
                 auto j = std::complex<T>(0, 1);
                 expTable = xt::exp(-angles * j);
 
@@ -124,33 +128,38 @@ namespace xt
                 xt::view(bv, xt::range(-n + 1, xt::placeholders::_)) = xt::view(xt::conj(xt::flip(expTable)), xt::range(xt::placeholders::_, - 1));
 
                 // Convolution
-                auto cv = xt::fft::fftconvolve<T>(av, bv);
+                auto cv = xt::fft::fft_convolve<T>(av, bv);
 
                 return xt::eval(xt::view(cv, xt::range(0, n)) * expTable);
             }
 
-            template<typename T, typename E1>
-            auto fft_impl(const E1& data)
+            template<
+                typename T
+            >
+            auto fft_impl(xt::xarray<std::complex<T>> data)
             {
                 //loop through all the next highest axis
 
                 // Is power of 2
-                if (detail::IsPower2(data.size())) 
+                if (detail::is_power2(data))
                 {
-                    return detail::transformRadix2<T>(data);
+                    return detail::transform_radix2<T>(std::move(data));
                 }
                 //More complicated algorithm for arbitrary sizes
                 else 
                 {
-                    return detail::transformBluestein<T>(data);
+                    return detail::transform_bluestein<T>(std::move(data));
                 }
             }
 
-            template<typename T, typename E1>
+            template<
+                typename T, 
+                typename E1
+            >
             auto fft(E1&& data, std::ptrdiff_t axis = -1)
             {
                 //check the length of the data on that axis
-                const size_t n(data.shape(axis));
+                const std::size_t n(data.shape(axis));
                 if (n == 0) {
                     XTENSOR_THROW(std::runtime_error, "Cannot take the FFT along an empty dimention");
                 }
@@ -214,11 +223,14 @@ namespace xt
 
         namespace detail 
         {
-            template<typename T, typename E1>
+            template<
+                typename T, 
+                typename E1
+            >
             auto ifft(E1&& data, std::ptrdiff_t axis = -1)
             {
                 //check the length of the data on that axis
-                const size_t n = data.shape(axis);
+                const std::size_t n = data.shape(axis);
                 if (n == 0) {
                     XTENSOR_THROW(std::runtime_error, "Cannot take the iFFT along an empty dimention");
                 }
@@ -252,8 +264,19 @@ namespace xt
             return detail::ifft<typename is_complex_t<typename E1::value_type>::value_type>(e1, axis);
         }
 
-        template<typename T, typename E1, typename E2>
-        xt::xarray<std::complex<T>> fftconvolve(E1&& xvec, E2&& yvec, std::ptrdiff_t axis)
+        /*
+        * @brief performs a circular fft convolution xvec and yvec must
+        *        be the same shape.
+        * @param xvec first array of the convolution
+        * @param yvec second array of the convolution
+        * @param axis axis along which to perform the convolution
+        */
+        template<
+            typename T, 
+            typename E1, 
+            typename E2
+        >
+        xt::xarray<std::complex<T>> fft_convolve(E1&& xvec, E2&& yvec, std::ptrdiff_t axis)
         {
             //we could broadcast but that could get complicated???
             if (xvec.dimension() != yvec.dimension())
@@ -267,7 +290,7 @@ namespace xt
                 XTENSOR_THROW(std::runtime_error, "Mismatched lengths along slice axis");
             }
    
-            const size_t n = xvec.shape(saxis);
+            const std::size_t n = xvec.shape(saxis);
 
             auto xv = fft(xvec, axis);
             auto yv = fft(yvec, axis);
