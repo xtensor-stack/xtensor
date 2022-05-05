@@ -43,6 +43,34 @@ A requirement for the user-specified containers is to provide a minimal ``std::v
 provides the aforementioned interface. In fact, the container could even be backed by a
 file on the disk, a database or a binary message.
 
+Adapting a pointer
+------------------
+
+Suppose that you want to use the *xtensor* machinery on a small contiguous subset of a large tensor.
+You can, of course, use :ref:`Views`, but for efficiency you can also use pointers to the right bit of memory.
+Consider an example of an ``[M, 2, 2]`` tensor ``A``,
+for which you want to operate on ``A[i, :, :]`` for different ``i``.
+In this case the most efficient *xtensor* has to offer is:
+
+.. code-block:: cpp
+
+    int main()
+    {
+        size_t M = 3;
+        size_t nd = 2;
+        size_t size = nd * nd;
+        xt::xarray<int> A = xt::arange<int>(M * size).reshape({M, nd, nd});
+        auto b = xt::adapt(&A.flat(0), std::array<size_t, 2>{nd, nd});
+
+        for (size_t i = 0; i < M; ++i) {
+            b.reset_buffer(&A.flat(i * size), size);
+        }
+        return 0;
+    }
+
+where ``xt::adapt`` first creates an ``xt::xtensor_adaptor`` on the memory of ``A[0, :, :]``.
+Then, inside the loop, we only replace the pointer to the relevant ``A[i, 0, 0]``.
+
 Structures that embed shape and strides
 ---------------------------------------
 
