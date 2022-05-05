@@ -425,7 +425,8 @@ namespace xt
         : base_type()
     {
         base_type::resize(xt::shape<shape_type>(t), true);
-        L == layout_type::row_major ? nested_copy(m_storage.begin(), t) : nested_copy(this->template begin<layout_type::row_major>(), t);
+	constexpr auto tmp = layout_type::row_major;
+	L == tmp ? nested_copy(m_storage.begin(), t) : nested_copy(this->template begin<tmp>(), t);
     }
 
     /**
