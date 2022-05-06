@@ -875,7 +875,7 @@ namespace xt
     template <class E>
     struct get_rank<E, decltype((void)E::rank, void())>
     {
-        constexpr static std::size_t value= E::rank;
+        constexpr static std::size_t value = E::rank;
     };
 
     /******************
