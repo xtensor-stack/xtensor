@@ -7,6 +7,32 @@
 Changelog
 =========
 
+0.24.2
+------
+
+- Fixed the documentation of adapt functions
+  `#2496 https://github.com/xtensor-stack/xtensor/pull/2496`
+- Updated C++20 option for visual studio builds C++2a no longer a valid std option
+  `#2497 https://github.com/xtensor-stack/xtensor/pull/2497`
+- Simplifying argmin and argmax where possible
+  `#2499 https://github.com/xtensor-stack/xtensor/pull/2499`
+- Removed unused code
+  `#2502 https://github.com/xtensor-stack/xtensor/pull/2502`
+- Fixed build error in MSVC 2019 by decaying decltype to base type
+  `#2506 https://github.com/xtensor-stack/xtensor/pull/2506`
+- Added xt::convolve
+  `#2507 https://github.com/xtensor-stack/xtensor/pull/2507`
+- Adding reset_data to xbuffer_adaptor and reset_buffer to adaptor to replace the pointer without any reallocation
+  `#2521 https://github.com/xtensor-stack/xtensor/pull/2521`
+- Workaround for EDG C++ frontend bug
+  `#2528 https://github.com/xtensor-stack/xtensor/pull/2528`
+- Adding cast to deal with xtensor-python's signedness of shape
+  `#2510 https://github.com/xtensor-stack/xtensor/pull/2510`
+- Adding missing rank to xtensor_adaptor
+  `#2520 https://github.com/xtensor-stack/xtensor/pull/2520`
+- Fixing compiler warning
+  `#2522 https://github.com/xtensor-stack/xtensor/pull/2522`
+
 0.24.1
 ------
 
