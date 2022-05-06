@@ -152,7 +152,7 @@ namespace xt
         {
             const auto& de = e.derived_cast();
             R ev;
-            ev.resize({de.size()});
+            ev.resize({static_cast<typename R::shape_type::value_type>(de.size())});
 
             std::copy(de.cbegin(), de.cend(), ev.begin());
             std::sort(ev.begin(), ev.end());
