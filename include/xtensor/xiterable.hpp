@@ -54,10 +54,10 @@ namespace xt
         template <layout_type L>
         using const_reverse_layout_iterator = std::reverse_iterator<const_layout_iterator<L>>;
 
-        using storage_iterator = layout_iterator<XTENSOR_DEFAULT_TRAVERSAL>;
-        using const_storage_iterator = const_layout_iterator<XTENSOR_DEFAULT_TRAVERSAL>;
-        using reverse_storage_iterator = reverse_layout_iterator<XTENSOR_DEFAULT_TRAVERSAL>;
-        using const_reverse_storage_iterator = const_reverse_layout_iterator<XTENSOR_DEFAULT_TRAVERSAL>;
+        using linear_iterator = layout_iterator<XTENSOR_DEFAULT_TRAVERSAL>;
+        using const_linear_iterator = const_layout_iterator<XTENSOR_DEFAULT_TRAVERSAL>;
+        using reverse_linear_iterator = reverse_layout_iterator<XTENSOR_DEFAULT_TRAVERSAL>;
+        using const_reverse_linear_iterator = const_reverse_layout_iterator<XTENSOR_DEFAULT_TRAVERSAL>;
 
         template <class S, layout_type L>
         using broadcast_iterator = xiterator<stepper, S, L>;
@@ -160,8 +160,8 @@ namespace xt
         using stepper = typename base_type::stepper;
         using const_stepper = typename base_type::const_stepper;
 
-        using storage_iterator = typename base_type::storage_iterator;
-        using reverse_storage_iterator = typename base_type::reverse_storage_iterator;
+        using linear_iterator = typename base_type::linear_iterator;
+        using reverse_linear_iterator = typename base_type::reverse_linear_iterator;
 
         template <layout_type L>
         using layout_iterator = typename base_type::template layout_iterator<L>;
@@ -246,7 +246,7 @@ namespace xt
     namespace detail
     {
         template <class C>
-        struct storage_iterator_traits
+        struct linear_iterator_traits
         {
             using iterator = typename C::iterator;
             using const_iterator = typename C::const_iterator;
@@ -255,7 +255,7 @@ namespace xt
         };
 
         template <class C>
-        struct storage_iterator_traits<const C>
+        struct linear_iterator_traits<const C>
         {
             using iterator = typename C::const_iterator;
             using const_iterator = iterator;
@@ -321,23 +321,23 @@ namespace xt
         template <class S, layout_type L>
         using const_reverse_broadcast_iterator = typename iterable_base::template const_reverse_broadcast_iterator<S, L>;
 
-        using storage_traits = detail::storage_iterator_traits<storage_type>;
-        using storage_iterator = typename storage_traits::iterator;
-        using const_storage_iterator = typename storage_traits::const_iterator;
-        using reverse_storage_iterator = typename storage_traits::reverse_iterator;
-        using const_reverse_storage_iterator = typename storage_traits::const_reverse_iterator;
+        using storage_traits = detail::linear_iterator_traits<storage_type>;
+        using linear_iterator = typename storage_traits::iterator;
+        using const_linear_iterator = typename storage_traits::const_iterator;
+        using reverse_linear_iterator = typename storage_traits::reverse_iterator;
+        using const_reverse_linear_iterator = typename storage_traits::const_reverse_iterator;
 
         template <layout_type L, class It1, class It2>
         using select_iterator_impl = std::conditional_t<L == static_layout, It1, It2>;
 
         template <layout_type L>
-        using select_iterator = select_iterator_impl<L, storage_iterator, layout_iterator<L>>;
+        using select_iterator = select_iterator_impl<L, linear_iterator, layout_iterator<L>>;
         template <layout_type L>
-        using select_const_iterator = select_iterator_impl<L, const_storage_iterator, const_layout_iterator<L>>;
+        using select_const_iterator = select_iterator_impl<L, const_linear_iterator, const_layout_iterator<L>>;
         template <layout_type L>
-        using select_reverse_iterator = select_iterator_impl<L, reverse_storage_iterator, reverse_layout_iterator<L>>;
+        using select_reverse_iterator = select_iterator_impl<L, reverse_linear_iterator, reverse_layout_iterator<L>>;
         template <layout_type L>
-        using select_const_reverse_iterator = select_iterator_impl<L, const_reverse_storage_iterator, const_reverse_layout_iterator<L>>;
+        using select_const_reverse_iterator = select_iterator_impl<L, const_reverse_linear_iterator, const_reverse_layout_iterator<L>>;
 
         using iterator = select_iterator<XTENSOR_DEFAULT_TRAVERSAL>;
         using const_iterator = select_const_iterator<XTENSOR_DEFAULT_TRAVERSAL>;

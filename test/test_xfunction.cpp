@@ -477,7 +477,7 @@ namespace xt
         iterator_tester(f1);
 // For an unknown reason, MSVC cannot correctly generate
 // storage_cbegin() for a function of function. Moreover,
-// a simple SFINAE deduction like has_storage_iterator
+// a simple SFINAE deduction like has_linear_iterator
 // harcoded and tested here fails (while it builds fine in any
 // empty project)
 #ifndef _MSC_VER

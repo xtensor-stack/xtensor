@@ -423,12 +423,12 @@ namespace xt
     namespace detail
     {
         template <class C, class = void_t<>>
-        struct has_storage_iterator : std::false_type
+        struct has_linear_iterator : std::false_type
         {
         };
 
         template <class C>
-        struct has_storage_iterator<C, void_t<decltype(std::declval<C>().storage_cbegin())>>
+        struct has_linear_iterator<C, void_t<decltype(std::declval<C>().storage_cbegin())>>
             : std::true_type
         {
         };
@@ -437,7 +437,7 @@ namespace xt
     template <class C>
     XTENSOR_CONSTEXPR_RETURN auto linear_begin(C& c) noexcept
     {
-        return xtl::mpl::static_if<detail::has_storage_iterator<C>::value>([&](auto self)
+        return xtl::mpl::static_if<detail::has_linear_iterator<C>::value>([&](auto self)
         {
             return self(c).storage_begin();
         }, /*else*/ [&](auto self)
@@ -449,7 +449,7 @@ namespace xt
     template <class C>
     XTENSOR_CONSTEXPR_RETURN auto linear_end(C& c) noexcept
     {
-        return xtl::mpl::static_if<detail::has_storage_iterator<C>::value>([&](auto self)
+        return xtl::mpl::static_if<detail::has_linear_iterator<C>::value>([&](auto self)
         {
             return self(c).storage_end();
         }, /*else*/ [&](auto self)
@@ -461,7 +461,7 @@ namespace xt
     template <class C>
     XTENSOR_CONSTEXPR_RETURN auto linear_begin(const C& c) noexcept
     {
-        return xtl::mpl::static_if<detail::has_storage_iterator<C>::value>([&](auto self)
+        return xtl::mpl::static_if<detail::has_linear_iterator<C>::value>([&](auto self)
         {
             return self(c).storage_cbegin();
         }, /*else*/ [&](auto self)
@@ -473,7 +473,7 @@ namespace xt
     template <class C>
     XTENSOR_CONSTEXPR_RETURN auto linear_end(const C& c) noexcept
     {
-        return xtl::mpl::static_if<detail::has_storage_iterator<C>::value>([&](auto self)
+        return xtl::mpl::static_if<detail::has_linear_iterator<C>::value>([&](auto self)
         {
             return self(c).storage_cend();
         }, /*else*/ [&](auto self)
