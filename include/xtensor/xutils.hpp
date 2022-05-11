@@ -587,7 +587,7 @@ namespace xt
 
     template <class T>
     struct has_storage_type<T, void_t<typename xcontainer_inner_types<T>::storage_type>>
-        : std::true_type
+        : xtl::negation<std::is_same<typename std::remove_cv<typename xcontainer_inner_types<T>::storage_type>::type, invalid_type>>
     {};
 
     /*************************************
