@@ -284,10 +284,12 @@ namespace xt
         template <class D>
         struct linear_iterator_traits_impl<D, false>
         {
-            using linear_iterator = typename D::linear_iterator;
-            using const_linear_iterator = typename D::const_linear_iterator;
-            using reverse_linear_iterator = typename D::reverse_linear_iterator;
-            using const_reverse_linear_iterator = typename D::const_reverse_linear_iterator;
+            using inner_types = xcontainer_inner_types<D>;
+            using xexpression_type = typename inner_types::xexpression_type;
+            using linear_iterator = typename xexpression_type::linear_iterator;
+            using const_linear_iterator = typename xexpression_type::const_linear_iterator;
+            using reverse_linear_iterator = typename xexpression_type::reverse_linear_iterator;
+            using const_reverse_linear_iterator = typename xexpression_type::const_reverse_linear_iterator;
         };
 
         template <class D>
