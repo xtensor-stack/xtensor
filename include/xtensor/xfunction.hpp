@@ -403,7 +403,7 @@ namespace xt
 
     private:
 
-        using data_type = std::tuple<decltype(linear_begin(std::declval<const std::decay_t<CT>>()))...>;
+        using data_type = std::tuple<decltype(xt::linear_begin(std::declval<const std::decay_t<CT>>()))...>;
 
         template <std::size_t... I>
         reference deref_impl(std::index_sequence<I...>) const;
