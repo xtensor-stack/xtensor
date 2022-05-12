@@ -161,7 +161,7 @@ namespace xt
             for (auto _ : state)
             {
                 auto fun = 3.0 * x - 2.0 * y;
-                std::copy(fun.storage_cbegin(), fun.storage_cend(), res.storage_begin());
+                std::copy(fun.linear_cbegin(), fun.linear_cend(), res.linear_begin());
                 benchmark::DoNotOptimize(res.data());
             }
         }

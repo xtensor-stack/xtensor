@@ -387,7 +387,7 @@ namespace xt
     {
         base_type::resize(xt::shape<shape_type>(t));
         bool condition = VE::static_layout == layout_type::row_major && FE::static_layout == layout_type::row_major;
-        condition ? detail::nested_optional_copy(this->storage_begin(), t)
+        condition ? detail::nested_optional_copy(this->linear_begin(), t)
                   : nested_copy(this->template begin<layout_type::row_major>(), t);
     }
 
@@ -401,7 +401,7 @@ namespace xt
     {
         base_type::resize(xt::shape<shape_type>(t));
         bool condition = VE::static_layout == layout_type::row_major && FE::static_layout == layout_type::row_major;
-        condition ? detail::nested_optional_copy(this->storage_begin(), t)
+        condition ? detail::nested_optional_copy(this->linear_begin(), t)
                   : nested_copy(this->template begin<layout_type::row_major>(), t);
     }
 
@@ -415,7 +415,7 @@ namespace xt
     {
         base_type::resize(xt::shape<shape_type>(t));
         bool condition = VE::static_layout == layout_type::row_major && FE::static_layout == layout_type::row_major;
-        condition ? detail::nested_optional_copy(this->storage_begin(), t)
+        condition ? detail::nested_optional_copy(this->linear_begin(), t)
                   : nested_copy(this->template begin<layout_type::row_major>(), t);
     }
 
@@ -429,7 +429,7 @@ namespace xt
     {
         base_type::resize(xt::shape<shape_type>(t));
         bool condition = VE::static_layout == layout_type::row_major && FE::static_layout == layout_type::row_major;
-        condition ? detail::nested_optional_copy(this->storage_begin(), t)
+        condition ? detail::nested_optional_copy(this->linear_begin(), t)
                   : nested_copy(this->template begin<layout_type::row_major>(), t);
     }
 
@@ -443,7 +443,7 @@ namespace xt
     {
         base_type::resize(xt::shape<shape_type>(t));
         bool condition = VE::static_layout == layout_type::row_major && FE::static_layout == layout_type::row_major;
-        condition ? detail::nested_optional_copy(this->storage_begin(), t)
+        condition ? detail::nested_optional_copy(this->linear_begin(), t)
                   : nested_copy(this->template begin<layout_type::row_major>(), t);
     }
     //@}

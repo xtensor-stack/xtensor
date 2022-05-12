@@ -18,7 +18,7 @@
 namespace xt
 {
     template <class VE, class FE, bool is_const>
-    class xoptional_assembly_storage_iterator;
+    class xoptional_assembly_linear_iterator;
 
     /******************************
      * xoptional_assembly_storage *
@@ -53,8 +53,8 @@ namespace xt
         using size_type = typename value_storage::size_type;
         using difference_type = typename value_storage::difference_type;
 
-        using iterator = xoptional_assembly_storage_iterator<VE, FE, false>;
-        using const_iterator = xoptional_assembly_storage_iterator<VE, FE, true>;
+        using iterator = xoptional_assembly_linear_iterator<VE, FE, false>;
+        using const_iterator = xoptional_assembly_linear_iterator<VE, FE, true>;
         using reverse_iterator = std::reverse_iterator<iterator>;
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
@@ -139,16 +139,16 @@ namespace xt
     void swap(xoptional_assembly_storage<VE, FE>& lhs, xoptional_assembly_storage<VE, FE>& rhs) noexcept;
 
     /***************************************
-     * xoptional_assembly_storage_iterator *
+     * xoptional_assembly_linear_iterator *
      ***************************************/
 
     template <class VE, class FE, bool is_const>
-    class xoptional_assembly_storage_iterator;
+    class xoptional_assembly_linear_iterator;
 
     template <class VE, class FE, bool is_const>
-    struct xoptional_assembly_storage_iterator_traits
+    struct xoptional_assembly_linear_iterator_traits
     {
-        using iterator_type = xoptional_assembly_storage_iterator<VE, FE, is_const>;
+        using iterator_type = xoptional_assembly_linear_iterator<VE, FE, is_const>;
         using xoptional_assembly_storage_type = xoptional_assembly_storage<VE, FE>;
         using value_type = typename xoptional_assembly_storage_type::value_type;
         using reference = std::conditional_t<is_const,
@@ -161,13 +161,13 @@ namespace xt
     };
 
     template <class VE, class FE, bool is_const>
-    class xoptional_assembly_storage_iterator
-        : public xtl::xrandom_access_iterator_base2<xoptional_assembly_storage_iterator_traits<VE, FE, is_const>>
+    class xoptional_assembly_linear_iterator
+        : public xtl::xrandom_access_iterator_base2<xoptional_assembly_linear_iterator_traits<VE, FE, is_const>>
     {
     public:
 
-        using self_type = xoptional_assembly_storage_iterator<VE, FE, is_const>;
-        using base_type = xtl::xrandom_access_iterator_base2<xoptional_assembly_storage_iterator_traits<VE, FE, is_const>>;
+        using self_type = xoptional_assembly_linear_iterator<VE, FE, is_const>;
+        using base_type = xtl::xrandom_access_iterator_base2<xoptional_assembly_linear_iterator_traits<VE, FE, is_const>>;
 
         using xoptional_assembly_storage_type = xoptional_assembly_storage<VE, FE>;
         using value_iterator = std::conditional_t<is_const,
@@ -182,7 +182,7 @@ namespace xt
         using pointer = typename base_type::pointer;
         using difference_type = typename base_type::difference_type;
 
-        xoptional_assembly_storage_iterator(value_iterator value_it, flag_iterator flag_it);
+        xoptional_assembly_linear_iterator(value_iterator value_it, flag_iterator flag_it);
 
         self_type& operator++();
         self_type& operator--();
@@ -463,17 +463,17 @@ namespace xt
     }
 
     /******************************************************
-     * xoptional_assembly_storage_iterator implementation *
+     * xoptional_assembly_linear_iterator implementation *
      ******************************************************/
 
     template <class VE, class FE, bool C>
-    inline xoptional_assembly_storage_iterator<VE, FE, C>::xoptional_assembly_storage_iterator(value_iterator value_it, flag_iterator flag_it)
+    inline xoptional_assembly_linear_iterator<VE, FE, C>::xoptional_assembly_linear_iterator(value_iterator value_it, flag_iterator flag_it)
         : m_value_it(value_it), m_flag_it(flag_it)
     {
     }
 
     template <class VE, class FE, bool C>
-    inline auto xoptional_assembly_storage_iterator<VE, FE, C>::operator++() -> self_type&
+    inline auto xoptional_assembly_linear_iterator<VE, FE, C>::operator++() -> self_type&
     {
         ++m_value_it;
         ++m_flag_it;
@@ -481,7 +481,7 @@ namespace xt
     }
 
     template <class VE, class FE, bool C>
-    inline auto xoptional_assembly_storage_iterator<VE, FE, C>::operator--() -> self_type&
+    inline auto xoptional_assembly_linear_iterator<VE, FE, C>::operator--() -> self_type&
     {
         --m_value_it;
         --m_flag_it;
@@ -489,7 +489,7 @@ namespace xt
     }
 
     template <class VE, class FE, bool C>
-    inline auto xoptional_assembly_storage_iterator<VE, FE, C>::operator+=(difference_type n) -> self_type&
+    inline auto xoptional_assembly_linear_iterator<VE, FE, C>::operator+=(difference_type n) -> self_type&
     {
         m_value_it += n;
         m_flag_it += n;
@@ -497,7 +497,7 @@ namespace xt
     }
 
     template <class VE, class FE, bool C>
-    inline auto xoptional_assembly_storage_iterator<VE, FE, C>::operator-=(difference_type n) -> self_type&
+    inline auto xoptional_assembly_linear_iterator<VE, FE, C>::operator-=(difference_type n) -> self_type&
     {
         m_value_it -= n;
         m_flag_it -= n;
@@ -505,31 +505,31 @@ namespace xt
     }
 
     template <class VE, class FE, bool C>
-    inline auto xoptional_assembly_storage_iterator<VE, FE, C>::operator-(const self_type& rhs) const -> difference_type
+    inline auto xoptional_assembly_linear_iterator<VE, FE, C>::operator-(const self_type& rhs) const -> difference_type
     {
         return m_value_it - rhs.m_value_it;
     }
 
     template <class VE, class FE, bool C>
-    inline auto xoptional_assembly_storage_iterator<VE, FE, C>::operator*() const -> reference
+    inline auto xoptional_assembly_linear_iterator<VE, FE, C>::operator*() const -> reference
     {
         return reference(*m_value_it, *m_flag_it);
     }
 
     template <class VE, class FE, bool C>
-    inline auto xoptional_assembly_storage_iterator<VE, FE, C>::operator->() const -> pointer
+    inline auto xoptional_assembly_linear_iterator<VE, FE, C>::operator->() const -> pointer
     {
         return &(this->operator*());
     }
 
     template <class VE, class FE, bool C>
-    inline bool xoptional_assembly_storage_iterator<VE, FE, C>::operator==(const self_type& rhs) const
+    inline bool xoptional_assembly_linear_iterator<VE, FE, C>::operator==(const self_type& rhs) const
     {
         return m_value_it == rhs.m_value_it;
     }
 
     template <class VE, class FE, bool C>
-    inline bool xoptional_assembly_storage_iterator<VE, FE, C>::operator<(const self_type& rhs) const
+    inline bool xoptional_assembly_linear_iterator<VE, FE, C>::operator<(const self_type& rhs) const
     {
         return m_value_it < rhs.m_value_it;
     }

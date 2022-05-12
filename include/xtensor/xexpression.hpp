@@ -278,7 +278,7 @@ namespace xt
 
     template <class E>
     using const_xclosure_t = typename const_xclosure<E>::type;
- 
+
     /*************************
      * expression tag system *
      *************************/
@@ -534,8 +534,8 @@ namespace xt
         using stepper = typename E::stepper;
         using const_stepper = typename E::const_stepper;
 
-        using storage_iterator = typename E::storage_iterator;
-        using const_storage_iterator = typename E::const_storage_iterator;
+        using linear_iterator = typename E::linear_iterator;
+        using const_linear_iterator = typename E::const_linear_iterator;
 
         using bool_load_type = typename E::bool_load_type;
 
@@ -571,14 +571,14 @@ namespace xt
         XTENSOR_FORWARD_CONST_ITERATOR_METHOD(rend)
         XTENSOR_FORWARD_CONST_ITERATOR_METHOD(crbegin)
         XTENSOR_FORWARD_CONST_ITERATOR_METHOD(crend)
-        
-        XTENSOR_FORWARD_METHOD(storage_begin)
-        XTENSOR_FORWARD_METHOD(storage_end)
-        XTENSOR_FORWARD_CONST_METHOD(storage_begin)
-        XTENSOR_FORWARD_CONST_METHOD(storage_end)
-        XTENSOR_FORWARD_CONST_METHOD(storage_cbegin)
-        XTENSOR_FORWARD_CONST_METHOD(storage_cend)
-        
+
+        XTENSOR_FORWARD_METHOD(linear_begin)
+        XTENSOR_FORWARD_METHOD(linear_end)
+        XTENSOR_FORWARD_CONST_METHOD(linear_begin)
+        XTENSOR_FORWARD_CONST_METHOD(linear_end)
+        XTENSOR_FORWARD_CONST_METHOD(linear_cbegin)
+        XTENSOR_FORWARD_CONST_METHOD(linear_cend)
+
         XTENSOR_FORWARD_METHOD(storage_rbegin)
         XTENSOR_FORWARD_METHOD(storage_rend)
         XTENSOR_FORWARD_CONST_METHOD(storage_rbegin)

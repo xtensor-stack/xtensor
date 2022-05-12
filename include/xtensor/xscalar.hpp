@@ -248,13 +248,13 @@ namespace xt
         template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
         const_reverse_broadcast_iterator<S, L> crend(const S& shape) const noexcept;
 
-        iterator storage_begin() noexcept;
-        iterator storage_end() noexcept;
+        iterator linear_begin() noexcept;
+        iterator linear_end() noexcept;
 
-        const_iterator storage_begin() const noexcept;
-        const_iterator storage_end() const noexcept;
-        const_iterator storage_cbegin() const noexcept;
-        const_iterator storage_cend() const noexcept;
+        const_iterator linear_begin() const noexcept;
+        const_iterator linear_end() const noexcept;
+        const_iterator linear_cbegin() const noexcept;
+        const_iterator linear_cend() const noexcept;
 
         reverse_iterator storage_rbegin() noexcept;
         reverse_iterator storage_rend() noexcept;
@@ -802,37 +802,37 @@ namespace xt
     }
 
     template <class CT>
-    inline auto xscalar<CT>::storage_begin() noexcept -> iterator
+    inline auto xscalar<CT>::linear_begin() noexcept -> iterator
     {
         return this->template begin<XTENSOR_DEFAULT_LAYOUT>();
     }
 
     template <class CT>
-    inline auto xscalar<CT>::storage_end() noexcept -> iterator
+    inline auto xscalar<CT>::linear_end() noexcept -> iterator
     {
         return this->template end<XTENSOR_DEFAULT_LAYOUT>();
     }
 
     template <class CT>
-    inline auto xscalar<CT>::storage_begin() const noexcept -> const_iterator
+    inline auto xscalar<CT>::linear_begin() const noexcept -> const_iterator
     {
         return this->template begin<XTENSOR_DEFAULT_LAYOUT>();
     }
 
     template <class CT>
-    inline auto xscalar<CT>::storage_end() const noexcept -> const_iterator
+    inline auto xscalar<CT>::linear_end() const noexcept -> const_iterator
     {
         return this->template end<XTENSOR_DEFAULT_LAYOUT>();
     }
 
     template <class CT>
-    inline auto xscalar<CT>::storage_cbegin() const noexcept -> const_iterator
+    inline auto xscalar<CT>::linear_cbegin() const noexcept -> const_iterator
     {
         return this->template cbegin<XTENSOR_DEFAULT_LAYOUT>();
     }
 
     template <class CT>
-    inline auto xscalar<CT>::storage_cend() const noexcept -> const_iterator
+    inline auto xscalar<CT>::linear_cend() const noexcept -> const_iterator
     {
         return this->template cend<XTENSOR_DEFAULT_LAYOUT>();
     }

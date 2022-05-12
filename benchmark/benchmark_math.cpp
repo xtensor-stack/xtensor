@@ -92,7 +92,7 @@ namespace xt
             for (auto _ : state)
             {
                 auto fct = f(lhs, rhs);
-                std::copy(fct.storage_begin(), fct.storage_end(), res.storage_begin());
+                std::copy(fct.linear_begin(), fct.linear_end(), res.linear_begin());
                 benchmark::DoNotOptimize(res.data());
             }
         }

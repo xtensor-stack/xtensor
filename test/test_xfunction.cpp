@@ -447,7 +447,7 @@ namespace xt
         if (func.has_linear_assign(res2.strides()))
         {
             auto resit2 = res2.template begin<XTENSOR_DEFAULT_LAYOUT>();
-            for (auto it = func.storage_begin(); it != func.storage_end(); ++it)
+            for (auto it = func.linear_begin(); it != func.linear_end(); ++it)
             {
                 *(resit2++) = *it;
             }
@@ -476,8 +476,8 @@ namespace xt
         auto f2 = x * 2.0 * x;
         iterator_tester(f1);
 // For an unknown reason, MSVC cannot correctly generate
-// storage_cbegin() for a function of function. Moreover,
-// a simple SFINAE deduction like has_storage_iterator
+// linear_cbegin() for a function of function. Moreover,
+// a simple SFINAE deduction like has_linear_iterator
 // harcoded and tested here fails (while it builds fine in any
 // empty project)
 #ifndef _MSC_VER

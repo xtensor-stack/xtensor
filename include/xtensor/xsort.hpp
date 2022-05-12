@@ -418,13 +418,13 @@ namespace xt
             std::sort(kth_copy.begin(), kth_copy.end());
         }
 
-        std::copy(de.storage_cbegin(), de.storage_cend(), ev.storage_begin()); // flatten
+        std::copy(de.linear_cbegin(), de.linear_cend(), ev.linear_begin()); // flatten
         std::size_t k_last = kth_copy.back();
-        std::nth_element(ev.storage_begin(), ev.storage_begin() + k_last, ev.storage_end());
+        std::nth_element(ev.linear_begin(), ev.linear_begin() + k_last, ev.linear_end());
 
         for (auto it = (kth_copy.rbegin() + 1); it != kth_copy.rend(); ++it)
         {
-            std::nth_element(ev.storage_begin(), ev.storage_begin() + *it, ev.storage_begin() + k_last);
+            std::nth_element(ev.linear_begin(), ev.linear_begin() + *it, ev.linear_begin() + k_last);
             k_last = *it;
         }
 
@@ -558,13 +558,13 @@ namespace xt
             return de[a] < de[b];
         };
 
-        std::iota(ev.storage_begin(), ev.storage_end(), 0);
+        std::iota(ev.linear_begin(), ev.linear_end(), 0);
         std::size_t k_last = kth_copy.back();
-        std::nth_element(ev.storage_begin(), ev.storage_begin() + k_last, ev.storage_end(), arg_lambda);
+        std::nth_element(ev.linear_begin(), ev.linear_begin() + k_last, ev.linear_end(), arg_lambda);
 
         for (auto it = (kth_copy.rbegin() + 1); it != kth_copy.rend(); ++it)
         {
-            std::nth_element(ev.storage_begin(), ev.storage_begin() + *it, ev.storage_begin() + k_last, arg_lambda);
+            std::nth_element(ev.linear_begin(), ev.linear_begin() + *it, ev.linear_begin() + k_last, arg_lambda);
             k_last = *it;
         }
 

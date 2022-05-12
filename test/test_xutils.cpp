@@ -132,6 +132,21 @@ namespace xt
         EXPECT_FALSE(b);
     }
 
+    TEST(utils, has_storage_type)
+    {
+        bool b = has_storage_type<xarray<int>>::value;
+        EXPECT_TRUE(b);
+
+        xarray<int> x, y;
+        b = has_storage_type<decltype(x + y)>::value;
+        EXPECT_FALSE(b);
+
+        b = has_storage_type<decltype(view(x, all()))>::value;
+        EXPECT_TRUE(b);
+        b = has_storage_type<decltype(view(2*x, all()))>::value;
+        EXPECT_FALSE(b);
+    }
+
     TEST(utils, has_strides)
     {
         bool b = has_strides<xarray<int>>::value;

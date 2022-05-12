@@ -22,7 +22,7 @@ namespace xt
         const V a({1,2,3,4});
         const V b({1,2,3,4});
         using value_type = typename V::value_type;
-    
+
         for (auto _ : state)
         {
             xtensor<value_type, 1> result(std::array<std::size_t, 1>({4}));
@@ -63,7 +63,7 @@ namespace xt
             auto ab = xt::adapt(b);
             auto ar = xt::adapt(res);
             auto fun = aa + ab;
-            std::copy(fun.storage_cbegin(), fun.storage_cend(), ar.storage_begin());
+            std::copy(fun.linear_cbegin(), fun.linear_cend(), ar.linear_begin());
             benchmark::DoNotOptimize(ar.data());
         }
     }
@@ -81,7 +81,7 @@ namespace xt
             auto ab = xt::adapt(b);
             auto ar = xt::adapt(res);
             auto fun = aa + ab;
-            std::transform(fun.storage_cbegin(), fun.storage_cend(), ar.storage_begin(),
+            std::transform(fun.linear_cbegin(), fun.linear_cend(), ar.linear_begin(),
                            [](typename decltype(fun)::value_type x) { return static_cast<typename decltype(ar)::value_type>(x); });
             benchmark::DoNotOptimize(ar.data());
         }
