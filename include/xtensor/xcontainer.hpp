@@ -189,13 +189,13 @@ namespace xt
         container_simd_return_type_t<storage_type, value_type, requested_type>
         /*simd_return_type<requested_type>*/ load_simd(size_type i) const;
 
-        linear_iterator storage_begin() noexcept;
-        linear_iterator storage_end() noexcept;
+        linear_iterator linear_begin() noexcept;
+        linear_iterator linear_end() noexcept;
 
-        const_linear_iterator storage_begin() const noexcept;
-        const_linear_iterator storage_end() const noexcept;
-        const_linear_iterator storage_cbegin() const noexcept;
-        const_linear_iterator storage_cend() const noexcept;
+        const_linear_iterator linear_begin() const noexcept;
+        const_linear_iterator linear_end() const noexcept;
+        const_linear_iterator linear_cbegin() const noexcept;
+        const_linear_iterator linear_cend() const noexcept;
 
         reverse_linear_iterator storage_rbegin() noexcept;
         reverse_linear_iterator storage_rend() noexcept;
@@ -423,7 +423,7 @@ namespace xt
     template <class T>
     inline void xcontainer<D>::fill(const T& value)
     {
-        std::fill(storage_begin(), storage_end(), value);
+        std::fill(linear_begin(), linear_end(), value);
     }
 
     /**
@@ -752,37 +752,37 @@ namespace xt
     }
 
     template <class D>
-    inline auto xcontainer<D>::storage_begin() noexcept -> linear_iterator
+    inline auto xcontainer<D>::linear_begin() noexcept -> linear_iterator
     {
         return storage().begin();
     }
 
     template <class D>
-    inline auto xcontainer<D>::storage_end() noexcept -> linear_iterator
+    inline auto xcontainer<D>::linear_end() noexcept -> linear_iterator
     {
         return storage().end();
     }
 
     template <class D>
-    inline auto xcontainer<D>::storage_begin() const noexcept -> const_linear_iterator
+    inline auto xcontainer<D>::linear_begin() const noexcept -> const_linear_iterator
     {
         return storage().begin();
     }
 
     template <class D>
-    inline auto xcontainer<D>::storage_end() const noexcept -> const_linear_iterator
+    inline auto xcontainer<D>::linear_end() const noexcept -> const_linear_iterator
     {
         return storage().cend();
     }
 
     template <class D>
-    inline auto xcontainer<D>::storage_cbegin() const noexcept -> const_linear_iterator
+    inline auto xcontainer<D>::linear_cbegin() const noexcept -> const_linear_iterator
     {
         return storage().cbegin();
     }
 
     template <class D>
-    inline auto xcontainer<D>::storage_cend() const noexcept -> const_linear_iterator
+    inline auto xcontainer<D>::linear_cend() const noexcept -> const_linear_iterator
     {
         return storage().cend();
     }

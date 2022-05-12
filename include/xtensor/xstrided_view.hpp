@@ -217,10 +217,10 @@ namespace xt
         template <class T>
         void fill(const T& value);
 
-        linear_iterator storage_begin();
-        linear_iterator storage_end();
-        const_linear_iterator storage_cbegin() const;
-        const_linear_iterator storage_cend() const;
+        linear_iterator linear_begin();
+        linear_iterator linear_end();
+        const_linear_iterator linear_cbegin() const;
+        const_linear_iterator linear_cend() const;
 
         template <class ST, class STEP = stepper>
         disable_indexed_stepper_t<STEP>
@@ -439,7 +439,7 @@ namespace xt
     {
         if (layout() != layout_type::dynamic)
         {
-            std::fill(this->storage_begin(), this->storage_end(), value);
+            std::fill(this->linear_begin(), this->linear_end(), value);
         }
         else
         {
@@ -473,25 +473,25 @@ namespace xt
     }
 
     template <class CT, class S, layout_type L, class FST>
-    inline auto xstrided_view<CT, S, L, FST>::storage_begin() -> linear_iterator
+    inline auto xstrided_view<CT, S, L, FST>::linear_begin() -> linear_iterator
     {
         return this->storage().begin() + static_cast<std::ptrdiff_t>(data_offset());
     }
 
     template <class CT, class S, layout_type L, class FST>
-    inline auto xstrided_view<CT, S, L, FST>::storage_end() -> linear_iterator
+    inline auto xstrided_view<CT, S, L, FST>::linear_end() -> linear_iterator
     {
         return this->storage().begin() + static_cast<std::ptrdiff_t>(data_offset() + size());
     }
 
     template <class CT, class S, layout_type L, class FST>
-    inline auto xstrided_view<CT, S, L, FST>::storage_cbegin() const -> const_linear_iterator
+    inline auto xstrided_view<CT, S, L, FST>::linear_cbegin() const -> const_linear_iterator
     {
         return this->storage().cbegin() + static_cast<std::ptrdiff_t>(data_offset());
     }
 
     template <class CT, class S, layout_type L, class FST>
-    inline auto xstrided_view<CT, S, L, FST>::storage_cend() const -> const_linear_iterator
+    inline auto xstrided_view<CT, S, L, FST>::linear_cend() const -> const_linear_iterator
     {
         return this->storage().cbegin() + static_cast<std::ptrdiff_t>(data_offset() + size());
     }

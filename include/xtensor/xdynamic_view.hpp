@@ -499,7 +499,7 @@ namespace xt
     template <class T>
     inline void xdynamic_view<CT, S, L, FST>::fill(const T& value)
     {
-        return std::fill(this->storage_begin(), this->storage_end(), value);
+        return std::fill(this->linear_begin(), this->linear_end(), value);
     }
 
     template <class CT, class S, layout_type L, class FST>

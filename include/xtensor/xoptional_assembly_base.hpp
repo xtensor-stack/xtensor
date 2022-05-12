@@ -216,13 +216,13 @@ namespace xt
         using iterable_base::crbegin;
         using iterable_base::crend;
 
-        linear_iterator storage_begin() noexcept;
-        linear_iterator storage_end() noexcept;
+        linear_iterator linear_begin() noexcept;
+        linear_iterator linear_end() noexcept;
 
-        const_linear_iterator storage_begin() const noexcept;
-        const_linear_iterator storage_end() const noexcept;
-        const_linear_iterator storage_cbegin() const noexcept;
-        const_linear_iterator storage_cend() const noexcept;
+        const_linear_iterator linear_begin() const noexcept;
+        const_linear_iterator linear_end() const noexcept;
+        const_linear_iterator linear_cbegin() const noexcept;
+        const_linear_iterator linear_cend() const noexcept;
 
         reverse_linear_iterator storage_rbegin() noexcept;
         reverse_linear_iterator storage_rend() noexcept;
@@ -467,7 +467,7 @@ namespace xt
     template <class T>
     inline void xoptional_assembly_base<D>::fill(const T& value)
     {
-        std::fill(this->storage_begin(), this->storage_end(), value);
+        std::fill(this->linear_begin(), this->linear_end(), value);
     }
 
     /**
@@ -829,55 +829,55 @@ namespace xt
     //@}
 
     template <class D>
-    inline auto xoptional_assembly_base<D>::storage_begin() noexcept -> linear_iterator
+    inline auto xoptional_assembly_base<D>::linear_begin() noexcept -> linear_iterator
     {
-        return linear_iterator(value().storage_begin(),
-                                has_value().storage_begin());
+        return linear_iterator(value().linear_begin(),
+                                has_value().linear_begin());
     }
 
     template <class D>
-    inline auto xoptional_assembly_base<D>::storage_end() noexcept -> linear_iterator
+    inline auto xoptional_assembly_base<D>::linear_end() noexcept -> linear_iterator
     {
-        return linear_iterator(value().storage_end(),
-                                has_value().storage_end());
+        return linear_iterator(value().linear_end(),
+                                has_value().linear_end());
     }
 
     template <class D>
-    inline auto xoptional_assembly_base<D>::storage_begin() const noexcept -> const_linear_iterator
+    inline auto xoptional_assembly_base<D>::linear_begin() const noexcept -> const_linear_iterator
     {
-        return storage_cbegin();
+        return linear_cbegin();
     }
 
     template <class D>
-    inline auto xoptional_assembly_base<D>::storage_end() const noexcept -> const_linear_iterator
+    inline auto xoptional_assembly_base<D>::linear_end() const noexcept -> const_linear_iterator
     {
-        return storage_cend();
+        return linear_cend();
     }
 
     template <class D>
-    inline auto xoptional_assembly_base<D>::storage_cbegin() const noexcept -> const_linear_iterator
+    inline auto xoptional_assembly_base<D>::linear_cbegin() const noexcept -> const_linear_iterator
     {
-        return const_linear_iterator(value().storage_cbegin(),
-                                      has_value().storage_cbegin());
+        return const_linear_iterator(value().linear_cbegin(),
+                                      has_value().linear_cbegin());
     }
 
     template <class D>
-    inline auto xoptional_assembly_base<D>::storage_cend() const noexcept -> const_linear_iterator
+    inline auto xoptional_assembly_base<D>::linear_cend() const noexcept -> const_linear_iterator
     {
-        return const_linear_iterator(value().storage_cend(),
-                                      has_value().storage_cend());
+        return const_linear_iterator(value().linear_cend(),
+                                      has_value().linear_cend());
     }
 
     template <class D>
     inline auto xoptional_assembly_base<D>::storage_rbegin() noexcept -> reverse_linear_iterator
     {
-        return reverse_linear_iterator(storage_end());
+        return reverse_linear_iterator(linear_end());
     }
 
     template <class D>
     inline auto xoptional_assembly_base<D>::storage_rend() noexcept -> reverse_linear_iterator
     {
-        return reverse_linear_iterator(storage_begin());
+        return reverse_linear_iterator(linear_begin());
     }
 
     template <class D>
@@ -895,13 +895,13 @@ namespace xt
     template <class D>
     inline auto xoptional_assembly_base<D>::storage_crbegin() const noexcept -> const_reverse_linear_iterator
     {
-        return const_reverse_linear_iterator(storage_cend());
+        return const_reverse_linear_iterator(linear_cend());
     }
 
     template <class D>
     inline auto xoptional_assembly_base<D>::storage_crend() const noexcept -> const_reverse_linear_iterator
     {
-        return const_reverse_linear_iterator(storage_cbegin());
+        return const_reverse_linear_iterator(linear_cbegin());
     }
 
     template <class D>

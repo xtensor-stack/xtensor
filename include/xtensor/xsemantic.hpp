@@ -706,7 +706,7 @@ namespace xt
         template <class D>
         auto get_begin(D&& lhs, std::true_type)
         {
-            return lhs.storage_begin();
+            return lhs.linear_begin();
         }
 
         template <class D>

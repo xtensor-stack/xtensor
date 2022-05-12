@@ -572,12 +572,12 @@ namespace xt
         XTENSOR_FORWARD_CONST_ITERATOR_METHOD(crbegin)
         XTENSOR_FORWARD_CONST_ITERATOR_METHOD(crend)
 
-        XTENSOR_FORWARD_METHOD(storage_begin)
-        XTENSOR_FORWARD_METHOD(storage_end)
-        XTENSOR_FORWARD_CONST_METHOD(storage_begin)
-        XTENSOR_FORWARD_CONST_METHOD(storage_end)
-        XTENSOR_FORWARD_CONST_METHOD(storage_cbegin)
-        XTENSOR_FORWARD_CONST_METHOD(storage_cend)
+        XTENSOR_FORWARD_METHOD(linear_begin)
+        XTENSOR_FORWARD_METHOD(linear_end)
+        XTENSOR_FORWARD_CONST_METHOD(linear_begin)
+        XTENSOR_FORWARD_CONST_METHOD(linear_end)
+        XTENSOR_FORWARD_CONST_METHOD(linear_cbegin)
+        XTENSOR_FORWARD_CONST_METHOD(linear_cend)
 
         XTENSOR_FORWARD_METHOD(storage_rbegin)
         XTENSOR_FORWARD_METHOD(storage_rend)

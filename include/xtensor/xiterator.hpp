@@ -428,7 +428,7 @@ namespace xt
         };
 
         template <class C>
-        struct has_linear_iterator<C, void_t<decltype(std::declval<C>().storage_cbegin())>>
+        struct has_linear_iterator<C, void_t<decltype(std::declval<C>().linear_cbegin())>>
             : std::true_type
         {
         };
@@ -439,7 +439,7 @@ namespace xt
     {
         return xtl::mpl::static_if<detail::has_linear_iterator<C>::value>([&](auto self)
         {
-            return self(c).storage_begin();
+            return self(c).linear_begin();
         }, /*else*/ [&](auto self)
         {
             return self(c).begin();
@@ -451,7 +451,7 @@ namespace xt
     {
         return xtl::mpl::static_if<detail::has_linear_iterator<C>::value>([&](auto self)
         {
-            return self(c).storage_end();
+            return self(c).linear_end();
         }, /*else*/ [&](auto self)
         {
             return self(c).end();
@@ -463,7 +463,7 @@ namespace xt
     {
         return xtl::mpl::static_if<detail::has_linear_iterator<C>::value>([&](auto self)
         {
-            return self(c).storage_cbegin();
+            return self(c).linear_cbegin();
         }, /*else*/ [&](auto self)
         {
             return self(c).cbegin();
@@ -475,7 +475,7 @@ namespace xt
     {
         return xtl::mpl::static_if<detail::has_linear_iterator<C>::value>([&](auto self)
         {
-            return self(c).storage_cend();
+            return self(c).linear_cend();
         }, /*else*/ [&](auto self)
         {
             return self(c).cend();
