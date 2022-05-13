@@ -197,13 +197,13 @@ namespace xt
         const_linear_iterator linear_cbegin() const noexcept;
         const_linear_iterator linear_cend() const noexcept;
 
-        reverse_linear_iterator storage_rbegin() noexcept;
-        reverse_linear_iterator storage_rend() noexcept;
+        reverse_linear_iterator linear_rbegin() noexcept;
+        reverse_linear_iterator linear_rend() noexcept;
 
-        const_reverse_linear_iterator storage_rbegin() const noexcept;
-        const_reverse_linear_iterator storage_rend() const noexcept;
-        const_reverse_linear_iterator storage_crbegin() const noexcept;
-        const_reverse_linear_iterator storage_crend() const noexcept;
+        const_reverse_linear_iterator linear_rbegin() const noexcept;
+        const_reverse_linear_iterator linear_rend() const noexcept;
+        const_reverse_linear_iterator linear_crbegin() const noexcept;
+        const_reverse_linear_iterator linear_crend() const noexcept;
 
         using container_iterator = linear_iterator;
         using const_container_iterator = const_linear_iterator;
@@ -788,37 +788,37 @@ namespace xt
     }
 
     template <class D>
-    inline auto xcontainer<D>::storage_rbegin() noexcept -> reverse_linear_iterator
+    inline auto xcontainer<D>::linear_rbegin() noexcept -> reverse_linear_iterator
     {
         return storage().rbegin();
     }
 
     template <class D>
-    inline auto xcontainer<D>::storage_rend() noexcept -> reverse_linear_iterator
+    inline auto xcontainer<D>::linear_rend() noexcept -> reverse_linear_iterator
     {
         return storage().rend();
     }
 
     template <class D>
-    inline auto xcontainer<D>::storage_rbegin() const noexcept -> const_reverse_linear_iterator
+    inline auto xcontainer<D>::linear_rbegin() const noexcept -> const_reverse_linear_iterator
     {
         return storage().rbegin();
     }
 
     template <class D>
-    inline auto xcontainer<D>::storage_rend() const noexcept -> const_reverse_linear_iterator
+    inline auto xcontainer<D>::linear_rend() const noexcept -> const_reverse_linear_iterator
     {
         return storage().rend();
     }
 
     template <class D>
-    inline auto xcontainer<D>::storage_crbegin() const noexcept -> const_reverse_linear_iterator
+    inline auto xcontainer<D>::linear_crbegin() const noexcept -> const_reverse_linear_iterator
     {
         return storage().crbegin();
     }
 
     template <class D>
-    inline auto xcontainer<D>::storage_crend() const noexcept -> const_reverse_linear_iterator
+    inline auto xcontainer<D>::linear_crend() const noexcept -> const_reverse_linear_iterator
     {
         return storage().crend();
     }

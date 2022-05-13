@@ -297,10 +297,10 @@ namespace xt
         const_linear_iterator linear_cbegin() const noexcept;
         const_linear_iterator linear_cend() const noexcept;
 
-        const_reverse_linear_iterator storage_rbegin() const noexcept;
-        const_reverse_linear_iterator storage_rend() const noexcept;
-        const_reverse_linear_iterator storage_crbegin() const noexcept;
-        const_reverse_linear_iterator storage_crend() const noexcept;
+        const_reverse_linear_iterator linear_rbegin() const noexcept;
+        const_reverse_linear_iterator linear_rend() const noexcept;
+        const_reverse_linear_iterator linear_crbegin() const noexcept;
+        const_reverse_linear_iterator linear_crend() const noexcept;
 
         template <class S>
         const_stepper stepper_begin(const S& shape) const noexcept;
@@ -712,25 +712,25 @@ namespace xt
     }
 
     template <class F, class... CT>
-    inline auto xfunction<F, CT...>::storage_rbegin() const noexcept -> const_reverse_linear_iterator
+    inline auto xfunction<F, CT...>::linear_rbegin() const noexcept -> const_reverse_linear_iterator
     {
-        return storage_crbegin();
+        return linear_crbegin();
     }
 
     template <class F, class... CT>
-    inline auto xfunction<F, CT...>::storage_rend() const noexcept -> const_reverse_linear_iterator
+    inline auto xfunction<F, CT...>::linear_rend() const noexcept -> const_reverse_linear_iterator
     {
-        return storage_crend();
+        return linear_crend();
     }
 
     template <class F, class... CT>
-    inline auto xfunction<F, CT...>::storage_crbegin() const noexcept -> const_reverse_linear_iterator
+    inline auto xfunction<F, CT...>::linear_crbegin() const noexcept -> const_reverse_linear_iterator
     {
         return const_reverse_linear_iterator(linear_cend());
     }
 
     template <class F, class... CT>
-    inline auto xfunction<F, CT...>::storage_crend() const noexcept -> const_reverse_linear_iterator
+    inline auto xfunction<F, CT...>::linear_crend() const noexcept -> const_reverse_linear_iterator
     {
         return const_reverse_linear_iterator(linear_cbegin());
     }

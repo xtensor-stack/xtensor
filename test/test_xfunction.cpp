@@ -453,7 +453,7 @@ namespace xt
             }
 
             auto resit4 = res4.template rbegin<XTENSOR_DEFAULT_LAYOUT>();
-            for (auto it = func.storage_rbegin(); it != func.storage_rend(); ++it)
+            for (auto it = func.linear_rbegin(); it != func.linear_rend(); ++it)
             {
                 *(resit4++) = *it;
             }

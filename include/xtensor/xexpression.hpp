@@ -579,12 +579,12 @@ namespace xt
         XTENSOR_FORWARD_CONST_METHOD(linear_cbegin)
         XTENSOR_FORWARD_CONST_METHOD(linear_cend)
 
-        XTENSOR_FORWARD_METHOD(storage_rbegin)
-        XTENSOR_FORWARD_METHOD(storage_rend)
-        XTENSOR_FORWARD_CONST_METHOD(storage_rbegin)
-        XTENSOR_FORWARD_CONST_METHOD(storage_rend)
-        XTENSOR_FORWARD_CONST_METHOD(storage_crbegin)
-        XTENSOR_FORWARD_CONST_METHOD(storage_crend)
+        XTENSOR_FORWARD_METHOD(linear_rbegin)
+        XTENSOR_FORWARD_METHOD(linear_rend)
+        XTENSOR_FORWARD_CONST_METHOD(linear_rbegin)
+        XTENSOR_FORWARD_CONST_METHOD(linear_rend)
+        XTENSOR_FORWARD_CONST_METHOD(linear_crbegin)
+        XTENSOR_FORWARD_CONST_METHOD(linear_crend)
 
         template <class T = E>
         std::enable_if_t<has_strides<T>::value, const inner_strides_type&>

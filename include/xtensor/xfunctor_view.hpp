@@ -301,13 +301,13 @@ namespace xt
         const_linear_iterator linear_cbegin() const noexcept;
         const_linear_iterator linear_cend() const noexcept;
 
-        reverse_linear_iterator storage_rbegin() noexcept;
-        reverse_linear_iterator storage_rend() noexcept;
+        reverse_linear_iterator linear_rbegin() noexcept;
+        reverse_linear_iterator linear_rend() noexcept;
 
-        const_reverse_linear_iterator storage_rbegin() const noexcept;
-        const_reverse_linear_iterator storage_rend() const noexcept;
-        const_reverse_linear_iterator storage_crbegin() const noexcept;
-        const_reverse_linear_iterator storage_crend() const noexcept;
+        const_reverse_linear_iterator linear_rbegin() const noexcept;
+        const_reverse_linear_iterator linear_rend() const noexcept;
+        const_reverse_linear_iterator linear_crbegin() const noexcept;
+        const_reverse_linear_iterator linear_crend() const noexcept;
 
         template <class S>
         stepper stepper_begin(const S& shape) noexcept;
@@ -1257,39 +1257,39 @@ namespace xt
     }
 
     template <class D>
-    inline auto xfunctor_applier_base<D>::storage_rbegin() noexcept -> reverse_linear_iterator
+    inline auto xfunctor_applier_base<D>::linear_rbegin() noexcept -> reverse_linear_iterator
     {
-        return reverse_linear_iterator(m_e.storage_rbegin(), &m_functor);
+        return reverse_linear_iterator(m_e.linear_rbegin(), &m_functor);
     }
 
     template <class D>
-    inline auto xfunctor_applier_base<D>::storage_rend() noexcept -> reverse_linear_iterator
+    inline auto xfunctor_applier_base<D>::linear_rend() noexcept -> reverse_linear_iterator
     {
-        return reverse_linear_iterator(m_e.storage_rend(), &m_functor);
+        return reverse_linear_iterator(m_e.linear_rend(), &m_functor);
     }
 
     template <class D>
-    inline auto xfunctor_applier_base<D>::storage_rbegin() const noexcept -> const_reverse_linear_iterator
+    inline auto xfunctor_applier_base<D>::linear_rbegin() const noexcept -> const_reverse_linear_iterator
     {
-        return const_reverse_linear_iterator(m_e.storage_rbegin(), &m_functor);
+        return const_reverse_linear_iterator(m_e.linear_rbegin(), &m_functor);
     }
 
     template <class D>
-    inline auto xfunctor_applier_base<D>::storage_rend() const noexcept -> const_reverse_linear_iterator
+    inline auto xfunctor_applier_base<D>::linear_rend() const noexcept -> const_reverse_linear_iterator
     {
-        return const_reverse_linear_iterator(m_e.storage_rend(), &m_functor);
+        return const_reverse_linear_iterator(m_e.linear_rend(), &m_functor);
     }
 
     template <class D>
-    inline auto xfunctor_applier_base<D>::storage_crbegin() const noexcept -> const_reverse_linear_iterator
+    inline auto xfunctor_applier_base<D>::linear_crbegin() const noexcept -> const_reverse_linear_iterator
     {
-        return const_reverse_linear_iterator(m_e.storage_crbegin(), &m_functor);
+        return const_reverse_linear_iterator(m_e.linear_crbegin(), &m_functor);
     }
 
     template <class D>
-    inline auto xfunctor_applier_base<D>::storage_crend() const noexcept -> const_reverse_linear_iterator
+    inline auto xfunctor_applier_base<D>::linear_crend() const noexcept -> const_reverse_linear_iterator
     {
-        return const_reverse_linear_iterator(m_e.storage_crend(), &m_functor);
+        return const_reverse_linear_iterator(m_e.linear_crend(), &m_functor);
     }
 
     /***************
