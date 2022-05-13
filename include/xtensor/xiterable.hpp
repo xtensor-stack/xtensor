@@ -1026,7 +1026,7 @@ namespace xt
     {
         return xtl::mpl::static_if<L == static_layout>([&](auto self)
         {
-            return self(*this).derived_cast().storage_rbegin();
+            return self(*this).derived_cast().linear_rbegin();
         }, /*else*/ [&](auto self)
         {
             return self(*this).iterable_base::template rbegin<L>();
@@ -1044,7 +1044,7 @@ namespace xt
     {
         return xtl::mpl::static_if<L == static_layout>([&](auto self)
         {
-            return self(*this).derived_cast().storage_rend();
+            return self(*this).derived_cast().linear_rend();
         }, /*else*/ [&](auto self)
         {
             return self(*this).iterable_base::template rend<L>();
@@ -1085,7 +1085,7 @@ namespace xt
     {
         return xtl::mpl::static_if<L == static_layout>([&](auto self)
         {
-            return self(*this).derived_cast().storage_crbegin();
+            return self(*this).derived_cast().linear_crbegin();
         }, /*else*/ [&](auto self)
         {
             return self(*this).iterable_base::template crbegin<L>();
@@ -1103,7 +1103,7 @@ namespace xt
     {
         return xtl::mpl::static_if<L == static_layout>([&](auto self)
         {
-            return self(*this).derived_cast().storage_crend();
+            return self(*this).derived_cast().linear_crend();
         }, /*else*/ [&](auto self)
         {
             return self(*this).iterable_base::template crend<L>();
