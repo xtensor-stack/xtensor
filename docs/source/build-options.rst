@@ -47,12 +47,12 @@ External dependencies
 The last group of macros is for using external libraries to achieve maximum performance (see next section for additional
 requirements):
 
-- ``XTENSOR_USE_XSIMD``: enables SIMD acceleration in *xtensor*. This requires that you have xsimd_ installed
+- ``XTENSOR_USE_XSIMD``/``xtensor:use_xsimd``: enables SIMD acceleration in *xtensor*. This requires that you have xsimd_ installed
   on your system.
-- ``XTENSOR_USE_TBB``: enables parallel assignment loop. This requires that you have tbb_ installed
+- ``XTENSOR_USE_TBB``/``xtensor:use_TBB``: enables parallel assignment loop. This requires that you have tbb_ installed
   on your system.
-- ``XTENSOR_DISABLE_EXCEPTIONS``: disables c++ exceptions.
-- ``XTENSOR_USE_OPENMP``: enables parallel assignment loop using OpenMP. This requires that OpenMP is available on your system.
+- ``XTENSOR_DISABLE_EXCEPTIONS``/``xtensor:noexcept``: disables c++ exceptions.
+- ``XTENSOR_USE_OPENMP``/``xtensor:use_OpenMP``: enables parallel assignment loop using OpenMP. This requires that OpenMP is available on your system.
 
 Defining these macros in the CMakeLists of your project before searching for *xtensor* will trigger automatic finding
 of dependencies, so you don't have to include the ``find_package(xsimd)`` and ``find_package(TBB)`` commands in your
@@ -69,6 +69,16 @@ CMakeLists:
     # the target now sets the proper defines (e.g. "XTENSOR_USE_XSIMD")
     target_link_libraries(... xtensor)
 
+Alternatively, one can use targets to configre *xtensor* instead of using defines.
+
+.. code:: cmake
+
+    find_package(xtensor REQUIRED)
+    # xsimd and TBB dependencies are automatically
+    # searched when the following is executed
+    # the target now sets the proper defines (e.g. "XTENSOR_USE_XSIMD")
+    target_link_libraries(... xtensor xtensor:use_simd xtensor:use_tbb)
+
 
 Build and optimization
 ----------------------
@@ -81,7 +91,7 @@ the following options are recommended:
 
 .. code:: cmake
 
-    target_link_libraries(... xtensor xtensor::optimize)
+    target_link_libraries(... xtensor xtensor:optimize)
     set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
 
     # OR
@@ -110,7 +120,7 @@ if your compiler supports it:
 
 .. code:: cmake
 
-    target_link_libraries(... xtensor xtensor::optimize)
+    target_link_libraries(... xtensor xtensor:optimize)
 
     # OR
 
