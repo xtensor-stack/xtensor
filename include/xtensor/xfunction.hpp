@@ -142,9 +142,10 @@ namespace xt
     struct xcontainer_inner_types<xfunction<F, CT...>>
     {
         // Added indirection for MSVC 2017 bug with the operator value_type()
-        using value_type = typename meta_identity<decltype(std::declval<F>()(std::declval<xvalue_type_t<std::decay_t<CT>>>()...))>::type;
-        using reference = value_type;
-        using const_reference = value_type;
+        using func_return_type = typename meta_identity<decltype(std::declval<F>()(std::declval<xvalue_type_t<std::decay_t<CT>>>()...))>::type;
+        using value_type = std::decay_t<func_return_type>;
+        using reference = func_return_type;
+        using const_reference = reference;
         using size_type = common_size_type_t<std::decay_t<CT>...>;
     };
 
@@ -439,7 +440,7 @@ namespace xt
         using xfunction_type = xfunction<F, CT...>;
 
         using value_type = typename xfunction_type::value_type;
-        using reference = typename xfunction_type::value_type;
+        using reference = typename xfunction_type::reference;
         using pointer = typename xfunction_type::const_pointer;
         using size_type = typename xfunction_type::size_type;
         using difference_type = typename xfunction_type::difference_type;
