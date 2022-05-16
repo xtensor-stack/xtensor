@@ -527,7 +527,7 @@ namespace xt
         using inner_backstrides_type = xtl::mpl::eval_if_t<has_strides<E>,
                                                            detail::expr_inner_backstrides_type<E>,
                                                            get_strides_type<shape_type>>;
-        using storage_type = xtl::mpl::eval_if_t<has_data_interface<E>,
+        using storage_type = xtl::mpl::eval_if_t<has_storage_type<E>,
                                                  detail::expr_storage_type<E>,
                                                  make_invalid_type<>>;
 
