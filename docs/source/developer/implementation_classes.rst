@@ -46,10 +46,10 @@ types:
     template <class S, layout_type L>
     const_reverse_broadcast_iterator<S, L>;
 
-    storage_iterator;
-    const_storage_iterator;
-    reverse_storage_iterator;
-    const_reverse_storage_iterator;
+    linear_iterator;
+    const_linear_iterator;
+    reverse_linear_iterator;
+    const_reverse_linear_iterator;
 
 **layout data**
 
