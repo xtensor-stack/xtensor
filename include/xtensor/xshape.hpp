@@ -25,6 +25,12 @@
 
 namespace xt
 {
+    namespace detail 
+    {
+        template <class E, class Enable = void>
+        struct get_fixed_size;
+    }
+
     template <class T>
     using dynamic_shape = svector<T, 4>;
 
@@ -231,9 +237,9 @@ namespace xt
         };
 
         template <class T>
-        struct static_dimension_impl<T, void_t<decltype(std::tuple_size<T>::value)>>
+        struct static_dimension_impl<T, void_t<decltype(detail::get_fixed_size<T>::value)>>
         {
-            static constexpr std::ptrdiff_t value = static_cast<std::ptrdiff_t>(std::tuple_size<T>::value);
+            static constexpr std::ptrdiff_t value = static_cast<std::ptrdiff_t>(detail::get_fixed_size<T>::value);
         };
     }
 
@@ -281,7 +287,7 @@ namespace xt
         };
 
         template <class T, class... Ts>
-        struct max_array_size<T, Ts...> : std::integral_constant<std::size_t, imax(std::tuple_size<T>::value, max_array_size<Ts...>::value)>
+        struct max_array_size<T, Ts...> : std::integral_constant<std::size_t, imax(detail::get_fixed_size<T>::value, max_array_size<Ts...>::value)>
         {
         };
 
@@ -375,8 +381,27 @@ namespace xt
             static constexpr bool value = true;
         };
 
+        template <class E, class Enable = void>
+        struct has_fixed_size : std::false_type
+        {
+        };
+
+        template <class E>
+        struct has_fixed_size<E, void_t<decltype(std::tuple_size<E>::value)>>
+            : std::true_type
+        {
+        };
+
+        template <class E, class Enable>
+        struct get_fixed_size;
+
+        template <class E>
+        struct get_fixed_size<E, void_t<decltype(std::tuple_size<E>::value)>> : std::integral_constant<std::size_t, std::tuple_size<E>::value>
+        {
+        };
+
         template <class... S>
-        using only_array = xtl::conjunction<xtl::disjunction<is_array<S>, is_fixed<S>>...>;
+        using only_array = xtl::conjunction<xtl::disjunction<is_array<S>, is_fixed<S>, has_fixed_size<S>>...>;
 
         // test that at least one argument is a fixed shape. If yes, then either argument has to be fixed or scalar
         template <class... S>

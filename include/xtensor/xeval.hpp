@@ -80,7 +80,7 @@ namespace xt
         template <class E>
         constexpr bool has_fixed_dims()
         {
-            return detail::is_array<typename std::decay_t<E>::shape_type>::value;
+            return detail::has_fixed_size<typename std::decay_t<E>::shape_type>::value;
         }
 
         template <class E>
@@ -102,7 +102,7 @@ namespace xt
 
         template <class E, layout_type L>
         using as_xtensor_container_t = xtensor<typename std::decay_t<E>::value_type,
-                                               std::tuple_size<typename std::decay_t<E>::shape_type>::value,
+                                               detail::get_fixed_size<typename std::decay_t<E>::shape_type>::value,
                                                layout_remove_any(L)>;
     }
 
