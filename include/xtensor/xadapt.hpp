@@ -89,7 +89,7 @@ namespace xt
      */
     template <layout_type L = XTENSOR_DEFAULT_LAYOUT, class C, class SC,
               XTL_REQUIRES(detail::not_an_array<std::decay_t<SC>>,
-                           std::is_pointer<C>)>
+                           std::is_pointer<std::remove_reference_t<C>>)>
     inline auto adapt(C&& pointer, const SC& shape, layout_type l = L)
     {
         static_assert(!xtl::is_integral<SC>::value, "shape cannot be a integer");
@@ -247,7 +247,7 @@ namespace xt
      */
     template <layout_type L = XTENSOR_DEFAULT_LAYOUT, class C, class SC,
               XTL_REQUIRES(detail::is_array<std::decay_t<SC>>,
-                           std::is_pointer<C>)>
+                           std::is_pointer<std::remove_reference_t<C>>)>
     inline auto adapt(C&& pointer, const SC& shape, layout_type l = L)
     {
         static_assert(!xtl::is_integral<SC>::value, "shape cannot be a integer");
@@ -390,7 +390,7 @@ namespace xt
      * @param shape the shape of the xtensor_fixed_adaptor
      */
     template <layout_type L = XTENSOR_DEFAULT_LAYOUT, class C, std::size_t... X,
-              XTL_REQUIRES(std::is_pointer<C>)>
+              XTL_REQUIRES(std::is_pointer<std::remove_reference_t<C>>)>
     inline auto adapt(C&& pointer, const fixed_shape<X...>& /*shape*/)
     {
         using buffer_type = xbuffer_adaptor<C, xt::no_ownership, detail::default_allocator_for_ptr_t<C>>;
