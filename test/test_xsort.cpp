@@ -190,6 +190,10 @@ namespace xt
         EXPECT_EQ(ex, argmin(xa));
         EXPECT_EQ(ex_2, argmin(xa, 0));
         EXPECT_EQ(ex_3, argmin(xa, 1));
+
+        xtensor<double, 1> ya = {0, 1, 2, 3, 4};
+        EXPECT_EQ(0, argmin(ya)());
+        EXPECT_EQ(0, argmin(ya, 0)());
     }
 
     TEST(xsort, argmax)
@@ -218,6 +222,10 @@ namespace xt
 
         xtensor<std::size_t, 2> ex_6 = {{0, 0, 0, 0}, {0, 0, 0, 0}};
         EXPECT_EQ(ex_6, argmax(c, 1));
+
+        xtensor<double, 1> ya = {0, 1, 2, 3, 4};
+        EXPECT_EQ(4, argmax(ya)());
+        EXPECT_EQ(4, argmax(ya, 0)());
     }
 
     TEST(xsort, sort_large_prob)

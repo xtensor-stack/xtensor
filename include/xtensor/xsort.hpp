@@ -777,14 +777,6 @@ namespace xt
             using result_type = typename argfunc_result_type<E>::type;
             using result_shape_type = typename result_type::shape_type;
 
-            if (e.dimension() == 1)
-            {
-                auto begin = e.template begin<L>();
-                auto end = e.template end<L>();
-                std::size_t i = static_cast<std::size_t>(std::distance(begin, std::min_element(begin, end)));
-                return xtensor<size_t, 0>{i};
-            }
-
             result_shape_type alt_shape;
             xt::resize_container(alt_shape, e.dimension() - 1);
 
@@ -831,7 +823,8 @@ namespace xt
     }
 
     template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E>
-    inline auto argmin(const xexpression<E>& e)
+    inline typename detail::argfunc_result_type<E>::type
+    argmin(const xexpression<E>& e)
     {
         using value_type = typename E::value_type;
         auto&& ed = eval(e.derived_cast());
@@ -852,16 +845,24 @@ namespace xt
      * @return returns xarray with positions of minimal value
      */
     template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E>
-    inline auto argmin(const xexpression<E>& e, std::ptrdiff_t axis)
+    inline typename detail::argfunc_result_type<E>::type
+    argmin(const xexpression<E>& e, std::ptrdiff_t axis)
     {
         using value_type = typename E::value_type;
         auto&& ed = eval(e.derived_cast());
         std::size_t ax = normalize_axis(ed.dimension(), axis);
+
+        if (ed.dimension() == 1)
+        {
+            return argmin(ed);
+        }
+
         return detail::arg_func_impl<L>(ed, ax, std::less<value_type>());
     }
 
     template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E>
-    inline auto argmax(const xexpression<E>& e)
+    inline typename detail::argfunc_result_type<E>::type
+    argmax(const xexpression<E>& e)
     {
         using value_type = typename E::value_type;
         auto&& ed = eval(e.derived_cast());
@@ -882,11 +883,18 @@ namespace xt
      * @return returns xarray with positions of maximal value
      */
     template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E>
-    inline auto argmax(const xexpression<E>& e, std::ptrdiff_t axis)
+    inline typename detail::argfunc_result_type<E>::type
+    argmax(const xexpression<E>& e, std::ptrdiff_t axis)
     {
         using value_type = typename E::value_type;
         auto&& ed = eval(e.derived_cast());
         std::size_t ax = normalize_axis(ed.dimension(), axis);
+
+        if (ed.dimension() == 1)
+        {
+            return argmax(ed);
+        }
+
         return detail::arg_func_impl<L>(ed, ax, std::greater<value_type>());
     }
 
