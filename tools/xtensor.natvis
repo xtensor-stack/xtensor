@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- https://docs.microsoft.com/en-us/visualstudio/debugger/create-custom-views-of-native-objects?view=vs-2022 -->
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <!-- xarray - Dynamic -->
+  <Type Name="xt::xarray_container&lt;xt::uvector&lt;*,std::allocator&lt;*&gt;&gt;,*,xt::svector&lt;unsigned __int64,4,std::allocator&lt;unsigned __int64&gt;,1&gt;,xt::xtensor_expression_tag&gt;">
+      <DisplayString Condition="(m_shape.m_end - m_shape.m_begin) == 0">empty</DisplayString>
+      <DisplayString Condition="(m_shape.m_end - m_shape.m_begin) > 0">type = {"$T1"}; shape = {m_shape.m_begin, [m_shape.m_end-m_shape.m_begin]nag}</DisplayString>
+      
+      <Expand>
+        <ArrayItems Condition="$T3!=2"> <!-- row major -->
+          <Rank>m_shape.m_end - m_shape.m_begin</Rank>
+          <Size>m_shape.m_begin[$i]</Size>
+          <ValuePointer>m_storage.p_begin</ValuePointer>
+        </ArrayItems>
+        <ArrayItems Condition="$T3==2"> <!-- column major -->
+          <Direction>Backward</Direction>
+          <Rank>m_shape.m_end - m_shape.m_begin</Rank>
+          <Size>m_shape.m_begin[$i]</Size>
+          <ValuePointer>m_storage.p_begin</ValuePointer>
+        </ArrayItems>
+      </Expand>
+  </Type>
+
+  <!-- xtensor - Fixed -->
+   <Type Name="xt::xtensor_container&lt;xt::uvector&lt;*,std::allocator&lt;*&gt;&gt;,*,*,xt::xtensor_expression_tag&gt;">
+      <DisplayString Condition="$T3 == 0">empty</DisplayString>
+      <DisplayString Condition="$T3 > 0">type = {"$T1"}; shape = {m_shape._Elems, [$T3]nag}</DisplayString>
+      
+      <Expand>
+        <ArrayItems Condition="$T4!=2"> <!-- row major -->
+          <Rank>$T3</Rank>
+          <Size>m_shape[$i]</Size>
+          <ValuePointer>m_storage.p_begin</ValuePointer>
+        </ArrayItems>
+        <ArrayItems Condition="$T4==2"> <!-- column major -->
+          <Direction>Backward</Direction>
+          <Rank>$T3</Rank>
+          <Size>m_shape[$i]</Size>
+          <ValuePointer>m_storage.p_begin</ValuePointer>
+        </ArrayItems>
+      </Expand>
+  </Type>
+</AutoVisualizer>
