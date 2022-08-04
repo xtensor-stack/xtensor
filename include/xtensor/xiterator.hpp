@@ -604,7 +604,8 @@ namespace xt
     void stepper_tools<layout_type::row_major>::increment_stepper(S& stepper, IT& index, const ST& shape)
     {
         using size_type = typename S::size_type;
-        size_type i = index.size();
+        const size_type size = index.size();
+        size_type i = size;
         while (i != 0)
         {
             --i;
@@ -625,7 +626,19 @@ namespace xt
         }
         if (i == 0)
         {
-            std::copy(shape.cbegin(), shape.cend(), index.begin());
+            if (size != size_type(0))
+            {
+                std::transform(
+                    shape.cbegin(),
+                    shape.cend() - 1,
+                    index.begin(),
+                    [](const auto& v)
+                    {
+                        return v - 1;
+                    }
+                );
+                index[size - 1] = shape[size - 1];
+            }
             stepper.to_end(layout_type::row_major);
         }
     }
@@ -640,8 +653,9 @@ namespace xt
     )
     {
         using size_type = typename S::size_type;
-        size_type i = index.size();
-        size_type leading_i = index.size() - 1;
+        const size_type size = index.size();
+        const size_type leading_i = size - 1;
+        size_type i = size;
         while (i != 0 && n != 0)
         {
             --i;
@@ -673,7 +687,19 @@ namespace xt
         }
         if (i == 0 && n != 0)
         {
-            std::copy(shape.cbegin(), shape.cend(), index.begin());
+            if (size != size_type(0))
+            {
+                std::transform(
+                    shape.cbegin(),
+                    shape.cend() - 1,
+                    index.begin(),
+                    [](const auto& v)
+                    {
+                        return v - 1;
+                    }
+                );
+                index[leading_i] = shape[leading_i];
+            }
             stepper.to_end(layout_type::row_major);
         }
     }
@@ -760,7 +786,7 @@ namespace xt
     void stepper_tools<layout_type::column_major>::increment_stepper(S& stepper, IT& index, const ST& shape)
     {
         using size_type = typename S::size_type;
-        size_type size = index.size();
+        const size_type size = index.size();
         size_type i = 0;
         while (i != size)
         {
@@ -782,7 +808,19 @@ namespace xt
         }
         if (i == size)
         {
-            std::copy(shape.cbegin(), shape.cend(), index.begin());
+            if (size != size_type(0))
+            {
+                std::transform(
+                    shape.cbegin() + 1,
+                    shape.cend(),
+                    index.begin() + 1,
+                    [](const auto& v)
+                    {
+                        return v - 1;
+                    }
+                );
+                index[0] = shape[0];
+            }
             stepper.to_end(layout_type::column_major);
         }
     }
@@ -797,9 +835,9 @@ namespace xt
     )
     {
         using size_type = typename S::size_type;
-        size_type size = index.size();
+        const size_type size = index.size();
+        const size_type leading_i = 0;
         size_type i = 0;
-        size_type leading_i = 0;
         while (i != size && n != 0)
         {
             size_type inc = (i == leading_i) ? n : 1;
@@ -808,7 +846,7 @@ namespace xt
                 index[i] += inc;
                 stepper.step(i, inc);
                 n -= inc;
-                if (i != leading_i || index.size() == 1)
+                if (i != leading_i || size == 1)
                 {
                     i = 0;
                     continue;
@@ -832,7 +870,19 @@ namespace xt
         }
         if (i == size && n != 0)
         {
-            std::copy(shape.cbegin(), shape.cend(), index.begin());
+            if (size != size_type(0))
+            {
+                std::transform(
+                    shape.cbegin() + 1,
+                    shape.cend(),
+                    index.begin() + 1,
+                    [](const auto& v)
+                    {
+                        return v - 1;
+                    }
+                );
+                index[leading_i] = shape[leading_i];
+            }
             stepper.to_end(layout_type::column_major);
         }
     }
