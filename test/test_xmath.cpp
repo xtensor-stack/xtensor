@@ -889,6 +889,27 @@ namespace xt
         EXPECT_EQ(xt::average(v, w, {0, 1})(), m);
     }
 
+    TEST(xmath, average_random)
+    {
+        xt::xtensor<double,4> v = xt::random::rand<double>({4, 5, 6, 7});
+        xt::xtensor<double,4> w = xt::random::rand<double>({4, 5, 6, 7}) + 1.0;
+        xt::xtensor<double,2> r = xt::zeros<double>({6, 7});
+        xt::xtensor<double,2> n = xt::zeros<double>({6, 7});
+
+        for (size_t i = 0; i < v.shape(0); ++i) {
+            for (size_t j = 0; j < v.shape(1); ++j) {
+                for (size_t k = 0; k < v.shape(2); ++k) {
+                    for (size_t l = 0; l < v.shape(3); ++l) {
+                        r(k, l) += v(i, j, k, l) * w(i, j, k, l);
+                        n(k, l) += w(i, j, k, l);
+                    }
+                }
+            }
+        }
+
+        EXPECT_TRUE(xt::allclose(xt::average(v, w, {0, 1}), xt::eval(r / n)));
+    }
+
     /************************
      * Linear interpolation *
      ************************/
