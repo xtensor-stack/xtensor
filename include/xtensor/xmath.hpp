@@ -1975,21 +1975,13 @@ namespace detail {
         auto ax = normalize_axis(e, axes);
         if (weights.dimension() == 1)
         {
-            if (weights.size() != e.shape()[ax[0]])
-            {
-                XTENSOR_THROW(std::runtime_error, "Weights need to have the same shape as expression at axes.");
-            }
-
+            XTENSOR_ASSERT_MSG(weights.size() == e.shape()[ax[0]], "Weights need to have the same shape as expression at axes.");
             std::fill(broadcast_shape.begin(), broadcast_shape.end(), std::size_t(1));
             broadcast_shape[ax[0]] = weights.size();
         }
         else
         {
-            if (!same_shape(e.shape(), weights.shape()))
-            {
-                XTENSOR_THROW(std::runtime_error, "Weights with dim > 1 need to have the same shape as expression.");
-            }
-
+            XTENSOR_ASSERT_MSG(same_shape(e.shape(), weights.shape()), "Weights with dim > 1 need to have the same shape as expression.");
             std::copy(e.shape().begin(), e.shape().end(), broadcast_shape.begin());
         }
 
