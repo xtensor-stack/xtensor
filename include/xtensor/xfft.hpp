@@ -43,9 +43,10 @@ namespace xt
             }
 
             template<
-                typename T
+                typename T,
+                typename E1
             >
-            auto transform_radix2(xt::xarray<std::complex<T>> data)
+            auto transform_radix2(E1&& data)
             {
                 // Length variables
                 const std::size_t n = data.shape(0);
@@ -93,9 +94,10 @@ namespace xt
             }
 
             template<
-                typename T
-                >
-            auto transform_bluestein(xt::xarray<std::complex<T>> data)
+                typename T,
+                typename E1
+            >
+            auto transform_bluestein(E1&& data)
             {
                 // Find a power-of-2 convolution length m such that m >= n * 2 + 1
                 const std::size_t n = data.size();
@@ -119,11 +121,11 @@ namespace xt
                 expTable = xt::exp(-angles * j);
 
                 // Temporary vectors and preprocessing
-                xt::xarray<std::complex<T>> av = xt::empty<std::complex<T>>({ m });
+                auto av = xt::empty<std::complex<T>>({ m });
                 xt::view(av, xt::range(0, n)) = data * expTable;
 
 
-                xt::xarray<std::complex<T>> bv = xt::empty<std::complex<T>>({ m });
+                auto bv = xt::empty<std::complex<T>>({ m });
                 xt::view(bv, xt::range(0, n)) = xt::conj(expTable);
                 xt::view(bv, xt::range(-n + 1, xt::placeholders::_)) = xt::view(xt::conj(xt::flip(expTable)), xt::range(xt::placeholders::_, - 1));
 
@@ -133,9 +135,7 @@ namespace xt
                 return xt::eval(xt::view(cv, xt::range(0, n)) * expTable);
             }
 
-            template<
-                typename T
-            >
+            template<typename T>
             auto fft_impl(xt::xarray<std::complex<T>> data)
             {
                 //loop through all the next highest axis
@@ -158,12 +158,6 @@ namespace xt
             >
             auto fft(E1&& data, std::ptrdiff_t axis = -1)
             {
-                //check the length of the data on that axis
-                const std::size_t n(data.shape(axis));
-                if (n == 0) {
-                    XTENSOR_THROW(std::runtime_error, "Cannot take the FFT along an empty dimention");
-                }
-
                 //select the axis
                 //create the return type
                 //this can be made smarter to use floats or double for small speed up
@@ -182,47 +176,56 @@ namespace xt
             }
         }
 
-        //meta class for finding nested types inside complex types
-        //false case
-        template<typename T>
-        struct is_complex_t : public std::false_type 
-        {
-        public:
-            using value_type = T;
-        };
-        
-        //true case
-        template<typename T>
-        struct is_complex_t<std::complex<T>> : public std::true_type 
-        {
-        public:
-            using value_type = T;
-        };
-
-        //case for integer types... We will always opt for a single precision
         template<class E1>
-        auto fft(E1 e1, std::ptrdiff_t axis = -1, typename std::enable_if<std::is_integral<typename E1::value_type>::value>::type* = nullptr)
+        auto fft(E1 e1, std::ptrdiff_t axis = -1)
         {
-            return detail::fft<float>(e1, axis);
+            std::size_t saxis = xt::normalize_axis(e1.dimension(), axis);
+            if(e1.shape(saxis) == 0)
+            {
+                XTENSOR_THROW(std::runtime_error, "You cannot take the FFT of an axis of length 0");
+            }
+
+            return detail::fft_type(e1, axis);
         }
 
-        //Case for floating point types
-        template<class E1>
-        auto fft(E1 e1, std::ptrdiff_t axis = -1, typename std::enable_if<std::is_floating_point<typename E1::value_type>::value>::type* = nullptr)
-        {
-            return detail::fft<typename E1::value_type>(e1, axis);
-        }
 
-        //Final case for a complex type. We want to know the inner type of the complex value to match precision so we
-        //use the meta class is_complex_t to find the nested type
-        template<class E1>
-        auto fft(E1 e1, std::ptrdiff_t axis = -1, typename std::enable_if<is_complex_t<typename E1::value_type>::value>::type* = nullptr)
-        {
-            return detail::fft<typename is_complex_t<typename E1::value_type>::value_type>(e1, axis);
-        }
+        namespace detail {
+            template<typename T>
+            struct complex_precision
+            {
 
-        namespace detail 
-        {
+            };
+
+            template<typename T>
+            struct complex_precision<std::complex<T>>
+            {
+            public:
+                using value_type = T;
+            };
+
+            //case for integer types... We will always opt for a single precision
+            template<class E1>
+            auto fft_type(E1 e1, std::ptrdiff_t axis = -1, typename std::enable_if<std::is_integral<typename E1::value_type>::value>::type* = nullptr)
+            {
+                return detail::fft<float>(e1, axis);
+            }
+
+            //Case for floating point types
+            template<class E1>
+            auto fft_type(E1 e1, std::ptrdiff_t axis = -1, typename std::enable_if<std::is_floating_point<typename E1::value_type>::value>::type* = nullptr)
+            {
+                return detail::fft<typename E1::value_type>(e1, axis);
+            }
+
+            //Final case for a complex type. We want to know the inner type of the complex value to match precision so we
+            template<class E1>
+            auto fft_type(E1 e1, std::ptrdiff_t axis = -1, typename std::enable_if<xtl::is_complex<typename E1::value_type>::value>::type* = nullptr)
+            {
+
+                return detail::fft<detail::complex_precision<E1::value_type>::value_type>(e1, axis);
+
+            }
+
             template<
                 typename T, 
                 typename E1
@@ -240,29 +243,42 @@ namespace xt
                 fft_res = xt::conj(fft_res);
                 return fft_res;
             }
+
+            //Case for floating point types
+            template<class E1>
+            auto ifft_type(E1 e1, std::ptrdiff_t axis = -1, typename std::enable_if<std::is_floating_point<typename E1::value_type>::value>::type* = nullptr)
+            {
+                return detail::ifft<typename E1::value_type>(e1, axis);
+            }
+
+            //case for integer types... We will always opt for a single precision
+            template<class E1>
+            auto ifft_type(E1 e1, std::ptrdiff_t axis = -1, typename std::enable_if<std::is_integral<typename E1::value_type>::value>::type* = nullptr)
+            {
+                return detail::ifft<float>(e1, axis);
+            }
+
+            //Final case for a complex type. We want to know the inner type of the complex value to match precision so we
+            //use the meta class is_complex_t to find the nested type
+            template<class E1>
+            auto ifft_type(E1 e1, std::ptrdiff_t axis = -1, typename std::enable_if<xtl::is_complex<typename E1::value_type>::value>::type* = nullptr)
+            {
+                return detail::ifft<detail::complex_precision<E1::value_type>::value_type>(e1, axis);
+            }
         }
 
-        //Case for floating point types
         template<class E1>
-        auto ifft(E1 e1, std::ptrdiff_t axis = -1, typename std::enable_if<std::is_floating_point<typename E1::value_type>::value>::type* = nullptr)
+        auto ifft(E1 e1, std::ptrdiff_t axis = -1)
         {
-            return detail::ifft<typename E1::value_type>(e1, axis);
+            std::size_t saxis = xt::normalize_axis(e1.dimension(), axis);
+            if (e1.shape(saxis) == 0)
+            {
+                XTENSOR_THROW(std::runtime_error, "You cannot take the FFT of an axis of length 0");
+            }
+
+            return detail::ifft_type(e1, axis);
         }
 
-        //case for integer types... We will always opt for a single precision
-        template<class E1>
-        auto ifft(E1 e1, std::ptrdiff_t axis = -1, typename std::enable_if<std::is_integral<typename E1::value_type>::value>::type* = nullptr)
-        {
-            return detail::ifft<float>(e1, axis);
-        }
-
-        //Final case for a complex type. We want to know the inner type of the complex value to match precision so we
-        //use the meta class is_complex_t to find the nested type
-        template<class E1>
-        auto ifft(E1 e1, std::ptrdiff_t axis = -1, typename std::enable_if<is_complex_t<typename E1::value_type>::value>::type* = nullptr)
-        {
-            return detail::ifft<typename is_complex_t<typename E1::value_type>::value_type>(e1, axis);
-        }
 
         /*
         * @brief performs a circular fft convolution xvec and yvec must

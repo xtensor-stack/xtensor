@@ -11,6 +11,7 @@ cmake_minimum_required(VERSION 3.1)
 
 find_package(doctest            REQUIRED)
 find_package(Threads)
+find_package(MKL)
 
 if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     project(xtensor-test CXX)
