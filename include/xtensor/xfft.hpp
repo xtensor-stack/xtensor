@@ -12,6 +12,10 @@ namespace xt
 {
     namespace fft
     {
+
+        template<class E1>
+        auto fft(E1 e1, std::ptrdiff_t axis = -1);
+
         template<
             typename T = double, 
             typename E1, 
@@ -176,18 +180,6 @@ namespace xt
             }
         }
 
-        template<class E1>
-        auto fft(E1 e1, std::ptrdiff_t axis = -1)
-        {
-            std::size_t saxis = xt::normalize_axis(e1.dimension(), axis);
-            if(e1.shape(saxis) == 0)
-            {
-                XTENSOR_THROW(std::runtime_error, "You cannot take the FFT of an axis of length 0");
-            }
-
-            return detail::fft_type(e1, axis);
-        }
-
 
         namespace detail {
             template<typename T>
@@ -222,7 +214,7 @@ namespace xt
             auto fft_type(E1 e1, std::ptrdiff_t axis = -1, typename std::enable_if<xtl::is_complex<typename E1::value_type>::value>::type* = nullptr)
             {
 
-                return detail::fft<detail::complex_precision<E1::value_type>::value_type>(e1, axis);
+                return detail::fft<typename detail::complex_precision<typename E1::value_type>::value_type>(e1, axis);
 
             }
 
@@ -263,8 +255,20 @@ namespace xt
             template<class E1>
             auto ifft_type(E1 e1, std::ptrdiff_t axis = -1, typename std::enable_if<xtl::is_complex<typename E1::value_type>::value>::type* = nullptr)
             {
-                return detail::ifft<detail::complex_precision<E1::value_type>::value_type>(e1, axis);
+                return detail::ifft<typename detail::complex_precision<typename E1::value_type>::value_type>(e1, axis);
             }
+        }
+
+        template<class E1>
+        auto fft(E1 e1, std::ptrdiff_t axis)
+        {
+            std::size_t saxis = xt::normalize_axis(e1.dimension(), axis);
+            if(e1.shape(saxis) == 0)
+            {
+                XTENSOR_THROW(std::runtime_error, "You cannot take the FFT of an axis of length 0");
+            }
+
+            return detail::fft_type(e1, axis);
         }
 
         template<class E1>
