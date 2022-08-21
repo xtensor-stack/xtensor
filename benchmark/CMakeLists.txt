@@ -15,8 +15,8 @@ if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     set(XTENSOR_INCLUDE_DIR ${xtensor_INCLUDE_DIRS})
 endif ()
 
-message(STATUS "Forcing tests build type to Release")
-set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+#message(STATUS "Forcing tests build type to Release")
+#set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
 
 include(CheckCXXCompilerFlag)
 
@@ -61,7 +61,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU"
 endif()
 
 if(MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /MP /bigobj")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /MP /bigobj /arch:AVX512 /Qvec-report:1")
     set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
     foreach(flag_var
             CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
@@ -113,20 +113,21 @@ include_directories(${XTENSOR_INCLUDE_DIR})
 include_directories(${GBENCHMARK_INCLUDE_DIRS})
 
 set(XTENSOR_BENCHMARK
-    benchmark_assign.cpp
-    benchmark_builder.cpp
-    benchmark_container.cpp
-    benchmark_creation.cpp
-    benchmark_increment_stepper.cpp
-    benchmark_lambda_expressions.cpp
-    benchmark_math.cpp
-    benchmark_random.cpp
-    benchmark_reducer.cpp
-    benchmark_views.cpp
-    benchmark_xshape.cpp
-    benchmark_view_access.cpp
-    benchmark_view_assignment.cpp
-    benchmark_view_adapt.cpp
+#    benchmark_assign.cpp
+#    benchmark_builder.cpp
+#    benchmark_container.cpp
+#    benchmark_creation.cpp
+#    benchmark_increment_stepper.cpp
+#    benchmark_lambda_expressions.cpp
+#    benchmark_math.cpp
+#    benchmark_random.cpp
+#    benchmark_reducer.cpp
+#    benchmark_views.cpp
+#    benchmark_xshape.cpp
+#    benchmark_view_access.cpp
+#    benchmark_view_assignment.cpp
+#    benchmark_view_adapt.cpp
+    benchmark_xfft.cpp
     main.cpp
 )
 

@@ -8,7 +8,7 @@ namespace xt
     TEST(xfft, fft_power_2)
     {
         size_t k = 2;
-        size_t n = 8096;
+        size_t n = 8192;
         size_t A = 10;
         auto x = xt::linspace<double>(0, static_cast<double>(n - 1), n);
         xt::xarray<double> y = A * xt::sin(2 * xt::numeric_constants<double>::PI * x * k / n);
@@ -77,10 +77,31 @@ namespace xt
         auto result = xt::fft::fft_convolve(x, y);
 
         xt::xarray<double> abs = xt::abs(result);
-        
         for(size_t i = 0; i < abs.size(); i++)
         {
             REQUIRE(expected(i) == doctest::Approx(abs(i)).epsilon(.0001));
         }
+    }
+
+    TEST(xfft, fft_n_0_length)
+    {
+        size_t k = 2;
+        size_t n = 0;
+        size_t A = 1;
+        size_t dim = 2;
+        auto x = xt::linspace<float>(0, n - 1, n) * xt::ones<float>({ dim, n });
+        xt::xarray<double> y = A * xt::sin(2 * xt::numeric_constants<float>::PI * x * k / n);
+        REQUIRE_THROWS(xt::fft::fft(y) / (n / 2.0));
+    }
+
+    TEST(xfft, ifft_n_0_length)
+    {
+        size_t k = 2;
+        size_t n = 0;
+        size_t A = 1;
+        size_t dim = 2;
+        auto x = xt::linspace<float>(0, n - 1, n) * xt::ones<float>({ dim, n });
+        xt::xarray<double> y = A * xt::sin(2 * xt::numeric_constants<float>::PI * x * k / n);
+        REQUIRE_THROWS(xt::fft::ifft(y) / (n / 2.0));
     }
 }
