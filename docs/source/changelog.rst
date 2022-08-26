@@ -7,6 +7,24 @@
 Changelog
 =========
 
+0.24.3
+------
+
+- Rename and fix storage iterator
+  `#2534 https://github.com/xtensor-stack/xtensor/pull/2534`
+- rename storage_rbegin, storage_rend, ... to linear_rbegin, ...
+  `#2535 https://github.com/xtensor-stack/xtensor/pull/2535`
+- Enabling reference value types for xfunction.
+  `#2532 https://github.com/xtensor-stack/xtensor/pull/2532`
+- fixing linear iterator docs.
+  `#2538 https://github.com/xtensor-stack/xtensor/pull/2538`
+- Minor improvements for Windows (MSVC, ClangCl) support
+  `#2531 https://github.com/xtensor-stack/xtensor/pull/2531`
+- changing static layout in xtsrided_view temporary_type to container's layout
+  `#2553 https://github.com/xtensor-stack/xtensor/pull/2553`
+- Upgraded to xsimd 9.0.1
+  `#2573 https://github.com/xtensor-stack/xtensor/pull/2573`
+
 0.24.2
 ------
 
