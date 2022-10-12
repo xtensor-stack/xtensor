@@ -44,7 +44,7 @@ namespace xt
      * @param head header
      */
     template <class E>
-    void dump_csv(std::ostream& stream, const xexpression<E>& e, const std::string& sep=" ", const std::string& head="");
+    void dump_csv(std::ostream& stream, const xexpression<E>& e, const std::string& sep=",", const std::string& head="");
 
     /*****************************************
      * load_csv and dump_csv implementations *
