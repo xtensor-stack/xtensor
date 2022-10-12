@@ -11,6 +11,7 @@
 #define XTENSOR_CSV_HPP
 
 #include <exception>
+#include <iostream>
 #include <istream>
 #include <iterator>
 #include <sstream>
@@ -33,8 +34,17 @@ namespace xt
     template <class T, class A = std::allocator<T>>
     xcsv_tensor<T, A> load_csv(std::istream& stream, const char delimiter = ',', const std::size_t skip_rows = 0, const std::ptrdiff_t max_rows = -1, const std::string comments = "#");
 
+    /**
+     * @brief exporting xexpression object to a std::ostream
+     * 
+     * @tparam expression type
+     * @param stream putput stream (e.g. std::cout)
+     * @param e E expression (e.g. xt::xarray<double>) 
+     * @param sep separator
+     * @param head header
+     */
     template <class E>
-    void dump_csv(std::ostream& stream, const xexpression<E>& e);
+    void dump_csv(std::ostream& stream, const xexpression<E>& e, const std::string& sep=" ", const std::string& head="");
 
     /*****************************************
      * load_csv and dump_csv implementations *
@@ -169,7 +179,7 @@ namespace xt
      * @param e the tensor expression to serialize
      */
     template <class E>
-    void dump_csv(std::ostream& stream, const xexpression<E>& e)
+    void dump_csv(std::ostream& stream, const xexpression<E>& e, const std::string& sep, const std:string& head)
     {
         using size_type = typename E::size_type;
         const E& ex = e.derived_cast();
@@ -179,6 +189,9 @@ namespace xt
         }
         size_type nbrows = ex.shape()[0], nbcols = ex.shape()[1];
         auto st = ex.stepper_begin(ex.shape());
+        
+        if (head != ""){ stream << head << std::endl; }
+        
         for (size_type r = 0; r != nbrows; ++r)
         {
             for (size_type c = 0; c != nbcols; ++c)
@@ -187,7 +200,7 @@ namespace xt
                 if (c != nbcols - 1)
                 {
                     st.step(1);
-                    stream << ',';
+                    stream << sep;
                 }
                 else
                 {
