@@ -34,15 +34,6 @@ namespace xt
     template <class T, class A = std::allocator<T>>
     xcsv_tensor<T, A> load_csv(std::istream& stream, const char delimiter = ',', const std::size_t skip_rows = 0, const std::ptrdiff_t max_rows = -1, const std::string comments = "#");
 
-    /**
-     * @brief exporting xexpression object to a std::ostream
-     * 
-     * @tparam expression type
-     * @param stream putput stream (e.g. std::cout)
-     * @param e E expression (e.g. xt::xarray<double>) 
-     * @param sep separator
-     * @param head header
-     */
     template <class E>
     void dump_csv(std::ostream& stream, const xexpression<E>& e, const std::string& sep=",", const std::string& head="");
 
