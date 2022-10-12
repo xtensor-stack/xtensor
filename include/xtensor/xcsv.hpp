@@ -179,7 +179,7 @@ namespace xt
      * @param e the tensor expression to serialize
      */
     template <class E>
-    void dump_csv(std::ostream& stream, const xexpression<E>& e, const std::string& sep, const std:string& head)
+    void dump_csv(std::ostream& stream, const xexpression<E>& e, const std::string& sep, const std::string& head)
     {
         using size_type = typename E::size_type;
         const E& ex = e.derived_cast();
