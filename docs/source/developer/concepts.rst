@@ -46,7 +46,7 @@ object to the most inheriting type, depending on the nature of the object (*lval
 .. code::
 
     derived_type& derived_cast() & noexcept;
-    const derived_type& derived_cast() & noexcept;
+    const derived_type& derived_cast() const & noexcept;
     derived_type derived_cast() && noexcept;
 
 .. _xiterable-concept-label:
