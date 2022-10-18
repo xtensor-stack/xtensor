@@ -83,6 +83,29 @@ namespace xt
         EXPECT_TRUE(all(equal(iarr1d, iarr1d_loaded)));
     }
 
+    TEST(xnpy, npy_file_move)
+    {
+        xarray<bool> barr = {{{ 0, 0, 1},
+                              { 1, 1, 0},
+                              { 1, 0, 1}},
+                             {{ 1, 1, 0},
+                              { 0, 1, 0},
+                              { 0, 1, 0}},
+                             {{ 0, 0, 1},
+                              { 1, 1, 1},
+                              { 0, 0, 0}}};
+
+        std::ifstream bstream(get_load_filename("files/xnpy_files/bool"));
+        detail::npy_file npy = detail::load_npy_file(bstream);
+        auto barr_cast = npy.cast<bool>(true);
+        EXPECT_TRUE(all(equal(barr, barr_cast)));
+
+        detail::npy_file npy_move;
+        npy_move = std::move(npy);
+        auto barr_cast_move = npy_move.cast<bool>(true);
+        EXPECT_TRUE(all(equal(barr, barr_cast_move)));
+    }
+
     bool compare_binary_files(std::string fn1, std::string fn2)
     {
         std::ifstream stream1(fn1, std::ios::in | std::ios::binary);

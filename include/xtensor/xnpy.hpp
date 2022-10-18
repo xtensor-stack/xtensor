@@ -495,7 +495,7 @@ namespace xt
 
             // delete copy constructor
             npy_file(const npy_file&) = delete;
-            npy_file& operator=(npy_file) = delete;
+            npy_file& operator=(const npy_file&) = delete;
 
             // implement move constructor and assignment
             npy_file(npy_file&& rhs)
