@@ -38,8 +38,8 @@ namespace xt
                 for (auto n : n_space)
                 {
                     n = std::pow(2,n);
-                    auto i = xt::linspace<double>(0, n / 2 - 1, n / 2) * std::complex<double>(0, 1);
-                    xt::xarray<std::complex<double>> expTable = xt::exp(-2 * i * pi<double>() / n);
+                    auto k = xt::linspace<double>(0, n / 2 - 1, n / 2) * std::complex<double>(0, 1);
+                    xt::xarray<std::complex<double>> expTable = xt::exp(-2 * k * pi<double>() / n);
                     twiddle.push_back(expTable);
                 }
                 return twiddle;
@@ -78,16 +78,16 @@ namespace xt
                 //Linker error when using numeric_constants in this header
                 //auto expTable = xt::eval(xt::exp(-2 * i * ::xt::numeric_constants<T>().PI / n));
                 //This is low hanging constexpr for all n < 2^16
-                xt::xarray<std::complex<T>> expTable;
+                xt::xarray<std::complex<T>> exp_table;
                 auto pow = std::log2(n);
                 if (pow <= 16)
                 {
-                    expTable = xt::cast<std::complex<T>>(twiddle.at(std::log2(n)));
+                    exp_table = xt::cast<std::complex<T>>(twiddle.at(std::log2(n)));
                 }
                 else
                 {
                     auto i = xt::linspace<double>(0, n / 2 - 1, n / 2) * std::complex<T>(0, 1);
-                    expTable = xt::exp(-2 * i * pi<T>() / n);
+                    exp_table = xt::exp(-2 * i * pi<T>() / n);
                 }
 
                 // Bit-reversed addressing permutation
@@ -111,7 +111,7 @@ namespace xt
                     {
                         for (std::size_t j = i, k = 0; j < i + halfsize; j++, k += tablestep)
                         {
-                            const auto temp = data(j + halfsize) * expTable(k);
+                            const auto temp = data(j + halfsize) * exp_table(k);
                             data(j + halfsize) = data(j) - temp;
                             data(j) += temp;
                         }
@@ -132,14 +132,11 @@ namespace xt
             {
                 // Find a power-of-2 convolution length m such that m >= n * 2 + 1
                 const std::size_t n = data.size();
-                std::size_t m = 1;
-                while (m / 2 <= n) 
-                {
-                    m *= 2;
-                }
+                size_t m = std::ceil(std::log2(n * 2 + 1));
+                m = std::pow(2, m);
 
                 // Trignometric table
-                auto expTable = xt::xtensor<std::complex<T>, 1>::from_shape({ n });
+                auto exp_table = xt::xtensor<std::complex<T>, 1>::from_shape({ n });
                 xt::xtensor<std::size_t, 1> i = xt::pow(xt::linspace<std::size_t>(0, n - 1, n), 2);
                 i %= (n * 2);
                 
@@ -149,21 +146,21 @@ namespace xt
                 //auto angles = xt::eval(::xt::numeric_constants<T>::PI * i / n);
                 auto angles = xt::eval(pi<T>() * i / n);
                 auto j = std::complex<T>(0, 1);
-                expTable = xt::exp(-angles * j);
+                exp_table = xt::exp(-angles * j);
 
                 // Temporary vectors and preprocessing
                 auto av = xt::empty<std::complex<T>>({ m });
-                xt::view(av, xt::range(0, n)) = data * expTable;
+                xt::view(av, xt::range(0, n)) = data * exp_table;
 
 
                 auto bv = xt::empty<std::complex<T>>({ m });
-                xt::view(bv, xt::range(0, n)) = xt::conj(expTable);
-                xt::view(bv, xt::range(-n + 1, xt::placeholders::_)) = xt::view(xt::conj(xt::flip(expTable)), xt::range(xt::placeholders::_, - 1));
+                xt::view(bv, xt::range(0, n)) = xt::conj(exp_table);
+                xt::view(bv, xt::range(-n + 1, xt::placeholders::_)) = xt::view(xt::conj(xt::flip(exp_table)), xt::range(xt::placeholders::_, - 1));
 
                 // Convolution
                 auto cv = xt::fft::fft_convolve<T>(av, bv);
 
-                return xt::eval(xt::view(cv, xt::range(0, n)) * expTable);
+                return xt::eval(xt::view(cv, xt::range(0, n)) * exp_table);
             }
 
             template<typename T>
