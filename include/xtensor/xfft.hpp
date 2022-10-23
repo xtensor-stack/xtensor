@@ -5,7 +5,6 @@
 #include "xcomplex.hpp"
 #include "xutils.hpp"
 #include "xaxis_slice_iterator.hpp"
-#include "xio.hpp"
 #include "xview.hpp"
 
 namespace xt 
