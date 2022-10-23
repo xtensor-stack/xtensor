@@ -12,11 +12,7 @@ namespace xt
 {
     namespace fft
     {
-        template<
-            typename T = double, 
-            typename E1, 
-            typename E2
-        >
+        template<typename T = double, typename E1, typename E2>
         xt::xarray<std::complex<T>> fft_convolve(E1&& xvec, E2&& yvec, std::ptrdiff_t axis = -1);
         
         namespace detail
@@ -27,6 +23,22 @@ namespace xt
                 constexpr double PI = 3.141592653589793238463;
                 return PI;
             }
+
+            //precompute the values
+            auto compute_twiddle(std::vector<size_t> n_space)
+            {
+                std::vector<xt::xarray<std::complex<double>>> twiddle;
+                for (auto n : n_space)
+                {
+                    n = std::pow(2,n);
+                    auto i = xt::linspace<double>(0, n / 2 - 1, n / 2) * std::complex<double>(0, 1);
+                    xt::xarray<std::complex<double>> expTable = xt::exp(-2 * i * pi<double>() / n);
+                    twiddle.push_back(expTable);
+                }
+                return twiddle;
+            }
+
+            std::vector<xt::xarray<std::complex<double>>> twiddle = compute_twiddle({ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16 });
 
             std::size_t reverse_bits(std::size_t x, int n)
             {
@@ -58,7 +70,18 @@ namespace xt
                 //Works in CPP17 and MSVC CPP14
                 //Linker error when using numeric_constants in this header
                 //auto expTable = xt::eval(xt::exp(-2 * i * ::xt::numeric_constants<T>().PI / n));
-                auto expTable = xt::eval(xt::exp(-2 * i * pi<T>() / n));
+                //This is low hanging constexpr for all n < 2^16
+                xt::xarray<std::complex<T>> expTable;
+                auto pow = std::log2(n);
+                if (pow <= 16)
+                {
+                    expTable = xt::cast<std::complex<T>>(twiddle.at(std::log2(n)));
+                }
+                else
+                {
+                    auto i = xt::linspace<double>(0, n / 2 - 1, n / 2) * std::complex<T>(0, 1);
+                    expTable = xt::exp(-2 * i * pi<T>() / n);
+                }
 
                 // Bit-reversed addressing permutation
                 for (std::size_t i = 0; i < n; i++)
@@ -69,6 +92,7 @@ namespace xt
                         std::swap(data(i), data(j));
                     }
                 }
+
 
                 // Cooley-Tukey decimation-in-time radix-2 FFT
                 // Could probably be reimplemented using stride views...

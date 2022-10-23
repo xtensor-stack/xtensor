@@ -16,6 +16,17 @@ namespace xt
         REQUIRE(A == doctest::Approx(std::abs(res(k))).epsilon(.0001));
     }
 
+    TEST(xfft, fft_power_2_long)
+    {
+        size_t k = 2;
+        size_t n = std::pow(2, 18);
+        size_t A = 10;
+        auto x = xt::linspace<double>(0, static_cast<double>(n - 1), n);
+        xt::xarray<double> y = A * xt::sin(2 * xt::numeric_constants<double>::PI * x * k / n);
+        auto res = xt::fft::fft(y) / (n / 2);
+        REQUIRE(A == doctest::Approx(std::abs(res(k))).epsilon(.0001));
+    }
+
     TEST(xfft, ifft_power_2)
     {
         size_t k = 2;

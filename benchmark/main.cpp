@@ -5,9 +5,7 @@
 *                                                                          *
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
-
 #include <iostream>
-
 #include <benchmark/benchmark.h>
 
 #include "xtensor/xtensor.hpp"
@@ -24,6 +22,7 @@ void print_type(T&& /*t*/)
 void print_stats()
 {
     std::cout << "USING XSIMD\nSIMD SIZE: " << xsimd::simd_traits<double>::size << "\n\n";
+
 #ifdef __GNUC__
     print_type(xt::xarray<double>());
     print_type(xt::xtensor<double, 2>());
