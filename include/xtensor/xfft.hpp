@@ -15,11 +15,7 @@ namespace xt
         template<class E1>
         auto fft(E1 e1, std::ptrdiff_t axis = -1);
 
-        template<
-            typename T = double, 
-            typename E1, 
-            typename E2
-        >
+        template<typename T = double, typename E1, typename E2>
         xt::xarray<std::complex<T>> fft_convolve(E1&& xvec, E2&& yvec, std::ptrdiff_t axis = -1);
         
         namespace detail
@@ -61,10 +57,7 @@ namespace xt
                 return ((data.size() & (data.size() - 1)) == 0);
             }
 
-            template<
-                typename T,
-                typename E1
-            >
+            template<typename T, typename E1>
             auto transform_radix2(E1&& data)
             {
                 // Length variables
@@ -124,10 +117,7 @@ namespace xt
                 return data;
             }
 
-            template<
-                typename T,
-                typename E1
-            >
+            template<typename T, typename E1>
             auto transform_bluestein(E1&& data)
             {
                 // Find a power-of-2 convolution length m such that m >= n * 2 + 1
@@ -180,10 +170,7 @@ namespace xt
                 }
             }
 
-            template<
-                typename T, 
-                typename E1
-            >
+            template<typename T, typename E1>
             auto fft(E1&& data, std::ptrdiff_t axis = -1)
             {
                 //select the axis
@@ -242,10 +229,7 @@ namespace xt
 
             }
 
-            template<
-                typename T, 
-                typename E1
-            >
+            template<typename T, typename E1>
             auto ifft(E1&& data, std::ptrdiff_t axis = -1)
             {
                 //check the length of the data on that axis
@@ -315,11 +299,7 @@ namespace xt
         * @param yvec second array of the convolution
         * @param axis axis along which to perform the convolution
         */
-        template<
-            typename T, 
-            typename E1, 
-            typename E2
-        >
+        template<typename T, typename E1, typename E2>
         xt::xarray<std::complex<T>> fft_convolve(E1&& xvec, E2&& yvec, std::ptrdiff_t axis)
         {
             //we could broadcast but that could get complicated???
