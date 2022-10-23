@@ -16,7 +16,7 @@ namespace xt
         auto fft(E1 e1, std::ptrdiff_t axis = -1);
 
         template<typename T = double, typename E1, typename E2>
-        xt::xarray<std::complex<T>> fft_convolve(E1&& xvec, E2&& yvec, std::ptrdiff_t axis = -1);
+        xt::xarray<std::complex<T>> convolve(E1&& xvec, E2&& yvec, std::ptrdiff_t axis = -1);
         
         namespace detail
         {
@@ -148,7 +148,7 @@ namespace xt
                 xt::view(bv, xt::range(-n + 1, xt::placeholders::_)) = xt::view(xt::conj(xt::flip(exp_table)), xt::range(xt::placeholders::_, - 1));
 
                 // Convolution
-                auto cv = xt::fft::fft_convolve<T>(av, bv);
+                auto cv = xt::fft::convolve<T>(av, bv);
 
                 return xt::eval(xt::view(cv, xt::range(0, n)) * exp_table);
             }
@@ -300,7 +300,7 @@ namespace xt
         * @param axis axis along which to perform the convolution
         */
         template<typename T, typename E1, typename E2>
-        xt::xarray<std::complex<T>> fft_convolve(E1&& xvec, E2&& yvec, std::ptrdiff_t axis)
+        xt::xarray<std::complex<T>> convolve(E1&& xvec, E2&& yvec, std::ptrdiff_t axis)
         {
             //we could broadcast but that could get complicated???
             if (xvec.dimension() != yvec.dimension())

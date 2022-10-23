@@ -44,7 +44,7 @@ namespace xt
         xt::xarray<double> y = { 5.0, 1.0, 1.0, 1.0};
         xt::xarray<double> expected = { 12, 12, 12, 28 };
 
-        auto result = xt::fft::fft_convolve(x, y);
+        auto result = xt::fft::convolve(x, y);
 
         for (size_t i = 0; i < x.size(); i++)
         {
@@ -85,7 +85,7 @@ namespace xt
         xt::xarray<double> y = { 5.0, 1.0, 1.0, 1.0, 1.0 };
         xt::xarray<size_t> expected = { 13, 13, 13, 29, 13 };
 
-        auto result = xt::fft::fft_convolve(x, y);
+        auto result = xt::fft::convolve(x, y);
 
         xt::xarray<double> abs = xt::abs(result);
         for(size_t i = 0; i < abs.size(); i++)
