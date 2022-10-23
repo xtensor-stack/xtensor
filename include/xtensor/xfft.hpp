@@ -325,7 +325,7 @@ namespace xt
 
             for (auto iter = begin_x; iter != end_x; iter++) 
             {
-                (*iter) = (*iter_y++)*(*iter);
+                (*iter) = (*iter_y++) * (*iter);
             }
             
             auto outvec = ifft(xv, axis);
