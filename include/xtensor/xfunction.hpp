@@ -22,6 +22,7 @@
 #include <xtl/xtype_traits.hpp>
 
 #include "xaccessible.hpp"
+#include "xaccumulator.hpp"
 #include "xexpression_traits.hpp"
 #include "xiterable.hpp"
 #include "xlayout.hpp"
@@ -913,7 +914,7 @@ namespace xt
         // Optimization: no need to compare each subiterator since they all
         // are incremented decremented together.
         constexpr std::size_t temp = xtl::mpl::find_if<is_not_xdummy_iterator, data_type>::value;
-        constexpr std::size_t index = (temp == std::tuple_size<data_type>::value) ? 0 : temp;
+        constexpr std::size_t index = (temp == detail::get_fixed_size<data_type>::value) ? 0 : temp;
         return std::get<index>(m_it) == std::get<index>(rhs.m_it);
     }
 
@@ -923,7 +924,7 @@ namespace xt
         // Optimization: no need to compare each subiterator since they all
         // are incremented decremented together.
         constexpr std::size_t temp = xtl::mpl::find_if<is_not_xdummy_iterator, data_type>::value;
-        constexpr std::size_t index = (temp == std::tuple_size<data_type>::value) ? 0 : temp;
+        constexpr std::size_t index = (temp == detail::get_fixed_size<data_type>::value) ? 0 : temp;
         return std::get<index>(m_it) < std::get<index>(rhs.m_it);
     }
 
@@ -1058,6 +1059,21 @@ namespace xt
     {
         auto step_leading_lambda = [](auto&& st) { st.step_leading(); };
         for_each(step_leading_lambda, m_st);
+    }
+
+    namespace detail
+    {
+        template<class F, class... CT>
+        struct has_fixed_size<xfunction<F, CT...>, std::enable_if_t<is_fixed<typename xfunction<F, CT...>::shape_type>::value>>
+            : std::true_type
+        {
+        };
+
+        template<class F, class... CT>
+        struct get_fixed_size<xfunction<F, CT...>, std::enable_if_t<has_fixed_size<xfunction<F, CT...>>::value>>
+            : std::integral_constant<std::size_t, fixed_compute_size<typename xfunction<F, CT...>::shape_type>::value>
+        {
+        };
     }
 }
 

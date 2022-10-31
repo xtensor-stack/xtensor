@@ -1909,30 +1909,27 @@ namespace xt
     # pragma clang diagnostic ignored "-Wmismatched-tags"
 #endif
 
-namespace std
+template <class T, std::size_t N>
+class std::tuple_size<xt::const_array<T, N>> :
+    public std::integral_constant<std::size_t, N>
 {
-    template <class T, std::size_t N>
-    class tuple_size<xt::const_array<T, N>> :
-        public integral_constant<std::size_t, N>
-    {
-    };
+};
 
-    template <std::size_t... N>
-    class tuple_size<xt::fixed_shape<N...>> :
-        public integral_constant<std::size_t, sizeof...(N)>
-    {
-    };
+template <std::size_t... N>
+class std::tuple_size<xt::fixed_shape<N...>> :
+    public std::integral_constant<std::size_t, sizeof...(N)>
+{
+};
 
-    template <class T, std::ptrdiff_t Start, std::ptrdiff_t End>
-    class tuple_size<xt::sequence_view<T, Start, End>> :
-        public integral_constant<std::size_t, std::size_t(End - Start)>
-    {
-    };
+template <class T, std::ptrdiff_t Start, std::ptrdiff_t End>
+class std::tuple_size<xt::sequence_view<T, Start, End>> :
+    public std::integral_constant<std::size_t, std::size_t(End - Start)>
+{
+};
 
-    // Undefine tuple size for not-known sequence view size
-    template <class T, std::ptrdiff_t Start>
-    class tuple_size<xt::sequence_view<T, Start, -1>>;
-}
+// Undefine tuple size for not-known sequence view size
+template <class T, std::ptrdiff_t Start>
+class std::tuple_size<xt::sequence_view<T, Start, -1>>;
 
 #if defined(__clang__)
     # pragma clang diagnostic pop

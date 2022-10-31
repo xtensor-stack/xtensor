@@ -228,7 +228,7 @@ namespace xt
     constexpr T get_backstrides(const S& shape, const T& strides) noexcept
     {
         return detail::get_backstrides_impl(shape, strides,
-                                            std::make_index_sequence<std::tuple_size<T>::value>{});
+                                            std::make_index_sequence<detail::get_fixed_size<T>::value>{});
     }
 
     template <class V, class S>
@@ -314,7 +314,7 @@ namespace xt
         using temporary_type = typename semantic_base::temporary_type;
         using expression_tag = Tag;
 
-        constexpr static std::size_t N = std::tuple_size<shape_type>::value;
+        constexpr static std::size_t N = detail::get_fixed_size<shape_type>::value;
         constexpr static std::size_t rank = N;
 
         xfixed_container() = default;
@@ -949,5 +949,30 @@ namespace xt
         return m_backstrides;
     }
 }
+
+/******************************
+ * std::tuple_size extensions *
+ ******************************/
+
+#if defined(__clang__)
+    # pragma clang diagnostic push
+    # pragma clang diagnostic ignored "-Wmismatched-tags"
+#endif
+
+template <class ET, class S, xt::layout_type L, bool SH, class Tag>
+class std::tuple_size<xt::xfixed_container<ET, S, L, SH, Tag>> :
+    public std::integral_constant<std::size_t, xt::detail::fixed_compute_size<S>::value>
+{
+};
+
+template <class ET, class S, xt::layout_type L, bool SH, class Tag>
+class std::tuple_size<xt::xfixed_adaptor<ET, S, L, SH, Tag>> :
+    public std::integral_constant<std::size_t, xt::detail::fixed_compute_size<S>::value>
+{
+};
+
+#if defined(__clang__)
+    # pragma clang diagnostic pop
+#endif
 
 #endif

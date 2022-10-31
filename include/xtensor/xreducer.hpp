@@ -117,9 +117,9 @@ namespace xt
 
         reducer_options(const T& tpl)
         {
-            xtl::mpl::static_if<initial_val_idx != std::tuple_size<T>::value>([this, &tpl](auto no_compile) {
+            xtl::mpl::static_if<initial_val_idx != detail::get_fixed_size<T>::value>([this, &tpl](auto no_compile) {
                     // use no_compile to prevent compilation if initial_val_idx is out of bounds!
-                    this->initial_value = no_compile(std::get<initial_val_idx != std::tuple_size<T>::value ? initial_val_idx : 0>(tpl)).value();
+                    this->initial_value = no_compile(std::get<initial_val_idx != detail::get_fixed_size<T>::value ? initial_val_idx : 0>(tpl)).value();
                 },
                 [](auto /*np_compile*/){}
             );
@@ -133,7 +133,7 @@ namespace xt
                                              std::true_type,
                                              std::false_type>;
 
-        constexpr static bool has_initial_value = initial_val_idx != std::tuple_size<d_t>::value;
+        constexpr static bool has_initial_value = initial_val_idx != detail::get_fixed_size<d_t>::value;
 
         R initial_value;
 
