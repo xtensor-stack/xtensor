@@ -245,17 +245,33 @@ namespace xt
 
     TEST(xmasked_view, view)
     {
-	xt::xarray<size_t> data = {{0,1}, {2,3}, {4,5}};
-	xt::xarray<size_t> data_new = xt::zeros<size_t>(data.shape());
-	xt::xarray<bool> col_mask = {false, true};
+        xarray<size_t> data = {{0,1}, {2,3}, {4,5}};
+        xarray<size_t> data_new = zeros<size_t>(data.shape());
+        xarray<bool> col_mask = {false, true};
 
-	auto row_masked = xt::masked_view(xt::view(data, 0, xt::all()), col_mask);
-        auto new_row_masked = xt::masked_view(xt::view(data_new, 0, xt::all()), col_mask);
+        auto row_masked = masked_view(view(data, 0, all()), col_mask);
+        auto new_row_masked = masked_view(view(data_new, 0, all()), col_mask);
 
         row_masked += 10;
         new_row_masked = row_masked;
 
         EXPECT_EQ(data_new(0, 0), size_t(0));
         EXPECT_EQ(data_new(0, 1), size_t(11));
+    }
+
+    TEST(xmasked_view, xfunction)
+    {
+        xt::xarray<size_t> data = {{0,1}, {2,3}, {4,5}};
+        xt::xarray<size_t> data_new = xt::zeros<size_t>(data.shape());
+        xt::xarray<bool> mask = {{true, false},
+                                 {false, true},
+                                 {true, false}};
+
+        masked_view(data_new, mask) = masked_view(2UL*data + 1UL, mask);
+
+        xarray<size_t> expected = {{1, 0},
+                                   {0, 7},
+                                   {9, 0}};
+        EXPECT_EQ(data_new, expected);
     }
 }

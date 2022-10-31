@@ -119,14 +119,17 @@ namespace xt
         using bool_load_type = xtl::xmasked_value<typename data_type::bool_load_type, mask_type>;
 
         using shape_type = typename data_type::shape_type;
-        using strides_type = typename data_type::strides_type;
 
         static constexpr layout_type static_layout = data_type::static_layout;
         static constexpr bool contiguous_layout = false;
 
         using inner_shape_type = typename data_type::inner_shape_type;
-        using inner_strides_type = typename data_type::inner_strides_type;
-        using inner_backstrides_type = typename data_type::inner_backstrides_type;
+        using inner_strides_type = xtl::mpl::eval_if_t<has_strides<data_type>,
+                                                                   detail::expr_inner_strides_type<data_type>,
+                                                                   get_strides_type<shape_type>>;
+        using inner_backstrides_type = xtl::mpl::eval_if_t<has_strides<data_type>,
+                                                                       detail::expr_inner_backstrides_type<data_type>,
+                                                                       get_strides_type<shape_type>>;
 
         using expression_tag = xtensor_expression_tag;
 
