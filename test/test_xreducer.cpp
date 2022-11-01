@@ -600,10 +600,10 @@ namespace xt
 
         EXPECT_TRUE(allclose(avg_all, expect_all));
         EXPECT_TRUE(allclose(avg_all_2, expect_all));
-        EXPECT_TRUE(all(equal(avg0, expect0)));
-        EXPECT_TRUE(all(equal(avg1, expect1)));
-        EXPECT_TRUE(all(equal(avg_m1, expect1)));
-        EXPECT_TRUE(all(equal(avg_d1, expect1)));
+        EXPECT_TRUE(allclose(avg0, expect0));
+        EXPECT_TRUE(allclose(avg1, expect1));
+        EXPECT_TRUE(allclose(avg_m1, expect1));
+        EXPECT_TRUE(allclose(avg_d1, expect1));
     }
 
 #define TEST_OPT_AVERAGE(INPUT)                                            \
