@@ -1,0 +1,23 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.3.0
+    hooks:
+    - id: check-added-large-files
+    - id: check-case-conflict
+    - id: end-of-file-fixer
+    - id: trailing-whitespace
+    - id: mixed-line-ending
+      args: ["--fix=lf"]
+      exclude: '\.bat$'
+    - id: check-json
+    - id: pretty-format-json
+      args: ["--autofix", "--top-keys=version"]
+    - id: check-yaml
+    - id: detect-private-key
+    - id: check-merge-conflict
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.3.1
+    hooks:
+      - id: forbid-tabs
+      - id: remove-tabs
+        args: [--whitespaces-count, "4"]
