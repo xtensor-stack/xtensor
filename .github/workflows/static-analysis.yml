@@ -1,0 +1,29 @@
+name: Static Analysis
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install micromamba
+        uses: mamba-org/provision-with-micromamba@v13
+        with:
+          environment-file: environment-dev.yml
+          environment-name: xtensor-dev
+          cache-downloads: true
+      - name: Set PYTHON_HASH
+        shell: bash -l {0}
+        run: echo "PYTHON_HASH=$(python -VV | sha256sum | cut -d' ' -f1)" >> $GITHUB_ENV
+      - uses: actions/cache@v3
+        with:
+          path: ~/.cache/pre-commit
+          key: precommit-v1-${{ env.PYTHON_HASH }}-${{ hashFiles('.pre-commit-config.yaml') }}
+      - name: Pre-commit hooks
+        shell: bash -l {0}
+        run: python -m pre_commit run --all-files --show-diff-on-failure
