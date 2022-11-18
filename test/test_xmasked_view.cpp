@@ -245,11 +245,11 @@ namespace xt
 
     TEST(xmasked_view, view)
     {
-	xt::xarray<size_t> data = {{0,1}, {2,3}, {4,5}};
-	xt::xarray<size_t> data_new = xt::zeros<size_t>(data.shape());
-	xt::xarray<bool> col_mask = {false, true};
+    xt::xarray<size_t> data = {{0,1}, {2,3}, {4,5}};
+    xt::xarray<size_t> data_new = xt::zeros<size_t>(data.shape());
+    xt::xarray<bool> col_mask = {false, true};
 
-	auto row_masked = xt::masked_view(xt::view(data, 0, xt::all()), col_mask);
+    auto row_masked = xt::masked_view(xt::view(data, 0, xt::all()), col_mask);
         auto new_row_masked = xt::masked_view(xt::view(data_new, 0, xt::all()), col_mask);
 
         row_masked += 10;
