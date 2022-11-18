@@ -244,6 +244,3 @@ Returns the elements on the diagonal of the expression
     auto d = xt::diagonal(a);
     std::cout << d << std::endl;
     // Outputs {1, 5, 9}
-
-
-

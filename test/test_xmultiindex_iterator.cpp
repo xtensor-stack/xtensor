@@ -10,7 +10,7 @@ TEST_SUITE("xmultiindex_iterator")
 {
 
     TEST_CASE("sum")
-    {   
+    {
         using shape_type = std::vector<std::size_t>;
         using iter_type = xmultiindex_iterator<shape_type>;
 

@@ -78,7 +78,7 @@
     #endif
 #else
     #ifdef XTENSOR_USE_XSIMD
-        
+
         #define XTENSOR_DEFAULT_ALLOCATOR(T) \
             xsimd::aligned_allocator<T, XSIMD_DEFAULT_ALIGNMENT>
     #else

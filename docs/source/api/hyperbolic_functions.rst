@@ -34,4 +34,3 @@ Defined in ``xtensor/xmath.hpp``
 .. _atanh-func-ref:
 .. doxygenfunction:: atanh(E&&)
    :project: xtensor
-

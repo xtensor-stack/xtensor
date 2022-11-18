@@ -79,7 +79,7 @@ rot90
     auto r1 = xt::rot90<-2>(a);
     auto r2 = xt::rot90(a);
     auto r4 = xt::rot90(a, {-2, -1});
-    
+
 split
 -----
 
@@ -100,7 +100,7 @@ hsplit
 
     xt::xarray<int> a = {{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}};
     auto res = xt::hsplit(a, 2);
-    
+
 vsplit
 ------
 
@@ -134,4 +134,3 @@ trim_zeros
     auto t0 = xt::trim_zeros(a);
     auto t1 = xt::trim_zeros(a, "b");
     auto t2 = xt::trim_zeros(a, "f");
-

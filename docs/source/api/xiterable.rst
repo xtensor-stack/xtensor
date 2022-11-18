@@ -20,4 +20,3 @@ Defined in ``xtensor/xiterable.hpp``
 .. doxygenclass:: xt::xcontiguous_iterable
    :project: xtensor
    :members:
-

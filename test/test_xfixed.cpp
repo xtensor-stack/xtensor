@@ -298,7 +298,7 @@ namespace xt
     {
         using fixed_tensor = xtensor_fixed<double, xshape<2>, layout_type::row_major, true>;
         using tiny_tensor = xtensor_fixed<double, xshape<2>, layout_type::row_major, false>;
-        EXPECT_GT(sizeof(fixed_tensor), sizeof(tiny_tensor)); 
+        EXPECT_GT(sizeof(fixed_tensor), sizeof(tiny_tensor));
     }
 }
 

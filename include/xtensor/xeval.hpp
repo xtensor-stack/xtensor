@@ -109,10 +109,10 @@ namespace xt
     /**
      * Force evaluation of xexpression not providing a data interface
      * and convert to the required layout.
-     * 
+     *
      * @warning This function should be used in a local context only.
      * Returning the value returned by this function could lead to a dangling reference.
-     * 
+     *
      * @return The expression when it already provides a data interface with the correct layout,
      * an evaluated xarray or xtensor depending on shape type otherwise.
      *

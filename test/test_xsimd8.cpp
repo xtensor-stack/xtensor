@@ -26,4 +26,3 @@ namespace xt
         xarray<std::complex<double>> res = xt::conj(cmplarg_0);
     }
 }
-

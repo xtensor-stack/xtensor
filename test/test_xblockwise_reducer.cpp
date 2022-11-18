@@ -106,7 +106,7 @@ using test_p_norm_values_test_types = std::tuple<
 
 TEST_SUITE("xblockwise_reducer")
 {
-    TEST_CASE_TEMPLATE_DEFINE("test_values", TesterTuple, test_values_id) 
+    TEST_CASE_TEMPLATE_DEFINE("test_values", TesterTuple, test_values_id)
     {
         using tester_type = std::tuple_element_t<0, TesterTuple>;
         using options_type = std::tuple_element_t<1, TesterTuple>;
@@ -115,7 +115,7 @@ TEST_SUITE("xblockwise_reducer")
         dynamic_shape<std::size_t> chunk_shape({5,4,2});
         xarray<int> input_exp(shape);
 
-        // just iota is a bit boring since it will 
+        // just iota is a bit boring since it will
         // lead to an uniform variance
         std::iota(input_exp.begin(), input_exp.end(), -5);
         for(std::size_t i=0; i<input_exp.size(); ++i)
@@ -162,8 +162,8 @@ TEST_SUITE("xblockwise_reducer")
                     reducer.assign_to(result);
 
                     auto should_result = xt::eval(should_reducer);
-                    if(std::is_same<tester_type, variance_tester>::value || std::is_same<tester_type, stddev_tester>::value)    
-                    { 
+                    if(std::is_same<tester_type, variance_tester>::value || std::is_same<tester_type, stddev_tester>::value)
+                    {
                         CHECK_UNARY(xt::allclose(result, should_result));
                     }
                     else
@@ -178,7 +178,7 @@ TEST_SUITE("xblockwise_reducer")
     TEST_CASE_TEMPLATE_APPLY(test_values_id, test_values_test_types);
 
 
-    TEST_CASE_TEMPLATE_DEFINE("test_p_norm_values", TesterTuple, test_p_norm_values_id) 
+    TEST_CASE_TEMPLATE_DEFINE("test_p_norm_values", TesterTuple, test_p_norm_values_id)
     {
         using tester_type = std::tuple_element_t<0, TesterTuple>;
         using options_type = std::tuple_element_t<1, TesterTuple>;
@@ -187,7 +187,7 @@ TEST_SUITE("xblockwise_reducer")
         dynamic_shape<std::size_t> chunk_shape({5,4,2});
         xarray<int> input_exp(shape);
 
-        // just iota is a bit boring since it will 
+        // just iota is a bit boring since it will
         // lead to an uniform variance
         std::iota(input_exp.begin(), input_exp.end(), -5);
         for(std::size_t i=0; i<input_exp.size(); ++i)
@@ -214,7 +214,7 @@ TEST_SUITE("xblockwise_reducer")
                 auto reducer = tester_type::op(input_exp, chunk_shape, 2.0, axes, options_type{});
                 auto should_reducer = tester_type::should_op(input_exp, 2.0, axes, options_type{});
                 auto should_result = xt::eval(should_reducer);
-                
+
                 using should_result_value_type = typename std::decay_t<decltype(should_reducer)>::value_type;
                 using result_value_type = typename std::decay_t<decltype(reducer)>::value_type;
 
@@ -308,7 +308,7 @@ TEST_SUITE("xblockwise_reducer")
                 xt::blockwise::norm_l2(input_exp, chunk_shape, axes);
             }
         }
-    } 
+    }
 }
 
 }

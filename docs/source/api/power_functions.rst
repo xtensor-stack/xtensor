@@ -32,4 +32,3 @@ Defined in ``xtensor/xmath.hpp``
 
 .. doxygenfunction:: hypot(E1&&, E2&&)
    :project: xtensor
-

@@ -117,4 +117,3 @@ Classification functions
     xt::xarray<double> res2 = xt::isnan(e1);
     xt::xarray<double> res3 = xt::isclose(e1, e2);
     bool res4 = xt::allclose(e1, e2);
-

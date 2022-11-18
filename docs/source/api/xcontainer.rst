@@ -32,4 +32,3 @@ Defined in ``xtensor/xcontainer.hpp``
 .. doxygenclass:: xt::xstrided_container
    :project: xtensor
    :members:
-

@@ -171,4 +171,3 @@ namespace xt
         EXPECT_EQ(count, xt::cast<double>(py_count));
     }
 }
-

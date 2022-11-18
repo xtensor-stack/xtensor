@@ -13,7 +13,7 @@ namespace xt
 {
 
 template<class CT, class F, class X, class O>
-class xblockwise_reducer 
+class xblockwise_reducer
 {
 public:
 
@@ -98,7 +98,7 @@ xblockwise_reducer<CT, F, X, O>::xblockwise_reducer(E && e, BS && block_shape,  
 }
 
 template<class CT, class F, class X, class O>
-inline auto xblockwise_reducer<CT, F, X, O>::input_shape()const -> const input_shape_type & 
+inline auto xblockwise_reducer<CT, F, X, O>::input_shape()const -> const input_shape_type &
 {
     return m_e.shape();
 }
@@ -116,7 +116,7 @@ inline std::size_t xblockwise_reducer<CT, F, X, O>::dimension() const
 }
 
 template<class CT, class F, class X, class O>
-inline auto xblockwise_reducer<CT, F, X, O>::shape() const -> const shape_type & 
+inline auto xblockwise_reducer<CT, F, X, O>::shape() const -> const shape_type &
 {
     return m_result_shape;
 }
@@ -206,7 +206,7 @@ auto xblockwise_reducer<CT, F, X, O>::compute_input_chunk_range(CI & result_chun
         }
     }
     return input_chunk_range_type{
-        multiindex_iterator_begin<input_chunk_index_type>(input_chunks_begin, input_chunks_end), 
+        multiindex_iterator_begin<input_chunk_index_type>(input_chunks_begin, input_chunks_end),
         multiindex_iterator_end<input_chunk_index_type>(input_chunks_begin, input_chunks_end)
     };
 }
@@ -268,12 +268,12 @@ inline auto blockwise_reducer(E && e, CS && chunk_shape, A && axes, O && raw_opt
     using axes_type = std::decay_t<A>;
 
     return xblockwise_reducer<
-        closure_type, 
+        closure_type,
         functor_type,
-        axes_type, 
+        axes_type,
         O
     >(
-        std::forward<E>(e), 
+        std::forward<E>(e),
         std::forward<CS>(chunk_shape),
         std::forward<A>(axes),
         std::forward<O>(raw_options),
@@ -282,7 +282,7 @@ inline auto blockwise_reducer(E && e, CS && chunk_shape, A && axes, O && raw_opt
 }
 
 namespace blockwise
-{   
+{
 
     #define XTENSOR_BLOCKWISE_REDUCER_FUNC(FNAME, FUNCTOR)\
         template<class T=void, class E, class BS, class X, class O = DEFAULT_STRATEGY_REDUCERS,\
@@ -345,7 +345,7 @@ namespace blockwise
                 std::move(ax),\
                 std::forward<O>(options),\
                 functor_type());\
-        } 
+        }
     XTENSOR_BLOCKWISE_REDUCER_FUNC(sum, xt::detail::blockwise::sum_functor)
     XTENSOR_BLOCKWISE_REDUCER_FUNC(prod, xt::detail::blockwise::prod_functor)
     XTENSOR_BLOCKWISE_REDUCER_FUNC(amin, xt::detail::blockwise::amin_functor)
@@ -420,7 +420,7 @@ namespace blockwise
                 std::move(ax),\
                 std::forward<O>(options),\
                 functor_type());\
-        } 
+        }
     XTENSOR_BLOCKWISE_NORM_REDUCER_FUNC(norm_l0, xt::detail::blockwise::norm_l0_functor)
     XTENSOR_BLOCKWISE_NORM_REDUCER_FUNC(norm_l1, xt::detail::blockwise::norm_l1_functor)
     XTENSOR_BLOCKWISE_NORM_REDUCER_FUNC(norm_l2, xt::detail::blockwise::norm_l2_functor)
@@ -491,7 +491,7 @@ namespace blockwise
                 std::move(ax),\
                 std::forward<O>(options),\
                 functor_type(p));\
-        } 
+        }
 
     XTENSOR_BLOCKWISE_NORM_REDUCER_FUNC(norm_lp_to_p, xt::detail::blockwise::norm_lp_to_p_functor);
     XTENSOR_BLOCKWISE_NORM_REDUCER_FUNC(norm_lp, xt::detail::blockwise::norm_lp_functor);

@@ -15,7 +15,7 @@ xarray initialization
     xt::xarray<double> a({1, 3, 4, 2});
 
 does not initialize a 4D-array, but a 1D-array containing the values ``1``, ``3``,
-``4``, and ``2``. 
+``4``, and ``2``.
 It is strictly equivalent to
 
 .. code::
@@ -73,7 +73,7 @@ is still an lvalue and thus captured by reference.
 Random numbers not consistent
 -----------------------------
 
-Using a random number function from xtensor actually returns a lazy 
+Using a random number function from xtensor actually returns a lazy
 generator. That means, accessing the same element of a random number
 generator does not give the same random number if called twice.
 

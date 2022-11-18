@@ -180,7 +180,7 @@ namespace xt
 
         xt::xarray<double, xt::layout_type::column_major> cm_arr = t;
         xt::xarray<double, xt::layout_type::row_major> rm_arr = t;
-        
+
         EXPECT_TRUE(xt::allclose(rm_arr, cm_arr));
 
         EXPECT_EQ(cm_arr(0, 0),  0.0);

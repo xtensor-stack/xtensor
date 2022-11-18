@@ -48,4 +48,3 @@ namespace xt
         EXPECT_TRUE((std::is_same<xt::common_tensor_type_t<decltype(b2), decltype(b3)>, decltype(b2)>::value));
     }
 }
-

@@ -64,12 +64,12 @@ namespace xt
     TEST(xtest_extended, partition)
     {
         // py_a
-        
+
         // py_p5 = np.partition(a, 5)
         // py_p0 = np.partition(a, 0)
         // py_p13 = np.partition(a, 13)
         // py_p19 = np.partition(a, 19)
-        
+
         // py_a5 = np.argpartition(a, 5)
         // py_a0 = np.argpartition(a, 0)
         // py_a13 = np.argpartition(a, 13)
@@ -98,7 +98,7 @@ namespace xt
     TEST(xtest_extended, multi_partition)
     {
         // py_a
-        
+
         // py_p0 = np.partition(a, (4, 5, 6))
         // py_p1 = np.partition(a, (2, 7, 12))
 
@@ -135,7 +135,7 @@ namespace xt
     {
         // py_a
         // py_m = np.median(a)
-        
+
         // py_m0 = np.median(a, 0)
         // py_m1 = np.median(a, 1)
         // py_m2 = np.median(a, 2)

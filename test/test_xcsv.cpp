@@ -13,8 +13,8 @@
 #include <iostream>
 
 #include "xtensor/xcsv.hpp"
-#include "xtensor/xmath.hpp" 
-#include "xtensor/xio.hpp" 
+#include "xtensor/xmath.hpp"
+#include "xtensor/xio.hpp"
 
 namespace xt
 {

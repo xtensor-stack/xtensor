@@ -248,7 +248,7 @@ expression:
         std::cout << shared_weights.use_count() << std::endl; // ==> 3
         return expr;
     }
-    
+
 In that case only three copies of the shared weights exist. Notice that contrary to
 ``make_xshare``, ``share`` also accepts lvalues; this is to avoid the required ``std::move``,
 however ``share`` will turn its argument into an rvalue and will move it into the shared

@@ -438,7 +438,7 @@ namespace xt
             return static_cast<int>(t);
         }
     };
-    
+
     struct bool_even
     {
         template <class T>

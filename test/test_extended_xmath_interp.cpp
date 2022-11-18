@@ -87,4 +87,3 @@ namespace xt
         EXPECT_TRUE(xt::allclose(f, py_f));
     }
 }
-

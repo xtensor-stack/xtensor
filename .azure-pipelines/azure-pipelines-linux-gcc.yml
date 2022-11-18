@@ -47,9 +47,8 @@ jobs:
             sudo apt-get --no-install-suggests --no-install-recommends install g++-$(gcc_version)
           fi
         displayName: Install build toolchain
-          
+
       - bash: echo "##vso[task.prependpath]$CONDA/bin"
         displayName: Add conda to PATH
 
       - template: unix-build.yml
-

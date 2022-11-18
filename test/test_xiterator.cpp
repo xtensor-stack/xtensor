@@ -141,7 +141,7 @@ namespace xt
 
         auto offset = shape.size() - a.dimension();
         auto broadcasting_stride = std::accumulate(shape.cbegin(), shape.cbegin() + offset, difference_type(1), std::multiplies<difference_type>());
-        
+
         auto nb_inc = L == layout_type::row_major ?
             difference_type(shape.back() * shape[shape.size() - 2] + 1) :
             broadcasting_stride * difference_type(result.shape().front() * result.shape()[1] + 1);
@@ -390,7 +390,7 @@ namespace xt
         using vector_type = typename R::vector_type;
         vector_type data = result.storage();
         xarray_adaptor<typename R::vector_type, layout_type::dynamic> a(data, result.shape(), result.strides());
-        
+
         size_type size = shape.size();
         difference_type nb_inc = difference_type(L == layout_type::row_major ?
             shape.back() * shape[size - 2] + shape.back() + 2 :
@@ -509,7 +509,7 @@ namespace xt
         row_major_result<> rm;
         using vector_type = row_major_result<>::vector_type;
         xarray_adaptor<vector_type, layout_type::dynamic> a(rm.storage(), rm.shape(), rm.strides());
-        
+
         SUBCASE("row_major iterator")
         {
             xarray<vector_type::value_type> dst(a.shape(), 1);

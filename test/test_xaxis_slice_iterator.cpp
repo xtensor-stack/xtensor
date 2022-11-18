@@ -51,10 +51,10 @@ namespace xt
 
         dist = std::distance(axis_slice_begin(a, 1), axis_slice_end(a, 1));
         EXPECT_EQ(8, dist);
-       
+
         dist = std::distance(axis_slice_begin(a_col, 1), axis_slice_end(a_col, 1));
         EXPECT_EQ(8, dist);
-       
+
         dist = std::distance(axis_slice_begin(a, 2), axis_slice_end(a, 2));
         EXPECT_EQ(6, dist);
 

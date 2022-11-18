@@ -158,7 +158,7 @@ namespace xt
     {
         xarray<int> a = {{{1, 3}, {2, 4}}, {{5, 7}, {6, 8}}};
         xarray<bool> cond = {{{true, true}, {false, false}}, {{true, true}, {false, false}}};
-        
+
         xarray<int> resc = xt::filter<xt::layout_type::column_major>(a, cond);
         xarray<int> expc = {1, 5 ,3, 7};
         EXPECT_EQ(resc, expc);

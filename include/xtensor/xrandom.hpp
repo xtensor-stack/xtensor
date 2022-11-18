@@ -61,12 +61,12 @@ namespace xt
                       E& engine = random::get_default_random_engine());
 
         template <class T, class S, class D = double, class E = random::default_engine_type>
-        auto geometric(const S& shape, D prob = 0.5, 
+        auto geometric(const S& shape, D prob = 0.5,
                        E& engine = random::get_default_random_engine());
 
         template <class T, class S, class D = double, class E = random::default_engine_type>
         auto negative_binomial(const S& shape, T k = 1, D prob = 0.5,
-                               E& engine = random::get_default_random_engine()); 
+                               E& engine = random::get_default_random_engine());
 
         template <class T, class S, class D = double, class E = random::default_engine_type>
         auto poisson(const S& shape, D rate = 1.0,
@@ -81,11 +81,11 @@ namespace xt
                    E& engine = random::get_default_random_engine());
 
         template <class T, class S, class E = random::default_engine_type>
-        auto weibull(const S& shape, T a = 1.0, T b = 1.0, 
+        auto weibull(const S& shape, T a = 1.0, T b = 1.0,
                      E& engine = random::get_default_random_engine());
 
         template <class T, class S, class E = random::default_engine_type>
-        auto extreme_value(const S& shape, T a = 0.0, T b = 1.0, 
+        auto extreme_value(const S& shape, T a = 0.0, T b = 1.0,
                            E& engine = random::get_default_random_engine());
 
         template <class T, class S, class E = random::default_engine_type>
@@ -97,7 +97,7 @@ namespace xt
                          E& engine = random::get_default_random_engine());
 
         template <class T, class S, class E = random::default_engine_type>
-        auto cauchy(const S& shape, T a = 0.0, T b = 1.0, 
+        auto cauchy(const S& shape, T a = 0.0, T b = 1.0,
                            E& engine = random::get_default_random_engine());
 
         template <class T, class S, class E = random::default_engine_type>
@@ -125,19 +125,19 @@ namespace xt
                       E& engine = random::get_default_random_engine());
 
         template <class T, class I, std::size_t L, class D = double, class E = random::default_engine_type>
-        auto geometric(const I (&shape)[L], D prob=0.5, 
+        auto geometric(const I (&shape)[L], D prob=0.5,
                        E& engine = random::get_default_random_engine());
 
         template <class T, class I, std::size_t L, class D = double, class E = random::default_engine_type>
         auto negative_binomial(const I (&shape)[L], T k = 1, D prob = 0.5,
-                               E& engine = random::get_default_random_engine()); 
-        
+                               E& engine = random::get_default_random_engine());
+
         template <class T, class I, std::size_t L, class D = double, class E = random::default_engine_type>
-        auto poisson(const I (&shape)[L], D rate = 1.0, 
+        auto poisson(const I (&shape)[L], D rate = 1.0,
                      E& engine = random::get_default_random_engine());
 
         template <class T, class I, std::size_t L, class E = random::default_engine_type>
-        auto exponential(const I (&shape)[L], T rate = 1.0, 
+        auto exponential(const I (&shape)[L], T rate = 1.0,
                          E& engine = random::get_default_random_engine());
 
         template <class T, class I, std::size_t L, class E = random::default_engine_type>
@@ -356,9 +356,9 @@ namespace xt
         /**
          * xexpression with specified @p shape containing numbers sampled from
          * a negative binomial random number distribution (also known as Pascal distribution)
-         * that returns the number of successes before @p k trials with probability of success 
+         * that returns the number of successes before @p k trials with probability of success
          * equal to @p prob for each of the Bernoulli trials.
-         * 
+         *
          * Numbers are drawn from @c std::negative_binomial_distribution.
          *
          * @param shape shape of resulting xexpression
@@ -371,13 +371,13 @@ namespace xt
         inline auto negative_binomial(const S& shape, T k, D prob, E& engine)
         {
             std::negative_binomial_distribution<T> dist(k, prob);
-            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);   
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
         }
 
         /**
          * xexpression with specified @p shape containing numbers sampled from
          * a Poisson random number distribution with rate @p rate
-         * 
+         *
          * Numbers are drawn from @c std::poisson_distribution.
          *
          * @param shape shape of resulting xexpression
@@ -389,13 +389,13 @@ namespace xt
         inline auto poisson(const S& shape, D rate, E& engine)
         {
             std::poisson_distribution<T> dist(rate);
-            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);   
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
         }
 
         /**
          * xexpression with specified @p shape containing numbers sampled from
          * a exponential random number distribution with rate @p rate
-         * 
+         *
          * Numbers are drawn from @c std::exponential_distribution.
          *
          * @param shape shape of resulting xexpression
@@ -407,13 +407,13 @@ namespace xt
         inline auto exponential(const S& shape, T rate, E& engine)
         {
             std::exponential_distribution<T> dist(rate);
-            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);   
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
         }
 
         /**
          * xexpression with specified @p shape containing numbers sampled from
          * a gamma random number distribution with shape @p alpha and scale @p beta
-         * 
+         *
          * Numbers are drawn from @c std::gamma_distribution.
          *
          * @param shape shape of resulting xexpression
@@ -432,7 +432,7 @@ namespace xt
         /**
          * xexpression with specified @p shape containing numbers sampled from
          * a Weibull random number distribution with shape @p a and scale @p b
-         * 
+         *
          * Numbers are drawn from @c std::weibull_distribution.
          *
          * @param shape shape of resulting xexpression
@@ -451,7 +451,7 @@ namespace xt
         /**
          * xexpression with specified @p shape containing numbers sampled from
          * a extreme value random number distribution with shape @p a and scale @p b
-         * 
+         *
          * Numbers are drawn from @c std::extreme_value_distribution.
          *
          * @param shape shape of resulting xexpression
@@ -508,7 +508,7 @@ namespace xt
         /**
          * xexpression with specified @p shape containing numbers sampled from
          * a Cauchy random number distribution with peak @p a and scale @p b
-         * 
+         *
          * Numbers are drawn from @c std::cauchy_distribution.
          *
          * @param shape shape of resulting xexpression
@@ -526,9 +526,9 @@ namespace xt
 
         /**
          * xexpression with specified @p shape containing numbers sampled from
-         * a Fisher-f random number distribution with numerator degrees of 
+         * a Fisher-f random number distribution with numerator degrees of
          * freedom equal to @p m and denominator degrees of freedom equal to @p n
-         * 
+         *
          * Numbers are drawn from @c std::fisher_f_distribution.
          *
          * @param shape shape of resulting xexpression
@@ -546,9 +546,9 @@ namespace xt
 
         /**
          * xexpression with specified @p shape containing numbers sampled from
-         * a Student-t random number distribution with degrees of 
-         * freedom equal to @p n 
-         * 
+         * a Student-t random number distribution with degrees of
+         * freedom equal to @p n
+         *
          * Numbers are drawn from @c std::student_t_distribution.
          *
          * @param shape shape of resulting xexpression
@@ -609,14 +609,14 @@ namespace xt
         inline auto poisson(const I (&shape)[L], D rate, E& engine)
         {
             std::poisson_distribution<T> dist(rate);
-            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);   
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
         }
 
         template <class T, class I, std::size_t L, class E>
         inline auto exponential(const I (&shape)[L], T rate, E& engine)
         {
             std::exponential_distribution<T> dist(rate);
-            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);   
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
         }
 
         template <class T, class I, std::size_t L, class E>

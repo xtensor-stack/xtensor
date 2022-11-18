@@ -54,7 +54,7 @@ Changelog
 0.24.1
 ------
 
-- Define tbb threshold 
+- Define tbb threshold
   `#2455 https://github.com/xtensor-stack/xtensor/pull/2455`
 - Export link interface to tbb
   `#2456 https://github.com/xtensor-stack/xtensor/pull/2456`
@@ -64,7 +64,7 @@ Changelog
   `#2462 https://github.com/xtensor-stack/xtensor/pull/2462`
 - Workaround for CMake implementations that do not use C and CXX languages
   `#2467 https://github.com/xtensor-stack/xtensor/pull/2467`
-- Fix erroneous less_equal usage in is_sorted calls 
+- Fix erroneous less_equal usage in is_sorted calls
   `#2471 https://github.com/xtensor-stack/xtensor/pull/2471`
 - Adding xt::missing to operator()
   `#2488 https://github.com/xtensor-stack/xtensor/pull/2488`
@@ -146,7 +146,7 @@ Changelog
   `#2361 https://github.com/xtensor-stack/xtensor/pull/2361`
 - Added const chunk iterators
   `#2362 https://github.com/xtensor-stack/xtensor/pull/2362`
-- Fixed chunk assignment 
+- Fixed chunk assignment
   `#2363 https://github.com/xtensor-stack/xtensor/pull/2363`
 
 0.23.5
@@ -154,11 +154,11 @@ Changelog
 
 - No need to explicitly install blas anymore with latest xtensor-blas
   `#2343 https://github.com/xtensor-stack/xtensor/pull/2343`
-- FIX for xtensor-stack/xtl/issues/245 
+- FIX for xtensor-stack/xtl/issues/245
   `#2344 https://github.com/xtensor-stack/xtensor/pull/2344`
 - Implement grid view
   `#2346 https://github.com/xtensor-stack/xtensor/pull/2346`
-- Refactoring of xchunked_view 
+- Refactoring of xchunked_view
   `#2353 https://github.com/xtensor-stack/xtensor/pull/2353`
 
 0.23.4
@@ -227,7 +227,7 @@ Breaking changes
 
 - Remove chunked array extension mechanism
   `#2283 <https://github.com/xtensor-stack/xtensor/pull/2283>`_
-- Upgraded to xtl 0.7.0 
+- Upgraded to xtl 0.7.0
   `#2284 <https://github.com/xtensor-stack/xtensor/pull/2284>`_
 
 Other changes
@@ -262,7 +262,7 @@ Other changes
   `#2241 <https://github.com/xtensor-stack/xtensor/pull/2241>`_
 - Testing alignment
   `#2246 <https://github.com/xtensor-stack/xtensor/pull/2246>`_
-- Add reducers tests 
+- Add reducers tests
   `#2252 <https://github.com/xtensor-stack/xtensor/pull/2252>`_
 - Fix binary operators on complex
   `#2253 <https://github.com/xtensor-stack/xtensor/pull/2253>`_
@@ -292,7 +292,7 @@ Other changes
   `#2276 <https://github.com/xtensor-stack/xtensor/pull/2276>`_
 - Updated reducer docs according to recent changes
   `#2278 <https://github.com/xtensor-stack/xtensor/pull/2278>`_
-- Added template parameter for initial value type in accumulators 
+- Added template parameter for initial value type in accumulators
   `#2279 <https://github.com/xtensor-stack/xtensor/pull/2279>`_
 
 0.21.10
@@ -320,7 +320,7 @@ Other changes
   `#2212 <https://github.com/xtensor-stack/xtensor/pull/2212>`_
 - ``xnpy.hpp``: fix multiple definition of 'host_endian_char' variable when included in different linked objects
   `#2214 <https://github.com/xtensor-stack/xtensor/pull/2214>`_
-- Made global variable const to force internal linkage 
+- Made global variable const to force internal linkage
   `#2216 <https://github.com/xtensor-stack/xtensor/pull/2216>`_
 - Use xtl::endianness instead of bundling it
   `#2218 <https://github.com/xtensor-stack/xtensor/pull/2218>`_
@@ -330,7 +330,7 @@ Other changes
 0.21.8
 ------
 
-- Fix undefined behavior while testing shifts 
+- Fix undefined behavior while testing shifts
   `#2175 <https://github.com/xtensor-stack/xtensor/pull/2175>`_
 - Fix ``zarray`` initialization from ``zarray``
   `#2180 <https://github.com/xtensor-stack/xtensor/pull/2180>`_
@@ -422,13 +422,13 @@ Other changes
   `#2087 <https://github.com/xtensor-stack/xtensor/pull/2087>`_
 - Fixed chunk layout
   `#2091 <https://github.com/xtensor-stack/xtensor/pull/2091>`_
-- Copy constructor gets expression's chunk_shape if it is chunked 
+- Copy constructor gets expression's chunk_shape if it is chunked
   `#2092 <https://github.com/xtensor-stack/xtensor/pull/2092>`_
 - Replaced template parameter chunk_type with chunk_storage
   `#2095 <https://github.com/xtensor-stack/xtensor/pull/2095>`_
-- Implemented on-disk chunked array 
+- Implemented on-disk chunked array
   `#2096 <https://github.com/xtensor-stack/xtensor/pull/2096>`_
-- Implemented chunk pool in xchunk_store_manager 
+- Implemented chunk pool in xchunk_store_manager
   `#2099 <https://github.com/xtensor-stack/xtensor/pull/2099>`_
 - ``xfile_array`` is now an expression
   `#2107 <https://github.com/xtensor-stack/xtensor/pull/2107>`_
@@ -442,7 +442,7 @@ Other changes
   `#2118 <https://github.com/xtensor-stack/xtensor/pull/2118>`_
 - Abstracted file format through a formal class
   `#2115 <https://github.com/xtensor-stack/xtensor/pull/2115>`_
-- Added ``xchunked_array`` extension template 
+- Added ``xchunked_array`` extension template
   `#2122 <https://github.com/xtensor-stack/xtensor/pull/2122>`_
 - Refactored ``xdisk_io_handler``
   `#2123 <https://github.com/xtensor-stack/xtensor/pull/2123>`_
@@ -895,7 +895,7 @@ Other changes
 0.20.3
 ------
 
-- Fix xbuffer adaptor 
+- Fix xbuffer adaptor
   `#1523 <https://github.com/xtensor-stack/xtensor/pull/1523>`_
 
 0.20.2
@@ -1164,7 +1164,7 @@ Other changes
   `#1302 <https://github.com/xtensor-stack/xtensor/pull/1302>`_.
 - Implementation of shift operators
   `#1304 <https://github.com/xtensor-stack/xtensor/pull/1304>`_.
-- Make functor adaptor stepper work for proxy specializations 
+- Make functor adaptor stepper work for proxy specializations
   `#1305 <https://github.com/xtensor-stack/xtensor/pull/1305>`_.
 - Replaced ``auto&`` with ``auto&&`` in ``assign_to``
   `#1306 <https://github.com/xtensor-stack/xtensor/pull/1306>`_.
@@ -1176,7 +1176,7 @@ Other changes
   `#1311 <https://github.com/xtensor-stack/xtensor/pull/1311>`_.
 - Fixed ``xvie_stepper``
   `#1317 <https://github.com/xtensor-stack/xtensor/pull/1317>`_.
-- Fixed assignment of view on view 
+- Fixed assignment of view on view
   `#1314 <https://github.com/xtensor-stack/xtensor/pull/1314>`_.
 - Documented indices
   `#1318 <https://github.com/xtensor-stack/xtensor/pull/1318>`_.
@@ -1255,9 +1255,9 @@ Other changes
   `#1213 <https://github.com/xtensor-stack/xtensor/pull/1213>`_.
 - Fix minor typos
   `#1212 <https://github.com/xtensor-stack/xtensor/pull/1212>`_.
-- Added missing assign operator in xstrided_view 
+- Added missing assign operator in xstrided_view
   `#1210 <https://github.com/xtensor-stack/xtensor/pull/1210>`_.
-- argmax on axis with single element fixed 
+- argmax on axis with single element fixed
   `#1209 <https://github.com/xtensor-stack/xtensor/pull/1209>`_.
 
 0.18.2
@@ -1330,7 +1330,7 @@ Other changes
 
 - Warnings removed
   `#1159 <https://github.com/xtensor-stack/xtensor/pull/1159>`_.
-- Added missing include 
+- Added missing include
   `#1162 <https://github.com/xtensor-stack/xtensor/pull/1162>`_.
 - Removed unused type alias in ``xmath/average``
   `#1163 <https://github.com/xtensor-stack/xtensor/pull/1163>`_.

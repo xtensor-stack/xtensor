@@ -45,7 +45,7 @@ namespace xt
         EXPECT_EQ(sa.use_count(), 2);
         auto cpysa = sa;
         EXPECT_EQ(sa.use_count(), 3);
-        
+
         std::stringstream buffer;
         buffer << sa;
         EXPECT_EQ(buffer.str(), "{{ 1.,  2.,  3.,  4.},\n { 5.,  6.,  7.,  8.}}");
@@ -122,7 +122,7 @@ namespace xt
         using dyn_exp = xt::xarray<int>;
         constexpr bool dyn_res = std::is_same<dyn_tmp, dyn_exp>::value;
         EXPECT_TRUE(dyn_res);
-        
+
         using sta_shape = std::array<std::size_t, 4>;
         using sta_tmp = xt::detail::xtype_for_shape<sta_shape>::type<int, XTENSOR_DEFAULT_LAYOUT>;
         using sta_exp = xt::xtensor<int, 4>;

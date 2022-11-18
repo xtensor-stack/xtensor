@@ -116,7 +116,7 @@ void check_promoted_types(E&& e)
         CHECK_STDDEV_TEMPLATED_RESULT_TYPE(stddev, INPUT)
 
     TEST(xmath, uchar_result_type)
-    {        
+    {
         shape_type shape = {3, 2};
         xarray<unsigned char> auchar(shape);
 
@@ -132,7 +132,7 @@ void check_promoted_types(E&& e)
     }
 
     TEST(xmath, short_result_type)
-    {        
+    {
         shape_type shape = {3, 2};
         xarray<short> ashort(shape);
 
@@ -148,7 +148,7 @@ void check_promoted_types(E&& e)
     }
 
     TEST(xmath, ushort_result_type)
-    {        
+    {
         shape_type shape = {3, 2};
         xarray<unsigned short> aushort(shape);
 
@@ -164,7 +164,7 @@ void check_promoted_types(E&& e)
     }
 
     TEST(xmath, int_result_type)
-    {        
+    {
         shape_type shape = {3, 2};
         xarray<int> aint(shape);
 
@@ -180,10 +180,10 @@ void check_promoted_types(E&& e)
     }
 
     TEST(xmath, uint_result_type)
-    {        
+    {
         shape_type shape = {3, 2};
         xarray<unsigned int> auint(shape);
-  
+
         CHECK_RESULT_TYPE(auint + auint, unsigned int);
         CHECK_RESULT_TYPE(2u * auint, unsigned int);
         CHECK_RESULT_TYPE(2.0 * auint, double);
@@ -196,7 +196,7 @@ void check_promoted_types(E&& e)
     }
 
     TEST(xmath, long_result_type)
-    {        
+    {
         shape_type shape = {3, 2};
         xarray<long long> along(shape);
 
@@ -212,10 +212,10 @@ void check_promoted_types(E&& e)
     }
 
     TEST(xmath, ulong_result_type)
-    {        
+    {
         shape_type shape = {3, 2};
         xarray<unsigned long long> aulong(shape);
-    
+
         CHECK_RESULT_TYPE(aulong + aulong, unsigned long long);
         CHECK_RESULT_TYPE(2ul * aulong, unsigned long long);
         CHECK_RESULT_TYPE(2.0 * aulong, double);
@@ -228,7 +228,7 @@ void check_promoted_types(E&& e)
     }
 
     TEST(xmath, float_result_type)
-    {        
+    {
         shape_type shape = {3, 2};
         xarray<float> afloat(shape);
 
@@ -244,7 +244,7 @@ void check_promoted_types(E&& e)
     }
 
     TEST(xmath, double_result_type)
-    {        
+    {
         shape_type shape = {3, 2};
         xarray<double> adouble(shape);
 
@@ -259,7 +259,7 @@ void check_promoted_types(E&& e)
     }
 
     TEST(xmath, float_complex_result_type)
-    {        
+    {
         shape_type shape = {3, 2};
         xarray<std::complex<float>> afcomplex(shape);
 
@@ -273,7 +273,7 @@ void check_promoted_types(E&& e)
     }
 
     TEST(xmath, double_complex_result_type)
-    {        
+    {
         shape_type shape = {3, 2};
         xarray<std::complex<double>> adcomplex(shape);
 
@@ -287,7 +287,7 @@ void check_promoted_types(E&& e)
     }
 
     TEST(xmath, mixed_result_type)
-    {        
+    {
         shape_type shape = {3, 2};
         xarray<unsigned char> auchar(shape);
         xarray<short> ashort(shape);
