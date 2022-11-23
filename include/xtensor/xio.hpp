@@ -203,20 +203,28 @@ namespace xt
 
                 size_type i = 0;
                 size_type elems_on_line = 0;
-                size_type ewp2 = static_cast<size_type>(element_width) + size_type(2);
-                size_type line_lim = static_cast<size_type>(std::floor(line_width / ewp2));
+                size_type const ewp2 = static_cast<size_type>(element_width) + size_type(2);
+                size_type const line_lim = static_cast<size_type>(std::floor(line_width / ewp2));
 
                 out << '{';
                 for (; i != size_type(view.shape()[0] - 1); ++i)
                 {
                     if (edgeitems && size_type(view.shape()[0]) > (edgeitems * 2) && i == edgeitems)
                     {
-                        out << "..., ";
-                        if (view.dimension() > 1)
+                        if (view.dimension() == 1 && line_lim != 0 && elems_on_line >= line_lim)
+                        {
+                            out << " ...,";
+                        }
+                        else if (view.dimension() > 1)
                         {
                             elems_on_line = 0;
-                            out << std::endl
+                            out << "...,"
+                                << std::endl
                                 << indents;
+                        }
+                        else
+                        {
+                            out << "..., ";
                         }
                         i = size_type(view.shape()[0]) - edgeitems;
                     }
@@ -231,11 +239,11 @@ namespace xt
                     slices.pop_back();
                     elems_on_line++;
 
-                    if (view.dimension() == 1)
+                    if ((view.dimension() == 1) && !(line_lim != 0 && elems_on_line >= line_lim))
                     {
                         out << ' ';
                     }
-                    else
+                    else if(view.dimension() > 1)
                     {
                         out << std::endl
                             << indents;
