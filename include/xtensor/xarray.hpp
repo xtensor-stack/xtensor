@@ -378,8 +378,8 @@ namespace xt
         : base_type()
     {
         base_type::resize(xt::shape<shape_type>(t));
-    constexpr auto tmp = layout_type::row_major;
-    L == tmp ? nested_copy(m_storage.begin(), t) : nested_copy(this->template begin<tmp>(), t);
+        constexpr auto tmp = layout_type::row_major;
+        L == tmp ? nested_copy(m_storage.begin(), t) : nested_copy(this->template begin<tmp>(), t);
     }
 
     /**
@@ -392,7 +392,7 @@ namespace xt
     {
         base_type::resize(xt::shape<shape_type>(t));
         constexpr auto tmp = layout_type::row_major;
-    L == tmp ? nested_copy(m_storage.begin(), t) : nested_copy(this->template begin<tmp>(), t);
+        L == tmp ? nested_copy(m_storage.begin(), t) : nested_copy(this->template begin<tmp>(), t);
     }
 
     /**
@@ -404,8 +404,8 @@ namespace xt
         : base_type()
     {
         base_type::resize(xt::shape<shape_type>(t));
-    constexpr auto tmp = layout_type::row_major;
-    L == tmp ? nested_copy(m_storage.begin(), t) : nested_copy(this->template begin<tmp>(), t);
+        constexpr auto tmp = layout_type::row_major;
+        L == tmp ? nested_copy(m_storage.begin(), t) : nested_copy(this->template begin<tmp>(), t);
     }
 
     /**
@@ -418,7 +418,7 @@ namespace xt
     {
         base_type::resize(xt::shape<shape_type>(t));
         constexpr auto tmp = layout_type::row_major;
-    L == tmp ? nested_copy(m_storage.begin(), t) : nested_copy(this->template begin<tmp>(), t);
+        L == tmp ? nested_copy(m_storage.begin(), t) : nested_copy(this->template begin<tmp>(), t);
     }
 
     /**
@@ -430,8 +430,8 @@ namespace xt
         : base_type()
     {
         base_type::resize(xt::shape<shape_type>(t));
-    constexpr auto tmp = layout_type::row_major;
-    L == tmp ? nested_copy(m_storage.begin(), t) : nested_copy(this->template begin<tmp>(), t);
+        constexpr auto tmp = layout_type::row_major;
+        L == tmp ? nested_copy(m_storage.begin(), t) : nested_copy(this->template begin<tmp>(), t);
     }
     //@}
 

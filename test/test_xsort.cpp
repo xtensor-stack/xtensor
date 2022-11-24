@@ -149,8 +149,8 @@ namespace xt
         EXPECT_EQ(ex_3, sort(a, 1));
 
 #ifndef XTENSOR_DISABLE_EXCEPTIONS
-    xt::xarray<double> xarr = xt::eval(xt::arange(0,16));
-    xarr.reshape({4,4});
+        xt::xarray<double> xarr = xt::eval(xt::arange(0,16));
+        xarr.reshape({4,4});
         auto view = xt::reshape_view(xt::transpose(xarr, {1,0}), {2,8});
         EXPECT_NO_THROW(xt::sort(view, 0));
 #endif
@@ -342,10 +342,10 @@ namespace xt
         EXPECT_TRUE(check_partition(r1, 2));
 
 #ifndef XTENSOR_DISABLE_EXCEPTIONS
-    xt::xarray<double> xarr = xt::eval(xt::arange(0,16));
-    xarr.reshape({4,4});
+        xt::xarray<double> xarr = xt::eval(xt::arange(0,16));
+        xarr.reshape({4,4});
         auto view = xt::transpose(xarr, {1,0});
-    EXPECT_NO_THROW(xt::partition(view, 1, 0));
+        EXPECT_NO_THROW(xt::partition(view, 1, 0));
 #endif
     }
 
