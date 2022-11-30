@@ -642,7 +642,7 @@ namespace xt
             e1.template store_simd<lhs_align_mode>(i, e2.template load_simd<rhs_align_mode, value_type>(i));
         });
 #elif defined(XTENSOR_USE_OPENMP)
-        if (size >= size_typeXTENSOR_OPENMP_TRESHOLD))
+        if (size >= size_type(XTENSOR_OPENMP_TRESHOLD))
         {
 #pragma omp parallel for default(none) shared(align_begin, align_end, e1, e2)
 #ifndef _WIN32
