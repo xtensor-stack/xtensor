@@ -657,7 +657,7 @@ namespace xt
             }
         }
 #elif defined(XTENSOR_USE_OPENMP)
-        if (size >= size_typeXTENSOR_OPENMP_TRESHOLD))
+        if (size >= size_type(XTENSOR_OPENMP_TRESHOLD))
         {
 #pragma omp parallel for default(none) shared(align_begin, align_end, e1, e2)
 #ifndef _WIN32
