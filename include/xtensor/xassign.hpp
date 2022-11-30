@@ -657,22 +657,22 @@ namespace xt
             }
         }
 #elif defined(XTENSOR_USE_OPENMP)
-        if (size >= XTENSOR_OPENMP_TRESHOLD)
+        if (size >= size_typeXTENSOR_OPENMP_TRESHOLD))
         {
-            #pragma omp parallel for default(none) shared(align_begin, align_end, e1, e2)
-    #ifndef _WIN32
+#pragma omp parallel for default(none) shared(align_begin, align_end, e1, e2)
+#ifndef _WIN32
             for (size_type i = align_begin; i < align_end; i += simd_size)
             {
                 e1.template store_simd<lhs_align_mode>(i, e2.template load_simd<rhs_align_mode, value_type>(i));
             }
-    #else
+#else
             for(auto i = static_cast<std::ptrdiff_t>(align_begin); i < static_cast<std::ptrdiff_t>(align_end);
                 i += static_cast<std::ptrdiff_t>(simd_size))
             {
                 size_type ui = static_cast<size_type>(i);
                 e1.template store_simd<lhs_align_mode>(ui, e2.template load_simd<rhs_align_mode, value_type>(ui));
             }
-    #endif
+#endif
         }
         else
         {
@@ -719,10 +719,21 @@ namespace xt
             *(dst + i) = static_cast<value_type>(*(src + i));
         });
 #elif defined(XTENSOR_USE_OPENMP)
-        #pragma omp parallel for default(none) shared(src, dst, n)
-        for (std::ptrdiff_t i = std::ptrdiff_t(0); i < static_cast<std::ptrdiff_t>(n) ; i++)
+        if (n >= XTENSOR_OPENMP_TRESHOLD)
         {
-            *(dst + i) = static_cast<value_type>(*(src + i));
+#pragma omp parallel for default(none) shared(src, dst, n)
+            for (std::ptrdiff_t i = std::ptrdiff_t(0); i < static_cast<std::ptrdiff_t>(n) ; i++)
+            {
+                *(dst + i) = static_cast<value_type>(*(src + i));
+            }
+        }
+        else {
+            for (; n > size_type(0); --n)
+            {
+                *dst = static_cast<value_type>(*src);
+                ++src;
+                ++dst;
+            }  
         }
 #else
         for (; n > size_type(0); --n)
@@ -1022,7 +1033,7 @@ namespace xt
         }
 // 		std::cout << "OUTER LOOP size is " << outer_loop_size << " INNER LOOP size is " << inner_loop_size <<std::endl;
 #if defined(XTENSOR_USE_OPENMP) && defined(strided_parallel_assign)
-		if (outer_loop_size>50) {
+		if (outer_loop_size>20) {
 			std::size_t first_step = true;
 #pragma omp parallel for schedule(static) firstprivate(first_step, fct_stepper, res_stepper, idx)
 			for (std::size_t ox = 0; ox < outer_loop_size; ++ox)
