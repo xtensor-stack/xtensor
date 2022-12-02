@@ -15,4 +15,3 @@ Defined in ``xtensor/xfixed.hpp``
 
 .. doxygentypedef:: xt::xtensor_fixed
    :project: xtensor
-

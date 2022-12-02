@@ -7,3 +7,4 @@ dependencies:
   - xsimd=9.0.1
   - nlohmann_json
   - doctest=2.4.7
+  - pre-commit

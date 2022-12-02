@@ -48,12 +48,12 @@ namespace xt
             benchmark::DoNotOptimize(a.data());
         }
     }
-    
+
     template <class T>
     inline auto builder_arange_for_loop_assign(benchmark::State& state)
     {
         for (auto _ : state)
-        { 
+        {
             auto expr = xt::arange(0, 10000);
             T res = T::from_shape({10000});
             for (std::size_t i = 0; i < 10000; ++i)
@@ -127,7 +127,7 @@ namespace xt
     inline auto builder_ones(benchmark::State& state)
     {
         for (auto _ : state)
-        { 
+        {
             xt::xarray<double> res = xt::ones<double>({200, 200});
             benchmark::DoNotOptimize(res.data());
         }

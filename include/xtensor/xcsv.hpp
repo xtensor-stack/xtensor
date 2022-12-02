@@ -104,7 +104,7 @@ namespace xt
 
     /**
      * @brief Load tensor from CSV.
-     * 
+     *
      * Returns an \ref xexpression for the parsed CSV
      * @param stream the input stream containing the CSV encoded values
      * @param delimiter the character used to separate values. [default: ',']
@@ -133,7 +133,7 @@ namespace xt
             std::string row, cell;
             while (std::getline(stream, row))
             {
-                if (nhead < skip_rows) 
+                if (nhead < skip_rows)
                 {
                     ++nhead;
                     continue;
@@ -164,7 +164,7 @@ namespace xt
 
     /**
      * @brief Dump tensor to CSV.
-     * 
+     *
      * @param stream the output stream to write the CSV encoded values
      * @param e the tensor expression to serialize
      */

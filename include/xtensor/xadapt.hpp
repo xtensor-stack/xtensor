@@ -204,7 +204,7 @@ namespace xt
     /***************************
      * xtensor_adaptor builder *
      ***************************/
-    
+
     /**
      * Constructs a 1-D xtensor_adaptor of the given stl-like container,
      * with the specified layout_type.
@@ -352,7 +352,7 @@ namespace xt
                            xtl::forward_sequence<typename return_type::inner_shape_type, SC>(shape),
                            xtl::forward_sequence<typename return_type::inner_strides_type, SS>(strides));
     }
-    
+
     /**
      * Contructs an xtensor_adaptor of the given C array allocated on the stack, with the
      * specified shape and layout.
@@ -438,7 +438,7 @@ namespace xt
      * Constructs:
      * - an xarray_adaptor if SC is not an array type
      * - an xtensor_adaptor if SC is an array type
-     * 
+     *
      * of the given dynamically allocated C array, with the specified shape and layout.
      * @param pointer the pointer to the beginning of the dynamic array
      * @param size the size of the dynamic array

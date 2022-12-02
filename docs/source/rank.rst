@@ -114,4 +114,3 @@ Consider the following example:
 ``xt::get_rank`` 'returns' the rank of the *xtensor* object if its rank is fixed.
 In all other cases it 'returns' ``SIZE_MAX``.
 Indeed ``xt::get_rank<xt::array<double>>::value`` is equal to ``SIZE_MAX``, but equally so is ``xt::get_rank<double>::value``.
-

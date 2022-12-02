@@ -58,7 +58,7 @@ namespace xt
         using axes_type = std::array<std::size_t, 2>;
         using shape_type = xarray<double>::shape_type;
         using xarray_type = xarray<double>;
-        using func = xreducer_functors<std::plus<double>>; 
+        using func = xreducer_functors<std::plus<double>>;
 
         axes_type m_axes;
 
@@ -96,10 +96,10 @@ namespace xt
         xarray_of_optional_type m_array_of_optional, m_simple_array_of_optional;
 
         xarray_optional_type m_array_optional, m_simple_array_optional;
-    
+
         optional_assembly_type m_optional_assembly, m_simple_optional_assembly;
 
-        xreducer_opt_features(): 
+        xreducer_opt_features():
             m_axes({1, 3}),
             m_array_of_optional(ones<xtl::xoptional<double>>({3, 2, 4, 6, 5})),
             m_array_optional(ones<xtl::xoptional<double>>({3, 2, 4, 6, 5})),
@@ -287,7 +287,7 @@ namespace xt
         CHECK_TYPE(xt::value(opt_res1)(1, 1, 1), xtl::xoptional<double>);
         EXPECT_EQ(xt::has_value(opt_res1), xt::full_like(res, true));
         EXPECT_EQ(opt_expected, opt_res1);
-        
+
         xreducer_opt_features::xarray_optional_type opt_res2 = res;
         CHECK_RESULT_TYPE(opt_res2, xtl::xoptional<double>);
         CHECK_TYPE(xt::value(opt_res2)(1, 1, 1), double);
@@ -335,13 +335,13 @@ namespace xt
     TEST(xreducer_array_optional, assign)
     {
         xreducer_opt_features feats;
-        TEST_OPT_ASSIGNMENT(feats.m_array_optional) 
+        TEST_OPT_ASSIGNMENT(feats.m_array_optional)
     }
-    
+
     TEST(xreducer_optional_assembly, assign)
     {
         xreducer_opt_features feats;
-        TEST_OPT_ASSIGNMENT(feats.m_optional_assembly) 
+        TEST_OPT_ASSIGNMENT(feats.m_optional_assembly)
     }
 #undef TEST_OPT_ASSIGNMENT
 
@@ -358,24 +358,24 @@ namespace xt
     auto res = xt::sum(INPUT, feats.m_axes);           \
     EXPECT_EQ(res.dimension(), std::size_t(3));        \
     EXPECT_EQ(res(0, 0, 0), xtl::missing<double>());   \
-    EXPECT_EQ(res(1, 1, 1), 24.);  
+    EXPECT_EQ(res(1, 1, 1), 24.);
 
     TEST(xreducer_array_of_optional, sum)
     {
         xreducer_opt_features feats;
-        TEST_OPT_SUM(feats.m_array_of_optional);   
+        TEST_OPT_SUM(feats.m_array_of_optional);
     }
 
     TEST(xreducer_array_optional, sum)
     {
         xreducer_opt_features feats;
-        TEST_OPT_SUM(feats.m_array_optional);       
-    } 
+        TEST_OPT_SUM(feats.m_array_optional);
+    }
 
     TEST(xreducer_optional_assembly, sum)
     {
         xreducer_opt_features feats;
-        TEST_OPT_SUM(feats.m_optional_assembly);        
+        TEST_OPT_SUM(feats.m_optional_assembly);
     }
 #undef TEST_OPT_SUM
 
@@ -409,24 +409,24 @@ namespace xt
                                                                        \
     xarray_optional<double> res3 = xt::sum(INPUT, {1});                \
     xarray_optional<double> res4 = xt::sum(INPUT, 1);                  \
-    EXPECT_EQ(res3, res4); 
+    EXPECT_EQ(res3, res4);
 
     TEST(xreducer_array_of_optional, single_axis_sugar)
     {
         xreducer_opt_features feats;
-        TEST_OPT_SINGLE_AXIS(feats.m_array_of_optional);   
+        TEST_OPT_SINGLE_AXIS(feats.m_array_of_optional);
     }
 
     TEST(xreducer_array_optional, single_axis_sugar)
     {
         xreducer_opt_features feats;
-        TEST_OPT_SINGLE_AXIS(feats.m_array_optional);       
-    } 
+        TEST_OPT_SINGLE_AXIS(feats.m_array_optional);
+    }
 
     TEST(xreducer_optional_assembly, single_axis_sugar)
     {
         xreducer_opt_features feats;
-        TEST_OPT_SINGLE_AXIS(feats.m_optional_assembly);        
+        TEST_OPT_SINGLE_AXIS(feats.m_optional_assembly);
     }
 #undef TEST_OPT_SINGLE_AXIS
 
@@ -478,19 +478,19 @@ namespace xt
     TEST(xreducer_array_of_optional, sum_all)
     {
         xreducer_opt_features feats;
-        TEST_OPT_SUM_ALL(feats.m_array_of_optional);   
+        TEST_OPT_SUM_ALL(feats.m_array_of_optional);
     }
 
     TEST(xreducer_array_optional, sum_all)
     {
         xreducer_opt_features feats;
-        TEST_OPT_SUM_ALL(feats.m_array_optional);       
-    } 
+        TEST_OPT_SUM_ALL(feats.m_array_optional);
+    }
 
     TEST(xreducer_optional_assembly, sum_all)
     {
         xreducer_opt_features feats;
-        TEST_OPT_SUM_ALL(feats.m_optional_assembly);        
+        TEST_OPT_SUM_ALL(feats.m_optional_assembly);
     }
 #undef TEST_OPT_SUM_ALL
 
@@ -512,19 +512,19 @@ namespace xt
     TEST(xreducer_array_of_optional, prod)
     {
         xreducer_opt_features feats;
-        TEST_OPT_PROD(feats.m_array_of_optional);   
+        TEST_OPT_PROD(feats.m_array_of_optional);
     }
 
     TEST(xreducer_array_optional, prod)
     {
         xreducer_opt_features feats;
-        TEST_OPT_PROD(feats.m_array_optional);       
-    } 
+        TEST_OPT_PROD(feats.m_array_optional);
+    }
 
     TEST(xreducer_optional_assembly, prod)
     {
         xreducer_opt_features feats;
-        TEST_OPT_PROD(feats.m_optional_assembly);        
+        TEST_OPT_PROD(feats.m_optional_assembly);
     }
 #undef TEST_OPT_PROD
 
@@ -566,19 +566,19 @@ namespace xt
     TEST(xreducer_array_of_optional, mean)
     {
         xreducer_opt_features feats;
-        TEST_OPT_MEAN(feats.m_array_of_optional);   
+        TEST_OPT_MEAN(feats.m_array_of_optional);
     }
 
     TEST(xreducer_array_optional, mean)
     {
         xreducer_opt_features feats;
-        TEST_OPT_MEAN(feats.m_array_optional);       
-    } 
+        TEST_OPT_MEAN(feats.m_array_optional);
+    }
 
     TEST(xreducer_optional_assembly, mean)
     {
         xreducer_opt_features feats;
-        TEST_OPT_MEAN(feats.m_optional_assembly);        
+        TEST_OPT_MEAN(feats.m_optional_assembly);
     }
 #undef TEST_OPT_MEAN
 
@@ -620,19 +620,19 @@ namespace xt
     TEST(xreducer_array_of_optional, average)
     {
         xreducer_opt_features feats;
-        TEST_OPT_AVERAGE(feats.m_simple_array_of_optional);   
+        TEST_OPT_AVERAGE(feats.m_simple_array_of_optional);
     }
 
     TEST(xreducer_array_optional, average)
     {
         xreducer_opt_features feats;
-        TEST_OPT_AVERAGE(feats.m_simple_array_optional);       
-    } 
+        TEST_OPT_AVERAGE(feats.m_simple_array_optional);
+    }
 
     TEST(xreducer_optional_assembly, average)
     {
         xreducer_opt_features feats;
-        TEST_OPT_AVERAGE(feats.m_simple_optional_assembly);        
+        TEST_OPT_AVERAGE(feats.m_simple_optional_assembly);
     }
 #undef TEST_OPT_AVERAGE
 
@@ -664,19 +664,19 @@ namespace xt
     TEST(xreducer_array_of_optional, count_nonzero)
     {
         xreducer_opt_features feats;
-        TEST_OPT_COUNT_NONZEROS(feats.m_simple_array_of_optional);   
+        TEST_OPT_COUNT_NONZEROS(feats.m_simple_array_of_optional);
     }
 
     TEST(xreducer_array_optional, count_nonzero)
     {
         xreducer_opt_features feats;
-        TEST_OPT_COUNT_NONZEROS(feats.m_simple_array_optional);       
-    } 
+        TEST_OPT_COUNT_NONZEROS(feats.m_simple_array_optional);
+    }
 
     TEST(xreducer_optional_assembly, count_nonzero)
     {
         xreducer_opt_features feats;
-        TEST_OPT_COUNT_NONZEROS(feats.m_simple_optional_assembly);        
+        TEST_OPT_COUNT_NONZEROS(feats.m_simple_optional_assembly);
     }
 */
 #undef TEST_OPT_COUNT_NONZEROS
@@ -939,7 +939,7 @@ namespace xt
         EXPECT_EQ(b.dimension(), 0u);
         EXPECT_EQ(minmax(b)(), (A{1.2, 1.2}));
     }
-    
+
     template <std::size_t... I, std::size_t... J>
     bool operator==(fixed_shape<I...>, fixed_shape<J...>)
     {
@@ -952,18 +952,18 @@ namespace xt
     {
         xt::xtensor<double, 4> a = xt::reshape_view(xt::arange<double>(5 * 5 * 5 * 5), {5, 5, 5, 5});
 
-        auto res = xt::sum(a, {0, 1}, xt::keep_dims | xt::evaluation_strategy::immediate);   
+        auto res = xt::sum(a, {0, 1}, xt::keep_dims | xt::evaluation_strategy::immediate);
         EXPECT_EQ(res.shape(), (std::array<std::size_t, 4>{1, 1, 5, 5}));
-        auto res2 = xt::sum(a, {0, 1}, xt::keep_dims);   
+        auto res2 = xt::sum(a, {0, 1}, xt::keep_dims);
         EXPECT_EQ(res2.shape(), (std::array<std::size_t, 4>{1, 1, 5, 5}));
 
         xt::xarray<double> b = a;
-        auto res3 = xt::sum(b, {0, 1}, xt::keep_dims | xt::evaluation_strategy::immediate);   
+        auto res3 = xt::sum(b, {0, 1}, xt::keep_dims | xt::evaluation_strategy::immediate);
         EXPECT_EQ(res3.shape(), (xt::dynamic_shape<std::size_t>{1, 1, 5, 5}));
-        auto res4 = xt::sum(b, {0, 1}, xt::keep_dims | xt::evaluation_strategy::lazy);   
+        auto res4 = xt::sum(b, {0, 1}, xt::keep_dims | xt::evaluation_strategy::lazy);
         EXPECT_EQ(res4.shape(), (xt::dynamic_shape<std::size_t>{1, 1, 5, 5}));
 
-        xt::xarray<double> resx3 = xt::sum(a, {0, 1});   
+        xt::xarray<double> resx3 = xt::sum(a, {0, 1});
         auto exp1 = xt::sum(a, {0, 1});
 
         EXPECT_EQ(res, res2);
@@ -989,15 +989,15 @@ namespace xt
     {
         xt::xtensor<double, 4> a = xt::reshape_view(xt::arange<double>(5 * 5 * 5 * 5), {5, 5, 5, 5});
 
-        auto res = xt::sum(a, {0, 2}, xt::keep_dims | xt::evaluation_strategy::immediate | initial(5));   
+        auto res = xt::sum(a, {0, 2}, xt::keep_dims | xt::evaluation_strategy::immediate | initial(5));
         auto reso = xt::sum(a, {0, 2}, xt::keep_dims | xt::evaluation_strategy::immediate);
         EXPECT_EQ(res, reso + 5);
 
-        xt::xarray<double> res2 = xt::sum(a, {0, 2}, xt::keep_dims | initial(5));   
-        auto reso2 = xt::sum(a, {0, 2}, xt::keep_dims);   
+        xt::xarray<double> res2 = xt::sum(a, {0, 2}, xt::keep_dims | initial(5));
+        auto reso2 = xt::sum(a, {0, 2}, xt::keep_dims);
         EXPECT_EQ(res2, reso2 + 5);
 
-        auto re0 = xt::prod(a, {1, 2}, xt::keep_dims | xt::evaluation_strategy::immediate | initial(0));   
+        auto re0 = xt::prod(a, {1, 2}, xt::keep_dims | xt::evaluation_strategy::immediate | initial(0));
         EXPECT_TRUE(xt::all(equal(re0, 0.)));
 
         auto rex0 = xt::prod(a, {1, 2}, initial(0));
@@ -1031,7 +1031,7 @@ namespace xt
     TEST(xreducer, zero_shape)
     {
         xt::xarray<int> x = xt::zeros<int>({ 0, 1 });
-        
+
         auto res0 = xt::sum(x, { 0 }, xt::keep_dims);
         EXPECT_EQ(res0.shape()[0], size_t(1));
         EXPECT_EQ(res0.shape()[1], size_t(1));
@@ -1057,7 +1057,7 @@ namespace xt
         auto result1 = xt::mean(a, { 1 });
         auto expected1 = xt::xarray<double>::from_shape({1, 0, 1});
         EXPECT_EQ(result1, expected1);
-       
+
         auto result2 = xt::mean(a, { 2 });
         auto expected2 = xt::xarray<double>::from_shape({1, 2, 1});
         EXPECT_EQ(result2.shape(), expected2.shape());

@@ -31,4 +31,3 @@ Defined in ``xtensor/xmath.hpp``
 
 .. doxygenfunction:: atan2(E1&&, E2&&)
    :project: xtensor
-

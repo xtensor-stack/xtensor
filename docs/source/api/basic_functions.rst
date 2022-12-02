@@ -46,4 +46,3 @@ Defined in ``xtensor/xmath.hpp``
 
 .. doxygenfunction:: sign(E&&)
    :project: xtensor
-

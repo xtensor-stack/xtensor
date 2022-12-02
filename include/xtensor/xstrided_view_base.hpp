@@ -704,7 +704,7 @@ namespace xt
         {
             m_e = ptr;
         }
-        
+
         template <class CT, layout_type L>
         inline auto flat_expression_adaptor<CT, L>::size() const -> size_type
         {

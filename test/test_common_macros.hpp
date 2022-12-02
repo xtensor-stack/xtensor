@@ -62,5 +62,5 @@
 
 #define HETEROGEN_PARAMETRIZED_TEST_APPLY(ID, TEST_FUNC)\
     TEST_CASE_TEMPLATE_APPLY(ID, augment_t<std::decay_t<decltype(TEST_FUNC())>>)
-    
+
 #endif

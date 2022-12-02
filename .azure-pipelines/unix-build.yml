@@ -57,13 +57,13 @@ steps:
       cmake -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX $CMAKE_EXTRA_ARGS $(Build.SourcesDirectory)
     displayName: Configure xtensor
     workingDirectory: $(Build.BinariesDirectory)
-      
+
   - script: |
       source activate xtensor
       make -j2 test_xtensor_lib
     displayName: Build xtensor
     workingDirectory: $(Build.BinariesDirectory)/build
-          
+
   - script: |
       source activate xtensor
       cd test

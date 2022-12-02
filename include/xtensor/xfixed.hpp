@@ -629,8 +629,8 @@ namespace xt
     inline xfixed_container<ET, S, L, SH, Tag>::xfixed_container(nested_initializer_list_t<value_type, N> t)
     {
         XTENSOR_ASSERT_MSG(detail::check_initializer_list_shape<N>::run(t, this->shape()) == true, "initializer list shape does not match fixed shape");
-	constexpr auto tmp = layout_type::row_major;
-	L == tmp ? nested_copy(m_storage.begin(), t) : nested_copy(this->template begin<tmp>(), t);
+        constexpr auto tmp = layout_type::row_major;
+        L == tmp ? nested_copy(m_storage.begin(), t) : nested_copy(this->template begin<tmp>(), t);
     }
     //@}
 

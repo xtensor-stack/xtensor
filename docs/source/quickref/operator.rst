@@ -84,4 +84,3 @@ comparison and return a boolean:
 
     bool res0 = e1 == e2; // true if all elements in e1 equal those in e2
     bool res1 = e1 != e2;
-

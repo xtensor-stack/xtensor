@@ -28,4 +28,3 @@ Defined in ``xtensor/xmath.hpp``
 
 .. doxygenfunction:: rint(E&&)
    :project: xtensor
-

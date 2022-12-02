@@ -165,7 +165,7 @@ namespace xt
             {
                 return std::complex<T>(real, 0);
             }
-            
+
 #ifdef XTENSOR_USE_XSIMD
             template <class T, class A>
             xsimd::complex_batch_type_t< xsimd::batch<T, A>> conj_impl(const xsimd::batch<T, A>& z)

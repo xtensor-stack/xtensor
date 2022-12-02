@@ -161,7 +161,7 @@ they are declared as ``protected`` in the base class.
     class raw_tensor_adaptor : public xcontainer<raw_tensor_adaptor<T>>,
                                public xcontainer_semantic<raw_tensor_adaptor<T>>
     {
-    
+
     public:
 
         using self_type = raw_tensor_adaptor<T>;
@@ -189,7 +189,7 @@ they are declared as ``protected`` in the base class.
             return semantic_base::operator=(e);
         }
     };
-    
+
 The last two methods are extended copy constructor and assign operator. They allow writing things like
 
 .. code::
@@ -392,7 +392,7 @@ constructor and assign operator.
             return semantic_base::operator=(e);
         }
     };
-    
+
 Implement access operators
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -510,4 +510,3 @@ iterators.
         size_type offset = s.size() - dimension();
         return const_stepper(this, offset, true);
     }
-

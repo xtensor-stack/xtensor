@@ -132,7 +132,7 @@ The three main functions for assigning expressions (``assign_xexpression``, ``co
 tag:
 
 .. code::
-    
+
     template <class E1, class E2>
     inline void assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2)
     {
@@ -174,7 +174,7 @@ a 1-D sequence on both sides. In that case, two options are possible:
 
 - if *xtensor* is compiled with the optional *xsimd* dependency, and if the layout and the
   ``value_type`` of each expression allows it, the assignment is a vectorized index-based loop
-  operating on the expression buffers. 
+  operating on the expression buffers.
 - if the *xsimd* assignment is not possible (for any reason), an iterator-based loop operating
   on the expresion buffers is used instead.
 
@@ -213,4 +213,3 @@ operation on each value:
         std::transform(d.cbegin(), d.cend(), d.begin(),
                        [e2, &f](const auto& v) { return f(v, e2); });
     }
-

@@ -41,7 +41,7 @@ namespace xt
         EXPECT_EQ(expected, e(1, 1));
 
         auto t = v + 3;
-		EXPECT_DOUBLE_EQ((e_copy(1, 1) + 6), t(0));
+        EXPECT_DOUBLE_EQ((e_copy(1, 1) + 6), t(0));
         EXPECT_EQ((e(1, 1) + 3), t(0));
 
         v = broadcast(123, v.shape());
@@ -158,7 +158,7 @@ namespace xt
     {
         xarray<int> a = {{{1, 3}, {2, 4}}, {{5, 7}, {6, 8}}};
         xarray<bool> cond = {{{true, true}, {false, false}}, {{true, true}, {false, false}}};
-        
+
         xarray<int> resc = xt::filter<xt::layout_type::column_major>(a, cond);
         xarray<int> expc = {1, 5 ,3, 7};
         EXPECT_EQ(resc, expc);

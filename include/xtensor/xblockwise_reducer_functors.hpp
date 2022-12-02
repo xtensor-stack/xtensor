@@ -29,7 +29,7 @@ namespace detail
 {
 namespace blockwise
 {
-  
+
     struct empty_reduction_variable
     {
     };
@@ -52,7 +52,7 @@ namespace blockwise
 
     template<class T_E, class T_I=void>
     struct sum_functor : public simple_functor_base
-    {   
+    {
 
         using value_type = typename std::decay_t<decltype(
             xt::sum<T_I>(
@@ -85,7 +85,7 @@ namespace blockwise
 
     template<class T_E, class T_I=void>
     struct prod_functor : public simple_functor_base
-    {   
+    {
 
         using value_type = typename std::decay_t<decltype(
             xt::sum<T_I>(
@@ -116,7 +116,7 @@ namespace blockwise
 
     template<class T_E, class T_I=void>
     struct amin_functor : public simple_functor_base
-    {   
+    {
 
         using value_type = typename std::decay_t<decltype(
             xt::amin<T_I>(
@@ -147,7 +147,7 @@ namespace blockwise
 
     template<class T_E, class T_I=void>
     struct amax_functor : public simple_functor_base
-    {   
+    {
 
         using value_type = typename std::decay_t<decltype(
             xt::amax<T_I>(
@@ -178,7 +178,7 @@ namespace blockwise
 
     template<class T_E, class T_I=void>
     struct mean_functor
-    {   
+    {
 
         using value_type = typename std::decay_t<decltype(
             xt::mean<T_I>(
@@ -228,7 +228,7 @@ namespace blockwise
 
     template<class T_E, class T_I=void>
     struct variance_functor
-    {   
+    {
 
         using value_type = typename std::decay_t<decltype(
             xt::variance<T_I>(
@@ -276,11 +276,11 @@ namespace blockwise
                 n_a += n_b;
             }
             else
-            {   
+            {
                 auto new_mean = (n_a * mean_a + n_b * mean_b) / (n_a + n_b);
                 auto new_variance = (n_a * variance_a +
-                                     n_b * variance_b + 
-                                     n_a * xt::pow(mean_a-new_mean, 2) + 
+                                     n_b * variance_b +
+                                     n_a * xt::pow(mean_a-new_mean, 2) +
                                      n_b * xt::pow(mean_b-new_mean, 2)) / (n_a + n_b);
                 xt::noalias(variance_a) = new_variance;
                 xt::noalias(mean_a) = new_mean;
@@ -309,7 +309,7 @@ namespace blockwise
 
     template<class T_E>
     struct norm_l0_functor : public simple_functor_base
-    {   
+    {
 
         using value_type = typename std::decay_t<decltype(
             xt::norm_l0(
@@ -337,12 +337,12 @@ namespace blockwise
             }
         }
     };
-    
+
 
 
     template<class T_E>
     struct norm_l1_functor : public simple_functor_base
-    {   
+    {
 
         using value_type = typename std::decay_t<decltype(
             xt::norm_l1(
@@ -375,7 +375,7 @@ namespace blockwise
 
     template<class T_E>
     struct norm_l2_functor
-    {   
+    {
 
         using value_type = typename std::decay_t<decltype(
             xt::norm_l2(
@@ -418,7 +418,7 @@ namespace blockwise
 
     template<class T_E>
     struct norm_sq_functor : public simple_functor_base
-    {   
+    {
 
         using value_type = typename std::decay_t<decltype(
             xt::norm_sq(
@@ -449,7 +449,7 @@ namespace blockwise
 
     template<class T_E>
     struct norm_linf_functor : public simple_functor_base
-    {   
+    {
 
         using value_type = typename std::decay_t<decltype(
             xt::norm_linf(
@@ -481,14 +481,14 @@ namespace blockwise
 
     template<class T_E>
     class norm_lp_to_p_functor
-    {   
+    {
     public:
         using value_type = typename std::decay_t<decltype(
             xt::norm_lp_to_p(
                 std::declval<xarray<T_E>>(), 1.0
             )
         )>::value_type;
-        
+
         norm_lp_to_p_functor(double p)
         : m_p(p)
         {
@@ -531,7 +531,7 @@ namespace blockwise
 
     template<class T_E>
     class norm_lp_functor
-    {   
+    {
     public:
         norm_lp_functor(double p)
         : m_p(p)

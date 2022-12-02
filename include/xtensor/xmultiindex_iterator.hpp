@@ -126,7 +126,7 @@ namespace xt
             std::forward<B>(roi_begin),
             std::forward<E>(roi_end),
             std::move(current),
-            linear_index 
+            linear_index
         );
     }
 

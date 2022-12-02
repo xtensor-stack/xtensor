@@ -77,4 +77,3 @@ Defined in ``xtensor/xmanipulation.hpp``
 
 .. doxygenfunction:: xt::trim_zeros
   :project: xtensor
-

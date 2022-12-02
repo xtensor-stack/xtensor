@@ -10,7 +10,7 @@ Designing language bindings with xtensor
 xtensor and its :ref:`related-projects` make it easy to implement a feature once in C++ and expose it
 to the main languages of data science, such as Python, Julia and R with little extra work. Although,
 if that sounds simple in principle, difficulties may appear when it comes to define the API of the
-C++ library. 
+C++ library.
 The following illustrates the different options we have with the case of a single function ``compute``
 that must be callable from all the languages.
 
@@ -45,7 +45,7 @@ rvalue references. If we want them back, we need to add the following overloads:
 
     template <class E>
     void compute(xexpression<E>& e);
-    
+
     template <class E>
     void compute(xexpression<E>&& e);
 
@@ -119,7 +119,7 @@ the library implementation of that container (xtensor, pytensor in the case of a
     struct xtensor_c
     {
     };
-    
+
     // container selector, must be specialized for each
     // library container selector
     template <class C, class T, std::size_t N>
@@ -149,7 +149,7 @@ The Python bindings only require that we specialize the ``tensor_container`` str
     struct pytensor_c
     {
     };
-    
+
     template <class T, std::size_t N>
     struct tensor_container<pytensor_c, T, N>
     {
@@ -215,11 +215,11 @@ metafunctions to help us make use of SFINAE:
     {
     };
 
-    template <class T, template <class> class C = is_tensor, 
+    template <class T, template <class> class C = is_tensor,
               std::enable_if_t<C<T>::value, bool> = true>
     void compute(const T& t);
 
-Here when ``C<T>::value`` is true, the ``enable_if_t`` invocation generates the bool type. Otherwise, it does 
+Here when ``C<T>::value`` is true, the ``enable_if_t`` invocation generates the bool type. Otherwise, it does
 not generate anything, leading to an invalid function declaration. The compiler removes this declaration from
 the overload resolution set and no error happens if another “compute” overload is a good match for the call.
 Otherwise, the compiler emits an error.
@@ -284,4 +284,3 @@ and drawbacks of the different options:
 - Full qualified API: simple, accepts only the specified parameter type, but requires a lot of typing for the bindings.
 - Container selection: quite simple, requires less typing than the previous method, but loses type inference on the C++ side and lacks some flexibility.
 - Type restriction with SFINAE: more flexible than the previous option, gets type inference back, but slightly more complex to implement.
-

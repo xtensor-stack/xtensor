@@ -24,7 +24,7 @@ overloads for the ``<<`` operator for std::ostreams and xexpressions.
         return 0;
     }
 
-Will print 
+Will print
 
 .. code::
 

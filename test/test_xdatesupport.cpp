@@ -47,7 +47,7 @@ namespace xt
             });
 
         xt::xarray<days> durations({days{300}, days{400}, days{600}, days{10000}});
-        
+
         xt::xarray<days_time_point> result = dates + durations;
         xt::xarray<days_time_point> result2 = dates + days{500};
 
@@ -90,4 +90,3 @@ namespace xt
 }
 
 #endif // defined(__GNUC__) && (__GNUC__ == 7) && (__cplusplus == 201703L)
-

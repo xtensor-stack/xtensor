@@ -25,4 +25,3 @@ Defined in ``xtensor/xmath.hpp``
 
 .. doxygenfunction:: allclose(E1&&, E2&, double, double)
    :project: xtensor
-

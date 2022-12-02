@@ -22,4 +22,3 @@ Defined in ``xtensor/xmath.hpp``
 
 .. doxygenfunction:: lgamma(E&&)
    :project: xtensor
-

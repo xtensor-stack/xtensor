@@ -19,7 +19,7 @@
 namespace xt
 {
     namespace random_bench
-    { 
+    {
         void random_assign_xtensor(benchmark::State& state)
         {
             for (auto _ : state)

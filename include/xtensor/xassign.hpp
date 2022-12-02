@@ -343,7 +343,7 @@ namespace xt
         template <class T>
         static constexpr bool simd_size_impl() { return xt_simd::simd_traits<T>::size > 1 || (is_bool<T>::value && use_xsimd()); }
         static constexpr bool simd_size() { return simd_size_impl<e1_value_type>() && simd_size_impl<e2_value_type>(); }
-        static constexpr bool simd_interface() { return has_simd_interface<E1, requested_value_type>() && 
+        static constexpr bool simd_interface() { return has_simd_interface<E1, requested_value_type>() &&
                                                         has_simd_interface<E2, requested_value_type>(); }
 
     public:

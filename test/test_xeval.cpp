@@ -61,7 +61,7 @@ namespace xt
 
 
 #define EXPECT_LAYOUT(EXPRESSION, LAYOUT)                         \
-  EXPECT_TRUE((decltype(EXPRESSION)::static_layout == LAYOUT)) 
+  EXPECT_TRUE((decltype(EXPRESSION)::static_layout == LAYOUT))
 
 #define HAS_DATA_INTERFACE(EXPRESSION)                            \
   has_data_interface<std::decay_t<decltype(EXPRESSION)>>::value
@@ -69,12 +69,12 @@ namespace xt
 #define EXPECT_XARRAY(EXPRESSION)                                    \
   EXPECT_TRUE(!detail::is_array<                                     \
                         typename std::decay_t<decltype(EXPRESSION)   \
-                                >::shape_type>::value) 
+                                >::shape_type>::value)
 
 #define EXPECT_XTENSOR(EXPRESSION)                                   \
   EXPECT_TRUE(detail::is_array<                                      \
                         typename std::decay_t<decltype(EXPRESSION)   \
-                                >::shape_type>::value == true) 
+                                >::shape_type>::value == true)
 
 
     TEST(utils, has_same_layout)
@@ -88,7 +88,7 @@ namespace xt
         EXPECT_TRUE(detail::has_same_layout<layout_type::column_major>(ten2));
         EXPECT_FALSE(detail::has_same_layout<layout_type::row_major>(ten2));
         EXPECT_TRUE(detail::has_same_layout<layout_type::any>(ten2));
-        
+
         EXPECT_FALSE((detail::has_same_layout(ten1, ten2)));
         EXPECT_TRUE((detail::has_same_layout(ten1, xt::xtensor<double, 1, layout_type::row_major>({1., 2., 3.2}))));
         EXPECT_TRUE((detail::has_same_layout(ten2, xt::xtensor<double, 1, layout_type::column_major>({1., 2., 3.2}))));

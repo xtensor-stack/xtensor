@@ -176,7 +176,7 @@ namespace xt
             using result_type = T;
             using simd_value_type = bool;
             using simd_result_type = bool;
-            
+
             template <class... Args>
             constexpr result_type operator()(const Args&... args) const
             {
@@ -495,7 +495,7 @@ namespace xt
             using expression_tag = xoptional_expression_tag;
             using value_functor = F;
             using flag_functor = xt::detail::optional_bitwise<bool>;
-        
+
             using value_expression = xfunction<value_functor, xt::detail::value_expression_t<CT>...>;
             using flag_expression = xfunction<flag_functor, xt::detail::flag_expression_t<CT>...>;
             using const_value_expression = value_expression;
@@ -503,7 +503,7 @@ namespace xt
 
             const_value_expression value() const;
             const_flag_expression has_value() const;
-            
+
         private:
 
             template <std::size_t... I>
@@ -1010,19 +1010,19 @@ namespace xt
         }
 
         template <class CT, class S, layout_type L, class FST>
-        inline auto xdynamic_view_optional<CT, S, L, FST>::value() const -> const_value_expression 
+        inline auto xdynamic_view_optional<CT, S, L, FST>::value() const -> const_value_expression
         {
             return this->derived_cast().build_view(this->derived_cast().expression().value());
         }
 
         template <class CT, class S, layout_type L, class FST>
-        inline auto xdynamic_view_optional<CT, S, L, FST>::has_value() -> flag_expression 
+        inline auto xdynamic_view_optional<CT, S, L, FST>::has_value() -> flag_expression
         {
             return this->derived_cast().build_view(this->derived_cast().expression().has_value());
         }
 
         template <class CT, class S, layout_type L, class FST>
-        inline auto xdynamic_view_optional<CT, S, L, FST>::has_value() const -> const_flag_expression 
+        inline auto xdynamic_view_optional<CT, S, L, FST>::has_value() const -> const_flag_expression
         {
             return this->derived_cast().build_view(this->derived_cast().expression().has_value());
         }
@@ -1119,7 +1119,7 @@ namespace xt
         inline auto xreducer_optional<F, CT, X, O>::value() const -> const_value_expression
         {
             auto func = this->derived_cast().functors();
-            auto opts = this->derived_cast().options().template rebind<rebound_result_type>(this->derived_cast().options().initial_value.value(), 
+            auto opts = this->derived_cast().options().template rebind<rebound_result_type>(this->derived_cast().options().initial_value.value(),
                                                                                             this->derived_cast().options());
 
             return this->derived_cast().build_reducer(this->derived_cast().expression().value(),
@@ -1152,19 +1152,19 @@ namespace xt
         }
 
         template <class CT, class S, layout_type L, class FST>
-        inline auto xstrided_view_optional<CT, S, L, FST>::value() const -> const_value_expression 
+        inline auto xstrided_view_optional<CT, S, L, FST>::value() const -> const_value_expression
         {
             return this->derived_cast().build_view(this->derived_cast().expression().value());
         }
 
         template <class CT, class S, layout_type L, class FST>
-        inline auto xstrided_view_optional<CT, S, L, FST>::has_value() -> flag_expression 
+        inline auto xstrided_view_optional<CT, S, L, FST>::has_value() -> flag_expression
         {
             return this->derived_cast().build_view(this->derived_cast().expression().has_value());
         }
 
         template <class CT, class S, layout_type L, class FST>
-        inline auto xstrided_view_optional<CT, S, L, FST>::has_value() const -> const_flag_expression 
+        inline auto xstrided_view_optional<CT, S, L, FST>::has_value() const -> const_flag_expression
         {
             return this->derived_cast().build_view(this->derived_cast().expression().has_value());
         }
@@ -1331,7 +1331,7 @@ namespace xt
     inline void xexpression_assigner_base<xoptional_expression_tag>::assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial)
     {
         detail::assign_data_impl<typename E1::expression_tag, typename E2::expression_tag>::run(e1, e2, trivial);
-    } 
+    }
 }
 
 #endif

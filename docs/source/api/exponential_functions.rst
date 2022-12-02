@@ -31,4 +31,3 @@ Defined in ``xtensor/xmath.hpp``
 
 .. doxygenfunction:: log1p(E&&)
    :project: xtensor
-
