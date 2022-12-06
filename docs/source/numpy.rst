@@ -501,6 +501,61 @@ More generally, one can use the :cpp:func:`xt::reduce(function, input, axes) <xt
 of an arbitrary binary function for the reduction.
 The binary function must be commutative and associative up to rounding errors.
 
+NaN functions
+-------------
+
+NaN functions allow disregarding NaNs during computation, changing the effective number of elements
+considered in reductions.
+
+.. list-table::
+   :widths: 50 50
+   :header-rows: 1
+
+   * - Python3 - NumPy
+     - C++14 - Xtensor
+   * - :any:`np.nan_to_num(a) <numpy.nan_to_num>`
+     - :cpp:func:`xt::nan_to_num(a) <xt::nan_to_num>`
+   * - :any:`np.nanmin(a) <numpy.nanmin>`
+     - :cpp:func:`xt::nanmin(a) <xt::nanmin>`
+   * - :any:`np.nanmin(a, axis=(0, 1)) <numpy.nanmin>`
+     - :cpp:func:`xt::nanmin(a, {0, 1}) <xt::nanmin>`
+   * - :any:`np.nanmax(a) <numpy.nanmax>`
+     - :cpp:func:`xt::nanmax(a) <xt::nanmax>`
+   * - :any:`np.nanmax(a, axis=(0, 1)) <numpy.nanmax>`
+     - :cpp:func:`xt::nanmax(a, {0, 1}) <xt::nanmax>`
+   * - :any:`np.nansum(a) <numpy.nansum>`
+     - :cpp:func:`xt::nansum(a) <xt::nansum>`
+   * - :any:`np.nansum(a, axis=0) <numpy.nansum>`
+     - :cpp:func:`xt::nansum(a, 0) <xt::nansum>`
+   * - :any:`np.nansum(a, axis=(0, 1)) <numpy.nansum>`
+     - :cpp:func:`xt::nansum(a, {0, 1}) <xt::nansum>`
+   * - :any:`np.nanprod(a) <numpy.nanprod>`
+     - :cpp:func:`xt::nanprod(a) <xt::nanprod>`
+   * - :any:`np.nanprod(a, axis=0) <numpy.nanprod>`
+     - :cpp:func:`xt::nanprod(a, 0) <xt::nanprod>`
+   * - :any:`np.nanprod(a, axis=(0, 1)) <numpy.nanprod>`
+     - :cpp:func:`xt::nanprod(a, {0, 1}) <xt::nanprod>`
+   * - :any:`np.nancumsum(a) <numpy.nancumsum>`
+     - :cpp:func:`xt::nancumsum(a) <xt::nancumsum>`
+   * - :any:`np.nancumsum(a, axis=0) <numpy.nancumsum>`
+     - :cpp:func:`xt::nancumsum(a, 0) <xt::nancumsum>`
+   * - :any:`np.nancumprod(a) <numpy.nancumsum>`
+     - :cpp:func:`xt::nancumsum(a) <xt::nancumsum>`
+   * - :any:`np.nancumprod(a, axis=0) <numpy.nancumsum>`
+     - :cpp:func:`xt::nancumsum(a, 0) <xt::nancumsum>`
+   * - :any:`np.nanmean(a) <numpy.nanmean>`
+     - :cpp:func:`xt::nanmean(a) <xt::nanmean>`
+   * - :any:`np.nanmean(a, axis=(0, 1)) <numpy.nanmean>`
+     - :cpp:func:`xt::nanmean(a, {0, 1}) <xt::nanmean>`
+   * - :any:`np.nanvar(a) <numpy.nanvar>`
+     - :cpp:func:`xt::nanvar(a) <xt::nanvar>`
+   * - :any:`np.nanvar(a, axis=(0, 1)) <numpy.nanvar>`
+     - :cpp:func:`xt::nanvar(a, {0, 1}) <xt::nanvar>`
+   * - :any:`np.nanstd(a) <numpy.nanstd>`
+     - :cpp:func:`xt::nanstd(a) <xt::nanstd>`
+   * - :any:`np.nanstd(a, axis=(0, 1)) <numpy.nanstd>`
+     - :cpp:func:`xt::nanstd(a, {0, 1}) <xt::nanstd>`
+
 I/O
 ---
 
