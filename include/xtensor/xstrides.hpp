@@ -175,11 +175,11 @@ namespace xt
     }
 
     /**
-    * @ingroup strides
-    * @brief strides_type
-    *
-    * Choose stride type
-    */
+     * @ingroup strides
+     * @brief strides_type
+     *
+     * Choose stride type
+     */
     enum class stride_type
     {
         internal = 0, ///< As used internally (with `stride(axis) == 0` if `shape(axis) == 1`)
@@ -188,13 +188,13 @@ namespace xt
     };
 
     /**
-    * @ingroup strides
-    * @brief strides
-    *
-    * Get strides of an object.
-    * @param a an array
-    * @return array
-    */
+     * @ingroup strides
+     * @brief strides
+     *
+     * Get strides of an object.
+     * @param a an array
+     * @return array
+     */
     template <class E>
     inline auto strides(const E& e, stride_type type = stride_type::normal) noexcept
     {
@@ -226,13 +226,13 @@ namespace xt
     }
 
     /**
-    * @ingroup strides
-    * @brief strides
-    *
-    * Get stride of an object along an axis.
-    * @param a an array
-    * @return integer
-    */
+     * @ingroup strides
+     * @brief strides
+     *
+     * Get stride of an object along an axis.
+     * @param a an array
+     * @return integer
+     */
     template <class E>
     inline auto strides(const E& e, std::size_t axis, stride_type type = stride_type::normal) noexcept
     {

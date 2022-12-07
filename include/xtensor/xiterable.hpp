@@ -1114,6 +1114,7 @@ namespace xt
     /**
      * @name Broadcast iterators
      */
+
      /**
       * Returns an iterator to the first element of the expression. The
       * iteration is broadcasted to the specified shape.

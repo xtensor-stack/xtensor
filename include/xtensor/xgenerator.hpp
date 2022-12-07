@@ -246,6 +246,7 @@ namespace xt
     /**
      * @name Data
      */
+
     /**
      * Returns the evaluated element at the specified position in the function.
      * @param args a list of indices specifying the position in the function. Indices

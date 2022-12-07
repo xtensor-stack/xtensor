@@ -271,7 +271,7 @@ namespace xt
      ***********************************/
 
     /**
-     * \brief L0 pseudo-norm of a complex number.
+     * @brief L0 pseudo-norm of a complex number.
      * Equivalent to <tt>t != 0</tt>.
      */
     template <class T>
@@ -281,7 +281,7 @@ namespace xt
     }
 
     /**
-     * \brief L1 norm of a complex number.
+     * @brief L1 norm of a complex number.
      */
     template <class T>
     inline auto norm_l1(const std::complex<T>& t) noexcept
@@ -290,7 +290,7 @@ namespace xt
     }
 
     /**
-     * \brief L2 norm of a complex number.
+     * @brief L2 norm of a complex number.
      * Equivalent to <tt>std::abs(t)</tt>.
      */
     template <class T>
@@ -300,7 +300,7 @@ namespace xt
     }
 
     /**
-     * \brief Squared norm of a complex number.
+     * @brief Squared norm of a complex number.
      * Equivalent to <tt>std::norm(t)</tt> (yes, the C++ standard really defines
      * <tt>norm()</tt> to compute the squared norm).
      */
@@ -312,7 +312,7 @@ namespace xt
     }
 
     /**
-     * \brief L-infinity norm of a complex number.
+     * @brief L-infinity norm of a complex number.
      */
     template <class T>
     inline auto norm_linf(const std::complex<T>& t) noexcept
@@ -321,7 +321,7 @@ namespace xt
     }
 
     /**
-     * \brief p-th power of the Lp norm of a complex number.
+     * @brief p-th power of the Lp norm of a complex number.
      */
     template <class T>
     inline auto norm_lp_to_p(const std::complex<T>& t, double p) noexcept
@@ -334,7 +334,7 @@ namespace xt
     }
 
     /**
-     * \brief Lp norm of a complex number.
+     * @brief Lp norm of a complex number.
      */
     template <class T>
     inline auto norm_lp(const std::complex<T>& t, double p) noexcept
@@ -465,7 +465,7 @@ namespace xt
      * @param es evaluation strategy to use (lazy (default), or immediate)
      *  For scalar types: implemented as <tt>abs(t)</tt><br>
      *  otherwise: implemented as <tt>sqrt(norm_sq(t))</tt>.
-    */
+     */
     template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
               XTL_REQUIRES(is_xexpression<E>)>
     inline auto norm_l2(E&& e, EVS es = EVS()) noexcept
@@ -483,7 +483,7 @@ namespace xt
      * @param es evaluation strategy to use (lazy (default), or immediate)
      * @param axes the axes along which the norm is computed
      * @return an \ref xreducer (specifically: <tt>sqrt(norm_sq(e, axes))</tt>) (or xcontainer, depending on evaluation strategy)
-    */
+     */
     template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
               XTL_REQUIRES(is_xexpression<E>, xtl::negation<is_reducer_options<X>>)>
     inline auto norm_l2(E&& e, X&& axes, EVS es = EVS()) noexcept

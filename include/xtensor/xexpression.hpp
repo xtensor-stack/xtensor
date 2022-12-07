@@ -39,7 +39,7 @@ namespace xt
      * Functions that can apply to any xexpression regardless of its specific type should take a
      * xexpression argument.
      *
-     * \tparam E The derived type.
+     * @tparam E The derived type.
      *
      */
     template <class D>

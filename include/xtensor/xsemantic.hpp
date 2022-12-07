@@ -476,6 +476,7 @@ namespace xt
     /**
      * @name Assign functions
      */
+
     /**
      * Assigns the xexpression \c e to \c *this. Ensures no temporary
      * will be used to perform the assignment.

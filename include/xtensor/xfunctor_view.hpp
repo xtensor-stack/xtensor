@@ -655,11 +655,11 @@ namespace xt
     }
 
     /**
-    * Constructs an xfunctor_applier_base expression wrappering the specified \ref xexpression.
-    *
-    * @param func the functor to be applied to the elements of the underlying expression.
-    * @param e the underlying expression
-    */
+     * Constructs an xfunctor_applier_base expression wrappering the specified \ref xexpression.
+     *
+     * @param func the functor to be applied to the elements of the underlying expression.
+     * @param e the underlying expression
+     */
     template <class D>
     template <class Func, class E>
     inline xfunctor_applier_base<D>::xfunctor_applier_base(Func&& func, E&& e) noexcept
@@ -671,6 +671,7 @@ namespace xt
     /**
      * @name Size and shape
      */
+
     /**
      * Returns the size of the expression.
      */
@@ -726,6 +727,7 @@ namespace xt
     /**
      * @name Data
      */
+
     /**
      * Returns a reference to the element at the specified position in the expression.
      * @param args a list of indices specifying the position in the function. Indices
@@ -875,10 +877,10 @@ namespace xt
     }
 
     /**
-    * Checks whether the xfunctor_applier_base can be linearly assigned to an expression
-    * with the specified strides.
-    * @return a boolean indicating whether a linear assign is possible
-    */
+     * Checks whether the xfunctor_applier_base can be linearly assigned to an expression
+     * with the specified strides.
+     * @return a boolean indicating whether a linear assign is possible
+     */
     template <class D>
     template <class S>
     inline bool xfunctor_applier_base<D>::has_linear_assign(const S& strides) const
@@ -1135,6 +1137,7 @@ namespace xt
     /**
      * @name Reverse broadcast iterators
      */
+
     /**
      * Returns an iterator to the first element of the expression. The
      * iteration is broadcasted to the specified shape.

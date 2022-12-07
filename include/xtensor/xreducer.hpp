@@ -1368,6 +1368,7 @@ namespace xt
     /**
      * @name Data
      */
+
     /**
      * Returns a constant reference to the element at the specified position in the reducer.
      * @param args a list of indices specifying the position in the reducer. Indices
@@ -1474,10 +1475,10 @@ namespace xt
     }
 
     /**
-    * Checks whether the xreducer can be linearly assigned to an expression
-    * with the specified strides.
-    * @return a boolean indicating whether a linear assign is possible
-    */
+     * Checks whether the xreducer can be linearly assigned to an expression
+     * with the specified strides.
+     * @return a boolean indicating whether a linear assign is possible
+     */
     template <class F, class CT, class X, class O>
     template <class S>
     inline bool xreducer<F, CT, X, O>::has_linear_assign(const S& /*strides*/) const noexcept

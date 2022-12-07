@@ -572,10 +572,10 @@ namespace xt
     }
 
     /**
-    * Returns a constant pointer to the underlying array serving as element storage. The pointer
-    * is such that range [data(); data() + size()] is always a valid range, even if the
-    * container is empty (data() is not is not dereferenceable in that case)
-    */
+     * Returns a constant pointer to the underlying array serving as element storage. The pointer
+     * is such that range [data(); data() + size()] is always a valid range, even if the
+     * container is empty (data() is not is not dereferenceable in that case)
+     */
     template <class D>
     inline auto xcontainer<D>::data() const noexcept -> const_pointer
     {

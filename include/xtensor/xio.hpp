@@ -151,31 +151,31 @@ namespace xt
         DEFINE_LOCAL_PRINT_OPTION(threshold)
 
        /**
-         * @class edge_items
-         *
-         * io manipulator used to set the number of egde items if
-         * the summarization is triggered.
-         *
-         * \code{.cpp}
-         * using po = xt::print_options;
-         * xt::xarray<double> a = xt::rand::randn<double>({2000, 500});
-         * std::cout << po::edge_items(5) << a << std::endl;
-         * \endcode
-         */
+        * @class edge_items
+        *
+        * io manipulator used to set the number of egde items if
+        * the summarization is triggered.
+        *
+        * \code{.cpp}
+        * using po = xt::print_options;
+        * xt::xarray<double> a = xt::rand::randn<double>({2000, 500});
+        * std::cout << po::edge_items(5) << a << std::endl;
+        * \endcode
+        */
         DEFINE_LOCAL_PRINT_OPTION(edge_items)
 
        /**
-         * @class precision
-         *
-         * io manipulator used to set the precision of the floating point values
-         * when printing an expression.
-         *
-         * \code{.cpp}
-         * using po = xt::print_options;
-         * xt::xarray<double> a = xt::rand::randn<double>({2000, 500});
-         * std::cout << po::precision(5) << a << std::endl;
-         * \endcode
-         */
+        * @class precision
+        *
+        * io manipulator used to set the precision of the floating point values
+        * when printing an expression.
+        *
+        * \code{.cpp}
+        * using po = xt::print_options;
+        * xt::xarray<double> a = xt::rand::randn<double>({2000, 500});
+        * std::cout << po::precision(5) << a << std::endl;
+        * \endcode
+        */
         DEFINE_LOCAL_PRINT_OPTION(precision)
    }
 
