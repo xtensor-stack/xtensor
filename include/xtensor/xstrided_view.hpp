@@ -336,9 +336,9 @@ namespace xt
     >;
 
     /**
-    * @typedef xstrided_slice_vector
-    * @brief vector of slices used to build a `xstrided_view`
-    */
+     * @typedef xstrided_slice_vector
+     * @brief vector of slices used to build a `xstrided_view`
+     */
     using xstrided_slice_vector = std::vector<xstrided_slice<std::ptrdiff_t>>;
 
     template <layout_type L = layout_type::dynamic, class E, class S, class X>

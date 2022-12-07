@@ -52,15 +52,15 @@ namespace xt
     }
 
     /**
-    * @ingroup logical_operators
-    * @brief isin
-    *
-    * Returns a boolean array of the same shape as ``element`` that is ``true`` where an element of
-    * ``element`` is in ``test_elements`` and ``False`` otherwise.
-    * @param element an \ref xexpression
-    * @param test_elements an array
-    * @return a boolean array
-    */
+     * @ingroup logical_operators
+     * @brief isin
+     *
+     * Returns a boolean array of the same shape as ``element`` that is ``true`` where an element of
+     * ``element`` is in ``test_elements`` and ``False`` otherwise.
+     * @param element an \ref xexpression
+     * @param test_elements an array
+     * @return a boolean array
+     */
     template <class E, class T>
     inline auto isin(E&& element, std::initializer_list<T> test_elements) noexcept
     {
@@ -70,15 +70,15 @@ namespace xt
     }
 
     /**
-    * @ingroup logical_operators
-    * @brief isin
-    *
-    * Returns a boolean array of the same shape as ``element`` that is ``true`` where an element of
-    * ``element`` is in ``test_elements`` and ``False`` otherwise.
-    * @param element an \ref xexpression
-    * @param test_elements an array
-    * @return a boolean array
-    */
+     * @ingroup logical_operators
+     * @brief isin
+     *
+     * Returns a boolean array of the same shape as ``element`` that is ``true`` where an element of
+     * ``element`` is in ``test_elements`` and ``False`` otherwise.
+     * @param element an \ref xexpression
+     * @param test_elements an array
+     * @return a boolean array
+     */
     template <class E, class F, class = typename std::enable_if_t<has_iterator_interface<F>::value>>
     inline auto isin(E&& element, F&& test_elements) noexcept
     {
@@ -87,16 +87,16 @@ namespace xt
     }
 
     /**
-    * @ingroup logical_operators
-    * @brief isin
-    *
-    * Returns a boolean array of the same shape as ``element`` that is ``true`` where an element of
-    * ``element`` is in ``test_elements`` and ``False`` otherwise.
-    * @param element an \ref xexpression
-    * @param test_elements_begin iterator to the beginning of an array
-    * @param test_elements_end iterator to the end of an array
-    * @return a boolean array
-    */
+     * @ingroup logical_operators
+     * @brief isin
+     *
+     * Returns a boolean array of the same shape as ``element`` that is ``true`` where an element of
+     * ``element`` is in ``test_elements`` and ``False`` otherwise.
+     * @param element an \ref xexpression
+     * @param test_elements_begin iterator to the beginning of an array
+     * @param test_elements_end iterator to the end of an array
+     * @return a boolean array
+     */
     template <class E, class I, class = typename std::enable_if_t<is_iterator<I>::value>>
     inline auto isin(E&& element, I&& test_elements_begin, I&& test_elements_end) noexcept
     {
@@ -106,15 +106,15 @@ namespace xt
     }
 
     /**
-    * @ingroup logical_operators
-    * @brief in1d
-    *
-    * Returns a boolean array of the same shape as ``element`` that is ``true`` where an element of
-    * ``element`` is in ``test_elements`` and ``False`` otherwise.
-    * @param element an \ref xexpression
-    * @param test_elements an array
-    * @return a boolean array
-    */
+     * @ingroup logical_operators
+     * @brief in1d
+     *
+     * Returns a boolean array of the same shape as ``element`` that is ``true`` where an element of
+     * ``element`` is in ``test_elements`` and ``False`` otherwise.
+     * @param element an \ref xexpression
+     * @param test_elements an array
+     * @return a boolean array
+     */
     template <class E, class T>
     inline auto in1d(E&& element, std::initializer_list<T> test_elements) noexcept
     {
@@ -123,15 +123,15 @@ namespace xt
     }
 
     /**
-    * @ingroup logical_operators
-    * @brief in1d
-    *
-    * Returns a boolean array of the same shape as ``element`` that is ``true`` where an element of
-    * ``element`` is in ``test_elements`` and ``False`` otherwise.
-    * @param element an \ref xexpression
-    * @param test_elements an array
-    * @return a boolean array
-    */
+     * @ingroup logical_operators
+     * @brief in1d
+     *
+     * Returns a boolean array of the same shape as ``element`` that is ``true`` where an element of
+     * ``element`` is in ``test_elements`` and ``False`` otherwise.
+     * @param element an \ref xexpression
+     * @param test_elements an array
+     * @return a boolean array
+     */
     template <class E, class F, class = typename std::enable_if_t<has_iterator_interface<F>::value>>
     inline auto in1d(E&& element, F&& test_elements) noexcept
     {
@@ -141,16 +141,16 @@ namespace xt
     }
 
     /**
-    * @ingroup logical_operators
-    * @brief in1d
-    *
-    * Returns a boolean array of the same shape as ``element`` that is ``true`` where an element of
-    * ``element`` is in ``test_elements`` and ``False`` otherwise.
-    * @param element an \ref xexpression
-    * @param test_elements_begin iterator to the beginning of an array
-    * @param test_elements_end iterator to the end of an array
-    * @return a boolean array
-    */
+     * @ingroup logical_operators
+     * @brief in1d
+     *
+     * Returns a boolean array of the same shape as ``element`` that is ``true`` where an element of
+     * ``element`` is in ``test_elements`` and ``False`` otherwise.
+     * @param element an \ref xexpression
+     * @param test_elements_begin iterator to the beginning of an array
+     * @param test_elements_end iterator to the end of an array
+     * @return a boolean array
+     */
     template <class E, class I, class = typename std::enable_if_t<is_iterator<I>::value>>
     inline auto in1d(E&& element, I&& test_elements_begin, I&& test_elements_end) noexcept
     {

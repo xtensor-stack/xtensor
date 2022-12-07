@@ -1588,14 +1588,14 @@ namespace detail {
     }
 
     /**
-    * @ingroup nearint_functions
-    * @brief floor function.
-    *
-    * Returns an \ref xfunction for the element-wise smallest integer value
-    * not greater than \em e.
-    * @param e an \ref xexpression
-    * @return an \ref xfunction
-    */
+     * @ingroup nearint_functions
+     * @brief floor function.
+     *
+     * Returns an \ref xfunction for the element-wise smallest integer value
+     * not greater than \em e.
+     * @param e an \ref xexpression
+     * @return an \ref xfunction
+     */
     template <class E>
     inline auto floor(E&& e) noexcept
         -> detail::xfunction_type_t<math::floor_fun, E>
@@ -1604,14 +1604,14 @@ namespace detail {
     }
 
     /**
-    * @ingroup nearint_functions
-    * @brief trunc function.
-    *
-    * Returns an \ref xfunction for the element-wise nearest integer not greater
-    * in magnitude than \em e.
-    * @param e an \ref xexpression
-    * @return an \ref xfunction
-    */
+     * @ingroup nearint_functions
+     * @brief trunc function.
+     *
+     * Returns an \ref xfunction for the element-wise nearest integer not greater
+     * in magnitude than \em e.
+     * @param e an \ref xexpression
+     * @return an \ref xfunction
+     */
     template <class E>
     inline auto trunc(E&& e) noexcept
         -> detail::xfunction_type_t<math::trunc_fun, E>
@@ -1858,7 +1858,7 @@ namespace detail {
      * @param axes the axes along which the product is computed (optional)
      * @param ddof delta degrees of freedom (optional).
      *             The divisor used in calculations is N - ddof, where N represents the number of
-                   elements. By default ddof is zero.
+     *             elements. By default ddof is zero.
      * @param es evaluation strategy of the reducer
      * @tparam T the value type used for internal computation. The default is `E::value_type`.
      *           `T` is also used for determining the value type of the result, which is the type
@@ -2088,7 +2088,7 @@ namespace detail {
      * @param axes the axes along which the variance is computed (optional)
      * @param ddof delta degrees of freedom (optional).
      *             The divisor used in calculations is N - ddof, where N represents the number of
-                   elements. By default ddof is zero.
+     *             elements. By default ddof is zero.
      * @param es evaluation strategy to use (lazy (default), or immediate)
      * @tparam T the value type used for internal computation. The default is
      *           `E::value_type`. `T`is also used for determining the value type of the result,

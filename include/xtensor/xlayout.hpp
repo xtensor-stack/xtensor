@@ -35,15 +35,14 @@ namespace xt
     /**
      * Implementation of the following logical table:
      *
-     * @verbatim
-         | d | a | r | c |
-       --+---+---+---+---+
-       d | d | d | d | d |
-       a | d | a | r | c |
-       r | d | r | r | d |
-       c | d | c | d | c |
-       d = dynamic, a = any, r = row_major, c = column_major.
-       @endverbatim
+     *        | d | a | r | c |
+     *      --+---+---+---+---+
+     *      d | d | d | d | d |
+     *      a | d | a | r | c |
+     *      r | d | r | r | d |
+     *      c | d | c | d | c |
+     *      d = dynamic, a = any, r = row_major, c = column_major.
+     *
      * Using bitmasks to avoid nested if-else statements.
      *
      * @param args the input layouts.

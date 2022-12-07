@@ -240,14 +240,14 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
     }
 
     /**
-    * @ingroup arithmetic_operators
-    * @brief Opposite
-    *
-    * Returns an \ref xfunction for the element-wise opposite
-    * of \a e.
-    * @param e an \ref xexpression
-    * @return an \ref xfunction
-    */
+     * @ingroup arithmetic_operators
+     * @brief Opposite
+     *
+     * Returns an \ref xfunction for the element-wise opposite
+     * of \a e.
+     * @param e an \ref xexpression
+     * @return an \ref xfunction
+     */
     template <class E>
     inline auto operator-(E&& e) noexcept
         -> detail::xfunction_type_t<detail::negate, E>
@@ -256,15 +256,15 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
     }
 
     /**
-    * @ingroup arithmetic_operators
-    * @brief Addition
-    *
-    * Returns an \ref xfunction for the element-wise addition
-    * of \a e1 and \a e2.
-    * @param e1 an \ref xexpression or a scalar
-    * @param e2 an \ref xexpression or a scalar
-    * @return an \ref xfunction
-    */
+     * @ingroup arithmetic_operators
+     * @brief Addition
+     *
+     * Returns an \ref xfunction for the element-wise addition
+     * of \a e1 and \a e2.
+     * @param e1 an \ref xexpression or a scalar
+     * @param e2 an \ref xexpression or a scalar
+     * @return an \ref xfunction
+     */
     template <class E1, class E2>
     inline auto operator+(E1&& e1, E2&& e2) noexcept
         -> detail::xfunction_type_t<detail::plus, E1, E2>
@@ -273,15 +273,15 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
     }
 
     /**
-    * @ingroup arithmetic_operators
-    * @brief Substraction
-    *
-    * Returns an \ref xfunction for the element-wise substraction
-    * of \a e2 to \a e1.
-    * @param e1 an \ref xexpression or a scalar
-    * @param e2 an \ref xexpression or a scalar
-    * @return an \ref xfunction
-    */
+     * @ingroup arithmetic_operators
+     * @brief Substraction
+     *
+     * Returns an \ref xfunction for the element-wise substraction
+     * of \a e2 to \a e1.
+     * @param e1 an \ref xexpression or a scalar
+     * @param e2 an \ref xexpression or a scalar
+     * @return an \ref xfunction
+     */
     template <class E1, class E2>
     inline auto operator-(E1&& e1, E2&& e2) noexcept
         -> detail::xfunction_type_t<detail::minus, E1, E2>
@@ -290,15 +290,15 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
     }
 
     /**
-    * @ingroup arithmetic_operators
-    * @brief Multiplication
-    *
-    * Returns an \ref xfunction for the element-wise multiplication
-    * of \a e1 by \a e2.
-    * @param e1 an \ref xexpression or a scalar
-    * @param e2 an \ref xexpression or a scalar
-    * @return an \ref xfunction
-    */
+     * @ingroup arithmetic_operators
+     * @brief Multiplication
+     *
+     * Returns an \ref xfunction for the element-wise multiplication
+     * of \a e1 by \a e2.
+     * @param e1 an \ref xexpression or a scalar
+     * @param e2 an \ref xexpression or a scalar
+     * @return an \ref xfunction
+     */
     template <class E1, class E2>
     inline auto operator*(E1&& e1, E2&& e2) noexcept
         -> detail::xfunction_type_t<detail::multiplies, E1, E2>
@@ -307,15 +307,15 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
     }
 
     /**
-    * @ingroup arithmetic_operators
-    * @brief Division
-    *
-    * Returns an \ref xfunction for the element-wise division
-    * of \a e1 by \a e2.
-    * @param e1 an \ref xexpression or a scalar
-    * @param e2 an \ref xexpression or a scalar
-    * @return an \ref xfunction
-    */
+     * @ingroup arithmetic_operators
+     * @brief Division
+     *
+     * Returns an \ref xfunction for the element-wise division
+     * of \a e1 by \a e2.
+     * @param e1 an \ref xexpression or a scalar
+     * @param e2 an \ref xexpression or a scalar
+     * @return an \ref xfunction
+     */
     template <class E1, class E2>
     inline auto operator/(E1&& e1, E2&& e2) noexcept
         -> detail::xfunction_type_t<detail::divides, E1, E2>
@@ -362,15 +362,15 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
     }
 
     /**
-    * @ingroup logical_operators
-    * @brief And
-    *
-    * Returns an \ref xfunction for the element-wise and
-    * of \a e1 and \a e2.
-    * @param e1 an \ref xexpression or a scalar
-    * @param e2 an \ref xexpression or a scalar
-    * @return an \ref xfunction
-    */
+     * @ingroup logical_operators
+     * @brief And
+     *
+     * Returns an \ref xfunction for the element-wise and
+     * of \a e1 and \a e2.
+     * @param e1 an \ref xexpression or a scalar
+     * @param e2 an \ref xexpression or a scalar
+     * @return an \ref xfunction
+     */
     template <class E1, class E2>
     inline auto operator&&(E1&& e1, E2&& e2) noexcept
         -> detail::xfunction_type_t<detail::logical_and, E1, E2>
@@ -379,14 +379,14 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
     }
 
     /**
-    * @ingroup logical_operators
-    * @brief Not
-    *
-    * Returns an \ref xfunction for the element-wise not
-    * of \a e.
-    * @param e an \ref xexpression
-    * @return an \ref xfunction
-    */
+     * @ingroup logical_operators
+     * @brief Not
+     *
+     * Returns an \ref xfunction for the element-wise not
+     * of \a e.
+     * @param e an \ref xexpression
+     * @return an \ref xfunction
+     */
     template <class E>
     inline auto operator!(E&& e) noexcept
         -> detail::xfunction_type_t<detail::logical_not, E>
@@ -788,17 +788,17 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
     }
 
     /**
-    * @ingroup logical_operators
-    * @brief Ternary selection
-    *
-    * Returns an \ref xfunction for the element-wise
-    * ternary selection (i.e. operator ? :) of \a e1,
-    * \a e2 and \a e3.
-    * @param e1 a boolean \ref xexpression
-    * @param e2 an \ref xexpression or a scalar
-    * @param e3 an \ref xexpression or a scalar
-    * @return an \ref xfunction
-    */
+     * @ingroup logical_operators
+     * @brief Ternary selection
+     *
+     * Returns an \ref xfunction for the element-wise
+     * ternary selection (i.e. operator ? :) of \a e1,
+     * \a e2 and \a e3.
+     * @param e1 a boolean \ref xexpression
+     * @param e2 an \ref xexpression or a scalar
+     * @param e3 an \ref xexpression or a scalar
+     * @return an \ref xfunction
+     */
     template <class E1, class E2, class E3>
     inline auto where(E1&& e1, E2&& e2, E3&& e3) noexcept
         -> detail::xfunction_type_t<detail::conditional_ternary, E1, E2, E3>
@@ -946,14 +946,14 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
     }
 
     /**
-    * @ingroup logical_operators
-    * @brief Any
-    *
-    * Returns true if any of the values of \a e is truthy,
-    * false otherwise.
-    * @param e an \ref xexpression
-    * @return a boolean
-    */
+     * @ingroup logical_operators
+     * @brief Any
+     *
+     * Returns true if any of the values of \a e is truthy,
+     * false otherwise.
+     * @param e an \ref xexpression
+     * @return a boolean
+     */
     template <class E>
     inline bool any(E&& e)
     {
@@ -963,14 +963,14 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
     }
 
     /**
-    * @ingroup logical_operators
-    * @brief Any
-    *
-    * Returns true if all of the values of \a e are truthy,
-    * false otherwise.
-    * @param e an \ref xexpression
-    * @return a boolean
-    */
+     * @ingroup logical_operators
+     * @brief Any
+     *
+     * Returns true if all of the values of \a e are truthy,
+     * false otherwise.
+     * @param e an \ref xexpression
+     * @return a boolean
+     */
     template <class E>
     inline bool all(E&& e)
     {

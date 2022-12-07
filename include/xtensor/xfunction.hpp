@@ -573,6 +573,7 @@ namespace xt
     /**
      * @name Data
      */
+
     /**
      * Returns a constant reference to the element at the specified position in the function.
      * @param args a list of indices specifying the position in the function. Indices
@@ -591,6 +592,7 @@ namespace xt
     /**
      * @name Data
      */
+
     /**
      * Returns a constant reference to the element at the specified position of the underlying
      * contiguous storage of the function.
@@ -673,10 +675,10 @@ namespace xt
     }
 
     /**
-    * Checks whether the xfunction can be linearly assigned to an expression
-    * with the specified strides.
-    * @return a boolean indicating whether a linear assign is possible
-    */
+     * Checks whether the xfunction can be linearly assigned to an expression
+     * with the specified strides.
+     * @return a boolean indicating whether a linear assign is possible
+     */
     template <class F, class... CT>
     template <class S>
     inline bool xfunction<F, CT...>::has_linear_assign(const S& strides) const noexcept

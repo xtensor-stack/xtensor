@@ -335,17 +335,17 @@ namespace xt
         }
 
          /**
-         * xexpression with specified @p shape containing numbers sampled from
-         * a gemoetric random number distribution with
-         * probability of success equal to @p prob for each of the Bernoulli trials.
-         *
-         * Numbers are drawn from @c std::geometric_distribution.
-         *
-         * @param shape shape of resulting xexpression
-         * @param prob probability of success of each trial
-         * @param engine random number engine
-         * @tparam T number type to use
-         */
+          * xexpression with specified @p shape containing numbers sampled from
+          * a gemoetric random number distribution with
+          * probability of success equal to @p prob for each of the Bernoulli trials.
+          *
+          * Numbers are drawn from @c std::geometric_distribution.
+          *
+          * @param shape shape of resulting xexpression
+          * @param prob probability of success of each trial
+          * @param engine random number engine
+          * @tparam T number type to use
+          */
         template <class T, class S, class D, class E>
         inline auto geometric(const S& shape, D prob, E& engine)
         {

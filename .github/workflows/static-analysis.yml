@@ -10,11 +10,11 @@ jobs:
   pre-commit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Install micromamba
-        uses: mamba-org/provision-with-micromamba@v13
-        with:
-          environment-file: environment-dev.yml
-          environment-name: xtensor-dev
-          cache-downloads: true
-      - uses: pre-commit/action@v3.0.0
+    - uses: actions/checkout@v3
+    - name: Install micromamba
+      uses: mamba-org/provision-with-micromamba@v13
+      with:
+        environment-file: environment-dev.yml
+        environment-name: xtensor-dev
+        cache-downloads: true
+    - uses: pre-commit/action@v3.0.0

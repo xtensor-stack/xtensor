@@ -3,7 +3,7 @@ name: gh-pages
 on:
   push:
     branches:
-      - master
+    - master
 
 jobs:
 
@@ -23,7 +23,7 @@ jobs:
     - name: Set conda environment "test"
       uses: conda-incubator/setup-miniconda@v2
       with:
-        mamba-version: "*"
+        mamba-version: '*'
         channels: conda-forge,defaults
         channel-priority: true
         environment-file: docs/environment.yaml

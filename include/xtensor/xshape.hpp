@@ -92,22 +92,18 @@ namespace xtl
 
 namespace xt
 {
-    /**
-     * @defgroup xt_xshape Shape manipulation and querrying utilities.
-     */
-
     /**************
      * same_shape *
      **************/
 
     /**
-    * Check if two objects have the same shape.
-    *
-    * @ingroup xt_xshape
-    * @param s1 an array
-    * @param s2 an array
-    * @return bool
-    */
+     * Check if two objects have the same shape.
+     *
+     * @ingroup xt_xshape
+     * @param s1 an array
+     * @param s2 an array
+     * @return bool
+     */
     template <class S1, class S2>
     inline bool same_shape(const S1& s1, const S2& s2) noexcept
     {
@@ -119,13 +115,13 @@ namespace xt
      *************/
 
     /**
-    * Check if an object has a certain shape.
-    *
-    * @ingroup xt_xshape
-    * @param a an array
-    * @param shape the shape to test
-    * @return bool
-    */
+     * Check if an object has a certain shape.
+     *
+     * @ingroup xt_xshape
+     * @param a an array
+     * @param shape the shape to test
+     * @return bool
+     */
     template <class E, class S>
     inline bool has_shape(const E& e, std::initializer_list<S> shape) noexcept
     {
@@ -133,13 +129,13 @@ namespace xt
     }
 
     /**
-    * Check if an object has a certain shape.
-    *
-    * @ingroup has_shape
-    * @param a an array
-    * @param shape the shape to test
-    * @return bool
-    */
+     * Check if an object has a certain shape.
+     *
+     * @ingroup has_shape
+     * @param a an array
+     * @param shape the shape to test
+     * @return bool
+     */
     template <class E, class S, class = typename std::enable_if_t<has_iterator_interface<S>::value>>
     inline bool has_shape(const E& e, const S& shape)
     {
