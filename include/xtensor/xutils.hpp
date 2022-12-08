@@ -858,6 +858,22 @@ namespace xt
         using type = std::array<std::ptrdiff_t, sizeof...(I)>;
     };
 
+    template <class CP, class O, class A>
+    class xbuffer_adaptor;
+
+    template <class CP, class O, class A>
+    struct get_strides_type<xbuffer_adaptor<CP, O, A>>
+    {
+        // In bindings this mapping is called by reshape_view with an inner shape of type
+        // xbuffer_adaptor.
+        // Since we cannot create a buffer adaptor holding data, we map it to an std::vector.
+        using type = std::vector<
+            typename xbuffer_adaptor<CP, O, A>::value_type,
+            typename xbuffer_adaptor<CP, O, A>::allocator_type
+         >;
+    };
+
+
     template <class C>
     using get_strides_t = typename get_strides_type<C>::type;
 
