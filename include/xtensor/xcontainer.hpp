@@ -51,6 +51,14 @@ namespace xt
         {
             using type = std::allocator<T>;  // fake allocator for testing
         };
+
+
+        template <class T, std::size_t N>
+        struct allocator_type_impl<const_array<T, N>>
+        {
+            using type = std::allocator<T>;  // fake allocator for testing
+        };
+
     }
 
     template <class T>
