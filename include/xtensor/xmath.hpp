@@ -22,6 +22,7 @@
 
 #include <xtl/xcomplex.hpp>
 #include <xtl/xtype_traits.hpp>
+#include <xtl/xsequence.hpp>
 
 #include "xaccumulator.hpp"
 #include "xeval.hpp"
@@ -2108,7 +2109,13 @@ namespace detail {
         auto inner_mean = eval(mean<T>(sc, std::move(axes_copy), evaluation_strategy::immediate));
 
         // fake keep_dims = 1
-        auto keep_dim_shape = e.shape();
+        // Since the inner_shape might have a reference semantic (e.g. xbuffer_adaptor in bindings)
+        // We need to map it to another type before modifying it.
+        // We pragmatically abuse `get_strides_t`
+        using tmp_shape_t = get_strides_t<typename std::decay_t<E>::shape_type>;
+        tmp_shape_t keep_dim_shape = xtl::forward_sequence<tmp_shape_t, decltype(e.shape())>(
+            e.shape()
+        );
         for (const auto& el : axes)
         {
             keep_dim_shape[el] = 1u;
@@ -2712,7 +2719,13 @@ namespace detail {
         auto inner_mean = nanmean<result_type>(sc, std::move(axes_copy));
 
         // fake keep_dims = 1
-        auto keep_dim_shape = e.shape();
+        // Since the inner_shape might have a reference semantic (e.g. xbuffer_adaptor in bindings)
+        // We need to map it to another type before modifying it.
+        // We pragmatically abuse `get_strides_t`
+        using tmp_shape_t = get_strides_t<typename std::decay_t<E>::shape_type>;
+        tmp_shape_t keep_dim_shape = xtl::forward_sequence<tmp_shape_t, decltype(e.shape())>(
+            e.shape()
+        );
         for (const auto& el : axes)
         {
             keep_dim_shape[el] = 1;
