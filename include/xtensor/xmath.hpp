@@ -2383,7 +2383,7 @@ namespace detail {
      * @ingroup nan_functions
      * @brief Convert nan or +/- inf to numbers
      *
-     * This functions converts nan to 0, and +inf to the highest, -inf to the lowest
+     * This functions converts NaN to 0, and +inf to the highest, -inf to the lowest
      * floating point value of the same type.
      *
      * @param e input \ref xexpression
@@ -2397,10 +2397,10 @@ namespace detail {
 
     /**
      * @ingroup nan_functions
-     * @brief Minimum element over given axes, excluding nans.
+     * @brief Minimum element over given axes, ignoring NaNs.
      *
      * Returns an \ref xreducer for the minimum of elements over given
-     * \em axes, ignoring nans.
+     * @p axes, ignoring NaNs.
      * @warning Casting the result to an integer type can cause undefined behavior.
      * @param e an \ref xexpression
      * @param axes the axes along which the minimum is found (optional)
@@ -2412,10 +2412,10 @@ namespace detail {
 
     /**
      * @ingroup nan_functions
-     * @brief Maximum element along given axes, excluding nans.
+     * @brief Maximum element along given axes, ignoring NaNs.
      *
      * Returns an \ref xreducer for the sum of elements over given
-     * \em axes, replacing nan with 0.
+     * @p axes, ignoring NaN.
      * @warning Casting the result to an integer type can cause undefined behavior.
      * @param e an \ref xexpression
      * @param axes the axes along which the sum is performed (optional)
@@ -2427,10 +2427,10 @@ namespace detail {
 
     /**
      * @ingroup nan_functions
-     * @brief Sum of elements over given axes, replacing nan with 0.
+     * @brief Sum of elements over given axes, replacing NaN with 0.
      *
      * Returns an \ref xreducer for the sum of elements over given
-     * \em axes, replacing nan with 0.
+     * @p axes, ignoring NaN.
      * @param e an \ref xexpression
      * @param axes the axes along which the sum is performed (optional)
      * @param es evaluation strategy of the reducer (optional)
@@ -2444,10 +2444,10 @@ namespace detail {
 
     /**
      * @ingroup nan_functions
-     * @brief Product of elements over given axes, replacing nan with 1.
+     * @brief Product of elements over given axes, replacing NaN with 1.
      *
      * Returns an \ref xreducer for the sum of elements over given
-     * \em axes, replacing nan with 1.
+     * @p axes, replacing nan with 1.
      * @param e an \ref xexpression
      * @param axes the axes along which the sum is performed (optional)
      * @param es evaluation strategy of the reducer (optional)
@@ -2631,10 +2631,12 @@ namespace detail {
 
     /**
      * @ingroup nan_functions
-     * @brief Mean of elements over given axes, excluding nans.
+     * @brief Mean of elements over given axes, excluding NaNs.
      *
      * Returns an \ref xreducer for the mean of elements over given
-     * \em axes, excluding nans.
+     * \em axes, excluding NaNs.
+     * This is not the same as counting NaNs as zero, since excluding NaNs changes the number
+     * of elements considered in the statistic.
      * @param e an \ref xexpression
      * @param axes the axes along which the mean is computed (optional)
      * @param es the evaluation strategy (optional)
@@ -2691,11 +2693,12 @@ namespace detail {
 
     /**
      * @ingroup nan_functions
-     * @brief Compute the variance along the specified axes, excluding nans
+     * @brief Compute the variance along the specified axes, excluding NaNs
      *
      * Returns the variance of the array elements, a measure of the spread of a
      * distribution. The variance is computed for the flattened array by default,
      * otherwise over the specified axes.
+     * Excluding NaNs changes the number of elements considered in the statistic.
      *
      * Note: this function is not yet specialized for complex numbers.
      *
@@ -2741,6 +2744,7 @@ namespace detail {
      * Returns the standard deviation, a measure of the spread of a distribution,
      * of the array elements. The standard deviation is computed for the flattened
      * array by default, otherwise over the specified axis.
+     * Excluding NaNs changes the number of elements considered in the statistic.
      *
      * Note: this function is not yet specialized for complex numbers.
      *
