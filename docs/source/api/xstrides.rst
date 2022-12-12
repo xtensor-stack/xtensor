@@ -10,7 +10,5 @@ xshape
 Defined in ``xtensor/xstride.hpp``
 
 .. doxygenfunction:: auto strides(const E& e, xt::stride_type type)
-   :project: xtensor
 
 .. doxygenfunction:: auto strides(const E& e, S axis, xt::stride_type type)
-   :project: xtensor

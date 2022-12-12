@@ -10,7 +10,5 @@ xjson: serialize to/from JSON
 Defined in ``xtensor/xjson.hpp``
 
 .. doxygenfunction:: xt::to_json(nlohmann::json&, const E&);
-   :project: xtensor
 
 .. doxygenfunction:: xt::from_json(const nlohmann::json&, E&);
-   :project: xtensor

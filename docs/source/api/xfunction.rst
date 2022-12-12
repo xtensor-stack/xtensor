@@ -10,10 +10,8 @@ xfunction
 Defined in ``xtensor/xfunction.hpp``
 
 .. doxygenclass:: xt::xfunction
-   :project: xtensor
    :members:
 
 Defined in ``xtensor/xmath.hpp``
 
 .. doxygenfunction:: make_lambda_xfunction
-   :project: xtensor

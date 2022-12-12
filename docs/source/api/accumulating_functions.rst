@@ -12,13 +12,9 @@ Accumulating functions
 Defined in ``xtensor/xmath.hpp``
 
 .. doxygenfunction:: cumsum(E&&)
-   :project: xtensor
 
 .. doxygenfunction:: cumsum(E&&, std::ptrdiff_t)
-   :project: xtensor
 
 .. doxygenfunction:: cumprod(E&&)
-   :project: xtensor
 
 .. doxygenfunction:: cumprod(E&&, std::ptrdiff_t)
-   :project: xtensor

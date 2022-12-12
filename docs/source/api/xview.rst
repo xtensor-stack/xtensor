@@ -10,37 +10,26 @@ xview
 Defined in ``xtensor/xview.hpp``
 
 .. doxygenclass:: xt::xview
-   :project: xtensor
    :members:
 
 .. doxygenfunction:: xt::view
-   :project: xtensor
 
 .. doxygenfunction:: xt::row
-   :project: xtensor
 
 .. doxygenfunction:: xt::col
-   :project: xtensor
 
 Defined in ``xtensor/xslice.hpp``
 
 .. doxygenfunction:: xt::range(A, B)
-   :project: xtensor
 
 .. doxygenfunction:: xt::range(A, B, C)
-   :project: xtensor
 
 .. doxygenfunction:: xt::all
-   :project: xtensor
 
 .. doxygenfunction:: xt::newaxis
-   :project: xtensor
 
 .. doxygenfunction:: xt::ellipsis
-   :project: xtensor
 
 .. doxygenfunction:: xt::keep(T&&)
-   :project: xtensor
 
 .. doxygenfunction:: xt::drop(T&&)
-   :project: xtensor

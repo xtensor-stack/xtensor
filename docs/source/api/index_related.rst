@@ -10,13 +10,9 @@ Index related functions
 Defined in ``xtensor/xoperation.hpp``
 
 .. doxygenfunction:: where(const T&)
-   :project: xtensor
 
 .. doxygenfunction:: nonzero(const T&)
-   :project: xtensor
 
 .. doxygenfunction:: argwhere
-   :project: xtensor
 
 .. doxygenfunction:: from_indices
-   :project: xtensor

@@ -12,13 +12,9 @@ Error and gamma functions
 Defined in ``xtensor/xmath.hpp``
 
 .. doxygenfunction:: erf(E&&)
-   :project: xtensor
 
 .. doxygenfunction:: erfc(E&&)
-   :project: xtensor
 
 .. doxygenfunction:: tgamma(E&&)
-   :project: xtensor
 
 .. doxygenfunction:: lgamma(E&&)
-   :project: xtensor

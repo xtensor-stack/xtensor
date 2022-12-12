@@ -10,20 +10,14 @@ xtensor
 Defined in ``xtensor/xtensor.hpp``
 
 .. doxygenclass:: xt::xtensor_container
-   :project: xtensor
    :members:
 
 .. doxygentypedef:: xt::xtensor
-   :project: xtensor
 
 .. doxygentypedef:: xt::xtensor_optional
-   :project: xtensor
 
 .. doxygenfunction:: xt::from_indices
-   :project: xtensor
 
 .. doxygenfunction:: xt::flatten_indices
-   :project: xtensor
 
 .. doxygenfunction:: xt::ravel_indices
-   :project: xtensor

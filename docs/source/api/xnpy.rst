@@ -10,13 +10,9 @@ xnpy: read/write NPY files
 Defined in ``xtensor/xnpy.hpp``
 
 .. doxygenfunction:: xt::load_npy(std::istream&)
-   :project: xtensor
 
 .. doxygenfunction:: xt::load_npy(const std::string&)
-   :project: xtensor
 
 .. doxygenfunction:: xt::dump_npy(const std::string&, const xexpression<E>&)
-   :project: xtensor
 
 .. doxygenfunction:: xt::dump_npy(const xexpression<E>&)
-   :project: xtensor

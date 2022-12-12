@@ -10,5 +10,4 @@ xmasked_view
 Defined in ``xtensor/xmasked_view.hpp``
 
 .. doxygenclass:: xt::xmasked_view
-   :project: xtensor
    :members:

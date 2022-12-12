@@ -10,19 +10,13 @@ xpad
 Defined in ``xtensor/xpad.hpp``
 
 .. doxygenenum:: xt::pad_mode
-   :project: xtensor
 
 .. doxygenfunction:: xt::pad(E&& , const std::vector<std::vector<S>>&, pad_mode, V)
-   :project: xtensor
 
 .. doxygenfunction:: xt::pad(E&& , const std::vector<S>&, pad_mode, V)
-   :project: xtensor
 
 .. doxygenfunction:: xt::pad(E&& , S, pad_mode, V)
-   :project: xtensor
 
 .. doxygenfunction:: xt::tile(E&& , std::initializer_list<S>)
-   :project: xtensor
 
 .. doxygenfunction:: xt::tile(E&& , S)
-   :project: xtensor
