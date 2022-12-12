@@ -9,26 +9,4 @@ xsort
 
 Defined in ``xtensor/xsort.hpp``
 
-.. doxygenfunction:: xt::sort(const xexpression<E>&, placeholders::xtuph)
-
-.. doxygenfunction:: xt::sort(const xexpression<E>&, std::ptrdiff_t)
-
-.. doxygenfunction:: xt::argsort(const xexpression<E>&, placeholders::xtuph)
-
-.. doxygenfunction:: xt::argsort(const xexpression<E>&, std::ptrdiff_t)
-
-.. doxygenfunction:: xt::argmin(const xexpression<E>&)
-
-.. doxygenfunction:: xt::argmin(const xexpression<E>&, std::ptrdiff_t)
-
-.. doxygenfunction:: xt::argmax(const xexpression<E>&)
-
-.. doxygenfunction:: xt::argmax(const xexpression<E>&, std::ptrdiff_t)
-
-.. doxygenfunction:: xt::unique(const xexpression<E>&)
-
-.. doxygenfunction:: xt::partition(const xexpression<E>&, const C&, placeholders::xtuph)
-
-.. doxygenfunction:: xt::argpartition(const xexpression<E>&, const C&, placeholders::xtuph)
-
-.. doxygenfunction:: xt::median(E&&, std::ptrdiff_t)
+.. doxygengroup:: xt_xsort
