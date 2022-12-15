@@ -619,10 +619,12 @@ namespace xt
         using allocator_type = A;
         using size_type = typename std::allocator_traits<A>::size_type;
         using value_type = typename std::allocator_traits<A>::value_type;
+#if __cplusplus <= 201703L
         using pointer = typename std::allocator_traits<A>::pointer;
         using const_pointer = typename std::allocator_traits<A>::const_pointer;
         using reference = value_type&;
         using const_reference = const value_type&;
+#endif
         using difference_type = typename std::allocator_traits<A>::difference_type;
 
         using iterator = pointer;
