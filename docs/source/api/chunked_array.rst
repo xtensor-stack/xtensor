@@ -10,4 +10,3 @@ chunked_array
 Defined in ``xtensor/xchunked_array.hpp``
 
 .. doxygenfunction:: xt::chunked_array
-   :project: xtensor

@@ -12,37 +12,25 @@ Basic functions
 Defined in ``xtensor/xmath.hpp``
 
 .. doxygenfunction:: abs(E&&)
-   :project: xtensor
 
 .. doxygenfunction:: fabs(E&&)
-   :project: xtensor
 
 .. doxygenfunction:: fmod(E1&&, E2&&)
-   :project: xtensor
 
 .. doxygenfunction:: remainder(E1&&, E2&&)
-   :project: xtensor
 
 .. doxygenfunction:: fma(E1&&, E2&&, E3&&)
-   :project: xtensor
 
 .. doxygenfunction:: maximum(E1&&, E2&&)
-   :project: xtensor
 
 .. doxygenfunction:: minimum(E1&&, E2&&)
-   :project: xtensor
 
 .. doxygenfunction:: fmax(E1&&, E2&&)
-   :project: xtensor
 
 .. doxygenfunction:: fmin(E1&&, E2&&)
-   :project: xtensor
 
 .. doxygenfunction:: fdim(E1&&, E2&&)
-   :project: xtensor
 
 .. doxygenfunction:: clip(E1&&, E2&&, E3&&)
-   :project: xtensor
 
 .. doxygenfunction:: sign(E&&)
-   :project: xtensor

@@ -11,24 +11,17 @@ xaxis_slice_iterator
 Defined in ``xtensor/xaxis_slice_iterator.hpp``
 
 .. doxygenclass:: xt::xaxis_slice_iterator
-   :project: xtensor
    :members:
 
 .. doxygenfunction:: operator==(const xaxis_slice_iterator<CT>&, const xaxis_slice_iterator<CT>&)
-   :project: xtensor
 
 
 .. doxygenfunction:: operator!=(const xaxis_slice_iterator<CT>&, const xaxis_slice_iterator<CT>&)
-   :project: xtensor
 
 .. doxygenfunction:: axis_slice_begin(E&&)
-   :project: xtensor
 
 .. doxygenfunction:: axis_slice_begin(E&&, typename std::decay_t<E>::size_type)
-   :project: xtensor
 
 .. doxygenfunction:: axis_slice_end(E&&)
-   :project: xtensor
 
 .. doxygenfunction:: axis_slice_end(E&&, typename std::decay_t<E>::size_type)
-   :project: xtensor

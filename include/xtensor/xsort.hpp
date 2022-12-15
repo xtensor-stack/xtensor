@@ -22,6 +22,13 @@
 
 namespace xt
 {
+    /**
+     * @defgroup xt_xsort Sorting functions.
+     *
+     * Because sorting functions need to access the tensor data repeatedly, they evaluate their
+     * input and may allocate temporaries.
+     */
+
     namespace detail
     {
         template <class T>
@@ -187,6 +194,7 @@ namespace xt
      * The sort is performed using the ``std::sort`` functions.
      * A copy of the xexpression is created and returned.
      *
+     * @ingroup xt_xsort
      * @param e xexpression to sort
      * @param axis axis along which sort is performed
      *
@@ -337,6 +345,7 @@ namespace xt
      * of indices of the same shape as e that index data along the given axis in
      * sorted order.
      *
+     * @ingroup xt_xsort
      * @param e xexpression to argsort
      * @param axis axis along which argsort is performed
      *
@@ -399,6 +408,7 @@ namespace xt
      * std::cout << xt::partition(a, {0, 3}) << std::endl; // {-10, 1, 10, 123} the correct entries at index 0 and 3
      * \endcode
      *
+     * @ingroup xt_xsort
      * @param e input xexpression
      * @param kth_container a container of ``indices`` that should contain the correctly sorted value
      * @param axis either integer (default = -1) to sort along last axis or ``xnone()`` to flatten before sorting
@@ -530,6 +540,7 @@ namespace xt
      * std::cout << xt::argpartition(a, {0, 3}) << std::endl; // {2, 0, 1, 3} the correct entries at index 0 and 3
      * \endcode
      *
+     * @ingroup xt_xsort
      * @param e input xexpression
      * @param kth_container a container of ``indices`` that should contain the correctly sorted value
      * @param axis either integer (default = -1) to sort along last axis or ``xnone()`` to flatten before sorting
@@ -724,6 +735,7 @@ namespace xt
      * sorted copy of V, V_sorted - i e., V_sorted[(N-1)/2], when N is odd,
      * and the average of the two middle values of V_sorted when N is even.
      *
+     * @ingroup xt_xsort
      * @param axis axis along which the medians are computed.
      *             If not set, computes the median along a flattened version of the input.
      * @param e input xexpression
@@ -876,6 +888,7 @@ namespace xt
      * By default, the returned index is into the flattened array.
      * If `axis` is specified, the indices are along the specified axis.
      *
+     * @ingroup xt_xsort
      * @param e input xexpression
      * @param axis select axis (optional)
      *
@@ -894,6 +907,7 @@ namespace xt
      * Find unique elements of a xexpression. This returns a flattened xtensor with
      * sorted, unique elements from the original expression.
      *
+     * @ingroup xt_xsort
      * @param e input xexpression (will be flattened)
      */
     template <class E>
@@ -913,6 +927,7 @@ namespace xt
      * Find the set difference of two xexpressions. This returns a flattened xtensor with
      * the sorted, unique values in ar1 that are not in ar2.
      *
+     * @ingroup xt_xsort
      * @param ar1 input xexpression (will be flattened)
      * @param ar2 input xexpression
      */

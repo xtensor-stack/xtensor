@@ -10,5 +10,4 @@ xview_semantic
 Defined in ``xtensor/xsemantic.hpp``
 
 .. doxygenclass:: xt::xview_semantic
-   :project: xtensor
    :members:

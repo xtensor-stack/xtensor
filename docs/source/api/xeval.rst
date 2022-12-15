@@ -10,4 +10,3 @@ xeval
 Defined in ``xtensor/xeval.hpp``
 
 .. doxygenfunction:: xt::eval(E&& e)
-   :project: xtensor

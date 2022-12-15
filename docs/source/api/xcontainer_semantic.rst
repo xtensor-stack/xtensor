@@ -10,5 +10,4 @@ xcontainer_semantic
 Defined in ``xtensor/xsemantic.hpp``
 
 .. doxygenclass:: xt::xcontainer_semantic
-   :project: xtensor
    :members:
