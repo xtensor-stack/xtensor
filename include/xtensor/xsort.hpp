@@ -11,14 +11,22 @@
 #define XTENSOR_SORT_HPP
 
 #include <algorithm>
+#include <cmath>
 #include <utility>
 
+#include <xtl/xcompare.hpp>
+
+#include "xadapt.hpp"
 #include "xarray.hpp"
 #include "xeval.hpp"
+#include "xindex_view.hpp"
 #include "xmanipulation.hpp"
+#include "xmath.hpp"
 #include "xslice.hpp"  // for xnone
 #include "xtensor.hpp"
 #include "xtensor_config.hpp"
+#include "xtensor_forward.hpp"
+#include "xview.hpp"
 
 namespace xt
 {
@@ -771,6 +779,256 @@ namespace xt
     {
         return argpartition(e, std::array<std::size_t, 1>({kth}), axis);
     }
+
+    /******************
+     *  xt::quantile  *
+     ******************/
+
+    namespace detail
+    {
+        template <class S, class I, class K, class O>
+        inline void select_indices_impl(
+            S const& shape,
+            I const& indices,
+            std::size_t axis,
+            std::size_t current_dim,
+            K const& current_index,
+            O& out
+        )
+        {
+            using id_t = typename K::value_type;
+            if ((current_dim < shape.size() - 1) && (current_dim == axis))
+            {
+                for (auto i : indices)
+                {
+                    auto idx = current_index;
+                    idx[current_dim] = i;
+                    select_indices_impl(shape, indices, axis, current_dim + 1, idx, out);
+                }
+            }
+            else if ((current_dim < shape.size() - 1) && (current_dim != axis))
+            {
+                for (id_t i = 0; xtl::cmp_less(i, shape[current_dim]); ++i)
+                {
+                    auto idx = current_index;
+                    idx[current_dim] = i;
+                    select_indices_impl(shape, indices, axis, current_dim + 1, idx, out);
+                }
+            }
+            else if ((current_dim == shape.size() - 1) && (current_dim == axis))
+            {
+                for (auto i : indices)
+                {
+                    auto idx = current_index;
+                    idx[current_dim] = i;
+                    out.push_back(std::move(idx));
+                }
+            }
+            else if ((current_dim == shape.size() - 1) && (current_dim != axis))
+            {
+                for (id_t i = 0; xtl::cmp_less(i, shape[current_dim]); ++i)
+                {
+                    auto idx = current_index;
+                    idx[current_dim] = i;
+                    out.push_back(std::move(idx));
+                }
+            }
+        }
+
+        template <class S, class I>
+        inline auto select_indices(S const& shape, I const& indices, std::size_t axis)
+        {
+            using index_type = get_strides_t<S>;
+            auto out = std::vector<index_type>();
+            select_indices_impl(shape, indices, axis, 0, xtl::make_sequence<index_type>(shape.size()), out);
+            return out;
+        }
+
+        // TODO remove when fancy index views are implemented
+        // Poor man's indexing along a single axis as in NumPy a[:, [1, 3, 4]]
+        template <class E, class I>
+        inline auto fancy_indexing(E&& e, I const& indices, std::ptrdiff_t axis)
+        {
+            std::size_t const ax = normalize_axis(e.dimension(), axis);
+            using shape_t = get_strides_t<typename std::decay_t<E>::shape_type>;
+            auto shape = xtl::forward_sequence<shape_t, decltype(e.shape())>(e.shape());
+            shape[ax] = indices.size();
+            return reshape_view(
+                index_view(std::forward<E>(e), select_indices(e.shape(), indices, ax)),
+                std::move(shape)
+            );
+        }
+
+        template <class T, class I, class P>
+        inline auto quantile_kth_gamma(std::size_t n, P const& probas, T alpha, T beta)
+        {
+            auto const m = alpha + probas * (T(1) - alpha - beta);
+            // Evaluting since reused a lot
+            auto const p_n_m = eval(probas * static_cast<T>(n) + m - 1);
+            // Previous (virtual) index, may be out of bounds
+            auto const j = floor(p_n_m);
+            auto const j_jp1 = concatenate(xtuple(j, j + 1));
+            // Both interpolation indices, k and k+1
+            auto const k_kp1 = xt::cast<std::size_t>(clip(j_jp1, T(0), T(n - 1)));
+            // Both interpolation coefficients, 1-gamma and gamma
+            auto const omg_g = concatenate(xtuple(T(1) - (p_n_m - j), p_n_m - j));
+            return std::make_pair(eval(k_kp1), eval(omg_g));
+        }
+
+        // TODO should implement unsqueeze rather
+        template <class S>
+        inline auto unsqueeze_shape(S const& shape, std::size_t axis)
+        {
+            XTENSOR_ASSERT(axis <= shape.size());
+            auto new_shape = xtl::forward_sequence<xt::svector<std::size_t>, decltype(shape)>(shape);
+            new_shape.insert(new_shape.begin() + axis, 1);
+            return new_shape;
+        }
+    }
+
+    enum class quantile_method
+    {
+        interpolated_inverted_cdf = 4,
+        hazen,
+        weibull,
+        linear,
+        median_unbiased,
+        normal_unbiased,
+    };
+
+    template <class T = double, class E, class P>
+    inline auto quantile(E&& e, P const& probas, std::ptrdiff_t axis, T alpha, T beta)
+    {
+        // Check inputs
+        if (any((probas < 0.) || (1. < probas)))
+        {
+            XTENSOR_THROW(std::runtime_error, "p must be between 0 and 1");
+        }
+        if ((alpha < 0) || (1 < alpha))
+        {
+            XTENSOR_THROW(std::runtime_error, "alpha must be between 0 and 1");
+        }
+        if ((beta < 0) || (1 < beta))
+        {
+            XTENSOR_THROW(std::runtime_error, "beta must be between 0 and 1");
+        }
+
+        using tmp_shape_t = get_strides_t<typename std::decay_t<E>::shape_type>;
+        using id_t = typename tmp_shape_t::value_type;
+
+        std::size_t const ax = normalize_axis(e.dimension(), axis);
+        std::size_t const n = e.shape()[ax];
+        auto kth_gamma = detail::quantile_kth_gamma<T, id_t, P>(n, probas, alpha, beta);
+
+        // Select relevant values for computing interpolating quantiles
+        auto e_partition = xt::partition(std::forward<E>(e), kth_gamma.first, ax);
+        auto e_kth = detail::fancy_indexing(std::move(e_partition), std::move(kth_gamma.first), ax);
+
+        // Reshape interpolation coefficients
+        auto gm1_g_shape = xtl::make_sequence<tmp_shape_t>(e.dimension(), 1);
+        gm1_g_shape[ax] = kth_gamma.second.size();
+        auto gm1_g_reshaped = reshape_view(std::move(kth_gamma.second), std::move(gm1_g_shape));
+
+        // Compute interpolation
+        // TODO(C++20) use (and create) xt::lerp in C++
+        auto e_kth_g = std::move(e_kth) * std::move(gm1_g_reshaped);
+        // Reshape pairwise interpolate for suming along new axis
+        auto e_kth_g_shape = detail::unsqueeze_shape(e_kth_g.shape(), ax);
+        e_kth_g_shape[ax] = 2;
+        e_kth_g_shape[ax + 1] /= 2;
+        auto quantiles = xt::sum(reshape_view(std::move(e_kth_g), std::move(e_kth_g_shape)), ax);
+        // Cannot do a transpose on a non-strided expression so we have to eval
+        return moveaxis(eval(std::move(quantiles)), ax, 0);
+    }
+
+    template <class T = double, class E, std::size_t N>
+    inline auto quantile(E&& e, const T (&probas)[N], std::ptrdiff_t axis, T alpha, T beta)
+    {
+        return quantile(std::forward<E>(e), adapt(probas, {N}), axis, alpha, beta);
+    }
+
+    template <class T = double, class E, class P>
+    inline auto quantile(E&& e, P const& probas, T alpha, T beta)
+    {
+        return quantile(xt::ravel(std::forward<E>(e)), probas, 0, alpha, beta);
+    }
+
+    template <class T = double, class E, std::size_t N>
+    inline auto quantile(E&& e, const T (&probas)[N], T alpha, T beta)
+    {
+        return quantile(std::forward<E>(e), adapt(probas, {N}), alpha, beta);
+    }
+
+    template <class T = double, class E, class P>
+    inline auto
+    quantile(E&& e, P const& probas, std::ptrdiff_t axis, quantile_method method = quantile_method::linear)
+    {
+        T alpha = 0.;
+        T beta = 0.;
+        switch (method)
+        {
+            case (quantile_method::interpolated_inverted_cdf):
+            {
+                alpha = 0.;
+                beta = 1.;
+                break;
+            }
+            case (quantile_method::hazen):
+            {
+                alpha = 0.5;
+                beta = 0.5;
+                break;
+            }
+            case (quantile_method::weibull):
+            {
+                alpha = 0.;
+                beta = 0.;
+                break;
+            }
+            case (quantile_method::linear):
+            {
+                alpha = 1.;
+                beta = 1.;
+                break;
+            }
+            case (quantile_method::median_unbiased):
+            {
+                alpha = 1. / 3.;
+                beta = 1. / 3.;
+                break;
+            }
+            case (quantile_method::normal_unbiased):
+            {
+                alpha = 3. / 8.;
+                beta = 3. / 8.;
+                break;
+            }
+        }
+        return quantile(std::forward<E>(e), probas, axis, alpha, beta);
+    }
+
+    template <class T = double, class E, std::size_t N>
+    inline auto
+    quantile(E&& e, const T (&probas)[N], std::ptrdiff_t axis, quantile_method method = quantile_method::linear)
+    {
+        return quantile(std::forward<E>(e), adapt(probas, {N}), axis, method);
+    }
+
+    template <class T = double, class E, class P>
+    inline auto quantile(E&& e, P const& probas, quantile_method method = quantile_method::linear)
+    {
+        return quantile(xt::ravel(std::forward<E>(e)), probas, 0, method);
+    }
+
+    template <class T = double, class E, std::size_t N>
+    inline auto quantile(E&& e, const T (&probas)[N], quantile_method method = quantile_method::linear)
+    {
+        return quantile(std::forward<E>(e), adapt(probas, {N}), method);
+    }
+
+    /****************
+     *  xt::median  *
+     ****************/
 
     template <class E>
     inline typename std::decay_t<E>::value_type median(E&& e)
