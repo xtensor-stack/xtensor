@@ -13,20 +13,20 @@
 #include <algorithm>
 #include <utility>
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xeval.hpp"
-#include "xtensor/xslice.hpp"  // for xnone
-#include "xtensor/xmanipulation.hpp"
-#include "xtensor/xtensor.hpp"
-#include "xtensor/xtensor_config.hpp"
+#include "xarray.hpp"
+#include "xeval.hpp"
+#include "xslice.hpp"  // for xnone
+#include "xmanipulation.hpp"
+#include "xtensor.hpp"
+#include "xtensor_config.hpp"
 
 namespace xt
 {
     /**
      * @defgroup xt_xsort Sorting functions.
      *
-     * Because sorting functions need to acees the tensor data repeatedly, they are evaluated
-     * eagerly and return a temporary.
+     * Because sorting functions need to access the tensor data repeatedly, they evaluate their
+     * input and may allocate temporaries.
      */
 
     namespace detail
