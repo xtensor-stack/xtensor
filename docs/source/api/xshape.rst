@@ -9,8 +9,4 @@ xshape
 
 Defined in ``xtensor/xshape.hpp``
 
-.. doxygenfunction:: bool same_shape(const S1& s1, const S2& s2)
-
-.. doxygenfunction:: bool has_shape(const E& e, std::initializer_list<S> shape)
-
-.. doxygenfunction:: bool has_shape(const E& e, const S& shape)
+.. doxygengroup:: xt_xshape
