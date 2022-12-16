@@ -9,4 +9,8 @@ xsort
 
 Defined in ``xtensor/xsort.hpp``
 
+.. cpp:namespace-push:: xt
+
 .. doxygengroup:: xt_xsort
+
+.. cpp:namespace-pop::

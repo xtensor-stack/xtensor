@@ -9,4 +9,8 @@ xshape
 
 Defined in ``xtensor/xshape.hpp``
 
+.. cpp:namespace-push:: xt
+
 .. doxygengroup:: xt_xshape
+
+.. cpp:namespace-pop::
