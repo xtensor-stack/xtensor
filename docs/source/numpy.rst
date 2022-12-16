@@ -399,34 +399,40 @@ Comparisons
 Minimum, Maximum, Sorting
 -------------------------
 
-.. table::
+.. list-table::
    :widths: 50 50
+   :header-rows: 1
 
-   +-----------------------------------------------------+---------------------------------------------------------+
-   |            Python 3 - NumPy                         |                C++ 14 - xtensor                         |
-   +=====================================================+=========================================================+
-   | :any:`np.amin(a) <numpy.amin>`                      | :cpp:func:`xt::amin(a) <xt::amin>`                      |
-   +-----------------------------------------------------+---------------------------------------------------------+
-   | :any:`np.amax(a) <numpy.amax>`                      | :cpp:func:`xt::amax(a) <xt::amax>`                      |
-   +-----------------------------------------------------+---------------------------------------------------------+
-   | :any:`np.argmin(a) <numpy.argmin>`                  | :cpp:func:`xt::argmin(a) <xt::argmin>`                  |
-   +-----------------------------------------------------+---------------------------------------------------------+
-   | :any:`np.argmax(a, axis=1) <numpy.argmax>`          | :cpp:func:`xt::argmax(a, 1) <xt::argmax>`               |
-   +-----------------------------------------------------+---------------------------------------------------------+
-   | :any:`np.sort(a, axis=1) <numpy.sort>`              | :cpp:func:`xt::sort(a, 1) <xt::sort>`                   |
-   +-----------------------------------------------------+---------------------------------------------------------+
-   | :any:`np.argsort(a, axis=1) <numpy.argsort>`        | :cpp:func:`xt::argsort(a, 1) <xt::argsort>`             |
-   +-----------------------------------------------------+---------------------------------------------------------+
-   | :any:`np.unique(a) <numpy.unique>`                  | :cpp:func:`xt::unique(a) <xt::unique>`                  |
-   +-----------------------------------------------------+---------------------------------------------------------+
-   | :any:`np.setdiff1d(ar1, ar2) <numpy.setdiff1d>`     | :cpp:func:`xt::setdiff1d(ar1, ar2) <xt::setdiff1d>`     |
-   +-----------------------------------------------------+---------------------------------------------------------+
-   | :any:`np.partition(a, kth) <numpy.partition>`       | :cpp:func:`xt::partition(a, kth) <xt::partition>`       |
-   +-----------------------------------------------------+---------------------------------------------------------+
-   | :any:`np.argpartition(a, kth) <numpy.argpartition>` | :cpp:func:`xt::argpartition(a, kth) <xt::argpartition>` |
-   +-----------------------------------------------------+---------------------------------------------------------+
-   | :any:`np.median(a, axis) <numpy.median>`            | :cpp:func:`xt::median(a, axis) <xt::median>`            |
-   +-----------------------------------------------------+---------------------------------------------------------+
+   * - Python3 - NumPy
+     - C++14 - xtensor
+   * - :any:`np.amin(a) <numpy.amin>`
+     - :cpp:func:`xt::amin(a) <xt::amin>`
+   * - :any:`np.amax(a) <numpy.amax>`
+     - :cpp:func:`xt::amax(a) <xt::amax>`
+   * - :any:`np.argmin(a) <numpy.argmin>`
+     - :cpp:func:`xt::argmin(a) <xt::argmin>`
+   * - :any:`np.argmax(a, axis=1) <numpy.argmax>`
+     - :cpp:func:`xt::argmax(a, 1) <xt::argmax>`
+   * - :any:`np.sort(a, axis=1) <numpy.sort>`
+     - :cpp:func:`xt::sort(a, 1) <xt::sort>`
+   * - :any:`np.argsort(a, axis=1) <numpy.argsort>`
+     - :cpp:func:`xt::argsort(a, 1) <xt::argsort>`
+   * - :any:`np.unique(a) <numpy.unique>`
+     - :cpp:func:`xt::unique(a) <xt::unique>`
+   * - :any:`np.setdiff1d(ar1, ar2) <numpy.setdiff1d>`
+     - :cpp:func:`xt::setdiff1d(ar1, ar2) <xt::setdiff1d>`
+   * - :any:`np.partition(a, kth) <numpy.partition>`
+     - :cpp:func:`xt::partition(a, kth) <xt::partition>`
+   * - :any:`np.argpartition(a, kth) <numpy.argpartition>`
+     - :cpp:func:`xt::argpartition(a, kth) <xt::argpartition>`
+   * - :any:`np.quantile(a, [.1 .3], method="linear") <numpy.quantile>`
+     - :cpp:func:`xt::quantile(a, {.1, .3}, xt::quantile_method::linear) <xt::quantile>`
+   * - :any:`np.quantile(a, [.1, .3], axis=1 method="linear") <numpy.quantile>`
+     - :cpp:func:`xt::quantile(a, {.1, .3}, 1, xt::quantile_method::linear) <xt::quantile>`
+   * -
+     - :cpp:func:`xt::quantile(a, {.1, .3}, 1, 1.0, 1.0) <xt::quantile>`
+   * - :any:`np.median(a, axis=1) <numpy.median>`
+     - :cpp:func:`xt::median(a, 1) <xt::median>`
 
 Complex numbers
 ---------------

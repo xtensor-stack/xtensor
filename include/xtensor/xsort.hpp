@@ -886,16 +886,35 @@ namespace xt
         }
     }
 
-    enum class quantile_method
-    {
-        interpolated_inverted_cdf = 4,
-        hazen,
-        weibull,
-        linear,
-        median_unbiased,
-        normal_unbiased,
-    };
-
+    /**
+     * Compute quantiles over the given axis.
+     *
+     * In a sorted array represneting a distribution of numbers, the quantile of a probability ``p``
+     * is the the cut value ``q`` such that a fraction ``p`` of the distribution is lesser or equal
+     * to ``q``.
+     * When the cutpoint falls between two elemnts of the sample distribution, a interpolation is
+     * computed using the @p alpha and @p beta coefficients, as descripted in
+     * (Hyndman and Fan, 1996).
+     *
+     * The algorithm partially sorts entries in a copy along the @p axis axis.
+     *
+     * @ingroup xt_xsort
+     * @param e Expression containing the distribution over which the quantiles are computed.
+     * @param probas An list of probability associated with each desired quantiles.
+     *        All elements must be in the range ``[0, 1]``.
+     * @param axis The dimension in which to compute the quantiles, *i.e* the axis representing the
+     *        distribution.
+     * @param alpha Interpolation parameter. Must be in the range ``[0, 1]]``.
+     * @param beta Interpolation parameter. Must be in the range ``[0, 1]]``.
+     * @tparam T The type in which the quatile are computed.
+     * @return An expression with as many dimensions as the input @p e.
+     *         The first axis correspond to the quantiles.
+     *         The other axes are the axes that remain after the reduction of @p e.
+     * @see (Hyndman and Fan, 1996) R. J. Hyndman and Y. Fan,
+     *      "Sample quantiles in statistical packages", The American Statistician,
+     *      50(4), pp. 361-365, 1996
+     * @see https://en.wikipedia.org/wiki/Quantile
+     */
     template <class T = double, class E, class P>
     inline auto quantile(E&& e, P const& probas, std::ptrdiff_t axis, T alpha, T beta)
     {
@@ -941,24 +960,71 @@ namespace xt
         return moveaxis(eval(std::move(quantiles)), ax, 0);
     }
 
+    // Static proba array overload
     template <class T = double, class E, std::size_t N>
     inline auto quantile(E&& e, const T (&probas)[N], std::ptrdiff_t axis, T alpha, T beta)
     {
         return quantile(std::forward<E>(e), adapt(probas, {N}), axis, alpha, beta);
     }
 
+    /**
+     * Compute quantiles of the whole expression.
+     *
+     * The quantiles are computed over the whole expression, as if flatten in a one-dimensional
+     * expression.
+     *
+     * @ingroup xt_xsort
+     * @see xt::quantile(E&& e, P const& probas, std::ptrdiff_t axis, T alpha, T beta)
+     */
     template <class T = double, class E, class P>
     inline auto quantile(E&& e, P const& probas, T alpha, T beta)
     {
         return quantile(xt::ravel(std::forward<E>(e)), probas, 0, alpha, beta);
     }
 
+    // Static proba array overload
     template <class T = double, class E, std::size_t N>
     inline auto quantile(E&& e, const T (&probas)[N], T alpha, T beta)
     {
         return quantile(std::forward<E>(e), adapt(probas, {N}), alpha, beta);
     }
 
+    /**
+     * Quantile interpolation method.
+     *
+     * Predefined methods for interpolating quantiles, as defined in (Hyndman and Fan, 1996).
+     *
+     * @ingroup xt_xsort
+     * @see (Hyndman and Fan, 1996) R. J. Hyndman and Y. Fan,
+     *      "Sample quantiles in statistical packages", The American Statistician,
+     *      50(4), pp. 361-365, 1996
+     * @see xt::quantile(E&& e, P const& probas, std::ptrdiff_t axis, xt::quantile_method method)
+     */
+    enum class quantile_method
+    {
+        /** Method 4 of (Hyndman and Fan, 1996) with ``alpha=0`` and ``beta=1``. */
+        interpolated_inverted_cdf = 4,
+        /** Method 5 of (Hyndman and Fan, 1996) with ``alpha=1/2`` and ``beta=1/2``. */
+        hazen,
+        /** Method 6 of (Hyndman and Fan, 1996) with ``alpha=0`` and ``beta=0``. */
+        weibull,
+        /** Method 7 of (Hyndman and Fan, 1996) with ``alpha=1`` and ``beta=1``. */
+        linear,
+        /** Method 8 of (Hyndman and Fan, 1996) with ``alpha=1/3`` and ``beta=1/3``. */
+        median_unbiased,
+        /** Method 9 of (Hyndman and Fan, 1996) with ``alpha=3/8`` and ``beta=3/8``. */
+        normal_unbiased,
+    };
+
+    /**
+     * Compute quantiles over the given axis.
+     *
+     * The function takes the name of a predefined method to compute to interpolate between values.
+     *
+     * @ingroup xt_xsort
+     * @see xt::quantile_method
+     * @see xt::quantile(E&& e, P const& probas, std::ptrdiff_t axis, T alpha, T beta)
+     */
     template <class T = double, class E, class P>
     inline auto
     quantile(E&& e, P const& probas, std::ptrdiff_t axis, quantile_method method = quantile_method::linear)
@@ -1007,6 +1073,7 @@ namespace xt
         return quantile(std::forward<E>(e), probas, axis, alpha, beta);
     }
 
+    // Static proba array overload
     template <class T = double, class E, std::size_t N>
     inline auto
     quantile(E&& e, const T (&probas)[N], std::ptrdiff_t axis, quantile_method method = quantile_method::linear)
@@ -1014,12 +1081,24 @@ namespace xt
         return quantile(std::forward<E>(e), adapt(probas, {N}), axis, method);
     }
 
+    /**
+     * Compute quantiles of the whole expression.
+     *
+     * The quantiles are computed over the whole expression, as if flatten in a one-dimensional
+     * expression.
+     * The function takes the name of a predefined method to compute to interpolate between values.
+     *
+     * @ingroup xt_xsort
+     * @see xt::quantile_method
+     * @see xt::quantile(E&& e, P const& probas, std::ptrdiff_t axis, xt::quantile_method method)
+     */
     template <class T = double, class E, class P>
     inline auto quantile(E&& e, P const& probas, quantile_method method = quantile_method::linear)
     {
         return quantile(xt::ravel(std::forward<E>(e)), probas, 0, method);
     }
 
+    // Static proba array overload
     template <class T = double, class E, std::size_t N>
     inline auto quantile(E&& e, const T (&probas)[N], quantile_method method = quantile_method::linear)
     {
