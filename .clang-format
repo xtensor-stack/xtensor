@@ -34,6 +34,17 @@ ExperimentalAutoDetectBinPacking: true
 EmptyLineAfterAccessModifier: Always
 EmptyLineBeforeAccessModifier: Always
 IncludeBlocks: Regroup
+IncludeCategories:
+- Regex: <[^.]+>
+  Priority: 1
+- Regex: <xtensor/.+>
+  Priority: 3
+- Regex: <.+>
+  Priority: 2
+- Regex: '"xtensor/.+"'
+  Priority: 4
+- Regex: '".+"'
+  Priority: 5
 IndentCaseLabels: true
 IndentWidth: '4'
 IndentWrappedFunctionNames: false
