@@ -18,6 +18,12 @@
 
 namespace xt
 {
+    /**
+     * @defgroup xt_xchunked_array
+     *
+     * Chunked array container.
+     * Defined in ``xtensor/xchunked_array.hpp``.
+     */
 
     /******************************
      * xchunked_array declaration *
@@ -189,7 +195,10 @@ namespace xt
 
     /**
      * Creates an in-memory chunked array.
-     * This function returns an uninitialized ``xchunked_array<xarray<T>>``.
+     *
+     * This function returns an uninitialized ``xt::xchunked_array<xt::xarray<T>>``.
+     *
+     * @ingroup xt_xchunked_array
      *
      * @tparam T The type of the elements (e.g. double)
      * @tparam L The layout_type of the array
@@ -198,7 +207,7 @@ namespace xt
      * @param chunk_shape The shape of a chunk
      * @param chunk_memory_layout The layout of each chunk (default: XTENSOR_DEFAULT_LAYOUT)
      *
-     * @return returns a ``xchunked_array<xarray<T>>`` with the given shape, chunk shape and memory layout.
+     * @return returns a ``xt::xchunked_array<xt::xarray<T>>`` with the given shape, chunk shape and memory layout.
      */
     template <class T, layout_type L = XTENSOR_DEFAULT_LAYOUT, class S>
     xchunked_array<xarray<xarray<T>>> chunked_array(S&& shape, S&& chunk_shape, layout_type chunk_memory_layout = XTENSOR_DEFAULT_LAYOUT);
@@ -208,7 +217,10 @@ namespace xt
 
     /**
      * Creates an in-memory chunked array.
-     * This function returns a ``xchunked_array<xarray<T>>`` initialized from an expression.
+     *
+     * This function returns a ``xt::xchunked_array<xt::xarray<T>>`` initialized from an expression.
+     *
+     * @ingroup xt_xchunked_array
      *
      * @tparam L The layout_type of the array
      *
@@ -216,7 +228,7 @@ namespace xt
      * @param chunk_shape The shape of a chunk
      * @param chunk_memory_layout The layout of each chunk (default: XTENSOR_DEFAULT_LAYOUT)
      *
-     * @return returns a ``xchunked_array<xarray<T>>`` from the given expression, with the given chunk shape and memory layout.
+     * @return returns a ``xt::xchunked_array<xt::xarray<T>>`` from the given expression, with the given chunk shape and memory layout.
      */
     template <layout_type L = XTENSOR_DEFAULT_LAYOUT, class E, class S>
     xchunked_array<xarray<xarray<typename E::value_type>>>
@@ -224,14 +236,17 @@ namespace xt
 
     /**
      * Creates an in-memory chunked array.
-     * This function returns a ``xchunked_array<xarray<T>>`` initialized from an expression.
+     *
+     * This function returns a ``xt::xchunked_array<xt::xarray<T>>`` initialized from an expression.
+     *
+     * @ingroup xt_xchunked_array
      *
      * @tparam L The layout_type of the array
      *
      * @param e The expression to initialize the chunked array from
      * @param chunk_memory_layout The layout of each chunk (default: XTENSOR_DEFAULT_LAYOUT)
      *
-     * @return returns a ``xchunked_array<xarray<T>>`` from the given expression, with the expression's chunk shape and the given memory layout.
+     * @return returns a ``xt::xchunked_array<xt::xarray<T>>`` from the given expression, with the expression's chunk shape and the given memory layout.
      */
     template <layout_type L = XTENSOR_DEFAULT_LAYOUT, class E>
     xchunked_array<xarray<xarray<typename E::value_type>>>

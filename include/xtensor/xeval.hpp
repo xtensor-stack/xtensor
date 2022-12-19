@@ -17,6 +17,13 @@
 namespace xt
 {
 
+    /**
+     * @defgroup xt_xeval
+     *
+     * Evaluation functions.
+     * Defined in ``xtensor/xeval.hpp``
+     */
+
     namespace detail
     {
         template <class T>
@@ -25,13 +32,15 @@ namespace xt
 
     /**
      * Force evaluation of xexpression.
-     * @return xarray or xtensor depending on shape type
      *
      * \code{.cpp}
-     * xarray<double> a = {1,2,3,4};
+     * xt::xarray<double> a = {1,2,3,4};
      * auto&& b = xt::eval(a); // b is a reference to a, no copy!
      * auto&& c = xt::eval(a + b); // c is xarray<double>, not an xexpression
      * \endcode
+     *
+     * @ingroup xt_xeval
+     * @return xt::xarray or xt::xtensor depending on shape type
      */
     template <class T>
     inline auto eval(T&& t)
@@ -110,20 +119,20 @@ namespace xt
      * Force evaluation of xexpression not providing a data interface
      * and convert to the required layout.
      *
-     * @warning This function should be used in a local context only.
-     * Returning the value returned by this function could lead to a dangling reference.
-     *
-     * @return The expression when it already provides a data interface with the correct layout,
-     * an evaluated xarray or xtensor depending on shape type otherwise.
-     *
      * \code{.cpp}
-     * xarray<double, layout_type::row_major> a = {1,2,3,4};
+     * xt::xarray<double, xt::layout_type::row_major> a = {1,2,3,4};
      * auto&& b = xt::as_strided(a); // b is a reference to a, no copy!
-     * auto&& c = xt::as_strided<layout_type::column_major>(a); // b is xarray<double> with the required layout
+     * auto&& c = xt::as_strided<xt::layout_type::column_major>(a); // b is xarray<double> with the required layout
      * auto&& a_cast = xt::cast<int>(a); // a_cast is an xexpression
      * auto&& d = xt::as_strided(a_cast); // d is xarray<int>, not an xexpression
-     * auto&& e = xt::as_strided<layout_type::column_major>(a_cast); // d is xarray<int> with the required layout
+     * auto&& e = xt::as_strided<xt::layout_type::column_major>(a_cast); // d is xarray<int> with the required layout
      * \endcode
+     *
+     * @warning This function should be used in a local context only.
+     *          Returning the value returned by this function could lead to a dangling reference.
+     * @ingroup xt_xeval
+     * @return The expression when it already provides a data interface with the correct layout,
+     *         an evaluated xt::xarray or xt::xtensor depending on shape type otherwise.
      */
     template <layout_type L = layout_type::any, class E>
     inline auto as_strided(E&& e)

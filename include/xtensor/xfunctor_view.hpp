@@ -29,6 +29,12 @@
 
 namespace xt
 {
+    /**
+     * @defgroup xt_xfunctor_view
+     *
+     * Chunked array container.
+     * Defined in ``xtensor/xfunctor_view.hpp``
+     */
 
     /************************************************
      * xfunctor_view and xfunctor_adaptor extension *
@@ -389,23 +395,23 @@ namespace xt
     };
 
     /**
-     * @class xfunctor_view
-     * @brief View of an xexpression .
+     * View of an xexpression .
      *
-     * The xfunctor_view class is an expression addressing its elements by applying a functor to the
-     * corresponding element of an underlying expression. Unlike e.g. xgenerator, an xfunctor_view is
-     * an lvalue. It is used e.g. to access real and imaginary parts of complex expressions.
+     * The xt::xfunctor_view class is an expression addressing its elements by applying a functor to the
+     * corresponding element of an underlying expression.
+     * Unlike e.g. xgenerator, an xt::xfunctor_view is an lvalue.
+     * It is used e.g. to access real and imaginary parts of complex expressions.
      *
-     * xfunctor_view has a view semantics and can be used on any expression.
-     * For a similar feature with a container semantics, one can use \ref xfunctor_adaptor.
+     * xt::xfunctor_view has a view semantics and can be used on any expression.
+     * For a similar feature with a container semantics, one can use xt::xfunctor_adaptor.
      *
-     * xfunctor_view is not meant to be used directly, but through helper functions such
-     * as \ref real or \ref imag.
+     * xt::xfunctor_view is not meant to be used directly, but through helper functions such
+     * as xt::real or xt::imag.
      *
+     * @ingroup xt_xfunctor_view
      * @tparam F the functor type to be applied to the elements of specified expression.
-     * @tparam CT the closure type of the \ref xexpression type underlying this view
-     *
-     * @sa real, imag
+     * @tparam CT the closure type of the xt::xexpression type underlying this view
+     * @see xt::real, xt::imag
      */
     template <class F, class CT>
     class xfunctor_view : public xfunctor_applier_base<xfunctor_view<F, CT>>,
@@ -466,16 +472,15 @@ namespace xt
     };
 
     /**
-     * @class xfunctor_adaptor
-     * @brief Adapt a container with a functor, forwarding methods such as resize / reshape.
+     * Adapt a container with a functor, forwarding methods such as resize / reshape.
      *
-     * xfunctor_adaptor has a container semantics and can only be used with containers.
-     * For a similar feature with a view semantics, one can use \ref xfunctor_view.
+     * xt::xfunctor_adaptor has a container semantics and can only be used with containers.
+     * For a similar feature with a view semantics, one can use xt::xfunctor_view.
      *
+     * @ingroup xt_xfunctor_view
      * @tparam F the functor type to be applied to the elements of specified expression.
-     * @tparam CT the closure type of the \ref xexpression type underlying this view
-     *
-     * @sa xfunctor_view
+     * @tparam CT the closure type of the xt::xexpression type underlying this view
+     * @see xt::xfunctor_view
      */
     template <class F, class CT>
     class xfunctor_adaptor : public xfunctor_applier_base<xfunctor_adaptor<F, CT>>,
@@ -644,7 +649,7 @@ namespace xt
     //@{
 
     /**
-     * Constructs an xfunctor_applier_base expression wrappering the specified \ref xexpression.
+     * Constructs an xfunctor_applier_base expression wrappering the specified xt::xexpression.
      *
      * @param e the underlying expression
      */
@@ -655,7 +660,7 @@ namespace xt
     }
 
     /**
-     * Constructs an xfunctor_applier_base expression wrappering the specified \ref xexpression.
+     * Constructs an xfunctor_applier_base expression wrappering the specified xt::xexpression.
      *
      * @param func the functor to be applied to the elements of the underlying expression.
      * @param e the underlying expression
@@ -879,6 +884,7 @@ namespace xt
     /**
      * Checks whether the xfunctor_applier_base can be linearly assigned to an expression
      * with the specified strides.
+     *
      * @return a boolean indicating whether a linear assign is possible
      */
     template <class D>

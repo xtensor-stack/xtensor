@@ -18,7 +18,7 @@ xexpression API is actually implemented in ``xstrided_container`` and ``xcontain
    xiterable
    xarray
    xarray_adaptor
-   chunked_array
+   xchunked_array
    xtensor
    xtensor_adaptor
    xfixed
