@@ -32,7 +32,7 @@ endif()
 
 if(XTENSOR_USE_TBB)
     find_dependency(TBB)
-    target_link_libraries(@PROJECT_NAME@ INTERFACE tbb)
+    target_link_libraries(@PROJECT_NAME@ INTERFACE TBB::tbb)
     target_compile_definitions(@PROJECT_NAME@ INTERFACE XTENSOR_USE_TBB)
 endif()
 
