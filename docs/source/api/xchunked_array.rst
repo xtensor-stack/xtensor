@@ -5,7 +5,7 @@
    The full license is in the file LICENSE, distributed with this software.
 
 xchunked_array
-=============
+==============
 
 .. cpp:namespace-push:: xt
 
