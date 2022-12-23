@@ -12,7 +12,9 @@
 
 #include <array>
 
+#include "xlayout.hpp"
 #include "xslice.hpp"
+#include "xtensor_forward.hpp"
 
 namespace xt
 {
