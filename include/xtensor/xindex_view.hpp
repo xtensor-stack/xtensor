@@ -102,7 +102,7 @@ namespace xt
         using expression_tag = typename extension_base::expression_tag;
 
         using value_type = typename xexpression_type::value_type;
-        using reference = typename xexpression_type::reference;
+        using reference = inner_reference_t<CT>;
         using const_reference = typename xexpression_type::const_reference;
         using pointer = typename xexpression_type::pointer;
         using const_pointer = typename xexpression_type::const_pointer;

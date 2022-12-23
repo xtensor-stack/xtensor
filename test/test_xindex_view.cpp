@@ -55,6 +55,15 @@ namespace xt
         EXPECT_EQ(3, e(2, 2));
     }
 
+    TEST(xindex_view, indices_const)
+    {
+        xarray<double> const e = xt::random::rand<double>({3, 3});
+        auto v = index_view(e, {{1ul, 1ul}, {1ul, 2ul}, {2ul, 2ul}});
+        EXPECT_EQ(e(1, 1), v(0));
+        auto const vc = index_view(e, {{1ul, 1ul}, {1ul, 2ul}, {2ul, 2ul}});
+        EXPECT_EQ(vc(0), v(0));
+    }
+
     TEST(xindex_view, boolean)
     {
         xarray<double> e = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
