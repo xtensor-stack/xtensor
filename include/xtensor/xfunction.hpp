@@ -24,6 +24,7 @@
 #include "xaccessible.hpp"
 #include "xexpression_traits.hpp"
 #include "xiterable.hpp"
+#include "xiterator.hpp"
 #include "xlayout.hpp"
 #include "xscalar.hpp"
 #include "xshape.hpp"

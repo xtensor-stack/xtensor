@@ -14,6 +14,7 @@
 #include <utility>
 
 #include "xaccessible.hpp"
+#include "xexpression.hpp"
 #include "xiterable.hpp"
 
 

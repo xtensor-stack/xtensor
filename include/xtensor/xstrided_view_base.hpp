@@ -13,6 +13,7 @@
 #include <type_traits>
 
 #include <xtl/xsequence.hpp>
+#include <xtl/xvariant.hpp>
 
 #include "xaccessible.hpp"
 #include "xtensor_forward.hpp"
