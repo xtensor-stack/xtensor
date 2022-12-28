@@ -92,6 +92,10 @@ namespace xtl
 
 namespace xt
 {
+    /**
+     * @defgroup xt_xshape Support functions to get/check a shape array.
+     */
+
     /**************
      * same_shape *
      **************/
