@@ -57,8 +57,14 @@ docs/*.tmp
 # Jupyter artefacts
 .ipynb_checkpoints/
 
-# Pytho artefacts
+# Python artefacts
 __pycache__
 
 # Generated files
 *.pc
+
+# Compilation database
+compile_commands.json
+
+# Clangd cache
+.cache
