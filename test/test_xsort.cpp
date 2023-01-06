@@ -218,6 +218,12 @@ namespace xt
 
         xtensor<std::size_t, 2> ex_6 = {{0, 0, 0, 0}, {0, 0, 0, 0}};
         EXPECT_EQ(ex_6, argmax(c, 1));
+
+        // xtensor#2568
+        xarray<double> d = {0, 1, 0};
+        xtensor<size_t, 0> d_ex_1 = { 1 };
+        EXPECT_EQ(d_ex_1, argmax(d));
+        EXPECT_EQ(1, argmax(d)(0));
     }
 
     TEST(xsort, sort_large_prob)
