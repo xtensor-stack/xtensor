@@ -10,10 +10,13 @@
 #include <complex>
 #include <limits>
 
-#include "test_common_macros.hpp"
+// For some obscure reason xtensor.hpp need to be included first for Windows' Clangcl
 #include "xtensor/xtensor.hpp"
+//
 #include "xtensor/xhistogram.hpp"
 #include "xtensor/xrandom.hpp"
+
+#include "test_common_macros.hpp"
 
 namespace xt
 {
