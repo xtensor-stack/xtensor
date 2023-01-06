@@ -456,6 +456,14 @@ namespace xt
         {
             using strides_value_type = typename std::decay_t<strides_type>::value_type;
             strides_value_type data_size = 1;
+
+        #if defined(_MSC_VER) && (1931 <= _MSC_VER)
+            // Workaround MSVC compiler optimization bug, xtensor#2568
+            if (0 == shape.size()) {
+                return static_cast<std::size_t>(data_size);
+            }
+        #endif
+
             if (L == layout_type::row_major || l == layout_type::row_major)
             {
                 for (std::size_t i = shape.size(); i != 0; --i)
