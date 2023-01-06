@@ -979,9 +979,18 @@ namespace xt
     }
 
     template <class C, bool is_const>
-    inline void xindexed_stepper<C, is_const>::to_end(layout_type)
+    inline void xindexed_stepper<C, is_const>::to_end(layout_type l)
     {
-        std::copy(p_e->shape().begin(), p_e->shape().end(), m_index.begin());
+        auto const& shape = p_e->shape();
+        std::transform(
+            shape.cbegin(),
+            shape.cend(),
+            m_index.begin(),
+            [](const auto& v) { return v - 1; }
+        );
+
+        size_type l_dim = (l == layout_type::row_major) ? shape.size() - 1 : 0;
+        m_index[l_dim] = shape[l_dim];
     }
 
     /****************************
