@@ -53,7 +53,7 @@ context while it actually is.
 Visual Studio 2022 (19.31+) workaround inline compiler optimization bug
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In `xstrides.hpp`, added an early return inside `compute_strides` when ``shape.size() == 0`` to
+In ``xstrides.hpp``, added an early return inside ``compute_strides`` when ``shape.size() == 0`` to
 prevent a run time crash from occuring. Without this guard statement, instructions from inside the
 for loop were somehow being reached, despite being logically unreachable.
 Original issue  `here. <https://github.com/xtensor-stack/xtensor/issues/2568>`_
