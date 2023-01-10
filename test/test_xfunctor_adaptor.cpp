@@ -1,19 +1,19 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
-
-#include "test_common_macros.hpp"
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #include "xtensor/xarray.hpp"
 #include "xtensor/xcomplex.hpp"
 #include "xtensor/xfunctor_view.hpp"
 #include "xtensor/xio.hpp"
 #include "xtensor/xnoalias.hpp"
+
+#include "test_common_macros.hpp"
 
 namespace xt
 {
@@ -22,7 +22,8 @@ namespace xt
     template <class T>
     struct nooblean_proxy
     {
-        nooblean_proxy(T& ref) : m_ref(ref)
+        nooblean_proxy(T& ref)
+            : m_ref(ref)
         {
         }
 
@@ -131,8 +132,7 @@ namespace xt
     {
         using container_type = xarray<std::complex<double>>;
 
-        container_type e = {{3.0       , 1.0 + 1.0i},
-                            {1.0 - 1.0i, 2.0       }};
+        container_type e = {{3.0, 1.0 + 1.0i}, {1.0 - 1.0i, 2.0}};
 
         // Assigning to a xfunctor_adaptor, which has a container semantics, resizes
         // the underlying container.
@@ -145,7 +145,8 @@ namespace xt
         EXPECT_EQ(xtl::real(e(1)), 5.0);
     }
 
-#if defined(XTENSOR_USE_XSIMD) && XSIMD_X86_INSTR_SET >= XSIMD_X86_AVX_VERSION && XSIMD_X86_INSTR_SET < XSIMD_X86_AVX512_VERSION
+#if defined(XTENSOR_USE_XSIMD) && XSIMD_X86_INSTR_SET >= XSIMD_X86_AVX_VERSION \
+    && XSIMD_X86_INSTR_SET < XSIMD_X86_AVX512_VERSION
     TEST(xfunctor_adaptor, simd)
     {
         // This test fails when the default layour is column_major
@@ -154,16 +155,14 @@ namespace xt
             return;
         }
 
-        xarray<std::complex<double>> e = {{3.0       , 1.0 + 1.0i},
-                                          {1.0 - 1.0i, 2.0       }};
+        xarray<std::complex<double>> e = {{3.0, 1.0 + 1.0i}, {1.0 - 1.0i, 2.0}};
         auto iview = xt::imag(e);
         auto loaded_batch = iview.template load_simd<xt_simd::aligned_mode, double, 4>(0);
         EXPECT_TRUE(xsimd::all(xsimd::batch<double, 4>(0, 1, -1, 0) == loaded_batch));
         auto newbatch = loaded_batch + 5;
 
         iview.template store_simd<xt_simd::aligned_mode>(0, newbatch);
-        xarray<std::complex<double>> exp1 = {{3.0 + 5.0i, 1.0 + 6.0i},
-                                             {1.0 + 4.0i, 2.0 + 5.0i }};
+        xarray<std::complex<double>> exp1 = {{3.0 + 5.0i, 1.0 + 6.0i}, {1.0 + 4.0i, 2.0 + 5.0i}};
         EXPECT_EQ(exp1, e);
 
         auto rview = xt::real(e);
@@ -171,8 +170,7 @@ namespace xt
         EXPECT_TRUE(xsimd::all(xsimd::batch<double, 4>(3, 1, 1, 2) == loaded_batch2));
         newbatch = loaded_batch2 + 5;
         rview.template store_simd<xt_simd::aligned_mode>(0, newbatch);
-        xarray<std::complex<double>> exp2 = {{8.0 + 5.0i, 6.0 + 6.0i},
-                                             {6.0 + 4.0i, 7.0 + 5.0i }};
+        xarray<std::complex<double>> exp2 = {{8.0 + 5.0i, 6.0 + 6.0i}, {6.0 + 4.0i, 7.0 + 5.0i}};
         EXPECT_EQ(exp2, e);
 
         auto f = xt::sin(xt::imag(e));

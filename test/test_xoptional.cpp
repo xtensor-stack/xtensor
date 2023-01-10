@@ -1,13 +1,11 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
-
-#include "test_common_macros.hpp"
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #include <algorithm>
 #include <sstream>
@@ -17,13 +15,13 @@
 #include "xtensor/xio.hpp"
 #include "xtensor/xoptional.hpp"
 
+#include "test_common_macros.hpp"
+
 namespace xt
 {
     TEST(xoptional, tensor)
     {
-        xtensor_optional<double, 2> m
-            {{ 1.0 ,       2.0         },
-             { 3.0 , xtl::missing<double>() }};
+        xtensor_optional<double, 2> m{{1.0, 2.0}, {3.0, xtl::missing<double>()}};
 
         ASSERT_EQ(m(0, 0).value(), 1.0);
         ASSERT_EQ(m(1, 0).value(), 3.0);
@@ -57,13 +55,9 @@ namespace xt
 
     TEST(xoptional, operation)
     {
-        xtensor_optional<double, 2> m1
-            {{ 0.0 ,       2.0         },
-             { 3.0 , xtl::missing<double>() }};
+        xtensor_optional<double, 2> m1{{0.0, 2.0}, {3.0, xtl::missing<double>()}};
 
-        xtensor<double, 2> m2
-            {{ 1.0 , 2.0 },
-             { 3.0 , 1.0 }};
+        xtensor<double, 2> m2{{1.0, 2.0}, {3.0, 1.0}};
 
         auto res_add = m1 + m2;
         ASSERT_EQ(res_add(0, 0).value(), 1.0);
@@ -97,9 +91,7 @@ namespace xt
 
     TEST(xoptional, bool_operation)
     {
-        xtensor_optional<bool, 2> m1
-            {{ false ,       true },
-             { false , xtl::missing<bool>() }};
+        xtensor_optional<bool, 2> m1{{false, true}, {false, xtl::missing<bool>()}};
 
         xtensor_optional<bool, 2> res = m1 && m1;
         EXPECT_FALSE(res(0, 0).value());
@@ -111,9 +103,7 @@ namespace xt
     TEST(xoptional, xio)
     {
         std::ostringstream oss;
-        xtensor_optional<double, 2> m
-            {{ 0.0 ,       2.0         },
-             { 3.0 , xtl::missing<double>() }};
+        xtensor_optional<double, 2> m{{0.0, 2.0}, {3.0, xtl::missing<double>()}};
 
         oss << m;
         std::string expect = "{{  0,   2},\n {  3, N/A}}";
@@ -122,9 +112,7 @@ namespace xt
 
     TEST(xoptional, ufunc)
     {
-        xtensor_optional<double, 2> m
-            {{ 0.0 ,       2.0         },
-             { 3.0 , xtl::missing<double>() }};
+        xtensor_optional<double, 2> m{{0.0, 2.0}, {3.0, xtl::missing<double>()}};
 
         auto flag_view = xt::has_value(m);
 
@@ -146,9 +134,7 @@ namespace xt
 
     TEST(xoptional, ufunc_nonoptional)
     {
-        xtensor<double, 2> m
-            {{ 0.0 , 2.0 },
-             { 3.0 , 1.0 }};
+        xtensor<double, 2> m{{0.0, 2.0}, {3.0, 1.0}};
 
         auto flag_view = has_value(m);
 
@@ -161,16 +147,13 @@ namespace xt
 
     TEST(xoptional, dynamic_view)
     {
-        xarray_optional<int> a = {{{0, 1, 2, 3},
-                                   {4, 5, 6, 7},
-                                   {8, 9, 10, 11}},
-                                  {{12, 13, 14, 15},
-                                   {16, 17, 18, 19},
-                                   {20, 21, 22, 23}}};
+        xarray_optional<int> a = {
+            {{0, 1, 2, 3}, {4, 5, 6, 7}, {8, 9, 10, 11}},
+            {{12, 13, 14, 15}, {16, 17, 18, 19}, {20, 21, 22, 23}}};
         a(1, 0, 1).has_value() = false;
         a(1, 2, 3).has_value() = false;
 
-        auto view0 = dynamic_view(a, xdynamic_slice_vector({ 1, keep(0, 2), range(1, 4) }));
+        auto view0 = dynamic_view(a, xdynamic_slice_vector({1, keep(0, 2), range(1, 4)}));
         auto v_view = view0.value();
         auto hv_view = view0.has_value();
 
@@ -196,43 +179,39 @@ namespace xt
 
     TEST(xoptional, function_on_view)
     {
-        xarray_optional<int> a = {{{0, 1, 2, 3},
-                                   {4, 5, 6, 7},
-                                   {8, 9, 10, 11}},
-                                  {{12, 13, 14, 15},
-                                   {16, 17, 18, 19},
-                                   {20, 21, 22, 23}}};
+        xarray_optional<int> a = {
+            {{0, 1, 2, 3}, {4, 5, 6, 7}, {8, 9, 10, 11}},
+            {{12, 13, 14, 15}, {16, 17, 18, 19}, {20, 21, 22, 23}}};
 
         a(1, 0, 1).has_value() = false;
         a(1, 2, 3).has_value() = false;
 
-        auto va = dynamic_view(a, xdynamic_slice_vector({ 1, keep(0, 2), range(1, 4) }));
+        auto va = dynamic_view(a, xdynamic_slice_vector({1, keep(0, 2), range(1, 4)}));
 
-        xarray_optional<int> b = {{0, 1, 2},
-                                  {3, 4, 5}};
+        xarray_optional<int> b = {{0, 1, 2}, {3, 4, 5}};
 
         auto f = va + b;
         auto vf = f.value();
         auto hvf = f.has_value();
 
-        EXPECT_EQ(vf(0,0), 13);
-        EXPECT_EQ(vf(0,1), 15);
-        EXPECT_EQ(vf(0,2), 17);
-        EXPECT_EQ(vf(1,0), 24);
-        EXPECT_EQ(vf(1,1), 26);
-        EXPECT_EQ(vf(1,2), 28);
+        EXPECT_EQ(vf(0, 0), 13);
+        EXPECT_EQ(vf(0, 1), 15);
+        EXPECT_EQ(vf(0, 2), 17);
+        EXPECT_EQ(vf(1, 0), 24);
+        EXPECT_EQ(vf(1, 1), 26);
+        EXPECT_EQ(vf(1, 2), 28);
 
-        EXPECT_FALSE(hvf(0,0));
-        EXPECT_TRUE(hvf(0,1));
-        EXPECT_TRUE(hvf(0,2));
-        EXPECT_TRUE(hvf(1,0));
-        EXPECT_TRUE(hvf(1,1));
-        EXPECT_FALSE(hvf(1,2));
+        EXPECT_FALSE(hvf(0, 0));
+        EXPECT_TRUE(hvf(0, 1));
+        EXPECT_TRUE(hvf(0, 2));
+        EXPECT_TRUE(hvf(1, 0));
+        EXPECT_TRUE(hvf(1, 1));
+        EXPECT_FALSE(hvf(1, 2));
 
         xarray_optional<int> res = f;
-        for(size_t i = 0; i < f.shape()[0]; ++i)
+        for (size_t i = 0; i < f.shape()[0]; ++i)
         {
-            for(size_t j = 0; j < f.shape()[1]; ++j)
+            for (size_t j = 0; j < f.shape()[1]; ++j)
             {
                 EXPECT_EQ(f(i, j), res(i, j));
             }
@@ -241,8 +220,7 @@ namespace xt
 
     TEST(xoptional, broadcast)
     {
-        xarray_optional<int> a = {{1, 2, 3},
-                                  {4, 5, 6}};
+        xarray_optional<int> a = {{1, 2, 3}, {4, 5, 6}};
         a(0, 1).has_value() = false;
         a(1, 2).has_value() = false;
 
@@ -250,11 +228,11 @@ namespace xt
         auto vbr = br.value();
         auto hvbr = br.has_value();
 
-        for(size_t i = 0; i < br.shape()[0]; ++i)
+        for (size_t i = 0; i < br.shape()[0]; ++i)
         {
-            for(size_t j = 0; j < br.shape()[1]; ++j)
+            for (size_t j = 0; j < br.shape()[1]; ++j)
             {
-                for(size_t k = 0; k < br.shape()[2]; ++k)
+                for (size_t k = 0; k < br.shape()[2]; ++k)
                 {
                     EXPECT_EQ(vbr(i, j, k), a(0, j, k).value());
                     EXPECT_EQ(hvbr(i, j, k), a(0, j, k).has_value());
@@ -268,16 +246,32 @@ namespace xt
     public:
 
         point() = default;
+
         point(int x, int y)
-            : m_x(x), m_y(y)
+            : m_x(x)
+            , m_y(y)
         {
         }
 
-        int& x() noexcept { return m_x; }
-        int& y() noexcept { return m_y; }
+        int& x() noexcept
+        {
+            return m_x;
+        }
 
-        const int& x() const noexcept { return m_x; }
-        const int& y() const noexcept { return m_y; }
+        int& y() noexcept
+        {
+            return m_y;
+        }
+
+        const int& x() const noexcept
+        {
+            return m_x;
+        }
+
+        const int& y() const noexcept
+        {
+            return m_y;
+        }
 
     private:
 
@@ -293,20 +287,27 @@ namespace xt
         using pointer = int*;
         using const_pointer = const int*;
 
-        reference operator()(point& p) const noexcept { return p.x(); }
-        const_reference operator()(const point& p) const noexcept { return p.x(); }
+        reference operator()(point& p) const noexcept
+        {
+            return p.x();
+        }
+
+        const_reference operator()(const point& p) const noexcept
+        {
+            return p.x();
+        }
 
         // Compilation trick: a functor view on xarray_optional<point> expects the functor
         // to provide operator() accepting reference and const_reference from xarray_optional<point>
         // Since we never use these overloads, no need to declare the right one, nor to provide
         // any implementation.
-        template <class T> T&& operator()(T&&) const noexcept;
+        template <class T>
+        T&& operator()(T&&) const noexcept;
     };
 
     TEST(xoptional, functor_view)
     {
-        xarray_optional<point> a = {{point(0, 0), point(0, 1)},
-                                    {point(1, 0), point(1, 1)}};
+        xarray_optional<point> a = {{point(0, 0), point(0, 1)}, {point(1, 0), point(1, 1)}};
         a(0, 0).has_value() = false;
         a(1, 0).has_value() = false;
 
@@ -333,12 +334,11 @@ namespace xt
 
     TEST(xoptional, index_view)
     {
-        xarray_optional<int> a = {{1, 2, 3},
-                                  {4, 5, 6}};
+        xarray_optional<int> a = {{1, 2, 3}, {4, 5, 6}};
         a(0, 0).has_value() = false;
         a(1, 2).has_value() = false;
 
-        auto iv = index_view(a, {{0ul,0ul}, {0ul,2ul}, {1ul,1ul}, {1ul,2ul}});
+        auto iv = index_view(a, {{0ul, 0ul}, {0ul, 2ul}, {1ul, 1ul}, {1ul, 2ul}});
         auto viv = iv.value();
         auto hviv = iv.has_value();
 
@@ -355,8 +355,7 @@ namespace xt
 
     TEST(xoptional, reducer)
     {
-        xarray_optional<int> a = {{1, 2, 3},
-                                  {4, 5, 6}};
+        xarray_optional<int> a = {{1, 2, 3}, {4, 5, 6}};
         a(1, 2).has_value() = false;
 
         auto red = sum(a, {1});
@@ -372,12 +371,9 @@ namespace xt
 
     TEST(xoptional, strided_view)
     {
-        xarray_optional<int> a = {{{0, 1, 2, 3},
-                                   {4, 5, 6, 7},
-                                   {8, 9, 10, 11}},
-                                  {{12, 13, 14, 15},
-                                   {16, 17, 18, 19},
-                                   {20, 21, 22, 23}}};
+        xarray_optional<int> a = {
+            {{0, 1, 2, 3}, {4, 5, 6, 7}, {8, 9, 10, 11}},
+            {{12, 13, 14, 15}, {16, 17, 18, 19}, {20, 21, 22, 23}}};
         a(1, 0, 1).has_value() = false;
         a(1, 2, 3).has_value() = false;
 
@@ -390,24 +386,21 @@ namespace xt
         EXPECT_EQ(hv_view.shape()[0], std::size_t(2));
         EXPECT_EQ(hv_view.shape()[1], std::size_t(3));
 
-        for(size_t i = 0; i < v_view.shape()[0]; ++i)
+        for (size_t i = 0; i < v_view.shape()[0]; ++i)
         {
-            for(size_t j = 0; j < v_view.shape()[1]; ++j)
+            for (size_t j = 0; j < v_view.shape()[1]; ++j)
             {
-                EXPECT_EQ(v_view(i, j), a(1, i, j+1).value());
-                EXPECT_EQ(hv_view(i, j), a(1, i, j+1).has_value());
+                EXPECT_EQ(v_view(i, j), a(1, i, j + 1).value());
+                EXPECT_EQ(hv_view(i, j), a(1, i, j + 1).has_value());
             }
         }
     }
 
     TEST(xoptional, view)
     {
-        xarray_optional<int> a = {{{0, 1, 2, 3},
-                                   {4, 5, 6, 7},
-                                   {8, 9, 10, 11}},
-                                  {{12, 13, 14, 15},
-                                   {16, 17, 18, 19},
-                                   {20, 21, 22, 23}}};
+        xarray_optional<int> a = {
+            {{0, 1, 2, 3}, {4, 5, 6, 7}, {8, 9, 10, 11}},
+            {{12, 13, 14, 15}, {16, 17, 18, 19}, {20, 21, 22, 23}}};
         a(1, 0, 1).has_value() = false;
         a(1, 2, 3).has_value() = false;
 
@@ -420,12 +413,12 @@ namespace xt
         EXPECT_EQ(hv_view.shape()[0], std::size_t(2));
         EXPECT_EQ(hv_view.shape()[1], std::size_t(3));
 
-        for(size_t i = 0; i < v_view.shape()[0]; ++i)
+        for (size_t i = 0; i < v_view.shape()[0]; ++i)
         {
-            for(size_t j = 0; j < v_view.shape()[1]; ++j)
+            for (size_t j = 0; j < v_view.shape()[1]; ++j)
             {
-                EXPECT_EQ(v_view(i, j), a(1, i, j+1).value());
-                EXPECT_EQ(hv_view(i, j), a(1, i, j+1).has_value());
+                EXPECT_EQ(v_view(i, j), a(1, i, j + 1).value());
+                EXPECT_EQ(hv_view(i, j), a(1, i, j + 1).has_value());
             }
         }
     }
@@ -444,7 +437,7 @@ namespace xt
         template <class T>
         bool operator()(T t) const
         {
-            return t%2 == 0;
+            return t % 2 == 0;
         }
     };
 
@@ -466,8 +459,7 @@ namespace xt
         template <class T>
         xtl::xoptional<int, bool> operator()(T t) const
         {
-            return xtl::xoptional<int, bool>(m_value_functor(t),
-                                             m_flag_functor(t));
+            return xtl::xoptional<int, bool>(m_value_functor(t), m_flag_functor(t));
         }
 
         value_functor_type m_value_functor;
@@ -476,13 +468,12 @@ namespace xt
 
     TEST(xoptional, cast)
     {
-        xarray_optional<double> a = {{1.2, 2.3, 3.4},
-                                     {4.5, 5.6, 6.7}};
+        xarray_optional<double> a = {{1.2, 2.3, 3.4}, {4.5, 5.6, 6.7}};
         a(1, 2).has_value() = false;
         auto b = cast<xtl::xoptional<int>>(a);
-        EXPECT_TRUE(b(0,2).has_value());
-        EXPECT_EQ(b(0,2), 3);
-        EXPECT_FALSE(b(1,2).has_value());
+        EXPECT_TRUE(b(0, 2).has_value());
+        EXPECT_EQ(b(0, 2), 3);
+        EXPECT_FALSE(b(1, 2).has_value());
     }
 
     TEST(xoptional, generator)

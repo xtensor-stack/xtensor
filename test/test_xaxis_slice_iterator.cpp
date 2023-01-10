@@ -1,16 +1,16 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
-#include "test_common_macros.hpp"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xaxis_slice_iterator.hpp"
 
+#include "test_common_macros.hpp"
 
 namespace xt
 {
@@ -18,12 +18,9 @@ namespace xt
 
     xarray<int> get_slice_test_array()
     {
-        xarray<int> res = { {{1, 2, 3, 4},
-                            {5, 6, 7, 8},
-                            {9, 10, 11, 12}},
-                           {{13, 14, 15, 16},
-                            {17, 18, 19, 20},
-                            {21, 22, 23, 24}} };
+        xarray<int> res = {
+            {{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}},
+            {{13, 14, 15, 16}, {17, 18, 19, 20}, {21, 22, 23, 24}}};
         return res;
     }
 
@@ -36,7 +33,6 @@ namespace xt
         EXPECT_EQ(a(0, 0, 0), (*iter_begin)(0));
         EXPECT_EQ(a(1, 0, 0), (*iter_begin)(1));
     }
-
 
     TEST(xaxis_slice_iterator, end)
     {
@@ -89,7 +85,6 @@ namespace xt
         EXPECT_EQ(a(0, 1, 2), (*iter)(2));
         EXPECT_EQ(a(0, 1, 3), (*iter)(3));
     }
-
 
     TEST(xaxis_slice_iterator, axis_0)
     {
@@ -250,7 +245,6 @@ namespace xt
         EXPECT_EQ(a(1, 1, 3), (*iter)(1));
         EXPECT_EQ(a(1, 2, 3), (*iter)(2));
     }
-
 
     TEST(xaxis_slice_iterator, axis_2)
     {

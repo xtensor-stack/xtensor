@@ -1,16 +1,17 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_SIMD_HPP
 #define XTENSOR_SIMD_HPP
 
 #include <vector>
+
 #include <xtl/xdynamic_bitset.hpp>
 
 #include "xutils.hpp"
@@ -18,7 +19,7 @@
 #ifdef XTENSOR_USE_XSIMD
 
 #include <xsimd/xsimd.hpp>
-//#include <xsimd/memory/xsimd_load_store.hpp>
+// #include <xsimd/memory/xsimd_load_store.hpp>
 
 #if defined(_MSV_VER) && (_MSV_VER < 1910)
 template <class T, class A>
@@ -66,11 +67,11 @@ namespace xt_simd
     template <class T1, class T2>
     using simd_return_type = xsimd::simd_return_type<T1, T2>;
 
-    using xsimd::load_as;
-    using xsimd::store_as;
     using xsimd::broadcast_as;
-    using xsimd::select;
     using xsimd::get_alignment_offset;
+    using xsimd::load_as;
+    using xsimd::select;
+    using xsimd::store_as;
 
     template <class V>
     using is_batch_bool = xsimd::is_batch_bool<V>;
@@ -244,7 +245,10 @@ namespace xt
         };
 
         template <class E, class T>
-        struct has_load_simd<E, T, void_t<decltype(std::declval<E>().template load_simd<aligned_mode, T>(typename E::size_type(0)))>>
+        struct has_load_simd<
+            E,
+            T,
+            void_t<decltype(std::declval<E>().template load_simd<aligned_mode, T>(typename E::size_type(0)))>>
             : std::true_type
         {
         };
@@ -266,19 +270,19 @@ namespace xt
     };
 
     template <class T>
-    struct has_simd_type
-        : std::integral_constant<bool, !std::is_same<T, xt_simd::simd_type<T>>::value>
+    struct has_simd_type : std::integral_constant<bool, !std::is_same<T, xt_simd::simd_type<T>>::value>
     {
     };
 
     namespace detail
     {
         template <class F, class B, class = void>
-        struct has_simd_apply_impl : std::false_type {};
+        struct has_simd_apply_impl : std::false_type
+        {
+        };
 
         template <class F, class B>
-        struct has_simd_apply_impl<F, B, void_t<decltype(&F::template simd_apply<B>)>>
-            : std::true_type
+        struct has_simd_apply_impl<F, B, void_t<decltype(&F::template simd_apply<B>)>> : std::true_type
         {
         };
     }

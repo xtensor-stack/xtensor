@@ -1,20 +1,21 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
-#include "test_common_macros.hpp"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xio.hpp"
-#include "xtensor/xtensor.hpp"
-#include "xtensor/xrandom.hpp"
-#include "xtensor/xview.hpp"
 #include "xtensor/xmath.hpp"
+#include "xtensor/xrandom.hpp"
+#include "xtensor/xtensor.hpp"
+#include "xtensor/xview.hpp"
+
 #include "test_common.hpp"
+#include "test_common_macros.hpp"
 
 namespace xt
 {

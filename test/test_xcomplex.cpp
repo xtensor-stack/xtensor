@@ -1,15 +1,14 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
-
-#include "test_common_macros.hpp"
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #include <complex>
+
 #include <xtl/xcomplex.hpp>
 
 #include "xtensor/xarray.hpp"
@@ -17,8 +16,9 @@
 #include "xtensor/xcomplex.hpp"
 #include "xtensor/xio.hpp"
 #include "xtensor/xnorm.hpp"
-
 #include "xtensor/xview.hpp"
+
+#include "test_common_macros.hpp"
 
 namespace xt
 {
@@ -26,9 +26,7 @@ namespace xt
 
     TEST(xcomplex, expression)
     {
-        xarray<std::complex<double>> e =
-            {{1.0       , 1.0 + 1.0i},
-             {1.0 - 1.0i, 1.0       }};
+        xarray<std::complex<double>> e = {{1.0, 1.0 + 1.0i}, {1.0 - 1.0i, 1.0}};
 
         // Test real expression
         auto r = real(e);
@@ -54,15 +52,11 @@ namespace xt
 
     TEST(xcomplex, lvalue)
     {
-        xarray<std::complex<double>> e =
-            {{1.0       , 1.0 + 1.0i},
-             {1.0 - 1.0i, 1.0       }};
+        xarray<std::complex<double>> e = {{1.0, 1.0 + 1.0i}, {1.0 - 1.0i, 1.0}};
 
         // Test assigning an expression to the complex view
         real(e) = zeros<double>({2, 2});
-        xarray<std::complex<double>> expect1 =
-            {{0.0       , 0.0 + 1.0i},
-             {0.0 - 1.0i, 0.0       }};
+        xarray<std::complex<double>> expect1 = {{0.0, 0.0 + 1.0i}, {0.0 - 1.0i, 0.0}};
         EXPECT_TRUE(all(equal(e, expect1)));
 
         imag(e) = zeros<double>({2, 2});
@@ -71,15 +65,11 @@ namespace xt
 
     TEST(xcomplex, scalar_assignmnent)
     {
-        xarray<std::complex<double>> e =
-            {{1.0       , 1.0 + 1.0i},
-             {1.0 - 1.0i, 1.0       }};
+        xarray<std::complex<double>> e = {{1.0, 1.0 + 1.0i}, {1.0 - 1.0i, 1.0}};
 
         // Test assigning an expression to the complex view
         real(e) = 0.0;
-        xarray<std::complex<double>> expect1 =
-            {{0.0       , 0.0 + 1.0i},
-             {0.0 - 1.0i, 0.0       }};
+        xarray<std::complex<double>> expect1 = {{0.0, 0.0 + 1.0i}, {0.0 - 1.0i, 0.0}};
         EXPECT_TRUE(all(equal(e, expect1)));
     }
 
@@ -103,9 +93,7 @@ namespace xt
 
     TEST(xcomplex, pointer)
     {
-        xarray<std::complex<double>> e =
-            {{1.0       , 1.0 + 1.0i},
-             {1.0 - 1.0i, 1.0       }};
+        xarray<std::complex<double>> e = {{1.0, 1.0 + 1.0i}, {1.0 - 1.0i, 1.0}};
         auto r = real(e);
         auto it = r.begin();
         EXPECT_EQ(*(it.operator->()), 1.0);
@@ -113,28 +101,32 @@ namespace xt
 
     TEST(xcomplex, arg)
     {
-        xarray<std::complex<double>> cmplarg_0 = {{0.40101756 + 0.71233018i, 0.62731701 + 0.42786349i, 0.32415089 + 0.2977805i},
-                                                  {0.24475928 + 0.49208478i, 0.69475518 + 0.74029639i, 0.59390240 + 0.35772892i},
-                                                  {0.63179202 + 0.41720995i, 0.44025718 + 0.65472131i, 0.08372648 + 0.37380143i}};
+        xarray<std::complex<double>> cmplarg_0 = {
+            {0.40101756 + 0.71233018i, 0.62731701 + 0.42786349i, 0.32415089 + 0.2977805i},
+            {0.24475928 + 0.49208478i, 0.69475518 + 0.74029639i, 0.59390240 + 0.35772892i},
+            {0.63179202 + 0.41720995i, 0.44025718 + 0.65472131i, 0.08372648 + 0.37380143i}};
         xarray<double> res = xt::arg(cmplarg_0);
-
     }
+
     TEST(xcomplex, abs_angle_conj)
     {
-        xarray<std::complex<double>> cmplarg_0 = {{0.40101756 + 0.71233018i, 0.62731701 + 0.42786349i, 0.32415089 + 0.2977805i},
-                                                  {0.24475928 + 0.49208478i, 0.69475518 + 0.74029639i, 0.59390240 + 0.35772892i},
-                                                  {0.63179202 + 0.41720995i, 0.44025718 + 0.65472131i, 0.08372648 + 0.37380143i}};
+        xarray<std::complex<double>> cmplarg_0 = {
+            {0.40101756 + 0.71233018i, 0.62731701 + 0.42786349i, 0.32415089 + 0.2977805i},
+            {0.24475928 + 0.49208478i, 0.69475518 + 0.74029639i, 0.59390240 + 0.35772892i},
+            {0.63179202 + 0.41720995i, 0.44025718 + 0.65472131i, 0.08372648 + 0.37380143i}};
         auto cmplres = xt::abs(cmplarg_0);
-        xarray<double> cmplexpected = {{0.81745298, 0.75933774, 0.44016704},
-                                       {0.54959488, 1.01524554, 0.69331814},
-                                       {0.75711643, 0.78897806, 0.38306348}};
+        xarray<double> cmplexpected = {
+            {0.81745298, 0.75933774, 0.44016704},
+            {0.54959488, 1.01524554, 0.69331814},
+            {0.75711643, 0.78897806, 0.38306348}};
 
         EXPECT_TRUE(allclose(cmplexpected, cmplres));
 
         auto cmplres_angle = xt::angle(cmplarg_0);
-        xarray<double> cmplexpected_angle = {{1.05805307, 0.59857922, 0.74302273},
-                                             {1.10923689, 0.81712241, 0.54213553},
-                                             {0.58362348, 0.97881125, 1.35044673}};
+        xarray<double> cmplexpected_angle = {
+            {1.05805307, 0.59857922, 0.74302273},
+            {1.10923689, 0.81712241, 0.54213553},
+            {0.58362348, 0.97881125, 1.35044673}};
         EXPECT_TRUE(allclose(cmplexpected_angle, cmplres_angle));
 
         using assign_t_angle = xassign_traits<xarray<double>, decltype(cmplres_angle)>;
@@ -144,9 +136,10 @@ namespace xt
 #endif
 
         auto cmplres_conj = xt::conj(cmplarg_0);
-        xarray<std::complex<double>> cmplexpected_conj = {{0.40101756 - 0.71233018i, 0.62731701 - 0.42786349i, 0.32415089 - 0.2977805i},
-                                                          {0.24475928 - 0.49208478i, 0.69475518 - 0.74029639i, 0.59390240 - 0.35772892i},
-                                                          {0.63179202 - 0.41720995i, 0.44025718 - 0.65472131i, 0.08372648 - 0.37380143i}};
+        xarray<std::complex<double>> cmplexpected_conj = {
+            {0.40101756 - 0.71233018i, 0.62731701 - 0.42786349i, 0.32415089 - 0.2977805i},
+            {0.24475928 - 0.49208478i, 0.69475518 - 0.74029639i, 0.59390240 - 0.35772892i},
+            {0.63179202 - 0.41720995i, 0.44025718 - 0.65472131i, 0.08372648 - 0.37380143i}};
         EXPECT_TRUE(allclose(cmplexpected_conj, cmplres_conj));
 
         using assign_t_conj = xassign_traits<xarray<std::complex<double>>, decltype(cmplres_conj)>;
@@ -160,9 +153,10 @@ namespace xt
 #endif
 
         auto cmplres_norm = xt::norm(cmplarg_0);
-        xarray<double> fieldnorm = {{0.66822937, 0.5765938, 0.19374703},
-                                    {0.30205453, 1.0307235, 0.48069004},
-                                    {0.57322529, 0.62248637, 0.14673763}};
+        xarray<double> fieldnorm = {
+            {0.66822937, 0.5765938, 0.19374703},
+            {0.30205453, 1.0307235, 0.48069004},
+            {0.57322529, 0.62248637, 0.14673763}};
 
         using assign_t_norm = xassign_traits<xarray<double>, decltype(cmplres_norm)>;
 
@@ -175,9 +169,10 @@ namespace xt
 
     TEST(xcomplex, arg)
     {
-        xarray<std::complex<double>> cmplarg_0 = {{0.40101756 + 0.71233018i, 0.62731701 + 0.42786349i, 0.32415089 + 0.2977805i},
-                                                  {0.24475928 + 0.49208478i, 0.69475518 + 0.74029639i, 0.59390240 + 0.35772892i},
-                                                  {0.63179202 + 0.41720995i, 0.44025718 + 0.65472131i, 0.08372648 + 0.37380143i}};
+        xarray<std::complex<double>> cmplarg_0 = {
+            {0.40101756 + 0.71233018i, 0.62731701 + 0.42786349i, 0.32415089 + 0.2977805i},
+            {0.24475928 + 0.49208478i, 0.69475518 + 0.74029639i, 0.59390240 + 0.35772892i},
+            {0.63179202 + 0.41720995i, 0.44025718 + 0.65472131i, 0.08372648 + 0.37380143i}};
         auto cmplres = xt::arg(cmplarg_0);
 
         auto evc = xt::eval(cmplres);
@@ -195,14 +190,14 @@ namespace xt
 #if XTENSOR_USE_XSIMD
         EXPECT_TRUE(assign_t_arg::simd_linear_assign());
 #endif
-
     }
 
     TEST(xcomplex, conj_real)
     {
-        xarray<double> A = {{0.81745298, 0.75933774, 0.44016704},
-                            {0.54959488, 1.01524554, 0.69331814},
-                            {0.75711643, 0.78897806, 0.38306348}};
+        xarray<double> A = {
+            {0.81745298, 0.75933774, 0.44016704},
+            {0.54959488, 1.01524554, 0.69331814},
+            {0.75711643, 0.78897806, 0.38306348}};
         xarray<double> B = xt::real(xt::conj(A));
         EXPECT_EQ(A, B);
     }
@@ -231,13 +226,15 @@ namespace xt
 
     TEST(xcomplex, isclose)
     {
-        xarray<std::complex<double>> arg = {{0.40101756 + 0.71233018i, 0.62731701 + 0.42786349i, 0.32415089 + 0.2977805i},
-                                            {0.24475928 + 0.49208478i, 0.69475518 + 0.74029639i, 0.59390240 + 0.35772892i},
-                                            {0.63179202 + 0.41720995i, 0.44025718 + 0.65472131i, 0.08372648 + 0.37380143i}};
+        xarray<std::complex<double>> arg = {
+            {0.40101756 + 0.71233018i, 0.62731701 + 0.42786349i, 0.32415089 + 0.2977805i},
+            {0.24475928 + 0.49208478i, 0.69475518 + 0.74029639i, 0.59390240 + 0.35772892i},
+            {0.63179202 + 0.41720995i, 0.44025718 + 0.65472131i, 0.08372648 + 0.37380143i}};
 
-        xarray<std::complex<double>> compare = {{0.401 + 0.712i, 0.627 + 0.427i, 0.324 + 0.297i},
-                                                {0.244 + 0.492i, 0.694 + 0.740i, 0.593 + 0.357i},
-                                                {0.631 + 0.417i, 0.440 + 0.654i, 0.083 + 0.373i}};
+        xarray<std::complex<double>> compare = {
+            {0.401 + 0.712i, 0.627 + 0.427i, 0.324 + 0.297i},
+            {0.244 + 0.492i, 0.694 + 0.740i, 0.593 + 0.357i},
+            {0.631 + 0.417i, 0.440 + 0.654i, 0.083 + 0.373i}};
 
         auto veryclose = isclose(arg, compare, 1e-5);
         auto looselyclose = isclose(arg, compare, 1e-1);
@@ -256,17 +253,14 @@ namespace xt
 
         EXPECT_TRUE(isclose(c_t(inf, -inf), c_t(0, inf))() == false);
         EXPECT_TRUE(isclose(c_t(5, 5), c_t(5, -5))() == false);
-
     }
 
     TEST(xcomplex, real_expression)
     {
         using cpx = std::complex<double>;
-        xtensor<cpx, 2> a = {{ cpx(1, 1), cpx(-1, 1), cpx(-2, -2) },
-                             { cpx(-1, 0), cpx(0, 1), cpx(2, 2) }};
+        xtensor<cpx, 2> a = {{cpx(1, 1), cpx(-1, 1), cpx(-2, -2)}, {cpx(-1, 0), cpx(0, 1), cpx(2, 2)}};
 
-        xtensor<double, 2> exp = {{2, -2, -4},
-                                  {-2, 0, 4}};
+        xtensor<double, 2> exp = {{2, -2, -4}, {-2, 0, 4}};
         xtensor<double, 2> res = real(a + a);
         EXPECT_EQ(res, exp);
     }
@@ -274,24 +268,29 @@ namespace xt
     TEST(xcomplex, conj)
     {
         using cpx = std::complex<double>;
-        xtensor<cpx, 2> a = {{ cpx(1, 1), cpx(-1, 1), cpx(-2, -2) },
-                             { cpx(-1, 0), cpx(0, 1), cpx(2, 2) }};
+        xtensor<cpx, 2> a = {{cpx(1, 1), cpx(-1, 1), cpx(-2, -2)}, {cpx(-1, 0), cpx(0, 1), cpx(2, 2)}};
         xtensor<cpx, 2> res = conj(a);
-        xtensor<cpx, 2> exp = {{ cpx(1, -1), cpx(-1, -1), cpx(-2, 2) },
-                             { cpx(-1, 0), cpx(0, -1), cpx(2, -2) }};
+        xtensor<cpx, 2> exp = {{cpx(1, -1), cpx(-1, -1), cpx(-2, 2)}, {cpx(-1, 0), cpx(0, -1), cpx(2, -2)}};
 
         EXPECT_EQ(res, exp);
     }
 
     TEST(xcomplex, exp)
     {
-        xt::xarray<float> ph = {274.7323f, 276.3974f, 274.7323f, 276.3974f, 274.7323f, 276.3974f, 274.7323f, 276.3974f};
+        xt::xarray<float> ph =
+            {274.7323f, 276.3974f, 274.7323f, 276.3974f, 274.7323f, 276.3974f, 274.7323f, 276.3974f};
         xt::xarray<std::complex<float>> input = ph * std::complex<float>(0, 1.f);
         xt::xarray<std::complex<float>> res = xt::exp(input);
-        auto expected = xt::xarray<std::complex<float>>::from_shape({ size_t(8) });
-        std::transform(input.cbegin(), input.cend(), expected.begin(), [](const std::complex<float>& arg) {
-            return std::exp(arg);
-        });
+        auto expected = xt::xarray<std::complex<float>>::from_shape({size_t(8)});
+        std::transform(
+            input.cbegin(),
+            input.cend(),
+            expected.begin(),
+            [](const std::complex<float>& arg)
+            {
+                return std::exp(arg);
+            }
+        );
         EXPECT_EQ(expected, res);
     }
 
@@ -312,7 +311,7 @@ namespace xt
 
     TEST(xcomplex, build_from_double)
     {
-        xt::xarray<double> r = { 1., 2., 3. };
+        xt::xarray<double> r = {1., 2., 3.};
         xt::xarray<std::complex<double>> rc(r);
         EXPECT_EQ(rc(0).real(), r(0));
         EXPECT_EQ(rc(1).real(), r(1));
@@ -322,23 +321,21 @@ namespace xt
     TEST(xcomplex, xcomplex)
     {
         using complex_type = xtl::xcomplex<double>;
-        xt::xarray<complex_type> a = xt::ones<complex_type>(std::vector<size_t>(3,7));
+        xt::xarray<complex_type> a = xt::ones<complex_type>(std::vector<size_t>(3, 7));
 
-        auto simd_loaded = a.template load_simd<xt_simd::aligned_mode, complex_type, xt_simd::simd_traits<complex_type>::size>(0);
-        (void)simd_loaded;
+        auto simd_loaded = a.template load_simd<xt_simd::aligned_mode, complex_type, xt_simd::simd_traits<complex_type>::size>(
+            0
+        );
+        (void) simd_loaded;
     }
 
     TEST(xcomplex, view)
     {
-
         using cpx = std::complex<double>;
-        xt::xtensor<cpx, 2> a = {
-            { cpx(1, 1), cpx(-1, 1), cpx(-2, -2) },
-            { cpx(-1, 0), cpx(0, 1), cpx(2, 2) }
-        };
+        xt::xtensor<cpx, 2> a = {{cpx(1, 1), cpx(-1, 1), cpx(-2, -2)}, {cpx(-1, 0), cpx(0, 1), cpx(2, 2)}};
 
         xtensor<cpx, 1> c = conj(view(a, 0, xt::all()));
-        xtensor<cpx ,1> exp_conj = {cpx(1, -1), cpx(-1, -1), cpx(-2, 2)};
+        xtensor<cpx, 1> exp_conj = {cpx(1, -1), cpx(-1, -1), cpx(-2, 2)};
         EXPECT_EQ(c, exp_conj);
 
         xtensor<double, 1> r = real(view(a, 0, xt::all()));

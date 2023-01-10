@@ -1,11 +1,11 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_NOALIAS_HPP
 #define XTENSOR_NOALIAS_HPP
@@ -18,7 +18,6 @@ namespace xt
     template <class A>
     class noalias_proxy
     {
-
     public:
 
         noalias_proxy(A a) noexcept;
@@ -222,8 +221,7 @@ namespace xt
     }
 
     template <class A>
-    inline noalias_proxy<xtl::closure_type_t<A>>
-    noalias(A&& a) noexcept
+    inline noalias_proxy<xtl::closure_type_t<A>> noalias(A&& a) noexcept
     {
         return noalias_proxy<xtl::closure_type_t<A>>(a);
     }

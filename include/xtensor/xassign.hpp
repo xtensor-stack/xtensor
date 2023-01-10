@@ -1,30 +1,30 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_ASSIGN_HPP
 #define XTENSOR_ASSIGN_HPP
 
 #include <algorithm>
+#include <functional>
 #include <type_traits>
 #include <utility>
-#include <functional>
 
 #include <xtl/xcomplex.hpp>
 #include <xtl/xsequence.hpp>
 
 #include "xexpression.hpp"
+#include "xfunction.hpp"
 #include "xiterator.hpp"
 #include "xstrides.hpp"
 #include "xtensor_config.hpp"
 #include "xtensor_forward.hpp"
 #include "xutils.hpp"
-#include "xfunction.hpp"
 
 #if defined(XTENSOR_USE_TBB)
 #include <tbb/tbb.h>
@@ -100,7 +100,6 @@ namespace xt
 
         template <class E1, class F, class... CT>
         static bool resize(E1& e1, const xfunction<F, CT...>& e2);
-
     };
 
     /********************
@@ -196,14 +195,18 @@ namespace xt
     template <class E1, class E2>
     inline void assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2)
     {
-        xtl::mpl::static_if<has_assign_to<E1, E2>::value>([&](auto self)
-        {
-            self(e2).derived_cast().assign_to(e1);
-        }, /*else*/ [&](auto /*self*/)
-        {
-            using tag = xexpression_tag_t<E1, E2>;
-            xexpression_assigner<tag>::assign_xexpression(e1, e2);
-        });
+        xtl::mpl::static_if<has_assign_to<E1, E2>::value>(
+            [&](auto self)
+            {
+                self(e2).derived_cast().assign_to(e1);
+            },
+            /*else*/
+            [&](auto /*self*/)
+            {
+                using tag = xexpression_tag_t<E1, E2>;
+                xexpression_assigner<tag>::assign_xexpression(e1, e2);
+            }
+        );
     }
 
     template <class E1, class E2>
@@ -239,15 +242,19 @@ namespace xt
             // A row_major or column_major container with a dimension <= 1 is computed as
             // layout any, leading to some performance improvements, for example when
             // assigning a col-major vector to a row-major vector etc
-            return compute_layout(select_layout<E1::static_layout, typename E1::shape_type>::value,
-                                  select_layout<E2::static_layout, typename E2::shape_type>::value) != layout_type::dynamic;
+            return compute_layout(
+                       select_layout<E1::static_layout, typename E1::shape_type>::value,
+                       select_layout<E2::static_layout, typename E2::shape_type>::value
+                   )
+                   != layout_type::dynamic;
         }
 
         template <class E1, class E2>
-        inline auto is_linear_assign(const E1& e1, const E2& e2) -> std::enable_if_t<has_strides<E1>::value, bool>
+        inline auto is_linear_assign(const E1& e1, const E2& e2)
+            -> std::enable_if_t<has_strides<E1>::value, bool>
         {
-            return (E1::contiguous_layout && E2::contiguous_layout && linear_static_layout<E1, E2>()) ||
-                   (e1.layout() != layout_type::dynamic && e2.has_linear_assign(e1.strides()));
+            return (E1::contiguous_layout && E2::contiguous_layout && linear_static_layout<E1, E2>())
+                   || (e1.layout() != layout_type::dynamic && e2.has_linear_assign(e1.strides()));
         }
 
         template <class E1, class E2>
@@ -259,9 +266,8 @@ namespace xt
         template <class E1, class E2>
         inline bool linear_dynamic_layout(const E1& e1, const E2& e2)
         {
-            return e1.is_contiguous()
-                && e2.is_contiguous()
-                && compute_layout(e1.layout(), e2.layout()) != layout_type::dynamic;
+            return e1.is_contiguous() && e2.is_contiguous()
+                   && compute_layout(e1.layout(), e2.layout()) != layout_type::dynamic;
         }
 
         template <class E, class = void>
@@ -270,16 +276,20 @@ namespace xt
         };
 
         template <class E>
-        struct has_step_leading<E, void_t<decltype(std::declval<E>().step_leading())>>
-            : std::true_type
+        struct has_step_leading<E, void_t<decltype(std::declval<E>().step_leading())>> : std::true_type
         {
         };
 
         template <class T>
         struct use_strided_loop
         {
-            static constexpr bool stepper_deref() { return std::is_reference<typename T::stepper::reference>::value; }
-            static constexpr bool value = has_strides<T>::value && has_step_leading<typename T::stepper>::value && stepper_deref();
+            static constexpr bool stepper_deref()
+            {
+                return std::is_reference<typename T::stepper::reference>::value;
+            }
+
+            static constexpr bool value = has_strides<T>::value
+                                          && has_step_leading<typename T::stepper>::value && stepper_deref();
         };
 
         template <class T>
@@ -333,43 +343,89 @@ namespace xt
         template <class T>
         using is_bool = std::is_same<T, bool>;
 
-        static constexpr bool is_bool_conversion() { return is_bool<e2_value_type>::value && !is_bool<e1_value_type>::value; }
-        static constexpr bool contiguous_layout() { return E1::contiguous_layout && E2::contiguous_layout; }
-        static constexpr bool convertible_types() { return std::is_convertible<e2_value_type, e1_value_type>::value
-                                                        && !is_bool_conversion(); }
+        static constexpr bool is_bool_conversion()
+        {
+            return is_bool<e2_value_type>::value && !is_bool<e1_value_type>::value;
+        }
 
-        static constexpr bool use_xsimd() { return xt_simd::simd_traits<int8_t>::size > 1; }
+        static constexpr bool contiguous_layout()
+        {
+            return E1::contiguous_layout && E2::contiguous_layout;
+        }
+
+        static constexpr bool convertible_types()
+        {
+            return std::is_convertible<e2_value_type, e1_value_type>::value && !is_bool_conversion();
+        }
+
+        static constexpr bool use_xsimd()
+        {
+            return xt_simd::simd_traits<int8_t>::size > 1;
+        }
 
         template <class T>
-        static constexpr bool simd_size_impl() { return xt_simd::simd_traits<T>::size > 1 || (is_bool<T>::value && use_xsimd()); }
-        static constexpr bool simd_size() { return simd_size_impl<e1_value_type>() && simd_size_impl<e2_value_type>(); }
-        static constexpr bool simd_interface() { return has_simd_interface<E1, requested_value_type>() &&
-                                                        has_simd_interface<E2, requested_value_type>(); }
+        static constexpr bool simd_size_impl()
+        {
+            return xt_simd::simd_traits<T>::size > 1 || (is_bool<T>::value && use_xsimd());
+        }
+
+        static constexpr bool simd_size()
+        {
+            return simd_size_impl<e1_value_type>() && simd_size_impl<e2_value_type>();
+        }
+
+        static constexpr bool simd_interface()
+        {
+            return has_simd_interface<E1, requested_value_type>()
+                   && has_simd_interface<E2, requested_value_type>();
+        }
 
     public:
 
         // constexpr methods instead of constexpr data members avoid the need of definitions at namespace
         // scope of these data members (since they are odr-used).
 
-        static constexpr bool simd_assign() { return convertible_types() && simd_size() && simd_interface(); }
-        static constexpr bool linear_assign(const E1& e1, const E2& e2, bool trivial) { return trivial && detail::is_linear_assign(e1, e2); }
-        static constexpr bool strided_assign() { return detail::use_strided_loop<E1>::value && detail::use_strided_loop<E2>::value; }
-        static constexpr bool simd_linear_assign() { return contiguous_layout() && simd_assign(); }
-        static constexpr bool simd_strided_assign() { return strided_assign() && simd_assign(); }
+        static constexpr bool simd_assign()
+        {
+            return convertible_types() && simd_size() && simd_interface();
+        }
 
-        static constexpr bool simd_linear_assign(const E1& e1, const E2& e2) { return simd_assign()
-                                                                                && detail::linear_dynamic_layout(e1, e2); }
+        static constexpr bool linear_assign(const E1& e1, const E2& e2, bool trivial)
+        {
+            return trivial && detail::is_linear_assign(e1, e2);
+        }
 
-        using e2_requested_value_type = std::conditional_t<is_bool<e2_value_type>::value,
-                                                           typename E2::bool_load_type,
-                                                           e2_value_type>;
-        using requested_value_type = detail::conditional_promote_to_complex_t<e1_value_type,
-                                                                              e2_requested_value_type>;
+        static constexpr bool strided_assign()
+        {
+            return detail::use_strided_loop<E1>::value && detail::use_strided_loop<E2>::value;
+        }
 
+        static constexpr bool simd_linear_assign()
+        {
+            return contiguous_layout() && simd_assign();
+        }
+
+        static constexpr bool simd_strided_assign()
+        {
+            return strided_assign() && simd_assign();
+        }
+
+        static constexpr bool simd_linear_assign(const E1& e1, const E2& e2)
+        {
+            return simd_assign() && detail::linear_dynamic_layout(e1, e2);
+        }
+
+        using e2_requested_value_type = std::
+            conditional_t<is_bool<e2_value_type>::value, typename E2::bool_load_type, e2_value_type>;
+        using requested_value_type = detail::conditional_promote_to_complex_t<e1_value_type, e2_requested_value_type>;
     };
 
     template <class E1, class E2>
-    inline void xexpression_assigner_base<xtensor_expression_tag>::assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial)
+    inline void xexpression_assigner_base<xtensor_expression_tag>::assign_data(
+        xexpression<E1>& e1,
+        const xexpression<E2>& e2,
+        bool trivial
+    )
     {
         E1& de1 = e1.derived_cast();
         const E2& de2 = e2.derived_cast();
@@ -381,7 +437,7 @@ namespace xt
         constexpr bool simd_strided_assign = traits::simd_strided_assign();
         if (linear_assign)
         {
-            if(simd_linear_assign || traits::simd_linear_assign(de1, de2))
+            if (simd_linear_assign || traits::simd_linear_assign(de1, de2))
             {
                 // Do not use linear_assigner<true> here since it will make the compiler
                 // instantiate this branch even if the runtime condition is false, resulting
@@ -431,8 +487,15 @@ namespace xt
 
         bool trivial_broadcast = de2.broadcast_shape(shape, true);
 
-        auto && de1_shape = de1.shape();
-        if (dim2 > de1.dimension() || std::lexicographical_compare(shape.begin(), shape.end(), de1_shape.begin(), de1_shape.end(), comperator_type()))
+        auto&& de1_shape = de1.shape();
+        if (dim2 > de1.dimension()
+            || std::lexicographical_compare(
+                shape.begin(),
+                shape.end(),
+                de1_shape.begin(),
+                de1_shape.end(),
+                comperator_type()
+            ))
         {
             typename E1::temporary_type tmp(shape);
             base_type::assign_data(tmp, e2, trivial_broadcast);
@@ -460,7 +523,8 @@ namespace xt
 
     template <class Tag>
     template <class E1, class E2>
-    inline void xexpression_assigner<Tag>::assert_compatible_shape(const xexpression<E1>& e1, const xexpression<E2>& e2)
+    inline void
+    xexpression_assigner<Tag>::assert_compatible_shape(const xexpression<E1>& e1, const xexpression<E2>& e2)
     {
         const E1& de1 = e1.derived_cast();
         const E2& de2 = e2.derived_cast();
@@ -504,16 +568,20 @@ namespace xt
     inline bool xexpression_assigner<Tag>::resize(E1& e1, const xfunction<F, CT...>& e2)
     {
         return xtl::mpl::static_if<detail::is_fixed<typename xfunction<F, CT...>::shape_type>::value>(
-            [&](auto /*self*/) {
+            [&](auto /*self*/)
+            {
                 /*
                  * If the shape of the xfunction is statically known, we can compute the broadcast triviality
                  * at compile time plus we can resize right away.
                  */
                 // resize in case LHS is not a fixed size container. If it is, this is a NOP
                 e1.resize(typename xfunction<F, CT...>::shape_type{});
-                return detail::static_trivial_broadcast<detail::is_fixed<typename xfunction<F, CT...>::shape_type>::value, CT...>::value;
+                return detail::static_trivial_broadcast<
+                    detail::is_fixed<typename xfunction<F, CT...>::shape_type>::value,
+                    CT...>::value;
             },
-            /* else */ [&](auto /*self*/)
+            /* else */
+            [&](auto /*self*/)
             {
                 using index_type = xindex_type_t<typename E1::shape_type>;
                 using size_type = typename E1::size_type;
@@ -536,9 +604,10 @@ namespace xt
         using argument_type = std::decay_t<FROM>;
         using result_type = std::decay_t<TO>;
 
-        static const bool value = xtl::is_arithmetic<result_type>::value &&
-            (sizeof(result_type) < sizeof(argument_type) ||
-             (xtl::is_integral<result_type>::value && std::is_floating_point<argument_type>::value));
+        static const bool value = xtl::is_arithmetic<result_type>::value
+                                  && (sizeof(result_type) < sizeof(argument_type)
+                                      || (xtl::is_integral<result_type>::value
+                                          && std::is_floating_point<argument_type>::value));
     };
 
     template <class FROM, class TO>
@@ -556,15 +625,16 @@ namespace xt
         using argument_type = std::decay_t<FROM>;
         using result_type = std::decay_t<TO>;
 
-        static const bool value = is_narrowing_conversion<argument_type, result_type>::value ||
-                                  has_sign_conversion<argument_type, result_type>::value;
+        static const bool value = is_narrowing_conversion<argument_type, result_type>::value
+                                  || has_sign_conversion<argument_type, result_type>::value;
     };
 
     template <class E1, class E2, layout_type L>
     inline stepper_assigner<E1, E2, L>::stepper_assigner(E1& e1, const E2& e2)
-        : m_e1(e1), m_lhs(e1.stepper_begin(e1.shape())),
-          m_rhs(e2.stepper_begin(e1.shape())),
-          m_index(xtl::make_sequence<index_type>(e1.shape().size(), size_type(0)))
+        : m_e1(e1)
+        , m_lhs(e1.stepper_begin(e1.shape()))
+        , m_rhs(e2.stepper_begin(e1.shape()))
+        , m_index(xtl::make_sequence<index_type>(e1.shape().size(), size_type(0)))
     {
     }
 
@@ -643,10 +713,18 @@ namespace xt
 #if defined(XTENSOR_USE_TBB)
         if (size >= XTENSOR_TBB_THRESHOLD)
         {
-            tbb::parallel_for(align_begin, align_end, simd_size, [&e1, &e2](size_t i)
-            {
-                e1.template store_simd<lhs_align_mode>(i, e2.template load_simd<rhs_align_mode, value_type>(i));
-            });
+            tbb::parallel_for(
+                align_begin,
+                align_end,
+                simd_size,
+                [&e1, &e2](size_t i)
+                {
+                    e1.template store_simd<lhs_align_mode>(
+                        i,
+                        e2.template load_simd<rhs_align_mode, value_type>(i)
+                    );
+                }
+            );
         }
         else
         {
@@ -658,20 +736,20 @@ namespace xt
 #elif defined(XTENSOR_USE_OPENMP)
         if (size >= XTENSOR_OPENMP_TRESHOLD)
         {
-            #pragma omp parallel for default(none) shared(align_begin, align_end, e1, e2)
-    #ifndef _WIN32
+#pragma omp parallel for default(none) shared(align_begin, align_end, e1, e2)
+#ifndef _WIN32
             for (size_type i = align_begin; i < align_end; i += simd_size)
             {
                 e1.template store_simd<lhs_align_mode>(i, e2.template load_simd<rhs_align_mode, value_type>(i));
             }
-    #else
-            for(auto i = static_cast<std::ptrdiff_t>(align_begin); i < static_cast<std::ptrdiff_t>(align_end);
-                i += static_cast<std::ptrdiff_t>(simd_size))
+#else
+            for (auto i = static_cast<std::ptrdiff_t>(align_begin); i < static_cast<std::ptrdiff_t>(align_end);
+                 i += static_cast<std::ptrdiff_t>(simd_size))
             {
                 size_type ui = static_cast<size_type>(i);
                 e1.template store_simd<lhs_align_mode>(ui, e2.template load_simd<rhs_align_mode, value_type>(ui));
             }
-    #endif
+#endif
         }
         else
         {
@@ -695,8 +773,8 @@ namespace xt
     template <class E1, class E2>
     inline void linear_assigner<false>::run(E1& e1, const E2& e2)
     {
-        using is_convertible = std::is_convertible<typename std::decay_t<E2>::value_type,
-                                                   typename std::decay_t<E1>::value_type>;
+        using is_convertible = std::
+            is_convertible<typename std::decay_t<E2>::value_type, typename std::decay_t<E1>::value_type>;
         // If the types are not compatible, this function is still instantiated but never called.
         // To avoid compilation problems in effectively unused code trivial_assigner_run_impl is
         // empty in this case.
@@ -713,13 +791,17 @@ namespace xt
         size_type n = e1.size();
 
 #if defined(XTENSOR_USE_TBB)
-        tbb::parallel_for(std::ptrdiff_t(0), static_cast<std::ptrdiff_t>(n), [&](std::ptrdiff_t i)
-        {
-            *(dst + i) = static_cast<value_type>(*(src + i));
-        });
+        tbb::parallel_for(
+            std::ptrdiff_t(0),
+            static_cast<std::ptrdiff_t>(n),
+            [&](std::ptrdiff_t i)
+            {
+                *(dst + i) = static_cast<value_type>(*(src + i));
+            }
+        );
 #elif defined(XTENSOR_USE_OPENMP)
-        #pragma omp parallel for default(none) shared(src, dst, n)
-        for (std::ptrdiff_t i = std::ptrdiff_t(0); i < static_cast<std::ptrdiff_t>(n) ; i++)
+#pragma omp parallel for default(none) shared(src, dst, n)
+        for (std::ptrdiff_t i = std::ptrdiff_t(0); i < static_cast<std::ptrdiff_t>(n); i++)
         {
             *(dst + i) = static_cast<value_type>(*(src + i));
         }
@@ -736,9 +818,7 @@ namespace xt
     template <class E1, class E2>
     inline void linear_assigner<false>::run_impl(E1&, const E2&, std::false_type /*is_convertible*/)
     {
-        XTENSOR_PRECONDITION(false,
-            "Internal error: linear_assigner called with unrelated types.");
-
+        XTENSOR_PRECONDITION(false, "Internal error: linear_assigner called with unrelated types.");
     }
 
     /****************************************
@@ -802,14 +882,13 @@ namespace xt
             using strides_type = S;
 
             check_strides_functor(const S& strides)
-                : m_cut(L == layout_type::row_major ? 0 : strides.size()),
-                  m_strides(strides)
+                : m_cut(L == layout_type::row_major ? 0 : strides.size())
+                , m_strides(strides)
             {
             }
 
             template <class T, layout_type LE = L>
-            std::enable_if_t<LE == layout_type::row_major, std::size_t>
-            operator()(const T& el)
+            std::enable_if_t<LE == layout_type::row_major, std::size_t> operator()(const T& el)
             {
                 auto var = check_strides_overlap<layout_type::row_major>::get(m_strides, el.strides());
                 if (var > m_cut)
@@ -820,8 +899,7 @@ namespace xt
             }
 
             template <class T, layout_type LE = L>
-            std::enable_if_t<LE == layout_type::column_major, std::size_t>
-            operator()(const T& el)
+            std::enable_if_t<LE == layout_type::column_major, std::size_t> operator()(const T& el)
             {
                 auto var = check_strides_overlap<layout_type::column_major>::get(m_strides, el.strides());
                 if (var < m_cut)
@@ -863,17 +941,24 @@ namespace xt
             }
             else if (E1::static_layout == layout_type::column_major || !is_row_major)
             {
-                auto csf = check_strides_functor<layout_type::column_major, decltype(e1.strides())>(e1.strides());
+                auto csf = check_strides_functor<layout_type::column_major, decltype(e1.strides())>(e1.strides()
+                );
                 cut = csf(e2);
-            } // can't reach here because this would have already triggered the fallback
+            }  // can't reach here because this would have already triggered the fallback
 
             using shape_value_type = typename E1::shape_type::value_type;
-            std::size_t outer_loop_size = static_cast<std::size_t>(
-                            std::accumulate(e1.shape().begin(), e1.shape().begin() + static_cast<std::ptrdiff_t>(cut),
-                                shape_value_type(1), std::multiplies<shape_value_type>{}));
-            std::size_t inner_loop_size = static_cast<std::size_t>(
-                            std::accumulate(e1.shape().begin() + static_cast<std::ptrdiff_t>(cut), e1.shape().end(),
-                                shape_value_type(1), std::multiplies<shape_value_type>{}));
+            std::size_t outer_loop_size = static_cast<std::size_t>(std::accumulate(
+                e1.shape().begin(),
+                e1.shape().begin() + static_cast<std::ptrdiff_t>(cut),
+                shape_value_type(1),
+                std::multiplies<shape_value_type>{}
+            ));
+            std::size_t inner_loop_size = static_cast<std::size_t>(std::accumulate(
+                e1.shape().begin() + static_cast<std::ptrdiff_t>(cut),
+                e1.shape().end(),
+                shape_value_type(1),
+                std::multiplies<shape_value_type>{}
+            ));
 
             if (E1::static_layout == layout_type::column_major || !is_row_major)
             {
@@ -920,7 +1005,11 @@ namespace xt
         }
 
         std::size_t inner_loop_size, outer_loop_size, cut;
-        std::tie(inner_loop_size, outer_loop_size, cut) = strided_assign_detail::get_loop_sizes(e1, e2, is_row_major);
+        std::tie(inner_loop_size, outer_loop_size, cut) = strided_assign_detail::get_loop_sizes(
+            e1,
+            e2,
+            is_row_major
+        );
 
         if ((is_row_major && cut == e1.dimension()) || (!is_row_major && cut == 0))
         {
@@ -947,9 +1036,10 @@ namespace xt
         using e2_value_type = typename E2::value_type;
         constexpr bool needs_cast = has_assign_conversion<e1_value_type, e2_value_type>::value;
         using value_type = typename xassign_traits<E1, E2>::requested_value_type;
-        using simd_type = std::conditional_t<std::is_same<e1_value_type, bool>::value,
-                                             xt_simd::simd_bool_type<value_type>,
-                                             xt_simd::simd_type<value_type>>;
+        using simd_type = std::conditional_t<
+            std::is_same<e1_value_type, bool>::value,
+            xt_simd::simd_bool_type<value_type>,
+            xt_simd::simd_type<value_type>>;
 
         std::size_t simd_size = inner_loop_size / simd_type::size;
         std::size_t simd_rest = inner_loop_size % simd_type::size;
@@ -960,7 +1050,7 @@ namespace xt
         // TODO in 1D case this is ambigous -- could be RM or CM.
         //      Use default layout to make decision
         std::size_t step_dim = 0;
-        if (!is_row_major) // row major case
+        if (!is_row_major)  // row major case
         {
             step_dim = cut;
         }
@@ -978,9 +1068,9 @@ namespace xt
                 fct_stepper.step_leading();
             }
 
-            is_row_major ?
-                strided_assign_detail::idx_tools<layout_type::row_major>::next_idx(idx, max_shape) :
-                strided_assign_detail::idx_tools<layout_type::column_major>::next_idx(idx, max_shape);
+            is_row_major
+                ? strided_assign_detail::idx_tools<layout_type::row_major>::next_idx(idx, max_shape)
+                : strided_assign_detail::idx_tools<layout_type::column_major>::next_idx(idx, max_shape);
 
             fct_stepper.to_begin();
 

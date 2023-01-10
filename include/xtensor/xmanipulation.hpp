@@ -1,20 +1,20 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_MANIPULATION_HPP
 #define XTENSOR_MANIPULATION_HPP
 
 #include "xbuilder.hpp"
-#include "xstrided_view.hpp"
-#include "xutils.hpp"
-#include "xtensor_config.hpp"
 #include "xrepeat.hpp"
+#include "xstrided_view.hpp"
+#include "xtensor_config.hpp"
+#include "xutils.hpp"
 
 namespace xt
 {
@@ -23,6 +23,7 @@ namespace xt
         struct none
         {
         };
+
         struct full
         {
         };
@@ -85,19 +86,19 @@ namespace xt
     template <std::ptrdiff_t N = 1, class E>
     auto rot90(E&& e, const std::array<std::ptrdiff_t, 2>& axes = {0, 1});
 
-    template<class E>
+    template <class E>
     auto roll(E&& e, std::ptrdiff_t shift);
 
-    template<class E>
+    template <class E>
     auto roll(E&& e, std::ptrdiff_t shift, std::ptrdiff_t axis);
 
-    template<class E>
+    template <class E>
     auto repeat(E&& e, std::size_t repeats, std::size_t axis);
 
-    template<class E>
+    template <class E>
     auto repeat(E&& e, const std::vector<std::size_t>& repeats, std::size_t axis);
 
-    template<class E>
+    template <class E>
     auto repeat(E&& e, std::vector<std::size_t>&& repeats, std::size_t axis);
 
     /****************************
@@ -169,7 +170,13 @@ namespace xt
                 new_layout = transpose_layout_noexcept(e.layout());
             }
 
-            return strided_view(std::forward<E>(e), std::move(temp_shape), std::move(temp_strides), get_offset<XTENSOR_DEFAULT_LAYOUT>(e), new_layout);
+            return strided_view(
+                std::forward<E>(e),
+                std::move(temp_shape),
+                std::move(temp_strides),
+                get_offset<XTENSOR_DEFAULT_LAYOUT>(e),
+                new_layout
+            );
         }
 
         template <class E, class S>
@@ -224,7 +231,13 @@ namespace xt
 
         layout_type new_layout = detail::transpose_layout_noexcept(e.layout());
 
-        return strided_view(std::forward<E>(e), std::move(shape), std::move(strides), detail::get_offset<XTENSOR_DEFAULT_TRAVERSAL>(e), new_layout);
+        return strided_view(
+            std::forward<E>(e),
+            std::move(shape),
+            std::move(strides),
+            detail::get_offset<XTENSOR_DEFAULT_TRAVERSAL>(e),
+            new_layout
+        );
     }
 
     /**
@@ -242,10 +255,11 @@ namespace xt
 
     /// @cond DOXYGEN_INCLUDE_SFINAE
     template <class E, class I, std::size_t N, class Tag = check_policy::none>
-    inline auto transpose(E&& e, const I(&permutation)[N], Tag check_policy = Tag())
+    inline auto transpose(E&& e, const I (&permutation)[N], Tag check_policy = Tag())
     {
         return detail::transpose_impl(std::forward<E>(e), permutation, check_policy);
     }
+
     /// @endcond
 
     /************************************
@@ -293,7 +307,7 @@ namespace xt
         auto adaptor = make_xiterator_adaptor(std::forward<E>(e), iterator_getter());
         constexpr layout_type layout = std::is_pointer<iterator>::value ? L : layout_type::dynamic;
         using type = xtensor_view<decltype(adaptor), 1, layout, extension::get_expression_tag_t<E>>;
-        return type(std::move(adaptor), { size });
+        return type(std::move(adaptor), {size});
     }
 
     /**
@@ -344,7 +358,8 @@ namespace xt
 
         std::ptrdiff_t begin = 0, end = static_cast<std::ptrdiff_t>(e.size());
 
-        auto find_fun = [](const auto& i) {
+        auto find_fun = [](const auto& i)
+        {
             return i != 0;
         };
 
@@ -358,7 +373,7 @@ namespace xt
             end -= std::find_if(e.crbegin(), e.crend(), find_fun) - e.crbegin();
         }
 
-        return strided_view(std::forward<E>(e), { range(begin, end) });
+        return strided_view(std::forward<E>(e), {range(begin, end)});
     }
 
     /**************************
@@ -377,11 +392,25 @@ namespace xt
     {
         dynamic_shape<std::size_t> new_shape;
         dynamic_shape<std::ptrdiff_t> new_strides;
-        std::copy_if(e.shape().cbegin(), e.shape().cend(), std::back_inserter(new_shape),
-                     [](std::size_t i) { return i != 1; });
+        std::copy_if(
+            e.shape().cbegin(),
+            e.shape().cend(),
+            std::back_inserter(new_shape),
+            [](std::size_t i)
+            {
+                return i != 1;
+            }
+        );
         decltype(auto) old_strides = detail::get_strides<XTENSOR_DEFAULT_LAYOUT>(e);
-        std::copy_if(old_strides.cbegin(), old_strides.cend(), std::back_inserter(new_strides),
-                     [](std::ptrdiff_t i) { return i != 0; });
+        std::copy_if(
+            old_strides.cbegin(),
+            old_strides.cend(),
+            std::back_inserter(new_strides),
+            [](std::ptrdiff_t i)
+            {
+                return i != 0;
+            }
+        );
 
         return strided_view(std::forward<E>(e), std::move(new_shape), std::move(new_strides), 0, e.layout());
     }
@@ -444,17 +473,22 @@ namespace xt
 
     /// @cond DOXYGEN_INCLUDE_SFINAE
     template <class E, class I, std::size_t N, class Tag = check_policy::none>
-    inline auto squeeze(E&& e, const I(&axis)[N], Tag check_policy = Tag())
+    inline auto squeeze(E&& e, const I (&axis)[N], Tag check_policy = Tag())
     {
         using arr_t = std::array<I, N>;
-        return detail::squeeze_impl(std::forward<E>(e), xtl::forward_sequence<arr_t, decltype(axis)>(axis), check_policy);
+        return detail::squeeze_impl(
+            std::forward<E>(e),
+            xtl::forward_sequence<arr_t, decltype(axis)>(axis),
+            check_policy
+        );
     }
 
     template <class E, class Tag = check_policy::none>
     inline auto squeeze(E&& e, std::size_t axis, Tag check_policy = Tag())
     {
-        return squeeze(std::forward<E>(e), std::array<std::size_t, 1>{ axis }, check_policy);
+        return squeeze(std::forward<E>(e), std::array<std::size_t, 1>{axis}, check_policy);
     }
+
     /// @endcond
 
     /******************************
@@ -633,7 +667,8 @@ namespace xt
     {
         using size_type = typename std::decay_t<E>::size_type;
         auto r = flip(e, 0);
-        for (size_type d = 1; d < e.dimension(); ++d) {
+        for (size_type d = 1; d < e.dimension(); ++d)
+        {
             r = flip(r, d);
         }
         return r;
@@ -664,7 +699,10 @@ namespace xt
         std::copy(old_strides.cbegin(), old_strides.cend(), strides.begin());
 
         strides[axis] *= -1;
-        std::size_t offset = static_cast<std::size_t>(static_cast<std::ptrdiff_t>(e.data_offset()) + old_strides[axis] * (static_cast<std::ptrdiff_t>(e.shape()[axis]) - 1));
+        std::size_t offset = static_cast<std::size_t>(
+            static_cast<std::ptrdiff_t>(e.data_offset())
+            + old_strides[axis] * (static_cast<std::ptrdiff_t>(e.shape()[axis]) - 1)
+        );
 
         return strided_view(std::forward<E>(e), std::move(shape), std::move(strides), offset);
     }
@@ -770,19 +808,23 @@ namespace xt
      *
      * @return a roll of the input expression
      */
-    template<class E>
+    template <class E>
     inline auto roll(E&& e, std::ptrdiff_t shift)
     {
         auto cpy = empty_like(e);
-        auto flat_size = std::accumulate(cpy.shape().begin(), cpy.shape().end(), 1L, std::multiplies<std::size_t>());
-        while(shift < 0)
+        auto flat_size = std::accumulate(
+            cpy.shape().begin(),
+            cpy.shape().end(),
+            1L,
+            std::multiplies<std::size_t>()
+        );
+        while (shift < 0)
         {
             shift += flat_size;
         }
 
         shift %= flat_size;
-        std::copy(e.begin(), e.end() - shift,
-                  std::copy(e.end() - shift, e.end(), cpy.begin()));
+        std::copy(e.begin(), e.end() - shift, std::copy(e.end() - shift, e.end(), cpy.begin()));
 
         return cpy;
     }
@@ -793,28 +835,33 @@ namespace xt
          * Algorithm adapted from pythran/pythonic/numpy/roll.hpp
          */
 
-        template < class To, class From, class S>
+        template <class To, class From, class S>
         To roll(To to, From from, std::ptrdiff_t shift, std::size_t axis, S const& shape, std::size_t M)
         {
             std::ptrdiff_t dim = std::ptrdiff_t(shape[M]);
-            std::ptrdiff_t offset = std::accumulate(shape.begin() + M + 1, shape.end(), std::ptrdiff_t(1), std::multiplies<std::ptrdiff_t>());
-            if(shape.size() == M + 1)
+            std::ptrdiff_t offset = std::accumulate(
+                shape.begin() + M + 1,
+                shape.end(),
+                std::ptrdiff_t(1),
+                std::multiplies<std::ptrdiff_t>()
+            );
+            if (shape.size() == M + 1)
             {
                 if (axis == M)
                 {
                     const auto split = from + (dim - shift) * offset;
-                    for(auto iter = split, end = from + dim * offset; iter != end; iter += offset, ++to)
+                    for (auto iter = split, end = from + dim * offset; iter != end; iter += offset, ++to)
                     {
                         *to = *iter;
                     }
-                    for(auto iter = from, end = split; iter != end; iter += offset, ++to)
+                    for (auto iter = from, end = split; iter != end; iter += offset, ++to)
                     {
                         *to = *iter;
                     }
                 }
                 else
                 {
-                    for(auto iter = from, end = from + dim * offset; iter != end; iter += offset, ++to)
+                    for (auto iter = from, end = from + dim * offset; iter != end; iter += offset, ++to)
                     {
                         *to = *iter;
                     }
@@ -825,11 +872,11 @@ namespace xt
                 if (axis == M)
                 {
                     const auto split = from + (dim - shift) * offset;
-                    for(auto iter = split, end = from + dim * offset; iter != end; iter += offset)
+                    for (auto iter = split, end = from + dim * offset; iter != end; iter += offset)
                     {
                         to = roll(to, iter, shift, axis, shape, M + 1);
                     }
-                    for(auto iter = from, end = split; iter != end; iter += offset)
+                    for (auto iter = from, end = split; iter != end; iter += offset)
                     {
                         to = roll(to, iter, shift, axis, shape, M + 1);
                     }
@@ -857,24 +904,24 @@ namespace xt
      *
      * @return a roll of the input expression
      */
-    template<class E>
+    template <class E>
     inline auto roll(E&& e, std::ptrdiff_t shift, std::ptrdiff_t axis)
     {
         auto cpy = empty_like(e);
         auto const& shape = cpy.shape();
         std::size_t saxis = static_cast<std::size_t>(axis);
-        if(axis < 0)
+        if (axis < 0)
         {
             axis += std::ptrdiff_t(cpy.dimension());
         }
 
-        if(saxis >= cpy.dimension() || axis < 0)
+        if (saxis >= cpy.dimension() || axis < 0)
         {
             XTENSOR_THROW(std::runtime_error, "axis is no within shape dimension.");
         }
 
         const auto axis_dim = static_cast<std::ptrdiff_t>(shape[saxis]);
-        while(shift < 0)
+        while (shift < 0)
         {
             shift += axis_dim;
         }
@@ -888,7 +935,7 @@ namespace xt
      ****************************/
     namespace detail
     {
-        template<class E, class R>
+        template <class E, class R>
         inline auto make_xrepeat(E&& e, R&& r, typename std::decay_t<E>::size_type axis)
         {
             const auto casted_axis = static_cast<typename std::decay_t<E>::size_type>(axis);

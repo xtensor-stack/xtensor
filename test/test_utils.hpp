@@ -25,9 +25,8 @@ namespace xt
             {
                 return (std::numeric_limits<T>::max)();
             }
-            if ((lhs == static_cast<T>(0)) ||
-                (rhs > static_cast<T>(1) &&
-                    lhs < rhs * (std::numeric_limits<T>::min)()))
+            if ((lhs == static_cast<T>(0))
+                || (rhs > static_cast<T>(1) && lhs < rhs * (std::numeric_limits<T>::min)()))
             {
                 return static_cast<T>(0);
             }
@@ -85,7 +84,8 @@ namespace xt
     template <class E1, class E2>
     bool tensor_near(const E1& e1, const E2& e2)
     {
-        bool res = e1.dimension() == e2.dimension() && std::equal(e1.shape().begin(), e1.shape().end(), e2.shape().begin());
+        bool res = e1.dimension() == e2.dimension()
+                   && std::equal(e1.shape().begin(), e1.shape().end(), e2.shape().begin());
         auto iter1 = e1.begin();
         auto iter2 = e2.begin();
         auto iter_end = e1.end();

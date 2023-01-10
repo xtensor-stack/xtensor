@@ -1,29 +1,29 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #if defined(__GNUC__) && (__GNUC__ == 7) && (__cplusplus == 201703L)
 #warning "test_xdatesupport.cpp has been deactivated because it leads to internal compiler error"
 #else
 
-#include "test_common_macros.hpp"
-
 #include <chrono>
 
 #include "xtensor/xarray.hpp"
-#include "xtensor/xmath.hpp"
-#include "xtensor/xio.hpp"
 #include "xtensor/xfixed.hpp"
+#include "xtensor/xio.hpp"
+#include "xtensor/xmath.hpp"
 #include "xtensor/xtensor.hpp"
+
+#include "test_common_macros.hpp"
 
 namespace xt
 {
-    using days            = std::chrono::duration<long long, std::ratio<3600 * 24>>;
+    using days = std::chrono::duration<long long, std::ratio<3600 * 24>>;
     using days_time_point = std::chrono::time_point<std::chrono::system_clock, days>;
     using tp = std::chrono::system_clock::time_point;
 
@@ -39,12 +39,11 @@ namespace xt
     TEST(xdate, xarray_of_dates)
     {
         xt::xarray<days_time_point> dates(
-            {
-                days_time_point{days{300}},
-                days_time_point{days{400}},
-                days_time_point{days{600}},
-                days_time_point{days{10000}}
-            });
+            {days_time_point{days{300}},
+             days_time_point{days{400}},
+             days_time_point{days{600}},
+             days_time_point{days{10000}}}
+        );
 
         xt::xarray<days> durations({days{300}, days{400}, days{600}, days{10000}});
 
@@ -60,18 +59,21 @@ namespace xt
 #ifndef _MSC_VER
     TEST(xdate, date_arange)
     {
-        xarray<tp> tarr = xt::arange<tp>(std::chrono::system_clock::now(),
-                                         std::chrono::system_clock::now() + std::chrono::hours(15),
-                                         std::chrono::hours(1));
+        xarray<tp> tarr = xt::arange<tp>(
+            std::chrono::system_clock::now(),
+            std::chrono::system_clock::now() + std::chrono::hours(15),
+            std::chrono::hours(1)
+        );
         EXPECT_TRUE(tarr.storage().back() > tarr.storage().front());
     }
 #endif
 
     TEST(xdate, xfunction)
     {
-        xarray<tp> tarr = { std::chrono::system_clock::now(),
-                            std::chrono::system_clock::now(),
-                            std::chrono::system_clock::now() };
+        xarray<tp> tarr = {
+            std::chrono::system_clock::now(),
+            std::chrono::system_clock::now(),
+            std::chrono::system_clock::now()};
 
         auto hours = std::chrono::hours(15);
 
@@ -89,4 +91,4 @@ namespace xt
     }
 }
 
-#endif // defined(__GNUC__) && (__GNUC__ == 7) && (__cplusplus == 201703L)
+#endif  // defined(__GNUC__) && (__GNUC__ == 7) && (__cplusplus == 201703L)

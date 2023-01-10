@@ -1,11 +1,11 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_SCALAR_HPP
 #define XTENSOR_SCALAR_HPP
@@ -171,10 +171,10 @@ namespace xt
 
         using accessible_base::at;
         using accessible_base::operator[];
-        using accessible_base::periodic;
-        using accessible_base::in_bounds;
-        using accessible_base::front;
         using accessible_base::back;
+        using accessible_base::front;
+        using accessible_base::in_bounds;
+        using accessible_base::periodic;
 
         template <class It>
         reference element(It, It) noexcept;
@@ -288,10 +288,8 @@ namespace xt
 
         template <class align, class simd = simd_value_type>
         void store_simd(size_type i, const simd& e);
-        template <class align, class requested_type = value_type,
-                  std::size_t N = xt_simd::simd_traits<requested_type>::size>
-        xt_simd::simd_return_type<value_type, requested_type>
-        load_simd(size_type i) const;
+        template <class align, class requested_type = value_type, std::size_t N = xt_simd::simd_traits<requested_type>::size>
+        xt_simd::simd_return_type<value_type, requested_type> load_simd(size_type i) const;
 
     private:
 
@@ -355,17 +353,12 @@ namespace xt
     public:
 
         using self_type = xscalar_stepper<is_const, CT>;
-        using storage_type = std::conditional_t<is_const,
-                                                const xscalar<CT>,
-                                                xscalar<CT>>;
+        using storage_type = std::conditional_t<is_const, const xscalar<CT>, xscalar<CT>>;
 
         using value_type = typename storage_type::value_type;
-        using reference = std::conditional_t<is_const,
-                                             typename storage_type::const_reference,
-                                             typename storage_type::reference>;
-        using pointer = std::conditional_t<is_const,
-                                           typename storage_type::const_pointer,
-                                           typename storage_type::pointer>;
+        using reference = std::
+            conditional_t<is_const, typename storage_type::const_reference, typename storage_type::reference>;
+        using pointer = std::conditional_t<is_const, typename storage_type::const_pointer, typename storage_type::pointer>;
         using size_type = typename storage_type::size_type;
         using difference_type = typename storage_type::difference_type;
         using shape_type = typename storage_type::shape_type;
@@ -402,30 +395,26 @@ namespace xt
     namespace detail
     {
         template <bool is_const, class CT>
-        using dummy_reference_t = std::conditional_t<is_const,
-                                                     typename xscalar<CT>::const_reference,
-                                                     typename xscalar<CT>::reference>;
+        using dummy_reference_t = std::
+            conditional_t<is_const, typename xscalar<CT>::const_reference, typename xscalar<CT>::reference>;
 
         template <bool is_const, class CT>
-        using dummy_pointer_t = std::conditional_t<is_const,
-                                                   typename xscalar<CT>::const_pointer,
-                                                   typename xscalar<CT>::pointer>;
+        using dummy_pointer_t = std::
+            conditional_t<is_const, typename xscalar<CT>::const_pointer, typename xscalar<CT>::pointer>;
     }
 
     template <bool is_const, class CT>
-    class xdummy_iterator
-        : public xtl::xrandom_access_iterator_base<xdummy_iterator<is_const, CT>,
-                                                   typename xscalar<CT>::value_type,
-                                                   typename xscalar<CT>::difference_type,
-                                                   detail::dummy_pointer_t<is_const, CT>,
-                                                   detail::dummy_reference_t<is_const, CT>>
+    class xdummy_iterator : public xtl::xrandom_access_iterator_base<
+                                xdummy_iterator<is_const, CT>,
+                                typename xscalar<CT>::value_type,
+                                typename xscalar<CT>::difference_type,
+                                detail::dummy_pointer_t<is_const, CT>,
+                                detail::dummy_reference_t<is_const, CT>>
     {
     public:
 
         using self_type = xdummy_iterator<is_const, CT>;
-        using storage_type = std::conditional_t<is_const,
-                                                const xscalar<CT>,
-                                                xscalar<CT>>;
+        using storage_type = std::conditional_t<is_const, const xscalar<CT>, xscalar<CT>>;
 
         using value_type = typename storage_type::value_type;
         using reference = detail::dummy_reference_t<is_const, CT>;
@@ -454,12 +443,11 @@ namespace xt
     };
 
     template <bool is_const, class CT>
-    bool operator==(const xdummy_iterator<is_const, CT>& lhs,
-                    const xdummy_iterator<is_const, CT>& rhs) noexcept;
+    bool
+    operator==(const xdummy_iterator<is_const, CT>& lhs, const xdummy_iterator<is_const, CT>& rhs) noexcept;
 
     template <bool is_const, class CT>
-    bool operator<(const xdummy_iterator<is_const, CT>& lhs,
-                   const xdummy_iterator<is_const, CT>& rhs) noexcept;
+    bool operator<(const xdummy_iterator<is_const, CT>& lhs, const xdummy_iterator<is_const, CT>& rhs) noexcept;
 
     template <class T>
     struct is_not_xdummy_iterator : std::true_type
@@ -714,8 +702,8 @@ namespace xt
     }
 
     /*****************************
-    * Broadcasting iterator api *
-    *****************************/
+     * Broadcasting iterator api *
+     *****************************/
 
     template <class CT>
     template <class S, layout_type L>
@@ -1093,15 +1081,15 @@ namespace xt
     }
 
     template <bool is_const, class CT>
-    inline bool operator==(const xdummy_iterator<is_const, CT>& lhs,
-                           const xdummy_iterator<is_const, CT>& rhs) noexcept
+    inline bool
+    operator==(const xdummy_iterator<is_const, CT>& lhs, const xdummy_iterator<is_const, CT>& rhs) noexcept
     {
         return lhs.equal(rhs);
     }
 
     template <bool is_const, class CT>
-    inline bool operator<(const xdummy_iterator<is_const, CT>& lhs,
-                          const xdummy_iterator<is_const, CT>& rhs) noexcept
+    inline bool
+    operator<(const xdummy_iterator<is_const, CT>& lhs, const xdummy_iterator<is_const, CT>& rhs) noexcept
     {
         return lhs.less_than(rhs);
     }

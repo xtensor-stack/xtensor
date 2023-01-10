@@ -1,10 +1,10 @@
 /***************************************************************************
-* Copyright (c) 2016, Johan Mabille, Sylvain Corlay and Wolf Vollprecht    *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) 2016, Johan Mabille, Sylvain Corlay and Wolf Vollprecht    *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #include <chrono>
 #include <cstddef>
@@ -47,9 +47,9 @@ namespace xt
         template <class V>
         inline void init_xtensor_benchmark(V& lhs, V& rhs, V& res, std::size_t size0, size_t size1)
         {
-            lhs.resize({ size0, size1 });
-            rhs.resize({ size0, size1 });
-            res.resize({ size0, size1 });
+            lhs.resize({size0, size1});
+            rhs.resize({size0, size1});
+            res.resize({size0, size1});
             init_benchmark_data(lhs, rhs, size0, size1);
         }
 
@@ -152,31 +152,56 @@ namespace xt
          * Benchmark functors *
          **********************/
 
-#define DEFINE_OP_FUNCTOR_2OP(OP, NAME)\
-    struct NAME##_fn {\
-        template <class T>\
-        inline auto operator()(const T& lhs, const T& rhs) const { return lhs OP rhs; }\
-        inline static std::string name() { return #NAME; }\
+#define DEFINE_OP_FUNCTOR_2OP(OP, NAME)                          \
+    struct NAME##_fn                                             \
+    {                                                            \
+        template <class T>                                       \
+        inline auto operator()(const T& lhs, const T& rhs) const \
+        {                                                        \
+            return lhs OP rhs;                                   \
+        }                                                        \
+        inline static std::string name()                         \
+        {                                                        \
+            return #NAME;                                        \
+        }                                                        \
     }
 
-#define DEFINE_FUNCTOR_1OP(FN)\
-    struct FN##_fn {\
-        template <class T>\
-        inline auto operator()(const T& x) const { using std::FN; using xt::FN; return FN(x); }\
-        inline static std::string name() { return #FN; }\
+#define DEFINE_FUNCTOR_1OP(FN)                   \
+    struct FN##_fn                               \
+    {                                            \
+        template <class T>                       \
+        inline auto operator()(const T& x) const \
+        {                                        \
+            using std::FN;                       \
+            using xt::FN;                        \
+            return FN(x);                        \
+        }                                        \
+        inline static std::string name()         \
+        {                                        \
+            return #FN;                          \
+        }                                        \
     }
 
-#define DEFINE_FUNCTOR_2OP(FN)\
-    struct FN##_fn{\
-        template <class T>\
-        inline auto operator()(const T&lhs, const T& rhs) const { using std::FN; using xt::FN; return FN(lhs, rhs); }\
-        inline static std::string name() { return #FN; }\
+#define DEFINE_FUNCTOR_2OP(FN)                                   \
+    struct FN##_fn                                               \
+    {                                                            \
+        template <class T>                                       \
+        inline auto operator()(const T& lhs, const T& rhs) const \
+        {                                                        \
+            using std::FN;                                       \
+            using xt::FN;                                        \
+            return FN(lhs, rhs);                                 \
+        }                                                        \
+        inline static std::string name()                         \
+        {                                                        \
+            return #FN;                                          \
+        }                                                        \
     }
 
         DEFINE_OP_FUNCTOR_2OP(+, add);
         DEFINE_OP_FUNCTOR_2OP(-, sub);
         DEFINE_OP_FUNCTOR_2OP(*, mul);
-        DEFINE_OP_FUNCTOR_2OP(/ , div);
+        DEFINE_OP_FUNCTOR_2OP(/, div);
 
         DEFINE_FUNCTOR_1OP(exp);
         DEFINE_FUNCTOR_1OP(exp2);
@@ -334,7 +359,8 @@ namespace xt
 
         a.resize({sz, sz});
         b.resize({sz, sz});
-        xtensor<bool, 2> res; res.resize({sz, sz});
+        xtensor<bool, 2> res;
+        res.resize({sz, sz});
 
         for (auto _ : state)
         {
@@ -351,7 +377,8 @@ namespace xt
 
         a.resize({sz, sz});
         b.resize({sz, sz});
-        xtensor<bool, 2> res; res.resize({sz, sz});
+        xtensor<bool, 2> res;
+        res.resize({sz, sz});
 
         for (auto _ : state)
         {

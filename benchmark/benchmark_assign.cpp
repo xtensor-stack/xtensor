@@ -1,19 +1,19 @@
 /***************************************************************************
-* Copyright (c) 2016, Johan Mabille, Sylvain Corlay and Wolf Vollprecht    *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) 2016, Johan Mabille, Sylvain Corlay and Wolf Vollprecht    *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef BENCHMARK_ASSIGN_HPP
 #define BENCHMARK_ASSIGN_HPP
 
 #include <benchmark/benchmark.h>
 
+#include "xtensor/xarray.hpp"
 #include "xtensor/xnoalias.hpp"
 #include "xtensor/xtensor.hpp"
-#include "xtensor/xarray.hpp"
 
 namespace xt
 {
@@ -39,24 +39,22 @@ namespace xt
         }
 
         template <class V>
-        inline void init_xtensor_benchmark(V& lhs, V& rhs, V& res,
-                                           std::size_t size0, size_t size1)
+        inline void init_xtensor_benchmark(V& lhs, V& rhs, V& res, std::size_t size0, size_t size1)
         {
-            lhs.resize({ size0, size1 });
-            rhs.resize({ size0, size1 });
-            res.resize({ size0, size1 });
+            lhs.resize({size0, size1});
+            rhs.resize({size0, size1});
+            res.resize({size0, size1});
             init_benchmark_data(lhs, rhs, size0, size1);
         }
 
         template <class V>
-        inline void init_dl_xtensor_benchmark(V& lhs, V& rhs, V& res,
-                                              std::size_t size0, size_t size1)
+        inline void init_dl_xtensor_benchmark(V& lhs, V& rhs, V& res, std::size_t size0, size_t size1)
         {
             using strides_type = typename V::strides_type;
-            strides_type str = { size1, 1 };
-            lhs.resize({ size0, size1 }, str);
-            rhs.resize({ size0, size1 }, str);
-            res.resize({ size0, size1 }, str);
+            strides_type str = {size1, 1};
+            lhs.resize({size0, size1}, str);
+            rhs.resize({size0, size1}, str);
+            res.resize({size0, size1}, str);
             init_benchmark_data(lhs, rhs, size0, size1);
         }
 
@@ -210,20 +208,19 @@ namespace xt
             }
         }
 
-
-        BENCHMARK_TEMPLATE(assign_c_assign, xt::xtensor<double, 2>)->Range(32, 32<<3);
-        BENCHMARK_TEMPLATE(assign_x_assign, xt::xtensor<double, 2>)->Range(32, 32<<3);
-        BENCHMARK_TEMPLATE(assign_xiter_copy, xt::xtensor<double, 2>)->Range(32, 32<<3);
-        BENCHMARK_TEMPLATE(assign_xstorageiter_copy, xt::xtensor<double, 2>)->Range(32, 32<<3);
-        BENCHMARK_TEMPLATE(assign_c_assign_ii, xt::xtensor<double, 2>)->Range(32, 32<<3);
-        BENCHMARK_TEMPLATE(assign_x_assign_ii, xt::xtensor<double, 2>)->Range(32, 32<<3);
-        BENCHMARK_TEMPLATE(assign_x_assign_iii, xt::xtensor<double, 2>)->Range(32, 32<<3);
-        BENCHMARK_TEMPLATE(assign_c_assign_iii, xt::xtensor<double, 2>)->Range(32, 32<<3);
-        BENCHMARK_TEMPLATE(assign_x_assign, xt::xarray<double>)->Range(32, 32<<3);
-        BENCHMARK_TEMPLATE(assign_x_assign, xt::xarray<double, layout_type::dynamic>)->Range(32, 32<<3);
-        BENCHMARK_TEMPLATE(assign_x_assign, xt::xtensor<double, 2, layout_type::dynamic>)->Range(32, 32<<3);
-        BENCHMARK_TEMPLATE(assign_c_scalar_computed, xt::xtensor<double, 2>)->Range(32, 32<<3);
-        BENCHMARK_TEMPLATE(assign_x_scalar_computed, xt::xtensor<double, 2>)->Range(32, 32<<3);
+        BENCHMARK_TEMPLATE(assign_c_assign, xt::xtensor<double, 2>)->Range(32, 32 << 3);
+        BENCHMARK_TEMPLATE(assign_x_assign, xt::xtensor<double, 2>)->Range(32, 32 << 3);
+        BENCHMARK_TEMPLATE(assign_xiter_copy, xt::xtensor<double, 2>)->Range(32, 32 << 3);
+        BENCHMARK_TEMPLATE(assign_xstorageiter_copy, xt::xtensor<double, 2>)->Range(32, 32 << 3);
+        BENCHMARK_TEMPLATE(assign_c_assign_ii, xt::xtensor<double, 2>)->Range(32, 32 << 3);
+        BENCHMARK_TEMPLATE(assign_x_assign_ii, xt::xtensor<double, 2>)->Range(32, 32 << 3);
+        BENCHMARK_TEMPLATE(assign_x_assign_iii, xt::xtensor<double, 2>)->Range(32, 32 << 3);
+        BENCHMARK_TEMPLATE(assign_c_assign_iii, xt::xtensor<double, 2>)->Range(32, 32 << 3);
+        BENCHMARK_TEMPLATE(assign_x_assign, xt::xarray<double>)->Range(32, 32 << 3);
+        BENCHMARK_TEMPLATE(assign_x_assign, xt::xarray<double, layout_type::dynamic>)->Range(32, 32 << 3);
+        BENCHMARK_TEMPLATE(assign_x_assign, xt::xtensor<double, 2, layout_type::dynamic>)->Range(32, 32 << 3);
+        BENCHMARK_TEMPLATE(assign_c_scalar_computed, xt::xtensor<double, 2>)->Range(32, 32 << 3);
+        BENCHMARK_TEMPLATE(assign_x_scalar_computed, xt::xtensor<double, 2>)->Range(32, 32 << 3);
     }
 }
 

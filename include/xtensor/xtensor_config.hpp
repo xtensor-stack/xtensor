@@ -1,11 +1,11 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_CONFIG_HPP
 #define XTENSOR_CONFIG_HPP
@@ -24,10 +24,10 @@
 // Exception support.
 #if defined(XTENSOR_DISABLE_EXCEPTIONS)
 #include <iostream>
-#define XTENSOR_THROW(_, msg)            \
-    {                                    \
-      std::cerr << msg << std::endl;     \
-      std::abort();                      \
+#define XTENSOR_THROW(_, msg)          \
+    {                                  \
+        std::cerr << msg << std::endl; \
+        std::abort();                  \
     }
 #else
 #define XTENSOR_THROW(exception, msg) throw exception(msg)
@@ -35,17 +35,17 @@
 
 // Workaround for some missing constexpr functionality in MSVC 2015 and MSVC 2017 x86
 #if defined(_MSC_VER)
-    #define XTENSOR_CONSTEXPR_ENHANCED const
-    // The following must not be defined to const, otherwise
-    // it prevents generation of copy operators of classes
-    // containing XTENSOR_CONSTEXPR_ENHANCED_STATIC members
-    #define XTENSOR_CONSTEXPR_ENHANCED_STATIC
-    #define XTENSOR_CONSTEXPR_RETURN inline
+#define XTENSOR_CONSTEXPR_ENHANCED const
+// The following must not be defined to const, otherwise
+// it prevents generation of copy operators of classes
+// containing XTENSOR_CONSTEXPR_ENHANCED_STATIC members
+#define XTENSOR_CONSTEXPR_ENHANCED_STATIC
+#define XTENSOR_CONSTEXPR_RETURN inline
 #else
-    #define XTENSOR_CONSTEXPR_ENHANCED constexpr
-    #define XTENSOR_CONSTEXPR_RETURN constexpr
-    #define XTENSOR_CONSTEXPR_ENHANCED_STATIC constexpr static
-    #define XTENSOR_HAS_CONSTEXPR_ENHANCED
+#define XTENSOR_CONSTEXPR_ENHANCED constexpr
+#define XTENSOR_CONSTEXPR_RETURN constexpr
+#define XTENSOR_CONSTEXPR_ENHANCED_STATIC constexpr static
+#define XTENSOR_HAS_CONSTEXPR_ENHANCED
 #endif
 
 #ifndef XTENSOR_DEFAULT_DATA_CONTAINER
@@ -58,42 +58,40 @@
 #endif
 
 #ifdef XTENSOR_USE_XSIMD
-    #include <xsimd/xsimd.hpp>
-    #define XSIMD_DEFAULT_ALIGNMENT xsimd::default_arch::alignment()
+#include <xsimd/xsimd.hpp>
+#define XSIMD_DEFAULT_ALIGNMENT xsimd::default_arch::alignment()
 #endif
 
 
 #ifndef XTENSOR_DEFAULT_ALLOCATOR
 #ifdef XTENSOR_ALLOC_TRACKING
-    #ifndef XTENSOR_ALLOC_TRACKING_POLICY
-        #define XTENSOR_ALLOC_TRACKING_POLICY xt::alloc_tracking::policy::print
-    #endif
-    #ifdef XTENSOR_USE_XSIMD
-        #include <xsimd/xsimd.hpp>
-        #define XTENSOR_DEFAULT_ALLOCATOR(T) \
-            xt::tracking_allocator<T, xsimd::aligned_allocator<T, XSIMD_DEFAULT_ALIGNMENT>, XTENSOR_ALLOC_TRACKING_POLICY>
-    #else
-        #define XTENSOR_DEFAULT_ALLOCATOR(T) \
-            xt::tracking_allocator<T, std::allocator<T>, XTENSOR_ALLOC_TRACKING_POLICY>
-    #endif
+#ifndef XTENSOR_ALLOC_TRACKING_POLICY
+#define XTENSOR_ALLOC_TRACKING_POLICY xt::alloc_tracking::policy::print
+#endif
+#ifdef XTENSOR_USE_XSIMD
+#include <xsimd/xsimd.hpp>
+#define XTENSOR_DEFAULT_ALLOCATOR(T) \
+    xt::tracking_allocator<T, xsimd::aligned_allocator<T, XSIMD_DEFAULT_ALIGNMENT>, XTENSOR_ALLOC_TRACKING_POLICY>
 #else
-    #ifdef XTENSOR_USE_XSIMD
+#define XTENSOR_DEFAULT_ALLOCATOR(T) \
+    xt::tracking_allocator<T, std::allocator<T>, XTENSOR_ALLOC_TRACKING_POLICY>
+#endif
+#else
+#ifdef XTENSOR_USE_XSIMD
 
-        #define XTENSOR_DEFAULT_ALLOCATOR(T) \
-            xsimd::aligned_allocator<T, XSIMD_DEFAULT_ALIGNMENT>
-    #else
-        #define XTENSOR_DEFAULT_ALLOCATOR(T) \
-            std::allocator<T>
-    #endif
+#define XTENSOR_DEFAULT_ALLOCATOR(T) xsimd::aligned_allocator<T, XSIMD_DEFAULT_ALIGNMENT>
+#else
+#define XTENSOR_DEFAULT_ALLOCATOR(T) std::allocator<T>
+#endif
 #endif
 #endif
 
 #ifndef XTENSOR_DEFAULT_ALIGNMENT
-    #ifdef XTENSOR_USE_XSIMD
-        #define XTENSOR_DEFAULT_ALIGNMENT XSIMD_DEFAULT_ALIGNMENT
-    #else
-        #define XTENSOR_DEFAULT_ALIGNMENT 0
-    #endif
+#ifdef XTENSOR_USE_XSIMD
+#define XTENSOR_DEFAULT_ALIGNMENT XSIMD_DEFAULT_ALIGNMENT
+#else
+#define XTENSOR_DEFAULT_ALIGNMENT 0
+#endif
 #endif
 
 #ifndef XTENSOR_DEFAULT_LAYOUT

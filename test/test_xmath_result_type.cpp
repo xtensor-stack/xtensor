@@ -1,11 +1,11 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #include <complex>
 
@@ -27,8 +27,8 @@
 #pragma GCC diagnostic pop
 #elif defined(_WIN32)
 #pragma warning(push)
-#pragma warning(disable: 4244)
-#pragma warning(disable: 4267)
+#pragma warning(disable : 4244)
+#pragma warning(disable : 4267)
 #include "xtensor/xarray.hpp"
 #include "xtensor/xmath.hpp"
 #include "xtensor/xrandom.hpp"
@@ -56,64 +56,61 @@ namespace xt
         EXPECT_TRUE((std::is_same<result_type, EXPECTED_TYPE>::value));              \
     }
 
-template <class T1, class T2>
-using promote_t = xtl::promote_type_t<T1, T2>;
+    template <class T1, class T2>
+    using promote_t = xtl::promote_type_t<T1, T2>;
 
-template <class T, class E>
-void check_promoted_types(E&& e)
-{
-    using result_type = typename std::decay_t<decltype(e)>::value_type;
-    EXPECT_TRUE((std::is_same<result_type, promote_t<T, result_type>>::value));
-}
+    template <class T, class E>
+    void check_promoted_types(E&& e)
+    {
+        using result_type = typename std::decay_t<decltype(e)>::value_type;
+        EXPECT_TRUE((std::is_same<result_type, promote_t<T, result_type>>::value));
+    }
 
-#define ARRAY_TYPE(VALUE_TYPE)  \
-    std::array<VALUE_TYPE, 2>
+#define ARRAY_TYPE(VALUE_TYPE) std::array<VALUE_TYPE, 2>
 
-#define CHECK_TEMPLATED_RESULT_TYPE(FUNC, INPUT)                                   \
-        check_promoted_types<unsigned char>(FUNC<unsigned char>(INPUT));           \
-        check_promoted_types<signed char>(FUNC<signed char>(INPUT));               \
-        check_promoted_types<char>(FUNC<char>(INPUT));                             \
-        check_promoted_types<unsigned short>(FUNC<unsigned short>(INPUT));         \
-        check_promoted_types<signed short>(FUNC<signed short>(INPUT));             \
-        check_promoted_types<short>(FUNC<short>(INPUT));                           \
-        check_promoted_types<unsigned int>(FUNC<unsigned int>(INPUT));             \
-        check_promoted_types<signed int>(FUNC<signed int>(INPUT));                 \
-        check_promoted_types<int>(FUNC<int>(INPUT));                               \
-        check_promoted_types<unsigned long long>(FUNC<unsigned long long>(INPUT)); \
-        check_promoted_types<long long>(FUNC<signed long long>(INPUT));            \
-        check_promoted_types<long long>(FUNC<long long>(INPUT));                   \
-        check_promoted_types<float>(FUNC<float>(INPUT));                           \
-        check_promoted_types<double>(FUNC<double>(INPUT));
+#define CHECK_TEMPLATED_RESULT_TYPE(FUNC, INPUT)                               \
+    check_promoted_types<unsigned char>(FUNC<unsigned char>(INPUT));           \
+    check_promoted_types<signed char>(FUNC<signed char>(INPUT));               \
+    check_promoted_types<char>(FUNC<char>(INPUT));                             \
+    check_promoted_types<unsigned short>(FUNC<unsigned short>(INPUT));         \
+    check_promoted_types<signed short>(FUNC<signed short>(INPUT));             \
+    check_promoted_types<short>(FUNC<short>(INPUT));                           \
+    check_promoted_types<unsigned int>(FUNC<unsigned int>(INPUT));             \
+    check_promoted_types<signed int>(FUNC<signed int>(INPUT));                 \
+    check_promoted_types<int>(FUNC<int>(INPUT));                               \
+    check_promoted_types<unsigned long long>(FUNC<unsigned long long>(INPUT)); \
+    check_promoted_types<long long>(FUNC<signed long long>(INPUT));            \
+    check_promoted_types<long long>(FUNC<long long>(INPUT));                   \
+    check_promoted_types<float>(FUNC<float>(INPUT));                           \
+    check_promoted_types<double>(FUNC<double>(INPUT));
 
-#define CHECK_STDDEV_TEMPLATED_RESULT_TYPE(FUNC, INPUT)                            \
-        {                                                                          \
-        using result_type = typename std::decay_t<decltype(INPUT)>::value_type;    \
-        using promo_type = std::conditional_t<std::is_integral<result_type>::value,\
-                                              double,                              \
-                                              float>;                              \
-                                                                                   \
-        check_promoted_types<promo_type>(FUNC<unsigned char>(INPUT));              \
-        check_promoted_types<promo_type>(FUNC<signed char>(INPUT));                \
-        check_promoted_types<promo_type>(FUNC<char>(INPUT));                       \
-        check_promoted_types<promo_type>(FUNC<unsigned short>(INPUT));             \
-        check_promoted_types<promo_type>(FUNC<signed short>(INPUT));               \
-        check_promoted_types<promo_type>(FUNC<short>(INPUT));                      \
-        check_promoted_types<promo_type>(FUNC<unsigned int>(INPUT));               \
-        check_promoted_types<promo_type>(FUNC<signed int>(INPUT));                 \
-        check_promoted_types<promo_type>(FUNC<int>(INPUT));                        \
-        check_promoted_types<promo_type>(FUNC<unsigned long long>(INPUT));         \
-        check_promoted_types<promo_type>(FUNC<signed long long>(INPUT));           \
-        check_promoted_types<promo_type>(FUNC<long long>(INPUT));                  \
-        check_promoted_types<float>(FUNC<float>(INPUT));                           \
-        check_promoted_types<double>(FUNC<double>(INPUT));                         \
-        }
+#define CHECK_STDDEV_TEMPLATED_RESULT_TYPE(FUNC, INPUT)                                             \
+    {                                                                                               \
+        using result_type = typename std::decay_t<decltype(INPUT)>::value_type;                     \
+        using promo_type = std::conditional_t<std::is_integral<result_type>::value, double, float>; \
+                                                                                                    \
+        check_promoted_types<promo_type>(FUNC<unsigned char>(INPUT));                               \
+        check_promoted_types<promo_type>(FUNC<signed char>(INPUT));                                 \
+        check_promoted_types<promo_type>(FUNC<char>(INPUT));                                        \
+        check_promoted_types<promo_type>(FUNC<unsigned short>(INPUT));                              \
+        check_promoted_types<promo_type>(FUNC<signed short>(INPUT));                                \
+        check_promoted_types<promo_type>(FUNC<short>(INPUT));                                       \
+        check_promoted_types<promo_type>(FUNC<unsigned int>(INPUT));                                \
+        check_promoted_types<promo_type>(FUNC<signed int>(INPUT));                                  \
+        check_promoted_types<promo_type>(FUNC<int>(INPUT));                                         \
+        check_promoted_types<promo_type>(FUNC<unsigned long long>(INPUT));                          \
+        check_promoted_types<promo_type>(FUNC<signed long long>(INPUT));                            \
+        check_promoted_types<promo_type>(FUNC<long long>(INPUT));                                   \
+        check_promoted_types<float>(FUNC<float>(INPUT));                                            \
+        check_promoted_types<double>(FUNC<double>(INPUT));                                          \
+    }
 
-#define CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(INPUT)        \
-        CHECK_TEMPLATED_RESULT_TYPE(sum, INPUT)           \
-        CHECK_TEMPLATED_RESULT_TYPE(mean, INPUT)          \
-        CHECK_TEMPLATED_RESULT_TYPE(prod, INPUT)          \
-        CHECK_TEMPLATED_RESULT_TYPE(variance, INPUT)      \
-        CHECK_STDDEV_TEMPLATED_RESULT_TYPE(stddev, INPUT)
+#define CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(INPUT) \
+    CHECK_TEMPLATED_RESULT_TYPE(sum, INPUT)        \
+    CHECK_TEMPLATED_RESULT_TYPE(mean, INPUT)       \
+    CHECK_TEMPLATED_RESULT_TYPE(prod, INPUT)       \
+    CHECK_TEMPLATED_RESULT_TYPE(variance, INPUT)   \
+    CHECK_STDDEV_TEMPLATED_RESULT_TYPE(stddev, INPUT)
 
     TEST(xmath, uchar_result_type)
     {

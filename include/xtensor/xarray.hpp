@@ -1,11 +1,11 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_ARRAY_HPP
 #define XTENSOR_ARRAY_HPP
@@ -279,7 +279,8 @@ namespace xt
      */
     template <class EC, layout_type L, class SC, class Tag>
     inline xarray_container<EC, L, SC, Tag>::xarray_container()
-        : base_type(), m_storage(1, value_type())
+        : base_type()
+        , m_storage(1, value_type())
     {
     }
 
@@ -304,7 +305,11 @@ namespace xt
      * @param l the layout_type of the xarray_container
      */
     template <class EC, layout_type L, class SC, class Tag>
-    inline xarray_container<EC, L, SC, Tag>::xarray_container(const shape_type& shape, const_reference value, layout_type l)
+    inline xarray_container<EC, L, SC, Tag>::xarray_container(
+        const shape_type& shape,
+        const_reference value,
+        layout_type l
+    )
         : base_type()
     {
         base_type::resize(shape, l);
@@ -331,7 +336,11 @@ namespace xt
      * @param value the value of the elements
      */
     template <class EC, layout_type L, class SC, class Tag>
-    inline xarray_container<EC, L, SC, Tag>::xarray_container(const shape_type& shape, const strides_type& strides, const_reference value)
+    inline xarray_container<EC, L, SC, Tag>::xarray_container(
+        const shape_type& shape,
+        const strides_type& strides,
+        const_reference value
+    )
         : base_type()
     {
         base_type::resize(shape, strides);
@@ -359,10 +368,16 @@ namespace xt
      * @param strides the strides of the xarray_container
      */
     template <class EC, layout_type L, class SC, class Tag>
-    inline xarray_container<EC, L, SC, Tag>::xarray_container(storage_type&& storage, inner_shape_type&& shape, inner_strides_type&& strides)
-        : base_type(std::move(shape), std::move(strides)), m_storage(std::move(storage))
+    inline xarray_container<EC, L, SC, Tag>::xarray_container(
+        storage_type&& storage,
+        inner_shape_type&& shape,
+        inner_strides_type&& strides
+    )
+        : base_type(std::move(shape), std::move(strides))
+        , m_storage(std::move(storage))
     {
     }
+
     //@}
 
     /**
@@ -433,6 +448,7 @@ namespace xt
         constexpr auto tmp = layout_type::row_major;
         L == tmp ? nested_copy(m_storage.begin(), t) : nested_copy(this->template begin<tmp>(), t);
     }
+
     //@}
 
     /**
@@ -450,17 +466,20 @@ namespace xt
     template <class EC, layout_type L, class SC, class Tag>
     template <std::size_t N>
     inline xarray_container<EC, L, SC, Tag>::xarray_container(xtensor_container<EC, N, L, Tag>&& rhs)
-        : base_type(inner_shape_type(rhs.shape().cbegin(), rhs.shape().cend()),
-                    inner_strides_type(rhs.strides().cbegin(), rhs.strides().cend()),
-                    inner_backstrides_type(rhs.backstrides().cbegin(), rhs.backstrides().cend()),
-                    std::move(rhs.layout())),
-          m_storage(std::move(rhs.storage()))
+        : base_type(
+            inner_shape_type(rhs.shape().cbegin(), rhs.shape().cend()),
+            inner_strides_type(rhs.strides().cbegin(), rhs.strides().cend()),
+            inner_backstrides_type(rhs.backstrides().cbegin(), rhs.backstrides().cend()),
+            std::move(rhs.layout())
+        )
+        , m_storage(std::move(rhs.storage()))
     {
     }
 
     template <class EC, layout_type L, class SC, class Tag>
     template <std::size_t N>
-    inline xarray_container<EC, L, SC, Tag>& xarray_container<EC, L, SC, Tag>::operator=(xtensor_container<EC, N, L, Tag>&& rhs)
+    inline xarray_container<EC, L, SC, Tag>&
+    xarray_container<EC, L, SC, Tag>::operator=(xtensor_container<EC, N, L, Tag>&& rhs)
     {
         this->shape_impl().assign(rhs.shape().cbegin(), rhs.shape().cend());
         this->strides_impl().assign(rhs.strides().cbegin(), rhs.strides().cend());
@@ -500,6 +519,7 @@ namespace xt
     {
         return semantic_base::operator=(e);
     }
+
     //@}
 
     template <class EC, layout_type L, class SC, class Tag>
@@ -528,7 +548,8 @@ namespace xt
      */
     template <class EC, layout_type L, class SC, class Tag>
     inline xarray_adaptor<EC, L, SC, Tag>::xarray_adaptor(storage_type&& storage)
-        : base_type(), m_storage(std::move(storage))
+        : base_type()
+        , m_storage(std::move(storage))
     {
     }
 
@@ -538,7 +559,8 @@ namespace xt
      */
     template <class EC, layout_type L, class SC, class Tag>
     inline xarray_adaptor<EC, L, SC, Tag>::xarray_adaptor(const storage_type& storage)
-        : base_type(), m_storage(storage)
+        : base_type()
+        , m_storage(storage)
     {
     }
 
@@ -552,7 +574,8 @@ namespace xt
     template <class EC, layout_type L, class SC, class Tag>
     template <class D>
     inline xarray_adaptor<EC, L, SC, Tag>::xarray_adaptor(D&& storage, const shape_type& shape, layout_type l)
-        : base_type(), m_storage(std::forward<D>(storage))
+        : base_type()
+        , m_storage(std::forward<D>(storage))
     {
         base_type::resize(shape, l);
     }
@@ -566,11 +589,17 @@ namespace xt
      */
     template <class EC, layout_type L, class SC, class Tag>
     template <class D>
-    inline xarray_adaptor<EC, L, SC, Tag>::xarray_adaptor(D&& storage, const shape_type& shape, const strides_type& strides)
-        : base_type(), m_storage(std::forward<D>(storage))
+    inline xarray_adaptor<EC, L, SC, Tag>::xarray_adaptor(
+        D&& storage,
+        const shape_type& shape,
+        const strides_type& strides
+    )
+        : base_type()
+        , m_storage(std::forward<D>(storage))
     {
         base_type::resize(shape, strides);
     }
+
     //@}
 
     template <class EC, layout_type L, class SC, class Tag>
@@ -612,6 +641,7 @@ namespace xt
     {
         return semantic_base::operator=(e);
     }
+
     //@}
 
     template <class EC, layout_type L, class SC, class Tag>

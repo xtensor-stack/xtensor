@@ -1,11 +1,11 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_SEMANTIC_HPP
 #define XTENSOR_SEMANTIC_HPP
@@ -40,9 +40,8 @@ namespace xt
     }
 
     template <class D>
-    using select_expression_base_t = std::conditional_t<detail::is_sharable<D>::value,
-                                                        xsharable_expression<D>,
-                                                        xexpression<D>>;
+    using select_expression_base_t = std::
+        conditional_t<detail::is_sharable<D>::value, xsharable_expression<D>, xexpression<D>>;
 
     /**
      * @class xsemantic_base
@@ -471,6 +470,7 @@ namespace xt
     {
         return this->derived_cast() = this->derived_cast() ^ e.derived_cast();
     }
+
     //@}
 
     /**
@@ -737,10 +737,12 @@ namespace xt
     template <class E>
     inline auto xview_semantic<D>::operator=(const xexpression<E>& rhs) -> derived_type&
     {
-        bool cond = (rhs.derived_cast().shape().size() == this->derived_cast().dimension()) &&
-            std::equal(this->derived_cast().shape().begin(),
-                       this->derived_cast().shape().end(),
-                       rhs.derived_cast().shape().begin());
+        bool cond = (rhs.derived_cast().shape().size() == this->derived_cast().dimension())
+                    && std::equal(
+                        this->derived_cast().shape().begin(),
+                        this->derived_cast().shape().end(),
+                        rhs.derived_cast().shape().begin()
+                    );
 
         if (!cond)
         {

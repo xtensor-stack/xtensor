@@ -1,21 +1,21 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
-
-#include "test_common.hpp"
-#include "test_common_macros.hpp"
 
 #include <cstddef>
 
 #include "xtensor/xarray.hpp"
-#include "xtensor/xtensor.hpp"
 #include "xtensor/xoptional_assembly.hpp"
+#include "xtensor/xtensor.hpp"
+
+#include "test_common.hpp"
+#include "test_common_macros.hpp"
 
 namespace xt
 {
@@ -59,7 +59,10 @@ namespace xt
     {
     public:
 
-        my_double(double d = 0.) : m_value(d) {}
+        my_double(double d = 0.)
+            : m_value(d)
+        {
+        }
 
         double& operator+=(double rhs)
         {
@@ -82,9 +85,9 @@ namespace xt
     class operation : public ::testing::Test
     {
     public:
+
         using storage_type = C;
     };
-
 
 
     template <class T>
@@ -110,14 +113,16 @@ namespace xt
         double a = 0;
         size_t b = 0;
 
-        explicit operator double() const { return a; }
+        explicit operator double() const
+        {
+            return a;
+        }
     };
 
-
     using xarray_type = xarray<double>;
-    using xtensor_2_type =  xtensor<double, 2>;
+    using xtensor_2_type = xtensor<double, 2>;
 
-    #define XOPERATION_TEST_TYPES xarray_type, xtensor_2_type
+#define XOPERATION_TEST_TYPES xarray_type, xtensor_2_type
 
     TEST_SUITE("operation")
     {
@@ -510,37 +515,37 @@ namespace xt
 
         TEST_CASE_TEMPLATE("where", TypeParam, XOPERATION_TEST_TYPES)
         {
-            TypeParam a = { { 1, 2, 3 },{ 0, 1, 0 },{ 0, 4, 1 } };
+            TypeParam a = {{1, 2, 3}, {0, 1, 0}, {0, 4, 1}};
             double b = 1.0;
             TypeParam res = where(a > b, b, a);
-            TypeParam expected = { { 1, 1, 1 },{ 0, 1, 0 },{ 0, 1, 1 } };
+            TypeParam expected = {{1, 1, 1}, {0, 1, 0}, {0, 1, 1}};
             EXPECT_EQ(expected, res);
 
-    #ifdef XTENSOR_USE_XSIMD
+#ifdef XTENSOR_USE_XSIMD
             // This will fail to compile if simd is broken for conditional_ternary
             auto func = where(a > b, b, a);
             auto s = func.template load_simd<xsimd::aligned_mode>(0);
-            (void)s;
+            (void) s;
 
             using assign_traits = xassign_traits<TypeParam, decltype(func)>;
 
             EXPECT_TRUE(assign_traits::simd_linear_assign());
-    #endif
+#endif
         }
 
         TEST_CASE_TEMPLATE("where_optional", TypeParam, XOPERATION_TEST_TYPES)
         {
             using opt_type = xoptional_assembly<TypeParam, xtensor<bool, 2>>;
             auto missing = xtl::missing<double>();
-            opt_type a = { { 1, missing, 3 },{ 0, 1, 0 },{ missing, 4, 1 } };
+            opt_type a = {{1, missing, 3}, {0, 1, 0}, {missing, 4, 1}};
             double b = 1.0;
 
             opt_type res = where(a > b, b, a);
-            opt_type expected = { { 1, missing, 1 },{ 0, 1, 0 },{ missing, 1, 1 } };
+            opt_type expected = {{1, missing, 1}, {0, 1, 0}, {missing, 1, 1}};
             EXPECT_EQ(expected, res);
 
             opt_type res1 = where(true, a + 3, a);
-            opt_type expected1 = { { 4, missing, 6 },{ 3, 4, 3 },{ missing, 7, 4 } };
+            opt_type expected1 = {{4, missing, 6}, {3, 4, 3}, {missing, 7, 4}};
             EXPECT_EQ(expected1, res1);
         }
 
@@ -550,7 +555,7 @@ namespace xt
             int_container_2d a = {{0, 1, 0}, {3, 0, 5}};
             double res1 = 1.2;
             TypeParam b = where(equal(a, 0.0), res1, 0.0);
-            TypeParam expected = { {1.2, 0., 1.2}, {0., 1.2, 0.} };
+            TypeParam expected = {{1.2, 0., 1.2}, {0., 1.2, 0.}};
             EXPECT_EQ(b, expected);
         }
 
@@ -568,7 +573,11 @@ namespace xt
             EXPECT_EQ(expected, argwhere(a));
 
             int_container_2d b = {{0, 2, 1}, {2, 1, 0}};
-            std::vector<xindex_type_t<typename int_container_2d::shape_type>> expected_b = {{0, 1}, {0, 2}, {1, 0}, {1, 1}};
+            std::vector<xindex_type_t<typename int_container_2d::shape_type>> expected_b = {
+                {0, 1},
+                {0, 2},
+                {1, 0},
+                {1, 1}};
             EXPECT_EQ(expected_b, argwhere(b));
 
             auto c = equal(b, 0);
@@ -600,7 +609,7 @@ namespace xt
         {
             using vtype_container_t = xop_test::rebind_container_t<TypeParam, vtype>;
             using shape_type = typename vtype_container_t::shape_type;
-            shape_type shape = { 3, 2 };
+            shape_type shape = {3, 2};
             vtype_container_t a(shape);
             auto ref = static_cast<double>(a(0, 0));
             auto actual = (cast<double>(a))(0, 0);
@@ -620,22 +629,22 @@ namespace xt
 
         TEST_CASE_TEMPLATE("assign_traits", TypeParam, XOPERATION_TEST_TYPES)
         {
-            TypeParam a = { { 0., 1., 2. },{ 3., 4., 5. } };
-            TypeParam b = { { 0., 1., 2. },{ 3., 4., 5. } };
+            TypeParam a = {{0., 1., 2.}, {3., 4., 5.}};
+            TypeParam b = {{0., 1., 2.}, {3., 4., 5.}};
 
             SUBCASE("xarray<double> + xarray<double>")
             {
                 auto fd = a + b;
                 using assign_traits_double = xassign_traits<TypeParam, decltype(fd)>;
-    #if XTENSOR_USE_XSIMD
+#if XTENSOR_USE_XSIMD
                 EXPECT_TRUE(assign_traits_double::simd_linear_assign());
-    #else
+#else
                 // SFINAE on load_simd is broken on mingw when xsimd is disabled. This using
                 // triggers the same error as the one caught by mingw.
                 using return_type = decltype(fd.template load_simd<aligned_mode>(std::size_t(0)));
                 EXPECT_FALSE(assign_traits_double::simd_linear_assign());
                 EXPECT_TRUE((std::is_same<return_type, double>::value));
-    #endif
+#endif
             }
 
             SUBCASE("double * xarray<double>")
@@ -643,30 +652,30 @@ namespace xt
                 xscalar<double> sd = 2.;
                 auto fsd = sd * a;
                 using assign_traits_scalar_double = xassign_traits<TypeParam, decltype(fsd)>;
-    #if XTENSOR_USE_XSIMD
+#if XTENSOR_USE_XSIMD
                 auto batch = fsd.template load_simd<double>(0);
-                (void)batch;
+                (void) batch;
                 EXPECT_TRUE(assign_traits_scalar_double::simd_linear_assign());
-    #else
+#else
                 using return_type = decltype(fsd.template load_simd<aligned_mode>(std::size_t(0)));
                 EXPECT_FALSE(assign_traits_scalar_double::simd_linear_assign());
                 EXPECT_TRUE((std::is_same<return_type, double>::value));
-    #endif
+#endif
             }
 
             SUBCASE("xarray<double> + xarray<int>")
             {
                 using int_container_t = xop_test::rebind_container_t<TypeParam, int>;
-                int_container_t c = { { 0, 1, 2 },{ 3, 4, 5 } };
+                int_container_t c = {{0, 1, 2}, {3, 4, 5}};
                 auto fm = a + c;
                 using assign_traits_mixed = xassign_traits<TypeParam, decltype(fm)>;
-    #if XTENSOR_USE_XSIMD
+#if XTENSOR_USE_XSIMD
                 EXPECT_TRUE(assign_traits_mixed::simd_linear_assign());
-    #else
+#else
                 using return_type = decltype(fm.template load_simd<aligned_mode>(std::size_t(0)));
                 EXPECT_FALSE(assign_traits_mixed::simd_linear_assign());
                 EXPECT_TRUE((std::is_same<return_type, double>::value));
-    #endif
+#endif
             }
 
             SUBCASE("int * xarray<double>")
@@ -674,43 +683,43 @@ namespace xt
                 xscalar<int> si = 2;
                 auto fsm = si * a;
                 using assign_traits_scalar_mixed = xassign_traits<TypeParam, decltype(fsm)>;
-    #if XTENSOR_USE_XSIMD
+#if XTENSOR_USE_XSIMD
                 EXPECT_TRUE(assign_traits_scalar_mixed::simd_linear_assign());
-    #else
+#else
                 using return_type = decltype(fsm.template load_simd<aligned_mode>(std::size_t(0)));
                 EXPECT_FALSE(assign_traits_scalar_mixed::simd_linear_assign());
                 EXPECT_TRUE((std::is_same<return_type, double>::value));
-    #endif
+#endif
             }
 
             SUBCASE("xarray<double> + xarray<char>")
             {
                 using char_container_t = xop_test::rebind_container_t<TypeParam, char>;
-                char_container_t d = { { 0, 1, 2 },{ 3, 4, 5 } };
+                char_container_t d = {{0, 1, 2}, {3, 4, 5}};
                 auto fdc = a + d;
                 using assign_traits_char_double = xassign_traits<TypeParam, decltype(fdc)>;
-    #if XTENSOR_USE_XSIMD
+#if XTENSOR_USE_XSIMD
                 EXPECT_TRUE(assign_traits_char_double::simd_linear_assign());
-    #else
+#else
                 using return_type = decltype(fdc.template load_simd<aligned_mode>(std::size_t(0)));
                 EXPECT_FALSE(assign_traits_char_double::simd_linear_assign());
                 EXPECT_TRUE((std::is_same<return_type, double>::value));
-    #endif
+#endif
             }
 
             SUBCASE("xarray<double> + xarray<my_double>")
             {
                 using md_container_t = xop_test::rebind_container_t<TypeParam, my_double>;
-                md_container_t d =  { { 0, 1, 2 },{ 3, 4, 5 } };
+                md_container_t d = {{0, 1, 2}, {3, 4, 5}};
                 auto fdm = a + d;
                 using assign_traits_md_double = xassign_traits<TypeParam, decltype(fdm)>;
-    #if XTENSOR_USE_XSIMD
+#if XTENSOR_USE_XSIMD
                 EXPECT_FALSE(assign_traits_md_double::simd_linear_assign());
-    #else
+#else
                 using return_type = decltype(fdm.template load_simd<aligned_mode>(std::size_t(0)));
                 EXPECT_FALSE(assign_traits_md_double::simd_linear_assign());
                 EXPECT_TRUE((std::is_same<return_type, double>::value));
-    #endif
+#endif
             }
 
             SUBCASE("xarray<double> > xarray<double>")
@@ -718,13 +727,13 @@ namespace xt
                 auto fgt = a > b;
                 using bool_container_t = xop_test::rebind_container_t<TypeParam, bool>;
                 using assign_traits_gt = xassign_traits<bool_container_t, decltype(fgt)>;
-    #if XTENSOR_USE_XSIMD
+#if XTENSOR_USE_XSIMD
                 EXPECT_TRUE(assign_traits_gt::simd_linear_assign());
-    #else
+#else
                 using return_type = decltype(fgt.template load_simd<aligned_mode>(std::size_t(0)));
                 EXPECT_FALSE(assign_traits_gt::simd_linear_assign());
                 EXPECT_TRUE((std::is_same<return_type, bool>::value));
-    #endif
+#endif
             }
 
             SUBCASE("xarray<bool> || xarray<bool>")
@@ -734,41 +743,39 @@ namespace xt
                 bool_container_t b1 = {{true, true, false}, {false, true, true}};
                 auto fb = b0 || b1;
                 using assign_traits_bool_bool = xassign_traits<bool_container_t, decltype(fb)>;
-    #if XTENSOR_USE_XSIMD
+#if XTENSOR_USE_XSIMD
                 EXPECT_TRUE(assign_traits_bool_bool::simd_linear_assign());
-    #else
+#else
                 using return_type = decltype(fb.template load_simd<aligned_mode>(std::size_t(0)));
                 EXPECT_FALSE(assign_traits_bool_bool::simd_linear_assign());
                 EXPECT_TRUE((std::is_same<return_type, bool>::value));
-    #endif
+#endif
             }
         }
 
 
-
-
         TEST(operation, mixed_assign)
         {
-            xt::xarray<double> asrc = { 1., 2. };
-            xt::xarray<std::size_t> bsrc = { std::size_t(3), std::size_t(4) };
+            xt::xarray<double> asrc = {1., 2.};
+            xt::xarray<std::size_t> bsrc = {std::size_t(3), std::size_t(4)};
 
             xt::xarray<double> a(asrc);
-            xt::xarray<double> aexp = { 3., 4. };
+            xt::xarray<double> aexp = {3., 4.};
             a = bsrc;
 
             xt::xarray<std::size_t> b(bsrc);
-            xt::xarray<std::size_t> bexp = { std::size_t(1), std::size_t(2) };
+            xt::xarray<std::size_t> bexp = {std::size_t(1), std::size_t(2)};
             b = asrc;
             EXPECT_EQ(b, bexp);
         }
 
         TEST(operation, mixed_bool_assign)
         {
-            xt::xarray<double> a = { 1., 6. };
-            xt::xarray<double> b = { 2., 3. };
+            xt::xarray<double> a = {1., 6.};
+            xt::xarray<double> b = {2., 3.};
             using uchar = unsigned char;
             xt::xarray<uchar> res = a > b;
-            xt::xarray<uchar> exp = { uchar(0), uchar(1) };
+            xt::xarray<uchar> exp = {uchar(0), uchar(1)};
             EXPECT_EQ(res, exp);
         }
 
@@ -792,11 +799,11 @@ namespace xt
 
             SUBCASE("row_major + row_major")
             {
-    #if XTENSOR_USE_XSIMD
+#if XTENSOR_USE_XSIMD
                 EXPECT_TRUE(frr_traits::simd_linear_assign(a, frr));
-    #else
+#else
                 EXPECT_FALSE(frr_traits::simd_linear_assign(a, frr));
-    #endif
+#endif
                 EXPECT_FALSE(frr_traits::simd_linear_assign(b, frr));
             }
 
@@ -809,19 +816,18 @@ namespace xt
             SUBCASE("row_major + column_major")
             {
                 EXPECT_FALSE(fcc_traits::simd_linear_assign(a, fcc));
-    #if XTENSOR_USE_XSIMD
+#if XTENSOR_USE_XSIMD
                 EXPECT_TRUE(fcc_traits::simd_linear_assign(b, fcc));
-    #else
+#else
                 EXPECT_FALSE(fcc_traits::simd_linear_assign(b, fcc));
-    #endif
+#endif
             }
-
         }
 
         TEST_CASE("left_shift")
         {
-            xarray<int> arr({5,1, 1000});
-            xarray<int> arr2({2,1, 3});
+            xarray<int> arr({5, 1, 1000});
+            xarray<int> arr2({2, 1, 3});
             xarray<int> res1 = left_shift(arr, 4);
             xarray<int> res2 = left_shift(arr, arr2);
             EXPECT_EQ(left_shift(arr, 4)(1), 16);
@@ -839,8 +845,8 @@ namespace xt
 
         TEST_CASE("right_shift")
         {
-            xarray<int> arr({5,1, 1000});
-            xarray<int> arr2({2,1, 3});
+            xarray<int> arr({5, 1, 1000});
+            xarray<int> arr2({2, 1, 3});
             xarray<int> res1 = right_shift(arr, 4);
             xarray<int> res2 = right_shift(arr, arr2);
             EXPECT_EQ(right_shift(arr, 4)(1), 0);
@@ -856,6 +862,7 @@ namespace xt
             EXPECT_EQ(expected2, res4);
         }
     }
-    #undef XOPERATION_TEST_TYPES
+
+#undef XOPERATION_TEST_TYPES
 
 }

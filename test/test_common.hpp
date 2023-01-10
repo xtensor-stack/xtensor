@@ -1,11 +1,11 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef TEST_COMMON_HPP
 #define TEST_COMMON_HPP
@@ -14,7 +14,7 @@
 
 #include "xtensor/xlayout.hpp"
 #include "xtensor/xmanipulation.hpp"
-#include "xtensor/xreducer.hpp" // tuple_idx_of
+#include "xtensor/xreducer.hpp"  // tuple_idx_of
 
 #include "test_common_macros.hpp"
 
@@ -24,29 +24,31 @@
 // with the gtest test where we can
 namespace testing
 {
-    template<class ... ARGS>
-    using Types = std::tuple<ARGS ...>;
+    template <class... ARGS>
+    using Types = std::tuple<ARGS...>;
 
-    struct Test{};
+    struct Test
+    {
+    };
 }
 
 namespace xt
 {
-    template<class C>
-    std::string stringify(const C & container)
+    template <class C>
+    std::string stringify(const C& container)
     {
         std::size_t i = 0;
         std::stringstream ss;
         ss << "[";
-        for(auto && c : container)
+        for (auto&& c : container)
         {
-            if(i + 1 == container.size())
+            if (i + 1 == container.size())
             {
-                ss<<c;
+                ss << c;
             }
             else
             {
-                ss<<c<<",";
+                ss << c << ",";
             }
             ++i;
         }
@@ -100,12 +102,35 @@ namespace xt
         layout_type m_layout;
         assigner_type m_assigner;
 
-        inline size_type size() const { return m_data.size(); }
-        inline const shape_type& shape() const { return m_shape; }
-        inline const strides_type& strides() const { return m_strides; }
-        inline const strides_type& backstrides() const { return m_backstrides; }
-        inline layout_type layout() const { return m_layout; }
-        inline const vector_type& storage() const { return m_data; }
+        inline size_type size() const
+        {
+            return m_data.size();
+        }
+
+        inline const shape_type& shape() const
+        {
+            return m_shape;
+        }
+
+        inline const strides_type& strides() const
+        {
+            return m_strides;
+        }
+
+        inline const strides_type& backstrides() const
+        {
+            return m_backstrides;
+        }
+
+        inline layout_type layout() const
+        {
+            return m_layout;
+        }
+
+        inline const vector_type& storage() const
+        {
+            return m_data;
+        }
     };
 
     template <class C = dynamic_shape<std::size_t>>
@@ -115,9 +140,8 @@ namespace xt
         {
             this->m_strides = {8, 4, 1};
             this->m_backstrides = {16, 4, 3};
-            this->m_data = {-1, 1, 2, 3, 4, 5, 6, 7, 8, 9,
-                            10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-                            20, 21, 22, 23};
+            this->m_data = {
+                -1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23};
             this->m_layout = layout_type::row_major;
         }
     };
@@ -129,10 +153,8 @@ namespace xt
         {
             this->m_strides = {1, 3, 6};
             this->m_backstrides = {2, 3, 18};
-            this->m_data = {-1, 8, 16, 4, 12, 20,
-                             1, 9, 17, 5, 13, 21,
-                             2, 10, 18, 6, 14, 22,
-                             3, 11, 19, 7, 15, 23};
+            this->m_data = {
+                -1, 8, 16, 4, 12, 20, 1, 9, 17, 5, 13, 21, 2, 10, 18, 6, 14, 22, 3, 11, 19, 7, 15, 23};
             this->m_layout = layout_type::column_major;
         }
     };
@@ -144,9 +166,8 @@ namespace xt
         {
             this->m_strides = {8, 1, 2};
             this->m_backstrides = {16, 1, 6};
-            this->m_data = {-1, 4, 1, 5, 2, 6, 3, 7,
-                            8, 12, 9, 13, 10, 14, 11, 15,
-                            16, 20, 17, 21, 18, 22, 19, 23};
+            this->m_data = {
+                -1, 4, 1, 5, 2, 6, 3, 7, 8, 12, 9, 13, 10, 14, 11, 15, 16, 20, 17, 21, 18, 22, 19, 23};
             this->m_layout = layout_type::dynamic;
         }
     };
@@ -186,12 +207,35 @@ namespace xt
         layout_type m_layout;
         assigner_type m_assigner;
 
-        inline size_type size() const { return m_data.size(); }
-        inline const shape_type& shape() const { return m_shape; }
-        inline const strides_type& strides() const { return m_strides; }
-        inline const strides_type& backstrides() const { return m_backstrides; }
-        inline layout_type layout() const { return m_layout; }
-        inline const vector_type& storage() const { return m_data; }
+        inline size_type size() const
+        {
+            return m_data.size();
+        }
+
+        inline const shape_type& shape() const
+        {
+            return m_shape;
+        }
+
+        inline const strides_type& strides() const
+        {
+            return m_strides;
+        }
+
+        inline const strides_type& backstrides() const
+        {
+            return m_backstrides;
+        }
+
+        inline layout_type layout() const
+        {
+            return m_layout;
+        }
+
+        inline const vector_type& storage() const
+        {
+            return m_data;
+        }
     };
 
     template <class V, class R>
@@ -199,7 +243,9 @@ namespace xt
     {
         EXPECT_TRUE(std::equal(vec.shape().cbegin(), vec.shape().cend(), result.shape().cbegin()));
         EXPECT_TRUE(std::equal(vec.strides().cbegin(), vec.strides().cend(), result.strides().cbegin()));
-        EXPECT_TRUE(std::equal(vec.backstrides().cbegin(), vec.backstrides().cend(), result.backstrides().cbegin()));
+        EXPECT_TRUE(
+            std::equal(vec.backstrides().cbegin(), vec.backstrides().cend(), result.backstrides().cbegin())
+        );
         EXPECT_EQ(vec.size(), result.size());
         if (compare_layout)
         {
@@ -274,10 +320,10 @@ namespace xt
             compare_shape(vec, rm);
 
             vec.resize(shape);
-            vec.reshape({ 3, -1, 4 }, layout_type::row_major);
+            vec.reshape({3, -1, 4}, layout_type::row_major);
             compare_shape(vec, rm);
 
-            auto & vec_ref = vec.reshape({ 3, -1, 4 }, layout_type::row_major);
+            auto& vec_ref = vec.reshape({3, -1, 4}, layout_type::row_major);
             compare_shape(vec_ref, rm);
 
             shape = rm.m_shape;
@@ -326,14 +372,10 @@ namespace xt
             EXPECT_EQ(vt.shape(), shape_new);
             EXPECT_TRUE(std::equal(vt.storage().cbegin(), vt.storage().cend(), rm.m_data.cbegin()));
 
-            strides_type new_strides = {rm.m_strides[2],
-                                        rm.m_strides[1],
-                                        rm.m_strides[0]};
+            strides_type new_strides = {rm.m_strides[2], rm.m_strides[1], rm.m_strides[0]};
             EXPECT_EQ(vt.strides(), new_strides);
 
-            strides_type new_backstrides = {rm.m_backstrides[2],
-                                            rm.m_backstrides[1],
-                                            rm.m_backstrides[0]};
+            strides_type new_backstrides = {rm.m_backstrides[2], rm.m_backstrides[1], rm.m_backstrides[0]};
             EXPECT_EQ(vt.backstrides(), new_backstrides);
 
             EXPECT_EQ(vec_copy(0, 0, 0), vt(0, 0, 0));
@@ -358,14 +400,10 @@ namespace xt
             EXPECT_TRUE(std::equal(vt.shape().cbegin(), vt.shape().cend(), shape_new.begin()));
             EXPECT_TRUE(std::equal(vt.storage().cbegin(), vt.storage().cend(), rm.m_data.cbegin()));
 
-            strides_type new_strides = {rm.m_strides[1],
-                                        rm.m_strides[0],
-                                        rm.m_strides[2]};
+            strides_type new_strides = {rm.m_strides[1], rm.m_strides[0], rm.m_strides[2]};
             EXPECT_EQ(vt.strides(), new_strides);
 
-            strides_type new_backstrides = {rm.m_backstrides[1],
-                                            rm.m_backstrides[0],
-                                            rm.m_backstrides[2]};
+            strides_type new_backstrides = {rm.m_backstrides[1], rm.m_backstrides[0], rm.m_backstrides[2]};
             EXPECT_EQ(vt.backstrides(), new_backstrides);
 
             EXPECT_EQ(vec_copy(0, 0, 0), vt(0, 0, 0));
@@ -419,13 +457,14 @@ namespace xt
             }
         }
     }
+
     template <class V>
     void test_bound_check(V& vec)
     {
 #if XTENSOR_ENABLE_ASSERT
         XT_EXPECT_ANY_THROW(vec(10, 10, 10));
 #else
-        (void)vec;
+        (void) vec;
 #endif
     }
 
@@ -769,7 +808,11 @@ namespace xt
             INFO("column_major storage iterator");
             column_major_result<C> cm;
             veccm.resize(cm.m_shape, layout_type::column_major);
-            std::copy(cm.storage().cbegin(), cm.storage().cend(), veccm.template begin<layout_type::column_major>());
+            std::copy(
+                cm.storage().cbegin(),
+                cm.storage().cend(),
+                veccm.template begin<layout_type::column_major>()
+            );
             EXPECT_TRUE(std::equal(cm.storage().cbegin(), cm.storage().cend(), veccm.storage().cbegin()));
             EXPECT_EQ(veccm.template end<layout_type::column_major>(), veccm.storage().end());
         }
@@ -779,7 +822,7 @@ namespace xt
     void test_fill(V& vec)
     {
         using value_type = typename V::value_type;
-        vec.resize({ 3, 4 });
+        vec.resize({3, 4});
         value_type v(4);
         vec.fill(v);
         for (auto it = vec.cbegin(); it != vec.cend(); ++it)
@@ -926,7 +969,8 @@ namespace xt
         using rm_layout_iterator = typename C::template layout_iterator<layout_type::row_major>;
         using rm_const_layout_iterator = typename C::template const_layout_iterator<layout_type::row_major>;
         using rm_reverse_layout_iterator = typename C::template reverse_layout_iterator<layout_type::row_major>;
-        using rm_const_reverse_layout_iterator = typename C::template const_reverse_layout_iterator<layout_type::row_major>;
+        using rm_const_reverse_layout_iterator = typename C::template const_reverse_layout_iterator<
+            layout_type::row_major>;
 
         using exp_rm_layout_iterator = xiterator<stepper, shape_type*, layout_type::row_major>;
         using exp_rm_const_layout_iterator = xiterator<const_stepper, shape_type*, layout_type::row_major>;
@@ -936,12 +980,14 @@ namespace xt
         EXPECT_TRUE((std::is_same<rm_layout_iterator, exp_rm_layout_iterator>::value));
         EXPECT_TRUE((std::is_same<rm_const_layout_iterator, exp_rm_const_layout_iterator>::value));
         EXPECT_TRUE((std::is_same<rm_reverse_layout_iterator, exp_rm_reverse_layout_iterator>::value));
-        EXPECT_TRUE((std::is_same<rm_const_reverse_layout_iterator, exp_rm_const_reverse_layout_iterator>::value));
+        EXPECT_TRUE((std::is_same<rm_const_reverse_layout_iterator, exp_rm_const_reverse_layout_iterator>::value
+        ));
 
         using cm_layout_iterator = typename C::template layout_iterator<layout_type::column_major>;
         using cm_const_layout_iterator = typename C::template const_layout_iterator<layout_type::column_major>;
         using cm_reverse_layout_iterator = typename C::template reverse_layout_iterator<layout_type::column_major>;
-        using cm_const_reverse_layout_iterator = typename C::template const_reverse_layout_iterator<layout_type::column_major>;
+        using cm_const_reverse_layout_iterator = typename C::template const_reverse_layout_iterator<
+            layout_type::column_major>;
 
         using exp_cm_layout_iterator = xiterator<stepper, shape_type*, layout_type::column_major>;
         using exp_cm_const_layout_iterator = xiterator<const_stepper, shape_type*, layout_type::column_major>;
@@ -951,7 +997,8 @@ namespace xt
         EXPECT_TRUE((std::is_same<cm_layout_iterator, exp_cm_layout_iterator>::value));
         EXPECT_TRUE((std::is_same<cm_const_layout_iterator, exp_cm_const_layout_iterator>::value));
         EXPECT_TRUE((std::is_same<cm_reverse_layout_iterator, exp_cm_reverse_layout_iterator>::value));
-        EXPECT_TRUE((std::is_same<cm_const_reverse_layout_iterator, exp_cm_const_reverse_layout_iterator>::value));
+        EXPECT_TRUE((std::is_same<cm_const_reverse_layout_iterator, exp_cm_const_reverse_layout_iterator>::value
+        ));
 
         using linear_iterator = typename C::linear_iterator;
         using const_linear_iterator = typename C::const_linear_iterator;

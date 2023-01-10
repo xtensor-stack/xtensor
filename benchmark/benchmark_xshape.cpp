@@ -1,10 +1,10 @@
 /***************************************************************************
-* Copyright (c) 2016, Johan Mabille, Sylvain Corlay and Wolf Vollprecht    *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) 2016, Johan Mabille, Sylvain Corlay and Wolf Vollprecht    *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 
 #ifndef BENCHMARK_SHAPE_HPP
@@ -14,7 +14,6 @@
 
 #include "xtensor/xshape.hpp"
 #include "xtensor/xstorage.hpp"
-
 
 namespace xt
 {
@@ -43,7 +42,7 @@ namespace xt
         template <class T>
         void xshape_access(benchmark::State& state)
         {
-            T a({3,2,1,3});
+            T a({3, 2, 1, 3});
             for (auto _ : state)
             {
                 a[0] = a[1] * a[2] + a[3];

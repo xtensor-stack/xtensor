@@ -1,16 +1,17 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
-#include "test_common_macros.hpp"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xchunked_array.hpp"
 #include "xtensor/xchunked_view.hpp"
+
+#include "test_common_macros.hpp"
 
 namespace xt
 {
@@ -36,7 +37,7 @@ namespace xt
         std::vector<std::size_t> shape = {3, 4};
         std::vector<std::size_t> chunk_shape = {1, 2};
         xarray<double> a(shape);
-        std::vector<double> data = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+        std::vector<double> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::copy(data.cbegin(), data.cend(), a.begin());
         xarray<double> b(shape);
 
