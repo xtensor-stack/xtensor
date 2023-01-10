@@ -306,7 +306,7 @@ add_test(NAME xtest COMMAND test_xtensor_lib)
 # Some files will be compiled twice, however compiling common files in a static
 # library and linking test_xtensor_lib with it removes half of the tests at
 # runtime.
-add_library(test_xtensor_core_lib ${COMMON_BASE} ${TEST_HEADERS} ${XTENSOR_HEADERS})
+add_library(test_xtensor_core_lib STATIC ${COMMON_BASE} ${TEST_HEADERS} ${XTENSOR_HEADERS})
 target_include_directories(test_xtensor_core_lib PRIVATE ${XTENSOR_INCLUDE_DIR})
 
 target_link_libraries(test_xtensor_core_lib PRIVATE xtensor doctest::doctest ${CMAKE_THREAD_LIBS_INIT})
