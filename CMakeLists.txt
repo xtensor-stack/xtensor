@@ -261,7 +261,7 @@ export(EXPORT ${PROJECT_NAME}-targets
 install(FILES ${XTENSOR_HEADERS}
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/xtensor)
 
-set(XTENSOR_CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}" CACHE
+set(XTENSOR_CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_DATADIR}/cmake/${PROJECT_NAME}" CACHE
     STRING "install path for xtensorConfig.cmake")
 
 configure_package_config_file(${PROJECT_NAME}Config.cmake.in
@@ -288,7 +288,7 @@ configure_file(${PROJECT_NAME}.pc.in
                "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc"
                 @ONLY)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc"
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig/")
+        DESTINATION "${CMAKE_INSTALL_DATADIR}/pkgconfig/")
 
 # Write single include
 # ====================
