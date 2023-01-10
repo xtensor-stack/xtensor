@@ -1,28 +1,27 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
-#include "test_common_macros.hpp"
-
-#include <vector>
 #include <algorithm>
-#include <sstream>
 #include <limits>
+#include <sstream>
+#include <vector>
 
 #include "xtensor/xarray.hpp"
-#include "xtensor/xtensor.hpp"
-#include "xtensor/xio.hpp"
-#include "xtensor/xrandom.hpp"
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xdynamic_view.hpp"
+#include "xtensor/xio.hpp"
+#include "xtensor/xrandom.hpp"
+#include "xtensor/xtensor.hpp"
 #include "xtensor/xview.hpp"
 
 #include "files/xio_expected_results.hpp"
+#include "test_common_macros.hpp"
 
 namespace xt
 {
@@ -52,9 +51,7 @@ namespace xt
 
     TEST(xio, xarray_two_d)
     {
-        xarray<double> e{{1, 2, 3, 4},
-                         {5, 6, 7, 8},
-                         {9, 10, 11, 12}};
+        xarray<double> e{{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}};
         std::stringstream out;
         out << e;
         EXPECT_EQ(twod_double, out.str());
@@ -62,9 +59,7 @@ namespace xt
 
     TEST(xio, view)
     {
-        xarray<double> e{{1, 2, 3, 4},
-                         {5, 6, 7, 8},
-                         {9, 10, 11, 12}};
+        xarray<double> e{{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}};
 
         auto v_1 = view(e, 1, xt::all());
         auto v_2 = view(e, xt::all(), 1);
@@ -92,10 +87,8 @@ namespace xt
 
     TEST(xio, xdynamic_view)
     {
-        xarray<int> e{{1, 2, 3, 4},
-                      {5, 6, 7, 8},
-                      {9, 10, 11, 12}};
-        auto v = xt::dynamic_view(e, { 1, keep(0, 2, 3)});
+        xarray<int> e{{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}};
+        auto v = xt::dynamic_view(e, {1, keep(0, 2, 3)});
         std::stringstream out;
         out << v;
         EXPECT_EQ("{5, 7, 8}", out.str());
@@ -108,7 +101,7 @@ namespace xt
         rn(1, 1) = -1;
         rn(1, 2) = +1;
         rn(1, 1) = -1;
-        rn(2, 2) = std::numeric_limits<double>::infinity();  //  inf
+        rn(2, 2) = std::numeric_limits<double>::infinity();   //  inf
         rn(2, 3) = -std::numeric_limits<double>::infinity();  // -inf
         rn(4, 4) = std::nan("xnan");
         std::stringstream out;
@@ -215,11 +208,7 @@ namespace xt
         xt::xarray<double, layout_type::row_major> rn = xt::random::rand<double>({100, 100}, -10, 10);
 
         std::stringstream out;
-        out << po::line_width(150)
-            << po::edge_items(10)
-            << po::precision(10)
-            << po::threshold(100)
-            << rn;
+        out << po::line_width(150) << po::edge_items(10) << po::precision(10) << po::threshold(100) << rn;
 
         EXPECT_EQ(print_options_result, out.str());
 
@@ -231,18 +220,10 @@ namespace xt
 
     TEST(xio, three_d)
     {
-        xarray<double> e{{{1, 2},
-                          {3, 4},
-                          {5, 6},
-                          {7, 8}},
-                         {{9, 10},
-                          {11, 12},
-                          {7, 9},
-                          {11, 14}},
-                         {{5, 26},
-                          {7, 8},
-                          {10, 8},
-                          {4, 3}}};
+        xarray<double> e{
+            {{1, 2}, {3, 4}, {5, 6}, {7, 8}},
+            {{9, 10}, {11, 12}, {7, 9}, {11, 14}},
+            {{5, 26}, {7, 8}, {10, 8}, {4, 3}}};
         std::stringstream out;
         out << e;
         EXPECT_EQ(threed_double, out.str());
@@ -258,7 +239,9 @@ namespace xt
 
     TEST(xio, long_strings)
     {
-        xt::xarray<std::string> e = {{"some", "random very long and very very", "boring"}, {"strings", "in", "xtensor xarray"}};
+        xt::xarray<std::string> e = {
+            {"some", "random very long and very very", "boring"},
+            {"strings", "in", "xtensor xarray"}};
         std::stringstream out;
         out << e;
         EXPECT_EQ(long_strings, out.str());
@@ -301,11 +284,16 @@ namespace xt
         xt::xarray<int> e = {{1, 2, 3, 4}, {100, 200, 1000, 10000000}};
 
         std::stringstream out;
-        pretty_print(e, [](const int& val) {
-            std::stringstream buf;
-            buf << "0x" << std::hex << val;
-            return buf.str();
-        }, out);
+        pretty_print(
+            e,
+            [](const int& val)
+            {
+                std::stringstream buf;
+                buf << "0x" << std::hex << val;
+                return buf.str();
+            },
+            out
+        );
 
         EXPECT_EQ(custom_formatter_result, out.str());
     }

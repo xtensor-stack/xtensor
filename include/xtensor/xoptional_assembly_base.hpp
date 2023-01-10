@@ -1,18 +1,18 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XOPTIONAL_ASSEMBLY_BASE_HPP
 #define XOPTIONAL_ASSEMBLY_BASE_HPP
 
 #include "xiterable.hpp"
-#include "xtensor_forward.hpp"
 #include "xoptional_assembly_storage.hpp"
+#include "xtensor_forward.hpp"
 
 namespace xt
 {
@@ -130,10 +130,10 @@ namespace xt
         void resize(const S& shape, const strides_type& strides);
 
         template <class S = shape_type>
-        auto & reshape(const S& shape, layout_type layout = static_layout) &;
+        auto& reshape(const S& shape, layout_type layout = static_layout) &;
 
         template <class T>
-        auto & reshape(std::initializer_list<T> shape, layout_type layout = static_layout) &;
+        auto& reshape(std::initializer_list<T> shape, layout_type layout = static_layout) &;
 
         layout_type layout() const noexcept;
         bool is_contiguous() const noexcept;
@@ -208,13 +208,13 @@ namespace xt
         bool has_linear_assign(const S& strides) const noexcept;
 
         using iterable_base::begin;
-        using iterable_base::end;
         using iterable_base::cbegin;
         using iterable_base::cend;
-        using iterable_base::rbegin;
-        using iterable_base::rend;
         using iterable_base::crbegin;
         using iterable_base::crend;
+        using iterable_base::end;
+        using iterable_base::rbegin;
+        using iterable_base::rend;
 
         linear_iterator linear_begin() noexcept;
         linear_iterator linear_end() noexcept;
@@ -280,22 +280,17 @@ namespace xt
         using self_type = xoptional_assembly_stepper<D, is_const>;
         using assembly_type = typename D::assembly_type;
         using value_type = typename assembly_type::value_type;
-        using reference = std::conditional_t<is_const,
-                                             typename assembly_type::const_reference,
-                                             typename assembly_type::reference>;
-        using pointer = std::conditional_t<is_const,
-                                           typename assembly_type::const_pointer,
-                                           typename assembly_type::pointer>;
+        using reference = std::
+            conditional_t<is_const, typename assembly_type::const_reference, typename assembly_type::reference>;
+        using pointer = std::conditional_t<is_const, typename assembly_type::const_pointer, typename assembly_type::pointer>;
         using size_type = typename assembly_type::size_type;
         using difference_type = typename assembly_type::difference_type;
         using raw_value_expression = typename assembly_type::raw_value_expression;
         using raw_flag_expression = typename assembly_type::raw_flag_expression;
-        using value_stepper = std::conditional_t<is_const,
-                                                 typename raw_value_expression::const_stepper,
-                                                 typename raw_value_expression::stepper>;
-        using flag_stepper = std::conditional_t<is_const,
-                                                typename raw_flag_expression::const_stepper,
-                                                typename raw_flag_expression::stepper>;
+        using value_stepper = std::
+            conditional_t<is_const, typename raw_value_expression::const_stepper, typename raw_value_expression::stepper>;
+        using flag_stepper = std::
+            conditional_t<is_const, typename raw_flag_expression::const_stepper, typename raw_flag_expression::stepper>;
 
         xoptional_assembly_stepper(value_stepper vs, flag_stepper fs) noexcept;
 
@@ -379,6 +374,7 @@ namespace xt
     {
         return value().backstrides();
     }
+
     //@}
 
     /**
@@ -427,7 +423,7 @@ namespace xt
      */
     template <class D>
     template <class S>
-    inline auto & xoptional_assembly_base<D>::reshape(const S& shape, layout_type layout) &
+    inline auto& xoptional_assembly_base<D>::reshape(const S& shape, layout_type layout) &
     {
         value().reshape(shape, layout);
         has_value().reshape(shape, layout);
@@ -436,7 +432,7 @@ namespace xt
 
     template <class D>
     template <class T>
-    inline auto & xoptional_assembly_base<D>::reshape(std::initializer_list<T> shape, layout_type layout) &
+    inline auto& xoptional_assembly_base<D>::reshape(std::initializer_list<T> shape, layout_type layout) &
     {
         value().reshape(shape, layout);
         has_value().reshape(shape, layout);
@@ -592,16 +588,14 @@ namespace xt
      */
     template <class D>
     template <class S>
-    inline auto xoptional_assembly_base<D>::operator[](const S& index)
-        -> disable_integral_t<S, reference>
+    inline auto xoptional_assembly_base<D>::operator[](const S& index) -> disable_integral_t<S, reference>
     {
         return reference(value()[index], has_value()[index]);
     }
 
     template <class D>
     template <class I>
-    inline auto xoptional_assembly_base<D>::operator[](std::initializer_list<I> index)
-        -> reference
+    inline auto xoptional_assembly_base<D>::operator[](std::initializer_list<I> index) -> reference
     {
         return reference(value()[index], has_value()[index]);
     }
@@ -628,8 +622,7 @@ namespace xt
 
     template <class D>
     template <class I>
-    inline auto xoptional_assembly_base<D>::operator[](std::initializer_list<I> index) const
-        -> const_reference
+    inline auto xoptional_assembly_base<D>::operator[](std::initializer_list<I> index) const -> const_reference
     {
         return const_reference(value()[index], has_value()[index]);
     }
@@ -765,6 +758,7 @@ namespace xt
     {
         return value().in_bounds(args...) && has_value().in_bounds(args...);
     }
+
     //@}
 
     template <class D>
@@ -826,20 +820,19 @@ namespace xt
     {
         return value().has_linear_assign(strides) && has_value().has_linear_assign(strides);
     }
+
     //@}
 
     template <class D>
     inline auto xoptional_assembly_base<D>::linear_begin() noexcept -> linear_iterator
     {
-        return linear_iterator(value().linear_begin(),
-                                has_value().linear_begin());
+        return linear_iterator(value().linear_begin(), has_value().linear_begin());
     }
 
     template <class D>
     inline auto xoptional_assembly_base<D>::linear_end() noexcept -> linear_iterator
     {
-        return linear_iterator(value().linear_end(),
-                                has_value().linear_end());
+        return linear_iterator(value().linear_end(), has_value().linear_end());
     }
 
     template <class D>
@@ -857,15 +850,13 @@ namespace xt
     template <class D>
     inline auto xoptional_assembly_base<D>::linear_cbegin() const noexcept -> const_linear_iterator
     {
-        return const_linear_iterator(value().linear_cbegin(),
-                                      has_value().linear_cbegin());
+        return const_linear_iterator(value().linear_cbegin(), has_value().linear_cbegin());
     }
 
     template <class D>
     inline auto xoptional_assembly_base<D>::linear_cend() const noexcept -> const_linear_iterator
     {
-        return const_linear_iterator(value().linear_cend(),
-                                      has_value().linear_cend());
+        return const_linear_iterator(value().linear_cend(), has_value().linear_cend());
     }
 
     template <class D>
@@ -927,7 +918,8 @@ namespace xt
 
     template <class D>
     template <class S>
-    inline auto xoptional_assembly_base<D>::stepper_end(const S& shape, layout_type l) const noexcept -> const_stepper
+    inline auto xoptional_assembly_base<D>::stepper_end(const S& shape, layout_type l) const noexcept
+        -> const_stepper
     {
         return const_stepper(value().stepper_end(shape, l), has_value().stepper_end(shape, l));
     }
@@ -986,7 +978,8 @@ namespace xt
 
     template <class D, bool C>
     inline xoptional_assembly_stepper<D, C>::xoptional_assembly_stepper(value_stepper vs, flag_stepper fs) noexcept
-        : m_vs(vs), m_fs(fs)
+        : m_vs(vs)
+        , m_fs(fs)
     {
     }
 

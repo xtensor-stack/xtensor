@@ -1,11 +1,11 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_CSV_HPP
 #define XTENSOR_CSV_HPP
@@ -31,7 +31,13 @@ namespace xt
     using xcsv_tensor = xtensor_container<std::vector<T, A>, 2, layout_type::row_major>;
 
     template <class T, class A = std::allocator<T>>
-    xcsv_tensor<T, A> load_csv(std::istream& stream, const char delimiter = ',', const std::size_t skip_rows = 0, const std::ptrdiff_t max_rows = -1, const std::string comments = "#");
+    xcsv_tensor<T, A> load_csv(
+        std::istream& stream,
+        const char delimiter = ',',
+        const std::size_t skip_rows = 0,
+        const std::ptrdiff_t max_rows = -1,
+        const std::string comments = "#"
+    );
 
     template <class E>
     void dump_csv(std::ostream& stream, const xexpression<E>& e);
@@ -59,35 +65,62 @@ namespace xt
                 return cell;
 
             size_t last = cell.find_last_not_of(' ');
-            return cell.substr(first, last==std::string::npos?cell.size():last+1);
+            return cell.substr(first, last == std::string::npos ? cell.size() : last + 1);
         }
 
         template <>
-        inline float lexical_cast<float>(const std::string& cell) { return std::stof(cell); }
+        inline float lexical_cast<float>(const std::string& cell)
+        {
+            return std::stof(cell);
+        }
 
         template <>
-        inline double lexical_cast<double>(const std::string& cell) { return std::stod(cell); }
+        inline double lexical_cast<double>(const std::string& cell)
+        {
+            return std::stod(cell);
+        }
 
         template <>
-        inline long double lexical_cast<long double>(const std::string& cell) { return std::stold(cell); }
+        inline long double lexical_cast<long double>(const std::string& cell)
+        {
+            return std::stold(cell);
+        }
 
         template <>
-        inline int lexical_cast<int>(const std::string& cell) { return std::stoi(cell); }
+        inline int lexical_cast<int>(const std::string& cell)
+        {
+            return std::stoi(cell);
+        }
 
         template <>
-        inline long lexical_cast<long>(const std::string& cell) { return std::stol(cell); }
+        inline long lexical_cast<long>(const std::string& cell)
+        {
+            return std::stol(cell);
+        }
 
         template <>
-        inline long long lexical_cast<long long>(const std::string& cell) { return std::stoll(cell); }
+        inline long long lexical_cast<long long>(const std::string& cell)
+        {
+            return std::stoll(cell);
+        }
 
         template <>
-        inline unsigned int lexical_cast<unsigned int>(const std::string& cell) { return static_cast<unsigned int>(std::stoul(cell)); }
+        inline unsigned int lexical_cast<unsigned int>(const std::string& cell)
+        {
+            return static_cast<unsigned int>(std::stoul(cell));
+        }
 
         template <>
-        inline unsigned long lexical_cast<unsigned long>(const std::string& cell) { return std::stoul(cell); }
+        inline unsigned long lexical_cast<unsigned long>(const std::string& cell)
+        {
+            return std::stoul(cell);
+        }
 
         template <>
-        inline unsigned long long lexical_cast<unsigned long long>(const std::string& cell) { return std::stoull(cell); }
+        inline unsigned long long lexical_cast<unsigned long long>(const std::string& cell)
+        {
+            return std::stoull(cell);
+        }
 
         template <class ST, class T, class OI>
         ST load_csv_row(std::istream& row_stream, OI output, std::string cell, const char delimiter = ',')
@@ -109,15 +142,18 @@ namespace xt
      * @param stream the input stream containing the CSV encoded values
      * @param delimiter the character used to separate values. [default: ',']
      * @param skip_rows the number of lines to skip from the beginning. [default: 0]
-     * @param max_rows the number of lines to read after skip_rows lines; the default is to read all the lines. [default: -1]
+     * @param max_rows the number of lines to read after skip_rows lines; the default is to read all the
+     * lines. [default: -1]
      * @param comments the string used to indicate the start of a comment. [default: "#"]
      */
     template <class T, class A>
-    xcsv_tensor<T, A> load_csv(std::istream& stream,
-                               const char delimiter,
-                               const std::size_t skip_rows,
-                               const std::ptrdiff_t max_rows,
-                               const std::string comments)
+    xcsv_tensor<T, A> load_csv(
+        std::istream& stream,
+        const char delimiter,
+        const std::size_t skip_rows,
+        const std::ptrdiff_t max_rows,
+        const std::string comments
+    )
     {
         using tensor_type = xcsv_tensor<T, A>;
         using storage_type = typename tensor_type::storage_type;
@@ -218,11 +254,17 @@ namespace xt
     template <class E>
     void load_file(std::istream& stream, xexpression<E>& e, const xcsv_config& config)
     {
-        e.derived_cast() = load_csv<typename E::value_type>(stream, config.delimiter, config.skip_rows, config.max_rows, config.comments);
+        e.derived_cast() = load_csv<typename E::value_type>(
+            stream,
+            config.delimiter,
+            config.skip_rows,
+            config.max_rows,
+            config.comments
+        );
     }
 
     template <class E>
-    void dump_file(std::ostream& stream, const xexpression<E> &e, const xcsv_config&)
+    void dump_file(std::ostream& stream, const xexpression<E>& e, const xcsv_config&)
     {
         dump_csv(stream, e);
     }

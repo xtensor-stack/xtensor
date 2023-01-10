@@ -1,26 +1,26 @@
 /***************************************************************************
-* Copyright (c) 2016, Johan Mabille, Sylvain Corlay and Wolf Vollprecht    *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) 2016, Johan Mabille, Sylvain Corlay and Wolf Vollprecht    *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #include <benchmark/benchmark.h>
 
 // #include "xtensor/xshape.hpp"
-#include "xtensor/xstorage.hpp"
-#include "xtensor/xutils.hpp"
 #include "xtensor/xadapt.hpp"
 #include "xtensor/xnoalias.hpp"
+#include "xtensor/xstorage.hpp"
+#include "xtensor/xutils.hpp"
 
 namespace xt
 {
     template <class V>
     void shape_array_adapter(benchmark::State& state)
     {
-        const V a({1,2,3,4});
-        const V b({1,2,3,4});
+        const V a({1, 2, 3, 4});
+        const V b({1, 2, 3, 4});
         using value_type = typename V::value_type;
 
         for (auto _ : state)
@@ -81,8 +81,15 @@ namespace xt
             auto ab = xt::adapt(b);
             auto ar = xt::adapt(res);
             auto fun = aa + ab;
-            std::transform(fun.linear_cbegin(), fun.linear_cend(), ar.linear_begin(),
-                           [](typename decltype(fun)::value_type x) { return static_cast<typename decltype(ar)::value_type>(x); });
+            std::transform(
+                fun.linear_cbegin(),
+                fun.linear_cend(),
+                ar.linear_begin(),
+                [](typename decltype(fun)::value_type x)
+                {
+                    return static_cast<typename decltype(ar)::value_type>(x);
+                }
+            );
             benchmark::DoNotOptimize(ar.data());
         }
     }

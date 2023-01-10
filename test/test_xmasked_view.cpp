@@ -1,17 +1,17 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
+
+#include "xtensor/xio.hpp"
+#include "xtensor/xmasked_view.hpp"
+#include "xtensor/xoptional_assembly.hpp"
 
 #include "test_common_macros.hpp"
-#include "test_common_macros.hpp"
-#include "xtensor/xoptional_assembly.hpp"
-#include "xtensor/xmasked_view.hpp"
-#include "xtensor/xio.hpp"
 
 namespace xt
 {
@@ -22,9 +22,7 @@ namespace xt
     //         { 7. ,  8.,  9. }}
     inline data_type make_test_data()
     {
-        data_type d = {{ 1., 2., 3.},
-                       { 4., 5., 6.},
-                       { 7., 8., 9.}};
+        data_type d = {{1., 2., 3.}, {4., 5., 6.}, {7., 8., 9.}};
         d(0, 2).has_value() = false;
         d(1, 0).has_value() = false;
         return d;
@@ -35,9 +33,7 @@ namespace xt
     //                { 7. ,  8.,  9. }}
     inline auto make_masked_data(data_type& data)
     {
-        xarray<bool> mask = {{ true,  true,  true},
-                             {false, false, false},
-                             { true,  true,  true}};
+        xarray<bool> mask = {{true, true, true}, {false, false, false}, {true, true, true}};
 
         return masked_view(data, std::move(mask));
     }
@@ -190,19 +186,15 @@ namespace xt
 
     TEST(xmasked_view, non_optional_data)
     {
-        xarray<double> data = {{ 1.,-2., 3.},
-                               { 4., 5.,-6.},
-                               { 7., 8.,-9.}};
-        xarray<bool> mask = {{ true,  true,  true},
-                             { true, false, false},
-                             { true, false,  true}};
+        xarray<double> data = {{1., -2., 3.}, {4., 5., -6.}, {7., 8., -9.}};
+        xarray<bool> mask = {{true, true, true}, {true, false, false}, {true, false, true}};
 
         auto masked_data = masked_view(data, mask);
 
         auto masked_value = xtl::masked<double>();
 
         EXPECT_EQ(masked_data(0, 0), 1.);
-        EXPECT_EQ(masked_data.at(0, 1),-2.);
+        EXPECT_EQ(masked_data.at(0, 1), -2.);
         EXPECT_EQ(masked_data.at(0, 2), 3.);
         EXPECT_EQ(masked_data.unchecked(1, 0), 4.);
         EXPECT_EQ(masked_data.unchecked(1, 1), masked_value);
@@ -210,42 +202,30 @@ namespace xt
         EXPECT_EQ(masked_data[index1], masked_value);
 
         masked_data = 3.65;
-        xarray<double> expected1 = {{3.65, 3.65, 3.65},
-                                   {3.65, 5.  ,-6.  },
-                                   {3.65, 8.  , 3.65}};
+        xarray<double> expected1 = {{3.65, 3.65, 3.65}, {3.65, 5., -6.}, {3.65, 8., 3.65}};
         EXPECT_EQ(data, expected1);
 
         masked_data += 3.;
-        xarray<double> expected2 = {{6.65, 6.65, 6.65},
-                                    {6.65, 5.  ,-6.  },
-                                    {6.65, 8.  , 6.65}};
+        xarray<double> expected2 = {{6.65, 6.65, 6.65}, {6.65, 5., -6.}, {6.65, 8., 6.65}};
         EXPECT_EQ(data, expected2);
     }
 
     TEST(xmasked_view, assign)
     {
-        xarray<double> data = {{ 1.,-2., 3.},
-                               { 4., 5.,-6.},
-                               { 7., 8.,-9.}};
-        xarray<double> data2 = {{ 0.1, 0.2, 0.3},
-                                { 0.4, 0.5, 0.6},
-                                { 0.7, 0.8, 0.9}};
-        xarray<bool> mask = {{ true,  true,  true},
-                             { true, false, false},
-                             { true, false,  true}};
+        xarray<double> data = {{1., -2., 3.}, {4., 5., -6.}, {7., 8., -9.}};
+        xarray<double> data2 = {{0.1, 0.2, 0.3}, {0.4, 0.5, 0.6}, {0.7, 0.8, 0.9}};
+        xarray<bool> mask = {{true, true, true}, {true, false, false}, {true, false, true}};
 
         auto masked_data = masked_view(data, mask);
 
         masked_data = data2;
-        xarray<double> expected1 = {{ 0.1, 0.2, 0.3},
-                                    { 0.4, 5. ,-6. },
-                                    { 0.7, 8. , 0.9}};
+        xarray<double> expected1 = {{0.1, 0.2, 0.3}, {0.4, 5., -6.}, {0.7, 8., 0.9}};
         EXPECT_EQ(data, expected1);
     }
 
     TEST(xmasked_view, view)
     {
-        xt::xarray<size_t> data = {{0,1}, {2,3}, {4,5}};
+        xt::xarray<size_t> data = {{0, 1}, {2, 3}, {4, 5}};
         xt::xarray<size_t> data_new = xt::zeros<size_t>(data.shape());
         xt::xarray<bool> col_mask = {false, true};
 

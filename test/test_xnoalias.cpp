@@ -1,17 +1,18 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
+
+#include "xtensor/xarray.hpp"
+#include "xtensor/xio.hpp"
+#include "xtensor/xnoalias.hpp"
+#include "xtensor/xview.hpp"
 
 #include "test_common_macros.hpp"
-#include "xtensor/xarray.hpp"
-#include "xtensor/xnoalias.hpp"
-#include "xtensor/xio.hpp"
-#include "xtensor/xview.hpp"
 #include "test_xsemantic.hpp"
 
 namespace xt
@@ -24,7 +25,7 @@ namespace xt
         using storage_type = C;
     };
 
-    #define XNOALIAS_TEST_TYPES xarray_dynamic, xtensor_dynamic
+#define XNOALIAS_TEST_TYPES xarray_dynamic, xtensor_dynamic
 
     TEST_SUITE("xnoalias")
     {
@@ -294,9 +295,9 @@ namespace xt
 
         TEST_CASE("scalar_ops")
         {
-            xarray<int> a = {{1,2,3}, {4,5,6}, {7,8,9}};
-            xarray<int> b = {{1,2,3}, {4,5,6}, {7,8,9}};
-            xarray<int> c = {{1,2,3}, {4,5,6}, {7,8,9}};
+            xarray<int> a = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+            xarray<int> b = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+            xarray<int> c = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
 
             xscalar<int> one(1), five(5), twelve(12), seven(7), bhalf(0b00001111), bxor(0b01001111);
 
@@ -356,8 +357,8 @@ namespace xt
 
         TEST_CASE("rvalue")
         {
-            xarray<int> a = {{1,2,3}, {4,5,6}, {7,8,9}};
-            xarray<int> b = {{1,2,3}, {4,5,6}, {7,8,9}};
+            xarray<int> a = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+            xarray<int> b = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
 
             xt::noalias(xt::view(a, 1)) += 10;
             xt::view(b, 1) += 10;

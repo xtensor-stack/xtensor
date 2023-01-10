@@ -1,16 +1,17 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
+
+#include "xtensor/xnoalias.hpp"
+#include "xtensor/xview.hpp"
 
 #include "test_common_macros.hpp"
-#include "xtensor/xview.hpp"
 #include "test_xsemantic.hpp"
-#include "xtensor/xnoalias.hpp"
 
 namespace xt
 {
@@ -33,7 +34,10 @@ namespace xt
 
     template <class F, class C>
     view_op_tester<F, C>::view_op_tester()
-        : operation_tester<F, C>(), x_slice(0), y_slice(0, 2), z_slice(1, 4)
+        : operation_tester<F, C>()
+        , x_slice(0)
+        , y_slice(0, 2)
+        , z_slice(1, 4)
     {
         vres_rr = this->a;
         vres_rc = this->a;
@@ -79,7 +83,7 @@ namespace xt
         using storage_type = C;
     };
 
-    #define VIEW_SEMANTIC_TEST_TYPES  xarray_dynamic, xtensor_dynamic
+#define VIEW_SEMANTIC_TEST_TYPES xarray_dynamic, xtensor_dynamic
 
     TEST_SUITE("view_semantic")
     {
@@ -419,18 +423,14 @@ namespace xt
         {
             using container_1d = redim_container_t<TypeParam, 1>;
             using container_2d = redim_container_t<TypeParam, 2>;
-            container_2d a = {{1,  2,  3,  4},
-                              {5,  6,  7,  8},
-                              {9, 10, 11, 12}};
+            container_2d a = {{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}};
             container_2d b = a;
             auto viewa = view(a, all(), range(1, 4));
             auto viewb = view(b, all(), range(1, 4));
             container_1d c = {1, 2, 3};
             viewa = c;
             noalias(viewb) = c;
-            container_2d res = {{1, 1, 2, 3},
-                                {5, 1, 2, 3},
-                                {9, 1, 2, 3}};
+            container_2d res = {{1, 1, 2, 3}, {5, 1, 2, 3}, {9, 1, 2, 3}};
 
             EXPECT_EQ(res, a);
             EXPECT_EQ(res, b);
@@ -439,15 +439,11 @@ namespace xt
         TEST_CASE_TEMPLATE("scalar_equal", TypeParam, VIEW_SEMANTIC_TEST_TYPES)
         {
             using container_2d = redim_container_t<TypeParam, 2>;
-            container_2d a = {{1, 2, 3, 4},
-                              {5, 6, 7, 8},
-                              {9, 10, 11, 12}};
+            container_2d a = {{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}};
             auto viewa = view(a, all(), range(1, 4));
             int b = 1;
             viewa = b;
-            container_2d res = {{1, 1, 1, 1},
-                                {5, 1, 1, 1},
-                                {9, 1, 1, 1}};
+            container_2d res = {{1, 1, 1, 1}, {5, 1, 1, 1}, {9, 1, 1, 1}};
 
             EXPECT_EQ(res, a);
         }
@@ -456,14 +452,14 @@ namespace xt
         {
             using container_2d = redim_container_t<TypeParam, 2>;
 
-            container_2d a = { {1, 2, 3}, {4, 5, 6} };
-            container_2d b = { {11, 12, 13} };
-            container_2d res = { { 11, 12, 13 }, { 4, 5, 6 } };
+            container_2d a = {{1, 2, 3}, {4, 5, 6}};
+            container_2d b = {{11, 12, 13}};
+            container_2d res = {{11, 12, 13}, {4, 5, 6}};
 
             auto viewa = view(a, 0, all());
             XT_EXPECT_ANY_THROW(viewa = b);
         }
     }
 
-    #undef VIEW_SEMANTIC_TEST_TYPES
+#undef VIEW_SEMANTIC_TEST_TYPES
 }

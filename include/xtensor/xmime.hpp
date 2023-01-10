@@ -1,11 +1,11 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_MIME_HPP
 #define XTENSOR_MIME_HPP
@@ -40,8 +40,7 @@ namespace xt
     }
 
     template <class P, class T>
-    void compute_1d_table(std::stringstream& out, P& printer, const T& expr,
-                          const std::size_t& edgeitems)
+    void compute_1d_table(std::stringstream& out, P& printer, const T& expr, const std::size_t& edgeitems)
     {
         const auto& dim = expr.shape()[0];
 
@@ -69,19 +68,29 @@ namespace xt
     }
 
     template <class P>
-    void compute_2d_element(std::stringstream& out, P& printer, const std::string& idx_str,
-                            const std::size_t& row_idx, const std::size_t& column_idx)
+    void compute_2d_element(
+        std::stringstream& out,
+        P& printer,
+        const std::string& idx_str,
+        const std::size_t& row_idx,
+        const std::size_t& column_idx
+    )
     {
-        out << "<td style='font-family:monospace;' title='("
-            << idx_str << row_idx << ", " << column_idx << ")'><pre>";
+        out << "<td style='font-family:monospace;' title='(" << idx_str << row_idx << ", " << column_idx
+            << ")'><pre>";
         printer.print_next(out);
         out << "</pre></td>";
     }
 
     template <class P, class T>
-    void compute_2d_row(std::stringstream& out, P& printer, const T& expr,
-                        const std::size_t& edgeitems, const std::string& idx_str,
-                        const std::size_t& row_idx)
+    void compute_2d_row(
+        std::stringstream& out,
+        P& printer,
+        const T& expr,
+        const std::size_t& edgeitems,
+        const std::string& idx_str,
+        const std::size_t& row_idx
+    )
     {
         const auto& dim = expr.shape()[expr.dimension() - 1];
 
@@ -109,15 +118,25 @@ namespace xt
     }
 
     template <class P, class T, class I>
-    void compute_2d_table(std::stringstream& out, P& printer, const T& expr,
-                          const std::size_t& edgeitems, const std::vector<I>& idx)
+    void compute_2d_table(
+        std::stringstream& out,
+        P& printer,
+        const T& expr,
+        const std::size_t& edgeitems,
+        const std::vector<I>& idx
+    )
     {
         const auto& dim = expr.shape()[expr.dimension() - 2];
         const auto& last_dim = expr.shape()[expr.dimension() - 1];
         std::string idx_str;
-        std::for_each(idx.cbegin(), idx.cend(), [&idx_str](const auto& i) {
-            idx_str += std::to_string(i) + ", ";
-        });
+        std::for_each(
+            idx.cbegin(),
+            idx.cend(),
+            [&idx_str](const auto& i)
+            {
+                idx_str += std::to_string(i) + ", ";
+            }
+        );
 
         std::size_t nb_ellipsis = 2 * edgeitems + 1;
         if (last_dim <= 2 * edgeitems + 1)
@@ -161,8 +180,13 @@ namespace xt
     }
 
     template <class P, class T, class I>
-    void compute_nd_row(std::stringstream& out, P& printer, const T& expr,
-                        const std::size_t& edgeitems, const std::vector<I>& idx)
+    void compute_nd_row(
+        std::stringstream& out,
+        P& printer,
+        const T& expr,
+        const std::size_t& edgeitems,
+        const std::vector<I>& idx
+    )
     {
         out << "<tr><td>";
         compute_nd_table_impl(out, printer, expr, edgeitems, idx);
@@ -170,8 +194,13 @@ namespace xt
     }
 
     template <class P, class T, class I>
-    void compute_nd_table_impl(std::stringstream& out, P& printer, const T& expr,
-                               const std::size_t& edgeitems, const std::vector<I>& idx)
+    void compute_nd_table_impl(
+        std::stringstream& out,
+        P& printer,
+        const T& expr,
+        const std::size_t& edgeitems,
+        const std::vector<I>& idx
+    )
     {
         const auto& displayed_dimension = idx.size();
         const auto& expr_dim = expr.dimension();
@@ -212,8 +241,7 @@ namespace xt
     }
 
     template <class P, class T>
-    void compute_nd_table(std::stringstream& out, P& printer, const T& expr,
-                          const std::size_t& edgeitems)
+    void compute_nd_table(std::stringstream& out, P& printer, const T& expr, const std::size_t& edgeitems)
     {
         if (expr.dimension() == 0)
         {

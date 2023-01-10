@@ -1,11 +1,11 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #include "test_common_macros.hpp"
 
@@ -16,11 +16,12 @@
 #pragma GCC diagnostic pop
 #endif
 
+#include <xtensor/xindex_view.hpp>
+
 #include "xtensor/xarray.hpp"
-#include "xtensor/xtensor.hpp"
 #include "xtensor/xmath.hpp"
 #include "xtensor/xstrided_view.hpp"
-#include <xtensor/xindex_view.hpp>
+#include "xtensor/xtensor.hpp"
 
 #include "xtl/xtype_traits.hpp"
 
@@ -31,28 +32,25 @@ namespace xt
     static const double d_min = std::numeric_limits<double>::min();
     static const double d_max = std::numeric_limits<double>::max();
 
-#define NAN_SENSITIVE_EQ(E1, E2, PLACE_HOLDER)                                                          \
-        EXPECT_EQ(xt::isnan(E1), xt::equal(E2, PLACE_HOLDER));                                          \
-        EXPECT_EQ(xt::filter(E1, !xt::isnan(E1)), xt::filter(E2, xt::not_equal(E2, PLACE_HOLDER)));
+#define NAN_SENSITIVE_EQ(E1, E2, PLACE_HOLDER)             \
+    EXPECT_EQ(xt::isnan(E1), xt::equal(E2, PLACE_HOLDER)); \
+    EXPECT_EQ(xt::filter(E1, !xt::isnan(E1)), xt::filter(E2, xt::not_equal(E2, PLACE_HOLDER)));
 
     namespace nantest
     {
-        xarray<double> aN = {{ nanv, nanv, 123, 3 }, { 1, 2, nanv, 3 }, { 1, 1, nanv, 3 }};
-        xarray<double> aR = {{ 0, 0, 123 , 3 }, { 1, 2, 0 , 3}, { 1, 1, 0, 3 }};
-        xarray<double> aP = {{ 1, 1, 123 , 3}, { 1, 2, 1, 3 }, { 1, 1, 1, 3 }};
-        xarray<double> aI = {{ d_max, d_max, 123 , 3}, { 1, 2, d_max, 3 }, { 1, 1, d_max, 3 }};
-        xarray<double> aA = {{ d_min, d_min, 123 , 3}, { 1, 2, d_min, 3 }, { 1, 1, d_min, 3 }};
+        xarray<double> aN = {{nanv, nanv, 123, 3}, {1, 2, nanv, 3}, {1, 1, nanv, 3}};
+        xarray<double> aR = {{0, 0, 123, 3}, {1, 2, 0, 3}, {1, 1, 0, 3}};
+        xarray<double> aP = {{1, 1, 123, 3}, {1, 2, 1, 3}, {1, 1, 1, 3}};
+        xarray<double> aI = {{d_max, d_max, 123, 3}, {1, 2, d_max, 3}, {1, 1, d_max, 3}};
+        xarray<double> aA = {{d_min, d_min, 123, 3}, {1, 2, d_min, 3}, {1, 1, d_min, 3}};
 
         xarray<double> xN = {{{nanv, nanv}, {1, 2}}, {{3, nanv}, {nanv, 5}}};
-        xarray<double> xR = {{{0, 0}, {1,2}}, {{3, 0}, {0, 5}}};
-        xarray<double> xP = {{{1, 1}, {1,2}}, {{3, 1}, {1, 5}}};
+        xarray<double> xR = {{{0, 0}, {1, 2}}, {{3, 0}, {0, 5}}};
+        xarray<double> xP = {{{1, 1}, {1, 2}}, {{3, 1}, {1, 5}}};
         xarray<double> xI = {{{d_max, d_max}, {1, 2}}, {{3, d_max}, {d_max, 5}}};
         xarray<double> xA = {{{d_min, d_min}, {1, 2}}, {{3, d_min}, {d_min, 5}}};
 
-        xarray<std::complex<double>> cN = {
-            {1.0 + 1.0i, 1.0 + 1.0i, nanv      },
-            {1.0 - 1.0i, 1.0       , 3.0 + 2.0i}
-        };
+        xarray<std::complex<double>> cN = {{1.0 + 1.0i, 1.0 + 1.0i, nanv}, {1.0 - 1.0i, 1.0, 3.0 + 2.0i}};
 
     }
 
@@ -78,7 +76,7 @@ namespace xt
     {
         double neg_inf = -std::numeric_limits<double>::infinity();
         double inf = std::numeric_limits<double>::infinity();
-        xarray<double> a = {{ nanv, nanv, 123}, {0.5123, neg_inf, inf}};
+        xarray<double> a = {{nanv, nanv, 123}, {0.5123, neg_inf, inf}};
 
         auto expr = nan_to_num(a);
         EXPECT_EQ(expr(0, 0), 0);
@@ -89,7 +87,9 @@ namespace xt
         EXPECT_TRUE(expr(1, 1) < 0);
         EXPECT_EQ(expr(1, 2), std::numeric_limits<double>::max());
 
-        xarray<double> exp = {{ 0, 0, 123 }, {0.5123, std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max() }};
+        xarray<double> exp = {
+            {0, 0, 123},
+            {0.5123, std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max()}};
         xarray<double> assigned = exp;
         EXPECT_EQ(assigned, exp);
     }
@@ -191,7 +191,7 @@ namespace xt
         EXPECT_DOUBLE_EQ(ase, 17.125);
 
         xarray<double> eaN0 = {1.0, 1.5, 123, 3};
-        xarray<double> eaN1 = {63.0, 2.0, 5.0/3.0};
+        xarray<double> eaN1 = {63.0, 2.0, 5.0 / 3.0};
 
         EXPECT_TENSOR_EQ(nanmean(nantest::aN, {0}), eaN0);
         EXPECT_TENSOR_EQ(nanmean(nantest::aN, {1}), eaN1);
@@ -207,7 +207,7 @@ namespace xt
         EXPECT_DOUBLE_EQ(cs, std::complex<double>(1.4, 0.6));
         EXPECT_DOUBLE_EQ(cse, std::complex<double>(1.4, 0.6));
 
-        xarray<std::complex<double>> ecN0 = {1.0 + 0.0i, 1.0+0.5i, 3.0+2.0i};
+        xarray<std::complex<double>> ecN0 = {1.0 + 0.0i, 1.0 + 0.5i, 3.0 + 2.0i};
         xarray<std::complex<double>> ecN1 = {1.0 + 1.0i, (5.0 + 1.0i) / 3.0};
 
         EXPECT_TENSOR_EQ(nanmean(nantest::cN, {0}), ecN0);
@@ -217,7 +217,6 @@ namespace xt
         EXPECT_TENSOR_EQ(nanmean(nantest::cN, {1}, evaluation_strategy::immediate), ecN1);
     }
 
-
     TEST(xnanfunctions, nanvar)
     {
         auto as = nanvar(nantest::aN)();
@@ -226,7 +225,7 @@ namespace xt
         EXPECT_EQ(ase, 1602.109375);
 
         xarray<double> eaN0 = {0.0, 0.25, 0.0, 0.0};
-        xarray<double> eaN1 = {3600.0, 2.0/3.0, 8.0/9.0};
+        xarray<double> eaN1 = {3600.0, 2.0 / 3.0, 8.0 / 9.0};
 
         EXPECT_EQ(nanvar(nantest::aN, {0}), eaN0);
         EXPECT_TRUE(allclose(nanvar(nantest::aN, {1}), eaN1));
@@ -250,7 +249,8 @@ namespace xt
         EXPECT_TRUE((std::is_same<result_type, EXPECTED_TYPE>::value));              \
     }
 
-    TEST(xnanfunctions, result_type) {
+    TEST(xnanfunctions, result_type)
+    {
         shape_type shape = {4, 3, 2};
         xarray<short> ashort(shape);
         xarray<unsigned short> aushort(shape);
@@ -261,21 +261,21 @@ namespace xt
         xarray<float> afloat(shape);
         xarray<double> adouble(shape);
 
-#define CHECK_RESULT_TYPE_FOR_ALL(INPUT, RESULT_TYPE, MINMAX_TYPE)  \
-        CHECK_RESULT_TYPE(nansum(INPUT, {1, 2}), RESULT_TYPE);      \
-        CHECK_RESULT_TYPE(nanmean(INPUT, {1, 2}), double);          \
-        CHECK_RESULT_TYPE(nanvar(INPUT, {1, 2}), double);           \
-        CHECK_RESULT_TYPE(nanstd(INPUT, {1, 2}), double);           \
-        CHECK_RESULT_TYPE(nanmin(INPUT, {1, 2}), MINMAX_TYPE);      \
-        CHECK_RESULT_TYPE(nanmax(INPUT, {1, 2}), MINMAX_TYPE);
+#define CHECK_RESULT_TYPE_FOR_ALL(INPUT, RESULT_TYPE, MINMAX_TYPE) \
+    CHECK_RESULT_TYPE(nansum(INPUT, {1, 2}), RESULT_TYPE);         \
+    CHECK_RESULT_TYPE(nanmean(INPUT, {1, 2}), double);             \
+    CHECK_RESULT_TYPE(nanvar(INPUT, {1, 2}), double);              \
+    CHECK_RESULT_TYPE(nanstd(INPUT, {1, 2}), double);              \
+    CHECK_RESULT_TYPE(nanmin(INPUT, {1, 2}), MINMAX_TYPE);         \
+    CHECK_RESULT_TYPE(nanmax(INPUT, {1, 2}), MINMAX_TYPE);
 
-#define CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(INPUT, TEMPLATE_TYPE, RESULT_TYPE, STD_TYPE, MINMAX_TYPE)  \
-        CHECK_RESULT_TYPE(nansum<TEMPLATE_TYPE>(INPUT, {1, 2}), RESULT_TYPE)                           \
-        CHECK_RESULT_TYPE(nanmean<TEMPLATE_TYPE>(INPUT, {1, 2}), RESULT_TYPE)                          \
-        CHECK_RESULT_TYPE(nanvar<TEMPLATE_TYPE>(INPUT, {1, 2}), RESULT_TYPE)                           \
-        CHECK_RESULT_TYPE(nanstd<TEMPLATE_TYPE>(INPUT, {1, 2}), STD_TYPE)                              \
-        CHECK_RESULT_TYPE(nanmin<TEMPLATE_TYPE>(INPUT, {1, 2}), MINMAX_TYPE)                           \
-        CHECK_RESULT_TYPE(nanmax<TEMPLATE_TYPE>(INPUT, {1, 2}), MINMAX_TYPE)
+#define CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(INPUT, TEMPLATE_TYPE, RESULT_TYPE, STD_TYPE, MINMAX_TYPE) \
+    CHECK_RESULT_TYPE(nansum<TEMPLATE_TYPE>(INPUT, {1, 2}), RESULT_TYPE)                              \
+    CHECK_RESULT_TYPE(nanmean<TEMPLATE_TYPE>(INPUT, {1, 2}), RESULT_TYPE)                             \
+    CHECK_RESULT_TYPE(nanvar<TEMPLATE_TYPE>(INPUT, {1, 2}), RESULT_TYPE)                              \
+    CHECK_RESULT_TYPE(nanstd<TEMPLATE_TYPE>(INPUT, {1, 2}), STD_TYPE)                                 \
+    CHECK_RESULT_TYPE(nanmin<TEMPLATE_TYPE>(INPUT, {1, 2}), MINMAX_TYPE)                              \
+    CHECK_RESULT_TYPE(nanmax<TEMPLATE_TYPE>(INPUT, {1, 2}), MINMAX_TYPE)
 
         /*********
          * short *
@@ -329,7 +329,13 @@ namespace xt
 #endif
         CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aulong, unsigned int, unsigned long long, double, unsigned long long);
         CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aulong, unsigned long, unsigned long long, double, unsigned long long);
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aulong, unsigned long long, unsigned long long, double, unsigned long long);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(
+            aulong,
+            unsigned long long,
+            unsigned long long,
+            double,
+            unsigned long long
+        );
 
         /*********
          * float *
@@ -349,6 +355,5 @@ namespace xt
         CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(adouble, float, double, double, double);
         CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(adouble, double, double, double, double);
         CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(adouble, long double, long double, long double, long double);
-
     }
 }

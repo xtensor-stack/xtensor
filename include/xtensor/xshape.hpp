@@ -1,11 +1,11 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_XSHAPE_HPP
 #define XTENSOR_XSHAPE_HPP
@@ -45,8 +45,8 @@ namespace xt
     template <class R, class T>
     constexpr R shape(T t);
 
-    template<class R = std::size_t, class T, std::size_t N>
-    xt::static_shape<R, N> shape(const T(&aList)[N]);
+    template <class R = std::size_t, class T, std::size_t N>
+    xt::static_shape<R, N> shape(const T (&aList)[N]);
 
     template <class S>
     struct static_dimension;
@@ -129,7 +129,8 @@ namespace xt
     template <class E, class S>
     inline bool has_shape(const E& e, std::initializer_list<S> shape) noexcept
     {
-        return e.shape().size() == shape.size() && std::equal(e.shape().cbegin(), e.shape().cend(), shape.begin());
+        return e.shape().size() == shape.size()
+               && std::equal(e.shape().cbegin(), e.shape().cend(), shape.begin());
     }
 
     /**
@@ -143,7 +144,8 @@ namespace xt
     template <class E, class S, class = typename std::enable_if_t<has_iterator_interface<S>::value>>
     inline bool has_shape(const E& e, const S& shape)
     {
-        return e.shape().size() == shape.size() && std::equal(e.shape().cbegin(), e.shape().cend(), shape.begin());
+        return e.shape().size() == shape.size()
+               && std::equal(e.shape().cbegin(), e.shape().cend(), shape.begin());
     }
 
     /*************************
@@ -208,12 +210,16 @@ namespace xt
     template <class R, class T>
     constexpr R shape(T t)
     {
-        return detail::initializer_shape<R, decltype(t)>(t, std::make_index_sequence<initializer_dimension<decltype(t)>::value>());
+        return detail::initializer_shape<R, decltype(t)>(
+            t,
+            std::make_index_sequence<initializer_dimension<decltype(t)>::value>()
+        );
     }
 
     /** @brief Generate an xt::static_shape of the given size. */
-    template<class R, class T, std::size_t N>
-    xt::static_shape<R, N> shape(const T(&list)[N]) {
+    template <class R, class T, std::size_t N>
+    xt::static_shape<R, N> shape(const T (&list)[N])
+    {
         xt::static_shape<R, N> shape;
         std::copy(std::begin(list), std::end(list), std::begin(shape));
         return shape;
@@ -257,7 +263,8 @@ namespace xt
     struct select_layout
     {
         constexpr static std::ptrdiff_t static_dimension = xt::static_dimension<S>::value;
-        constexpr static bool is_any = static_dimension != -1 && static_dimension <= 1 && L != layout_type::dynamic;
+        constexpr static bool is_any = static_dimension != -1 && static_dimension <= 1
+                                       && L != layout_type::dynamic;
         constexpr static layout_type value = is_any ? layout_type::any : L;
     };
 
@@ -284,7 +291,8 @@ namespace xt
         };
 
         template <class T, class... Ts>
-        struct max_array_size<T, Ts...> : std::integral_constant<std::size_t, imax(std::tuple_size<T>::value, max_array_size<Ts...>::value)>
+        struct max_array_size<T, Ts...>
+            : std::integral_constant<std::size_t, imax(std::tuple_size<T>::value, max_array_size<Ts...>::value)>
         {
         };
 
@@ -308,16 +316,16 @@ namespace xt
         template <std::size_t JX, std::size_t... I, std::size_t... J>
         struct broadcast_fixed_shape_cmp_impl<JX, fixed_shape<I...>, fixed_shape<J...>>
         {
-            //We line the shapes up from the last index
-            //IX may underflow, thus being a very large number
+            // We line the shapes up from the last index
+            // IX may underflow, thus being a very large number
             static constexpr std::size_t IX = JX - (sizeof...(J) - sizeof...(I));
 
-            //Out of bounds access gives value 0
+            // Out of bounds access gives value 0
             static constexpr std::size_t I_v = at<IX, I...>::value;
             static constexpr std::size_t J_v = at<JX, J...>::value;
 
             // we're statically checking if the broadcast shapes are either one on either of them or equal
-            static_assert(!I_v ||  I_v == 1 || J_v == 1 || J_v == I_v, "broadcast shapes do not match.");
+            static_assert(!I_v || I_v == 1 || J_v == 1 || J_v == I_v, "broadcast shapes do not match.");
 
             static constexpr std::size_t ordinate = (I_v > J_v) ? I_v : J_v;
             static constexpr bool value = (I_v == J_v);
@@ -326,10 +334,12 @@ namespace xt
         template <std::size_t... JX, std::size_t... I, std::size_t... J>
         struct broadcast_fixed_shape_impl<std::index_sequence<JX...>, fixed_shape<I...>, fixed_shape<J...>>
         {
-            static_assert(sizeof... (J) >= sizeof... (I), "broadcast shapes do not match.");
+            static_assert(sizeof...(J) >= sizeof...(I), "broadcast shapes do not match.");
 
-            using type = xt::fixed_shape<broadcast_fixed_shape_cmp_impl<JX, fixed_shape<I...>, fixed_shape<J...>>::ordinate...>;
-            static constexpr bool value = xtl::conjunction<broadcast_fixed_shape_cmp_impl<JX, fixed_shape<I...>, fixed_shape<J...>>...>::value;
+            using type = xt::fixed_shape<
+                broadcast_fixed_shape_cmp_impl<JX, fixed_shape<I...>, fixed_shape<J...>>::ordinate...>;
+            static constexpr bool value = xtl::conjunction<
+                broadcast_fixed_shape_cmp_impl<JX, fixed_shape<I...>, fixed_shape<J...>>...>::value;
         };
 
         /* broadcast_fixed_shape<fixed_shape<I...>, fixed_shape<J...>>
@@ -340,7 +350,9 @@ namespace xt
 
         template <std::size_t... I, std::size_t... J>
         struct broadcast_fixed_shape<fixed_shape<I...>, fixed_shape<J...>>
-            : broadcast_fixed_shape_impl<std::make_index_sequence<sizeof...(J)>, fixed_shape<I...>, fixed_shape<J...>> {};
+            : broadcast_fixed_shape_impl<std::make_index_sequence<sizeof...(J)>, fixed_shape<I...>, fixed_shape<J...>>
+        {
+        };
 
         // Simple is_array and only_array meta-functions
         template <class S>
@@ -361,8 +373,7 @@ namespace xt
         };
 
         template <std::size_t... N>
-        struct is_fixed<fixed_shape<N...>>
-            : std::true_type
+        struct is_fixed<fixed_shape<N...>> : std::true_type
         {
         };
 
@@ -381,10 +392,13 @@ namespace xt
         template <class... S>
         using only_array = xtl::conjunction<xtl::disjunction<is_array<S>, is_fixed<S>>...>;
 
-        // test that at least one argument is a fixed shape. If yes, then either argument has to be fixed or scalar
+        // test that at least one argument is a fixed shape. If yes, then either argument has to be fixed or
+        // scalar
         template <class... S>
-        using only_fixed = std::integral_constant<bool, xtl::disjunction<is_fixed<S>...>::value &&
-                                                        xtl::conjunction<xtl::disjunction<is_fixed<S>, is_scalar_shape<S>>...>::value>;
+        using only_fixed = std::integral_constant<
+            bool,
+            xtl::disjunction<is_fixed<S>...>::value
+                && xtl::conjunction<xtl::disjunction<is_fixed<S>, is_scalar_shape<S>>...>::value>;
 
         template <class... S>
         using all_fixed = xtl::conjunction<is_fixed<S>...>;
@@ -396,7 +410,8 @@ namespace xt
         template <class... S>
         struct promote_array
         {
-            using type = std::array<typename std::common_type<typename S::value_type...>::type, max_array_size<S...>::value>;
+            using type = std::
+                array<typename std::common_type<typename S::value_type...>::type, max_array_size<S...>::value>;
         };
 
         template <>
@@ -421,7 +436,9 @@ namespace xt
         using filter_scalar_t = typename filter_scalar<S>::type;
 
         template <class... S>
-        struct promote_fixed : promote_fixed<filter_scalar_t<S>...> {};
+        struct promote_fixed : promote_fixed<filter_scalar_t<S>...>
+        {
+        };
 
         template <std::size_t... I>
         struct promote_fixed<fixed_shape<I...>>
@@ -435,7 +452,8 @@ namespace xt
         {
         private:
 
-            using intermediate = std::conditional_t< (sizeof... (I) > sizeof... (J)),
+            using intermediate = std::conditional_t<
+                (sizeof...(I) > sizeof...(J)),
                 broadcast_fixed_shape<fixed_shape<J...>, fixed_shape<I...>>,
                 broadcast_fixed_shape<fixed_shape<I...>, fixed_shape<J...>>>;
             using result = promote_fixed<typename intermediate::type, S...>;
@@ -450,7 +468,9 @@ namespace xt
         struct select_promote_index;
 
         template <class... S>
-        struct select_promote_index<true, true, S...> : promote_fixed<S...> {};
+        struct select_promote_index<true, true, S...> : promote_fixed<S...>
+        {
+        };
 
         template <>
         struct select_promote_index<true, true>
@@ -460,7 +480,9 @@ namespace xt
         };
 
         template <class... S>
-        struct select_promote_index<false, true, S...> : promote_array<S...> {};
+        struct select_promote_index<false, true, S...> : promote_array<S...>
+        {
+        };
 
         template <class... S>
         struct select_promote_index<false, false, S...>
@@ -469,7 +491,9 @@ namespace xt
         };
 
         template <class... S>
-        struct promote_index : select_promote_index<only_fixed<S...>::value, only_array<S...>::value, S...> {};
+        struct promote_index : select_promote_index<only_fixed<S...>::value, only_array<S...>::value, S...>
+        {
+        };
 
         template <class T>
         struct index_from_shape_impl

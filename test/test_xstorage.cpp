@@ -1,17 +1,18 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
+
+#include <numeric>
+
+#include "xtensor/xstorage.hpp"
+#include "xtensor/xtensor_config.hpp"
 
 #include "test_common_macros.hpp"
-#include "test_common_macros.hpp"
-#include "xtensor/xtensor_config.hpp"
-#include "xtensor/xstorage.hpp"
-#include <numeric>
 
 namespace xt
 {
@@ -91,10 +92,10 @@ namespace xt
 
     TEST(svector, behavior)
     {
-        svector_type s = {1,2,3,4};
+        svector_type s = {1, 2, 3, 4};
         svector_type s2 = s;
         std::vector<std::size_t> v(s.begin(), s.end());
-        std::vector<std::size_t> v2 = {1,2,3,4};
+        std::vector<std::size_t> v2 = {1, 2, 3, 4};
 
         EXPECT_TRUE(std::equal(s.begin(), s.end(), v.begin()));
         EXPECT_TRUE(std::equal(s2.begin(), s2.end(), v2.begin()));
@@ -128,10 +129,10 @@ namespace xt
 
     TEST(svector, insert)
     {
-        svector_type s = {1,2,3,4};
+        svector_type s = {1, 2, 3, 4};
         svector_type s2 = s;
         std::vector<std::size_t> v(s.begin(), s.end());
-        std::vector<std::size_t> v2 = {1,2,3,4};
+        std::vector<std::size_t> v2 = {1, 2, 3, 4};
 
         s.insert(s.begin(), std::size_t(55));
         s.insert(s.begin() + 2, std::size_t(123));
@@ -146,7 +147,7 @@ namespace xt
 
     TEST(svector, insert_range)
     {
-        svector_type s0 = {1,2,3,4};
+        svector_type s0 = {1, 2, 3, 4};
         svector_type s1 = s0;
         svector_type s2 = s0;
         std::vector<std::size_t> v0(s0.begin(), s0.end());
@@ -156,10 +157,10 @@ namespace xt
 
         s0.insert(s0.begin(), ins.cbegin(), ins.cend());
         v0.insert(v0.begin(), ins.cbegin(), ins.cend());
-        s1.insert(s1.begin()+2, ins.cbegin(), ins.cend());
-        v1.insert(v1.begin()+2, ins.cbegin(), ins.cend());
-        s2.insert(s2.begin()+4, ins.cbegin(), ins.cend());
-        v2.insert(v2.begin()+4, ins.cbegin(), ins.cend());
+        s1.insert(s1.begin() + 2, ins.cbegin(), ins.cend());
+        v1.insert(v1.begin() + 2, ins.cbegin(), ins.cend());
+        s2.insert(s2.begin() + 4, ins.cbegin(), ins.cend());
+        v2.insert(v2.begin() + 4, ins.cbegin(), ins.cend());
 
         EXPECT_TRUE(std::equal(s0.begin(), s0.end(), v0.begin()));
         EXPECT_TRUE(std::equal(s1.begin(), s1.end(), v1.begin()));
@@ -168,7 +169,7 @@ namespace xt
 
     TEST(svector, insert_initializer_list)
     {
-        svector_type s0 = {1,2,3,4};
+        svector_type s0 = {1, 2, 3, 4};
         svector_type s1 = s0;
         svector_type s2 = s0;
         std::vector<std::size_t> v0(s0.begin(), s0.end());
@@ -177,10 +178,10 @@ namespace xt
 
         s0.insert(s0.begin(), {1u, 4u});
         v0.insert(v0.begin(), {1u, 4u});
-        s1.insert(s1.begin()+2, {1u, 4u});
-        v1.insert(v1.begin()+2, {1u, 4u});
-        s2.insert(s2.begin()+4, {1u, 4u});
-        v2.insert(v2.begin()+4, {1u, 4u});
+        s1.insert(s1.begin() + 2, {1u, 4u});
+        v1.insert(v1.begin() + 2, {1u, 4u});
+        s2.insert(s2.begin() + 4, {1u, 4u});
+        v2.insert(v2.begin() + 4, {1u, 4u});
 
         EXPECT_TRUE(std::equal(s0.begin(), s0.end(), v0.begin()));
         EXPECT_TRUE(std::equal(s1.begin(), s1.end(), v1.begin()));
@@ -208,11 +209,11 @@ namespace xt
         EXPECT_EQ(size_t(10), d.size());
         EXPECT_EQ(size_t(1), d[2]);
 
-        svector_type f = { 1, 2, 3, 4 };
+        svector_type f = {1, 2, 3, 4};
         EXPECT_EQ(size_t(4), f.size());
         EXPECT_EQ(size_t(3), f[2]);
 
-        svector<std::size_t, 8> ov = { 1, 2, 3, 4, 5, 6, 7, 8 };
+        svector<std::size_t, 8> ov = {1, 2, 3, 4, 5, 6, 7, 8};
         svector_type g(ov);
         EXPECT_EQ(size_t(8), g.size());
         EXPECT_EQ(size_t(3), g[2]);
@@ -220,7 +221,7 @@ namespace xt
 
     TEST(svector, assign)
     {
-        svector_type a = { 1, 2, 3, 4 };
+        svector_type a = {1, 2, 3, 4};
 
         svector_type src1(10, 2);
         a = src1;
@@ -232,7 +233,7 @@ namespace xt
         EXPECT_EQ(size_t(5), a.size());
         EXPECT_EQ(size_t(1), a[2]);
 
-        a = { 1, 2, 3, 4 };
+        a = {1, 2, 3, 4};
         EXPECT_EQ(size_t(4), a.size());
         EXPECT_EQ(size_t(3), a[2]);
 
@@ -255,7 +256,7 @@ namespace xt
             EXPECT_EQ(size2, a.size());
         }
 
-        svector_type b = { 1, 3, 4 };
+        svector_type b = {1, 3, 4};
         b.resize(6);
         EXPECT_EQ(b[0], 1u);
         EXPECT_EQ(b[1], 3u);
@@ -267,7 +268,7 @@ namespace xt
         using std::swap;
 
         {
-            svector_type a = { 1, 3, 4, 6, 7 };
+            svector_type a = {1, 3, 4, 6, 7};
             svector_type b = {};
             svector_type abu = a;
             svector_type bbu = b;
@@ -279,8 +280,8 @@ namespace xt
         }
 
         {
-            svector_type a = { 1, 3 ,4 };
-            svector_type b = { 2, 1, 5, 3, 9, 12 };
+            svector_type a = {1, 3, 4};
+            svector_type b = {2, 1, 5, 3, 9, 12};
             svector_type abu = a;
             svector_type bbu = b;
 
@@ -291,8 +292,8 @@ namespace xt
         }
 
         {
-            svector_type a = { 10, 13, 14 };
-            svector_type b = { 12, 15, 17 };
+            svector_type a = {10, 13, 14};
+            svector_type b = {12, 15, 17};
             svector_type abu = a;
             svector_type bbu = b;
 

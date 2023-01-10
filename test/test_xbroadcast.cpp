@@ -1,24 +1,23 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
+
+#include "xtensor/xarray.hpp"
+#include "xtensor/xbroadcast.hpp"
 
 #include "test_common.hpp"
-#include "xtensor/xbroadcast.hpp"
-#include "xtensor/xarray.hpp"
 
 namespace xt
 {
     TEST(xbroadcast, broadcast)
     {
-        xarray<double> m1
-          {{1, 2, 3},
-           {4, 5, 6}};
+        xarray<double> m1{{1, 2, 3}, {4, 5, 6}};
 
         auto m1_broadcast = broadcast(m1, {1, 2, 3});
         ASSERT_EQ(1.0, m1_broadcast(0, 0, 0));
@@ -52,9 +51,7 @@ namespace xt
 
     TEST(xbroadcast, element)
     {
-        xarray<double> m1
-          {{1, 2, 3},
-           {4, 5, 6}};
+        xarray<double> m1{{1, 2, 3}, {4, 5, 6}};
 
         auto m1_broadcast = broadcast(m1, {4, 2, 3});
 
@@ -68,15 +65,13 @@ namespace xt
 
     TEST(xbroadcast, indexed_access)
     {
-        xarray<double> m1
-          {{ 1, 2, 3 },
-           { 4, 5, 6 }};
+        xarray<double> m1{{1, 2, 3}, {4, 5, 6}};
 
-        auto m1_broadcast = broadcast(m1, { 4, 2, 3 });
-        std::array<std::size_t, 3> index1 = { 0, 1, 1 };
+        auto m1_broadcast = broadcast(m1, {4, 2, 3});
+        std::array<std::size_t, 3> index1 = {0, 1, 1};
         ASSERT_EQ(5.0, m1_broadcast[index1]);
         ASSERT_EQ(5.0, (m1_broadcast[{0, 1, 1}]));
-        std::array<std::size_t, 4> index3 = { 4, 0, 1, 1 };
+        std::array<std::size_t, 4> index3 = {4, 0, 1, 1};
         ASSERT_EQ(5.0, m1_broadcast[index3]);
         ASSERT_EQ(5.0, (m1_broadcast[{4, 0, 1, 1}]));
     }
@@ -172,9 +167,7 @@ namespace xt
 
     TEST(xbroadcast, same_shape)
     {
-        xt::xarray<double, xt::layout_type::column_major> arr
-            {{ 0.0,  1.0,  2.0},
-             {10.0, 11.0, 12.0}};
+        xt::xarray<double, xt::layout_type::column_major> arr{{0.0, 1.0, 2.0}, {10.0, 11.0, 12.0}};
 
         auto t = xt::broadcast(arr, {2, 3});
 
@@ -183,9 +176,9 @@ namespace xt
 
         EXPECT_TRUE(xt::allclose(rm_arr, cm_arr));
 
-        EXPECT_EQ(cm_arr(0, 0),  0.0);
-        EXPECT_EQ(cm_arr(0, 1),  1.0);
-        EXPECT_EQ(cm_arr(0, 2),  2.0);
+        EXPECT_EQ(cm_arr(0, 0), 0.0);
+        EXPECT_EQ(cm_arr(0, 1), 1.0);
+        EXPECT_EQ(cm_arr(0, 2), 2.0);
         EXPECT_EQ(cm_arr(1, 0), 10.0);
         EXPECT_EQ(cm_arr(1, 1), 11.0);
         EXPECT_EQ(cm_arr(1, 2), 12.0);

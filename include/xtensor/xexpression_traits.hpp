@@ -1,11 +1,11 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_EXPRESSION_TRAITS_HPP
 #define XTENSOR_EXPRESSION_TRAITS_HPP
@@ -111,8 +111,8 @@ namespace xt
             template <class T, layout_type L>
             using type = xarray<T, L>;
         };
-#endif // __cplusplus == 201703L
-#endif // __GNUC__ && (__GNUC__ > 6)
+#endif  // __cplusplus == 201703L
+#endif  // __GNUC__ && (__GNUC__ > 6)
 
         template <template <class, std::size_t> class S, class X, std::size_t N>
         struct xtype_for_shape<S<X, N>>

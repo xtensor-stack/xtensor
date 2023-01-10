@@ -1,19 +1,19 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
+
+#include "xtensor/xarray.hpp"
+#include "xtensor/xbuilder.hpp"
+#include "xtensor/xeval.hpp"
+#include "xtensor/xtensor.hpp"
+#include "xtensor/xtensor_config.hpp"
 
 #include "test_common.hpp"
-
-#include "xtensor/xtensor_config.hpp"
-#include "xtensor/xeval.hpp"
-#include "xtensor/xbuilder.hpp"
-#include "xtensor/xarray.hpp"
-#include "xtensor/xtensor.hpp"
 
 namespace xt
 {
@@ -59,48 +59,44 @@ namespace xt
         EXPECT_TRUE(type_eq_2);
     }
 
+#define EXPECT_LAYOUT(EXPRESSION, LAYOUT) EXPECT_TRUE((decltype(EXPRESSION)::static_layout == LAYOUT))
 
-#define EXPECT_LAYOUT(EXPRESSION, LAYOUT)                         \
-  EXPECT_TRUE((decltype(EXPRESSION)::static_layout == LAYOUT))
+#define HAS_DATA_INTERFACE(EXPRESSION) has_data_interface<std::decay_t<decltype(EXPRESSION)>>::value
 
-#define HAS_DATA_INTERFACE(EXPRESSION)                            \
-  has_data_interface<std::decay_t<decltype(EXPRESSION)>>::value
+#define EXPECT_XARRAY(EXPRESSION) \
+    EXPECT_TRUE(!detail::is_array<typename std::decay_t<decltype(EXPRESSION)>::shape_type>::value)
 
-#define EXPECT_XARRAY(EXPRESSION)                                    \
-  EXPECT_TRUE(!detail::is_array<                                     \
-                        typename std::decay_t<decltype(EXPRESSION)   \
-                                >::shape_type>::value)
-
-#define EXPECT_XTENSOR(EXPRESSION)                                   \
-  EXPECT_TRUE(detail::is_array<                                      \
-                        typename std::decay_t<decltype(EXPRESSION)   \
-                                >::shape_type>::value == true)
-
+#define EXPECT_XTENSOR(EXPRESSION) \
+    EXPECT_TRUE(detail::is_array<typename std::decay_t<decltype(EXPRESSION)>::shape_type>::value == true)
 
     TEST(utils, has_same_layout)
     {
-        xt::xtensor<double, 1, layout_type::row_major> ten1 {1., 2., 3.2};
+        xt::xtensor<double, 1, layout_type::row_major> ten1{1., 2., 3.2};
         EXPECT_TRUE(detail::has_same_layout<layout_type::row_major>(ten1));
         EXPECT_FALSE(detail::has_same_layout<layout_type::column_major>(ten1));
         EXPECT_TRUE(detail::has_same_layout<layout_type::any>(ten1));
 
-        xt::xtensor<double, 1, layout_type::column_major> ten2 {1., 2., 3.2};
+        xt::xtensor<double, 1, layout_type::column_major> ten2{1., 2., 3.2};
         EXPECT_TRUE(detail::has_same_layout<layout_type::column_major>(ten2));
         EXPECT_FALSE(detail::has_same_layout<layout_type::row_major>(ten2));
         EXPECT_TRUE(detail::has_same_layout<layout_type::any>(ten2));
 
         EXPECT_FALSE((detail::has_same_layout(ten1, ten2)));
-        EXPECT_TRUE((detail::has_same_layout(ten1, xt::xtensor<double, 1, layout_type::row_major>({1., 2., 3.2}))));
-        EXPECT_TRUE((detail::has_same_layout(ten2, xt::xtensor<double, 1, layout_type::column_major>({1., 2., 3.2}))));
+        EXPECT_TRUE(
+            (detail::has_same_layout(ten1, xt::xtensor<double, 1, layout_type::row_major>({1., 2., 3.2})))
+        );
+        EXPECT_TRUE(
+            (detail::has_same_layout(ten2, xt::xtensor<double, 1, layout_type::column_major>({1., 2., 3.2})))
+        );
     }
 
     TEST(utils, has_fixed_dims)
     {
-        xt::xtensor<double, 1> ten {1., 2., 3.2};
+        xt::xtensor<double, 1> ten{1., 2., 3.2};
         EXPECT_TRUE((detail::has_fixed_dims<xt::xtensor<double, 1>>()));
         EXPECT_TRUE(detail::has_fixed_dims(ten));
 
-        xt::xarray<double> arr {1., 2., 3.2};
+        xt::xarray<double> arr{1., 2., 3.2};
         EXPECT_FALSE((detail::has_fixed_dims<xt::xarray<double>>()));
         EXPECT_FALSE(detail::has_fixed_dims(arr));
     }
@@ -124,14 +120,14 @@ namespace xt
     }
 
     namespace testing
-    { // avoid collision with fixture class
+    {  // avoid collision with fixture class
 
-        class as_strided: public ::testing::Test
+        class as_strided : public ::testing::Test
         {
-            protected:
+        protected:
 
-                xt::xtensor<double, 1, layout_type::row_major> ten {1., 2., 3.2};
-                xt::xarray<double, layout_type::row_major> arr {1., 2., 3.2};
+            xt::xtensor<double, 1, layout_type::row_major> ten{1., 2., 3.2};
+            xt::xarray<double, layout_type::row_major> arr{1., 2., 3.2};
         };
 
         TEST_F(as_strided, array_reference)
@@ -159,8 +155,8 @@ namespace xt
             EXPECT_EQ(res_lvalue(2), 3.2);
 
             auto res_rvalue = xt::as_strided<layout_type::row_major>(
-                                xt::xarray<double, layout_type::row_major>({1., 2., 3.2})
-                                );
+                xt::xarray<double, layout_type::row_major>({1., 2., 3.2})
+            );
             EXPECT_LAYOUT(res_rvalue, layout_type::row_major);
             EXPECT_TRUE(HAS_DATA_INTERFACE(res_rvalue));
             EXPECT_XARRAY(res_rvalue);
@@ -176,8 +172,8 @@ namespace xt
             EXPECT_EQ(res_lvalue(2), 3.2);
 
             auto res_rvalue = xt::as_strided<layout_type::row_major>(
-                                xt::xtensor<double, 1, layout_type::row_major>({1., 2., 3.2})
-                                );
+                xt::xtensor<double, 1, layout_type::row_major>({1., 2., 3.2})
+            );
             EXPECT_LAYOUT(res_rvalue, layout_type::row_major);
             EXPECT_TRUE(HAS_DATA_INTERFACE(res_rvalue));
             EXPECT_XTENSOR(res_rvalue);
@@ -193,8 +189,8 @@ namespace xt
             EXPECT_EQ(res_lvalue(2), 3.2);
 
             auto res_rvalue = xt::as_strided<layout_type::column_major>(
-                                xt::xarray<double, layout_type::row_major>({1., 2., 3.2})
-                                );
+                xt::xarray<double, layout_type::row_major>({1., 2., 3.2})
+            );
             EXPECT_LAYOUT(res_rvalue, layout_type::column_major);
             EXPECT_TRUE(HAS_DATA_INTERFACE(res_rvalue));
             EXPECT_XARRAY(res_rvalue);
@@ -210,8 +206,8 @@ namespace xt
             EXPECT_EQ(res_lvalue(2), 3.2);
 
             auto res_rvalue = xt::as_strided<layout_type::column_major>(
-                                xt::xtensor<double, 1, layout_type::row_major>({1., 2., 3.2})
-                                );
+                xt::xtensor<double, 1, layout_type::row_major>({1., 2., 3.2})
+            );
             EXPECT_LAYOUT(res_rvalue, layout_type::column_major);
             EXPECT_TRUE(HAS_DATA_INTERFACE(res_rvalue));
             EXPECT_XTENSOR(res_rvalue);
@@ -230,9 +226,7 @@ namespace xt
             EXPECT_XARRAY(res_lvalue);
             EXPECT_EQ(res_lvalue(2), 3);
 
-            auto res_rvalue = xt::as_strided<layout_type::row_major>(
-                                xt::cast<int>(arr)
-                                );
+            auto res_rvalue = xt::as_strided<layout_type::row_major>(xt::cast<int>(arr));
             EXPECT_LAYOUT(res_rvalue, layout_type::row_major);
             EXPECT_TRUE(HAS_DATA_INTERFACE(res_rvalue));
             EXPECT_XARRAY(res_rvalue);
@@ -251,9 +245,7 @@ namespace xt
             EXPECT_XTENSOR(res_lvalue);
             EXPECT_EQ(res_lvalue(2), 3);
 
-            auto res_rvalue = xt::as_strided<layout_type::row_major>(
-                                xt::cast<int>(ten)
-                                );
+            auto res_rvalue = xt::as_strided<layout_type::row_major>(xt::cast<int>(ten));
             EXPECT_LAYOUT(res_rvalue, layout_type::row_major);
             EXPECT_TRUE(HAS_DATA_INTERFACE(res_rvalue));
             EXPECT_XTENSOR(res_rvalue);
@@ -272,9 +264,7 @@ namespace xt
             EXPECT_XARRAY(res_lvalue);
             EXPECT_EQ(res_lvalue(2), 3);
 
-            auto res_rvalue = xt::as_strided<layout_type::column_major>(
-                                xt::cast<int>(arr)
-                                );
+            auto res_rvalue = xt::as_strided<layout_type::column_major>(xt::cast<int>(arr));
             EXPECT_LAYOUT(res_rvalue, layout_type::column_major);
             EXPECT_TRUE(HAS_DATA_INTERFACE(res_rvalue));
             EXPECT_XARRAY(res_rvalue);
@@ -293,9 +283,7 @@ namespace xt
             EXPECT_XTENSOR(res_lvalue);
             EXPECT_EQ(res_lvalue(2), 3);
 
-            auto res_rvalue = xt::as_strided<layout_type::column_major>(
-                                xt::cast<int>(ten)
-                                );
+            auto res_rvalue = xt::as_strided<layout_type::column_major>(xt::cast<int>(ten));
             EXPECT_LAYOUT(res_rvalue, layout_type::column_major);
             EXPECT_TRUE(HAS_DATA_INTERFACE(res_rvalue));
             EXPECT_XTENSOR(res_rvalue);

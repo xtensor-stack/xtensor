@@ -1,11 +1,11 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #if defined(_MSC_VER) && !defined(__clang__)
 #define VS_SKIP_XFIXED 1
@@ -15,14 +15,15 @@
 // an easy way to prevent compilation
 #ifndef VS_SKIP_XFIXED
 
-#include "test_common_macros.hpp"
 #include "xtensor/xadapt.hpp"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xfixed.hpp"
 #include "xtensor/xio.hpp"
-#include "xtensor/xtensor.hpp"
-#include "xtensor/xnoalias.hpp"
 #include "xtensor/xmanipulation.hpp"
+#include "xtensor/xnoalias.hpp"
+#include "xtensor/xtensor.hpp"
+
+#include "test_common_macros.hpp"
 
 // On VS2015, when compiling in x86 mode, alignas(T) leads to C2718
 // when used for a function parameter, even indirectly. This means that
@@ -96,7 +97,9 @@ namespace xt
     TEST(xtensor_fixed, strides)
     {
         xtensor_fixed<double, xshape<3, 7, 2, 5, 3>, layout_type::row_major> arm;
-        xtensor<double, 5, layout_type::row_major> brm = xtensor<double, 5, layout_type::row_major>::from_shape({3, 7, 2, 5, 3});
+        xtensor<double, 5, layout_type::row_major> brm = xtensor<double, 5, layout_type::row_major>::from_shape(
+            {3, 7, 2, 5, 3}
+        );
 
         EXPECT_TRUE(std::equal(arm.strides().begin(), arm.strides().end(), brm.strides().begin()));
         EXPECT_EQ(arm.strides().size(), brm.strides().size());
@@ -105,7 +108,8 @@ namespace xt
         EXPECT_EQ(arm.size(), std::size_t(3 * 7 * 2 * 5 * 3));
 
         xtensor_fixed<double, xshape<3, 7, 2, 5, 3>, layout_type::column_major> acm;
-        xtensor<double, 5, layout_type::column_major> bcm = xtensor<double, 5, layout_type::column_major>::from_shape({3, 7, 2, 5, 3});
+        xtensor<double, 5, layout_type::column_major>
+            bcm = xtensor<double, 5, layout_type::column_major>::from_shape({3, 7, 2, 5, 3});
 
         EXPECT_TRUE(std::equal(acm.strides().begin(), acm.strides().end(), bcm.strides().begin()));
         EXPECT_EQ(acm.strides().size(), bcm.strides().size());
@@ -131,7 +135,8 @@ namespace xt
         EXPECT_EQ(tt1[1], sc2[1]);
         EXPECT_EQ(tt1[2], sc2[2]);
 
-        auto sc3c = get_strides<layout_type::column_major, const_array<ptrdiff_t, 6>>(xshape<3, 1, 3, 2, 1, 3>());
+        auto sc3c = get_strides<layout_type::column_major, const_array<ptrdiff_t, 6>>(xshape<3, 1, 3, 2, 1, 3>()
+        );
         auto sc3r = get_strides<layout_type::row_major, const_array<ptrdiff_t, 6>>(xshape<3, 1, 3, 2, 1, 3>());
         std::vector<std::size_t> ts2({3, 1, 3, 2, 1, 3}), tt2(6);
 
@@ -142,7 +147,8 @@ namespace xt
 
         xtensor_fixed<double, xshape<3, 1, 3, 2, 1, 3>> saxa;
         xtensor<double, 6> saxt(std::array<std::size_t, 6>{3, 1, 3, 2, 1, 3});
-        EXPECT_TRUE(std::equal(saxa.backstrides().begin(), saxa.backstrides().end(), saxt.backstrides().begin()));
+        EXPECT_TRUE(std::equal(saxa.backstrides().begin(), saxa.backstrides().end(), saxt.backstrides().begin())
+        );
     }
 
     TEST(xtensor_fixed, adapt)
@@ -193,38 +199,38 @@ namespace xt
 
     auto check_shape_a()
     {
-        xtensor_fixed<double, xshape<3, 4>> a = {{1,2,3,4}, {5,6,7,8}, {9,10,11,12}, {9,10,11,12}};
+        xtensor_fixed<double, xshape<3, 4>> a = {{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}, {9, 10, 11, 12}};
         return a;
     }
 
     auto check_shape_b()
     {
-        xtensor_fixed<double, xshape<3, 4>> a({{1,2}, {5,6,7,8}, {9,10,11,12}});
+        xtensor_fixed<double, xshape<3, 4>> a({{1, 2}, {5, 6, 7, 8}, {9, 10, 11, 12}});
         return a;
     }
 
     auto check_shape_c()
     {
-        xtensor_fixed<double, xshape<3, 4>> a = {{1,2,3}, {5,6,7}, {9,10,11}};
+        xtensor_fixed<double, xshape<3, 4>> a = {{1, 2, 3}, {5, 6, 7}, {9, 10, 11}};
         return a;
     }
 
     TEST(xtensor_fixed, initializer_list_constructor)
     {
         using T = xtensor_fixed<double, xshape<3, 4>>;
-        T a = {{1,2,3,4}, {5,6,7,8}, {9,10,11,12}};
+        T a = {{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}};
 
-    #ifdef XTENSOR_ENABLE_ASSERT
+#ifdef XTENSOR_ENABLE_ASSERT
         XT_EXPECT_THROW(T{{1}}, std::runtime_error);
         XT_EXPECT_THROW(check_shape_a(), std::runtime_error);
         XT_EXPECT_THROW(check_shape_b(), std::runtime_error);
         XT_EXPECT_THROW(check_shape_c(), std::runtime_error);
-    #endif
+#endif
     }
 
     TEST(xtensor_fixed, transpose)
     {
-        xtensorf3x4 a = {{1,2,3,4}, {5,6,7,8}, {9,10,11,12}};
+        xtensorf3x4 a = {{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}};
         xtensor_fixed<double, xshape<4, 3>> ta = xt::transpose(a);
         EXPECT_EQ(a(1, 1), ta(1, 1));
         EXPECT_EQ(a(2, 1), ta(1, 2));
@@ -256,7 +262,7 @@ namespace xt
         truth = std::is_same<decltype(e2), xtensor_fixed<double, xshape<3, 4>>>::value;
         EXPECT_TRUE(truth);
 
-        xtensor_fixed<char, xshape<   2, 1, 10, 5>> xa;
+        xtensor_fixed<char, xshape<2, 1, 10, 5>> xa;
         xtensor_fixed<char, xshape<3, 2, 4, 10, 1>> xb;
 
         auto fx1 = xa * xb;
@@ -266,7 +272,7 @@ namespace xt
         truth = std::is_same<typename decltype(fx2)::shape_type, xshape<3, 2, 4, 10, 5>>::value;
         EXPECT_TRUE(truth);
 
-        xtensor_fixed<char, xshape<   2, 1, 10, 5>> xc;
+        xtensor_fixed<char, xshape<2, 1, 10, 5>> xc;
         auto fx3 = xa * xc;
         truth = std::is_same<typename decltype(fx3)::shape_type, xshape<2, 1, 10, 5>>::value;
         EXPECT_TRUE(truth);
@@ -274,10 +280,10 @@ namespace xt
 
     TEST(xtensor_fixed, adaptor_function_assignment)
     {
-        xt::xtensor<double, 4> a_Eps  = xt::zeros<double>({2, 2, 2, 2});
+        xt::xtensor<double, 4> a_Eps = xt::zeros<double>({2, 2, 2, 2});
         xt::xtensor<double, 4> a_Epsd = xt::zeros<double>({2, 2, 2, 2});
         std::size_t e = 0, k = 1;
-        auto Eps  = xt::adapt(&a_Eps (e, k, 0, 0), xt::xshape<2, 2>());
+        auto Eps = xt::adapt(&a_Eps(e, k, 0, 0), xt::xshape<2, 2>());
         auto Epsd = xt::adapt(&a_Epsd(e, k, 0, 0), xt::xshape<2, 2>());
 
         xt::noalias(Eps) = Epsd * 123;
@@ -304,4 +310,4 @@ namespace xt
 
 #endif
 
-#endif // VS_SKIP_XFIXED
+#endif  // VS_SKIP_XFIXED

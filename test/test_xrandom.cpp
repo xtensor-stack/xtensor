@@ -1,15 +1,14 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #include <type_traits>
 
-#include "test_common_macros.hpp"
 #include "test_common_macros.hpp"
 #if (defined(__GNUC__) && !defined(__clang__))
 #pragma GCC diagnostic push
@@ -20,8 +19,8 @@
 #include "xtensor/xrandom.hpp"
 #endif
 #include "xtensor/xarray.hpp"
-#include "xtensor/xview.hpp"
 #include "xtensor/xset_operation.hpp"
+#include "xtensor/xview.hpp"
 
 namespace xt
 {
@@ -168,14 +167,17 @@ namespace xt
         xarray<int> a = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         xarray<double> w = {1, 0, 2, 0, 1, 0, 1, 0, 2, 0, 1, 0};
 
-        for(bool replace : {true, false}) {
+        for (bool replace : {true, false})
+        {
             xt::random::seed(42);
             auto ac1 = xt::random::choice(a, 6, w, replace);
             auto ac2 = xt::random::choice(a, 6, w, replace);
             xt::random::seed(42);
             auto ac3 = xt::random::choice(a, 6, w, replace);
-            static_assert(std::is_same<decltype(a)::value_type, decltype(ac1)::value_type>::value,
-                          "Elements must be same type");
+            static_assert(
+                std::is_same<decltype(a)::value_type, decltype(ac1)::value_type>::value,
+                "Elements must be same type"
+            );
             ASSERT_EQ(ac1, ac3);
             ASSERT_NE(ac1, ac2);
             ASSERT_TRUE(all(isin(ac1, a)));
@@ -232,7 +234,6 @@ namespace xt
         xt::random::shuffle(a);
         EXPECT_FALSE(std::is_sorted(a.begin(), a.end()));
 #endif
-
     }
 
     TEST(xrandom, permutation)

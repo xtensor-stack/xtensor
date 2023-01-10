@@ -1,11 +1,11 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_JSON_HPP
 #define XTENSOR_JSON_HPP
@@ -34,6 +34,7 @@ namespace xt
     /// @cond DOXYGEN_INCLUDE_SFINAE
     template <template <typename U, typename V, typename... Args> class M, class E>
     enable_xview_semantics<E> from_json(const nlohmann::basic_json<M>&, E&);
+
     /// @endcond
 
     /****************************************
@@ -43,8 +44,7 @@ namespace xt
     namespace detail
     {
         template <template <typename U, typename V, typename... Args> class M, class D>
-        void to_json_impl(nlohmann::basic_json<M>& j, const xexpression<D>& e,
-                          xstrided_slice_vector& slices)
+        void to_json_impl(nlohmann::basic_json<M>& j, const xexpression<D>& e, xstrided_slice_vector& slices)
         {
             const auto view = strided_view(e.derived_cast(), slices);
             if (view.dimension() == 0)
@@ -68,8 +68,8 @@ namespace xt
         }
 
         template <template <typename U, typename V, typename... Args> class M, class D>
-        inline void from_json_impl(const nlohmann::basic_json<M>& j, xexpression<D>& e,
-                                   xstrided_slice_vector& slices)
+        inline void
+        from_json_impl(const nlohmann::basic_json<M>& j, xexpression<D>& e, xstrided_slice_vector& slices)
         {
             auto view = strided_view(e.derived_cast(), slices);
 
@@ -182,6 +182,7 @@ namespace xt
         auto sv = xstrided_slice_vector();
         detail::from_json_impl(j, e, sv);
     }
+
     /// @endcond
 }
 
