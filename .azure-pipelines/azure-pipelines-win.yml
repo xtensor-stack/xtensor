@@ -37,8 +37,8 @@ jobs:
                     ninja ^
                     doctest==2.4.7 ^
                     nlohmann_json ^
-                    xtl==0.7.0 ^
-                    xsimd==9.0.1 ^
+                    xtl==0.7.4 ^
+                    xsimd==10.0.0 ^
                     python=3.9
       conda list
     displayName: Install conda packages
