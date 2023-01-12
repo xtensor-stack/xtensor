@@ -1665,12 +1665,12 @@ namespace xt
         }
         else
         {
-            res = static_cast<reference>(m_reducer->m_init());
-            for (size_type i = 0; i != size; ++i, m_stepper.step(index))
+            res = m_reducer->m_reduce(static_cast<reference>(m_reducer->m_init()), *m_stepper);
+            for (size_type i = 1; i != size; ++i)
             {
+                m_stepper.step(index);
                 res = m_reducer->m_reduce(res, *m_stepper);
             }
-            m_stepper.step_back(index);
         }
         m_stepper.reset(index);
         return res;
@@ -1697,12 +1697,12 @@ namespace xt
             }
             else
             {
-                res = m_reducer->m_init();
-                for (size_type i = 0; i != size; ++i, m_stepper.step(index))
+                res = m_reducer->m_reduce(static_cast<reference>(m_reducer->m_init()), *m_stepper);
+                for (size_type i = 1; i != size; ++i)
                 {
+                    m_stepper.step(index);
                     res = m_reducer->m_reduce(res, *m_stepper);
                 }
-                m_stepper.step_back(index);
             }
             m_stepper.reset(index);
         }

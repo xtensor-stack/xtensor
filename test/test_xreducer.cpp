@@ -1085,4 +1085,28 @@ namespace xt
         xt::xtensor_fixed<float, xt::xshape<3>> res1 = res;
         EXPECT_EQ(res1, a * 2.);
     }
+
+    TEST(xreducer, sum_reshape_view_xfunction)
+    {
+        xt::xtensor<double, 1> a = { 0, 1, 2, 3, 4, 5, 6, 7};
+        xt::xtensor<double, 1> b = { 0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5 };
+        xt::svector<double> sh = { 2, 4 };
+
+        auto res = xt::sum(xt::reshape_view(a * b, sh), 0);
+
+        xt::xtensor<double, 2> ra = reshape_view(a, sh);
+        xt::xtensor<double, 2> rb = reshape_view(b, sh);
+
+        auto exp = xt::sum(ra * rb, 0);
+
+        auto itres = res.cbegin();
+        auto itexp = exp.cbegin();
+        auto itexp_end = exp.cend();
+        while(itexp != itexp_end)
+        {
+            EXPECT_EQ(*itres, *itexp);
+            ++itres;
+            ++itexp;
+        }
+    }
 }
