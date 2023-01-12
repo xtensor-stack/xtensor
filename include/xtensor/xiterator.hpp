@@ -17,6 +17,7 @@
 #include <numeric>
 #include <vector>
 
+#include <xtl/xcompare.hpp>
 #include <xtl/xiterator_base.hpp>
 #include <xtl/xmeta_utils.hpp>
 #include <xtl/xsequence.hpp>
@@ -645,7 +646,7 @@ namespace xt
         {
             --i;
             size_type inc = (i == leading_i) ? n : 1;
-            if (index[i] + inc < shape[i])
+            if (xtl::cmp_less(index[i] + inc, shape[i]))
             {
                 index[i] += inc;
                 stepper.step(i, inc);
@@ -723,7 +724,7 @@ namespace xt
         {
             --i;
             size_type inc = (i == leading_i) ? n : 1;
-            if (index[i] >= inc)
+            if (xtl::cmp_greater_equal(index[i], inc))
             {
                 index[i] -= inc;
                 stepper.step_back(i, inc);
