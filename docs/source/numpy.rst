@@ -255,36 +255,38 @@ Rearrange elements
 In the same spirit as concatenation, the following operations do not allocate any memory and do
 not modify the underlying xexpression.
 
-.. table::
+.. list-table::
    :widths: 50 50
+   :header-rows: 1
 
-   +-----------------------------------------------------+-----------------------------------------------------------------------+
-   |            Python 3 - NumPy                         |                C++ 14 - xtensor                                       |
-   +=====================================================+=======================================================================+
-   | :any:`np.diag(a) <numpy.diag>`                      | :cpp:func:`xt::diag(a) <xt::diag>`                                    |
-   +-----------------------------------------------------+-----------------------------------------------------------------------+
-   | :any:`np.diagonal(a) <numpy.diagonal>`              | :cpp:func:`xt::diagonal(a) <xt::diagonal>`                            |
-   +-----------------------------------------------------+-----------------------------------------------------------------------+
-   | :any:`np.triu(a) <numpy.triu>`                      | :cpp:func:`xt::triu(a) <xt::triu>`                                    |
-   +-----------------------------------------------------+-----------------------------------------------------------------------+
-   | :any:`np.tril(a, k=1) <numpy.tril>`                 | :cpp:func:`xt::tril(a, 1) <xt::tril>`                                 |
-   +-----------------------------------------------------+-----------------------------------------------------------------------+
-   | :any:`np.flip(a, axis=3) <numpy.flip>`              | :cpp:func:`xt::flip(a, 3) <xt::flip>`                                 |
-   +-----------------------------------------------------+-----------------------------------------------------------------------+
-   | :any:`np.flipud(a) <numpy.flipud>`                  | :cpp:func:`xt::flip(a, 0) <xt::flip>`                                 |
-   +-----------------------------------------------------+-----------------------------------------------------------------------+
-   | :any:`np.fliplr(a) <numpy.fliplr>`                  | :cpp:func:`xt::flip(a, 1) <xt::flip>`                                 |
-   +-----------------------------------------------------+-----------------------------------------------------------------------+
-   | :any:`np.transpose(a, (1, 0, 2)) <numpy.transpose>` | :cpp:func:`xt::transpose(a, {1, 0, 2}) <xt::transpose>`               |
-   +-----------------------------------------------------+-----------------------------------------------------------------------+
-   | :any:`np.ravel(a, order='F') <numpy.ravel>`         | :cpp:func:`xt::ravel\<xt::layout_type::column_major\>(a) <xt::ravel>` |
-   +-----------------------------------------------------+-----------------------------------------------------------------------+
-   | :any:`np.rot90(a) <numpy.rot90>`                    | :cpp:func:`xt::rot90(a) <xt::rot90>`                                  |
-   +-----------------------------------------------------+-----------------------------------------------------------------------+
-   | :any:`np.rot90(a, 2, (1, 2)) <numpy.rot90>`         | :cpp:func:`xt::rot90\<2\>(a, {1, 2}) <xt::rot90>`                     |
-   +-----------------------------------------------------+-----------------------------------------------------------------------+
-   | :any:`np.roll(a, 2, axis=1) <numpy.roll>`           | :cpp:func:`xt::roll(a, 2, 1) <xt::roll>`                              |
-   +-----------------------------------------------------+-----------------------------------------------------------------------+
+   * - Python3 - NumPy
+     - C++14 - xtensor
+   * - :any:`np.nan_to_num(a) <numpy.nan_to_num>`
+     - :cpp:func:`xt::nan_to_num(a) <xt::nan_to_num>`
+   * - :any:`np.diag(a) <numpy.diag>`
+     - :cpp:func:`xt::diag(a) <xt::diag>`
+   * - :any:`np.diagonal(a) <numpy.diagonal>`
+     - :cpp:func:`xt::diagonal(a) <xt::diagonal>`
+   * - :any:`np.triu(a) <numpy.triu>`
+     - :cpp:func:`xt::triu(a) <xt::triu>`
+   * - :any:`np.tril(a, k=1) <numpy.tril>`
+     - :cpp:func:`xt::tril(a, 1) <xt::tril>`
+   * - :any:`np.flip(a, axis=3) <numpy.flip>`
+     - :cpp:func:`xt::flip(a, 3) <xt::flip>`
+   * - :any:`np.flipud(a) <numpy.flipud>`
+     - :cpp:func:`xt::flip(a, 0) <xt::flip>`
+   * - :any:`np.fliplr(a) <numpy.fliplr>`
+     - :cpp:func:`xt::flip(a, 1) <xt::flip>`
+   * - :any:`np.transpose(a, (1, 0, 2)) <numpy.transpose>`
+     - :cpp:func:`xt::transpose(a, {1, 0, 2}) <xt::transpose>`
+   * - :any:`np.ravel(a, order='F') <numpy.ravel>`
+     - :cpp:func:`xt::ravel\<xt::layout_type::column_major\>(a) <xt::ravel>`
+   * - :any:`np.rot90(a) <numpy.rot90>`
+     - :cpp:func:`xt::rot90(a) <xt::rot90>`
+   * - :any:`np.rot90(a, 2, (1, 2)) <numpy.rot90>`
+     - :cpp:func:`xt::rot90\<2\>(a, {1, 2}) <xt::rot90>`
+   * - :any:`np.roll(a, 2, axis=1) <numpy.roll>`
+     - :cpp:func:`xt::roll(a, 2, 1) <xt::roll>`
 
 Iteration
 ---------

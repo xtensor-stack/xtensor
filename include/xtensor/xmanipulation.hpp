@@ -18,6 +18,10 @@
 
 namespace xt
 {
+    /**
+     * @defgroup xt_xmanipulation
+     */
+
     namespace check_policy
     {
         struct none
@@ -215,6 +219,8 @@ namespace xt
 
     /**
      * Returns a transpose view by reversing the dimensions of xexpression e
+     *
+     * @ingroup xt_xmanipulation
      * @param e the input expression
      */
     template <class E>
@@ -242,6 +248,8 @@ namespace xt
 
     /**
      * Returns a transpose view by permuting the xexpression e with @p permutation.
+     *
+     * @ingroup xt_xmanipulation
      * @param e the input expression
      * @param permutation the sequence containing permutation
      * @param check_policy the check level (check_policy::full() or check_policy::none())
@@ -292,10 +300,12 @@ namespace xt
     }
 
     /**
-     * Returns a flatten view of the given expression. No copy is made.
+     * Return a flatten view of the given expression. No copy is made.
+     *
+     * @ingroup xt_xmanipulation
      * @param e the input expression
-     * @tparam L the layout used to read the elements of e. If no parameter
-     * is specified, XTENSOR_DEFAULT_TRAVERSAL is used.
+     * @tparam L the layout used to read the elements of e.
+     *     If no parameter is specified, XTENSOR_DEFAULT_TRAVERSAL is used.
      * @tparam E the type of the expression
      */
     template <layout_type L, class E>
@@ -311,12 +321,15 @@ namespace xt
     }
 
     /**
-     * Returns a flatten view of the given expression. No copy is made. This
-     * method is equivalent to ravel and is provided for API sameness with
-     * Numpy.
+     * Return a flatten view of the given expression.
+     *
+     * No copy is made.
+     * This method is equivalent to ravel and is provided for API sameness with Numpy.
+     *
+     * @ingroup xt_xmanipulation
      * @param e the input expression
-     * @tparam L the layout used to read the elements of e. If no parameter
-     * is specified, XTENSOR_DEFAULT_TRAVERSAL is used.
+     * @tparam L the layout used to read the elements of e.
+     *     If no parameter is specified, XTENSOR_DEFAULT_TRAVERSAL is used.
      * @tparam E the type of the expression
      * @sa ravel
      */
@@ -327,8 +340,9 @@ namespace xt
     }
 
     /**
-     * @brief return indices that are non-zero in the flattened version of arr,
-     * equivalent to nonzero(ravel<layout_type>(arr))[0];
+     * Return indices that are non-zero in the flattened version of arr.
+     *
+     * Equivalent to ``nonzero(ravel<layout_type>(arr))[0];``
      *
      * @param arr input array
      * @return indices that are non-zero in the flattened version of arr
@@ -346,6 +360,7 @@ namespace xt
     /**
      * Trim zeros at beginning, end or both of 1D sequence.
      *
+     * @ingroup xt_xmanipulation
      * @param e input xexpression
      * @param direction string of either 'f' for trim from beginning, 'b' for trim from end
      *                  or 'fb' (default) for both.
@@ -381,9 +396,11 @@ namespace xt
      **************************/
 
     /**
-     * Returns a squeeze view of the given expression. No copy is made.
-     * Squeezing an expression removes dimensions of extent 1.
+     * Returns a squeeze view of the given expression.
      *
+     * No copy is made. Squeezing an expression removes dimensions of extent 1.
+     *
+     * @ingroup xt_xmanipulation
      * @param e the input expression
      * @tparam E the type of the expression
      */
@@ -457,8 +474,9 @@ namespace xt
     }
 
     /**
-     * @brief Remove single-dimensional entries from the shape of an xexpression
+     * Remove single-dimensional entries from the shape of an xexpression
      *
+     * @ingroup xt_xmanipulation
      * @param e input xexpression
      * @param axis integer or container of integers, select a subset of single-dimensional
      *        entries of the shape.
@@ -496,11 +514,12 @@ namespace xt
      ******************************/
 
     /**
-     * @brief Expand the shape of an xexpression.
+     * Expand the shape of an xexpression.
      *
      * Insert a new axis that will appear at the axis position in the expanded array shape.
      * This will return a ``strided_view`` with a ``xt::newaxis()`` at the indicated axis.
      *
+     * @ingroup xt_xmanipulation
      * @param e input xexpression
      * @param axis axis to expand
      * @return returns a ``strided_view`` with expanded dimension
@@ -525,6 +544,7 @@ namespace xt
      * Note: dimensions are added equally at the beginning and the end.
      * For example, a 1-D array of shape (N,) becomes a view of shape (1, N, 1).
      *
+     * @ingroup xt_xmanipulation
      * @param e input xexpression
      * @tparam N the number of requested dimensions
      * @return ``strided_view`` with expanded dimensions
@@ -552,6 +572,8 @@ namespace xt
 
     /**
      * Expand to at least 1D
+     *
+     * @ingroup xt_xmanipulation
      * @sa atleast_Nd
      */
     template <class E>
@@ -562,6 +584,8 @@ namespace xt
 
     /**
      * Expand to at least 2D
+     *
+     * @ingroup xt_xmanipulation
      * @sa atleast_Nd
      */
     template <class E>
@@ -572,6 +596,8 @@ namespace xt
 
     /**
      * Expand to at least 3D
+     *
+     * @ingroup xt_xmanipulation
      * @sa atleast_Nd
      */
     template <class E>
@@ -585,13 +611,14 @@ namespace xt
      ************************/
 
     /**
-     * @brief Split xexpression along axis into subexpressions
+     * Split xexpression along axis into subexpressions
      *
      * This splits an xexpression along the axis in `n` equal parts and
      * returns a vector of ``strided_view``.
      * Calling split with axis > dimension of e or a `n` that does not result in
      * an equal division of the xexpression will throw a runtime_error.
      *
+     * @ingroup xt_xmanipulation
      * @param e input xexpression
      * @param n number of elements to return
      * @param axis axis along which to split the expression
@@ -624,10 +651,11 @@ namespace xt
     }
 
     /**
-     * @brief Split an xexpression into subexpressions horizontally (column-wise)
+     * Split an xexpression into subexpressions horizontally (column-wise)
      *
      * This method is equivalent to ``split(e, n, 1)``.
      *
+     * @ingroup xt_xmanipulation
      * @param e input xexpression
      * @param n number of elements to return
      */
@@ -638,10 +666,11 @@ namespace xt
     }
 
     /**
-     * @brief Split an xexpression into subexpressions vertically (row-wise)
+     * Split an xexpression into subexpressions vertically (row-wise)
      *
      * This method is equivalent to ``split(e, n, 0)``.
      *
+     * @ingroup xt_xmanipulation
      * @param e input xexpression
      * @param n number of elements to return
      */
@@ -656,10 +685,10 @@ namespace xt
      ***********************/
 
     /**
-     * @brief Reverse the order of elements in an xexpression along every axis.
+     * Reverse the order of elements in an xexpression along every axis.
      *
+     * @ingroup xt_xmanipulation
      * @param e the input xexpression
-     *
      * @return returns a view with the result of the flip.
      */
     template <class E>
@@ -675,13 +704,14 @@ namespace xt
     }
 
     /**
-     * @brief Reverse the order of elements in an xexpression along the given axis.
+     * Reverse the order of elements in an xexpression along the given axis.
+     *
      * Note: A NumPy/Matlab style `flipud(arr)` is equivalent to `xt::flip(arr, 0)`,
      * `fliplr(arr)` to `xt::flip(arr, 1)`.
      *
+     * @ingroup xt_xmanipulation
      * @param e the input xexpression
      * @param axis the axis along which elements should be reversed
-     *
      * @return returns a view with the result of the flip
      */
     template <class E>
@@ -767,13 +797,14 @@ namespace xt
     };
 
     /**
-     * @brief Rotate an array by 90 degrees in the plane specified by axes.
+     * Rotate an array by 90 degrees in the plane specified by axes.
+     *
      * Rotation direction is from the first towards the second axis.
      *
+     * @ingroup xt_xmanipulation
      * @param e the input xexpression
      * @param axes the array is rotated in the plane defined by the axes. Axes must be different.
      * @tparam N number of times the array is rotated by 90 degrees. Default is 1.
-     *
      * @return returns a view with the result of the rotation
      */
     template <std::ptrdiff_t N, class E>
@@ -797,15 +828,16 @@ namespace xt
      ***********************/
 
     /**
-     * @brief Roll an expression.
+     * Roll an expression.
+     *
      * The expression is flatten before shifting, after which the original
      * shape is restore. Elements that roll beyond the last position are
      * re-introduced at the first. This function does not change the input
      * expression.
      *
+     * @ingroup xt_xmanipulation
      * @param e the input xexpression
      * @param shift the number of places by which elements are shifted
-     *
      * @return a roll of the input expression
      */
     template <class E>
@@ -894,14 +926,15 @@ namespace xt
     }
 
     /**
-     * @brief Roll an expression along a given axis.
+     * Roll an expression along a given axis.
+     *
      * Elements that roll beyond the last position are re-introduced at the first.
      * This function does not change the input expression.
      *
+     * @ingroup xt_xmanipulation
      * @param e the input xexpression
      * @param shift the number of places by which elements are shifted
      * @param axis the axis along which elements are shifted.
-     *
      * @return a roll of the input expression
      */
     template <class E>
@@ -933,6 +966,7 @@ namespace xt
     /****************************
      * repeat implementation    *
      ****************************/
+
     namespace detail
     {
         template <class E, class R>
@@ -948,13 +982,13 @@ namespace xt
     }
 
     /**
-     * @brief Repeats elements of an expression along a given axis.
+     * Repeat elements of an expression along a given axis.
      *
+     * @ingroup xt_xmanipulation
      * @param e the input xexpression
-     * @param repeats The number of repetition of each elements. \ref repeats is broadcasted to
-     * fit the shape of the given \ref axis.
+     * @param repeats The number of repetition of each elements.
+     *     @p repeats is broadcasted to fit the shape of the given @p axis.
      * @param axis the axis along which to repeat the value
-     *
      * @return an expression which as the same shape as \ref e, except along the given \ref axis
      */
     template <class E>
@@ -967,11 +1001,12 @@ namespace xt
     }
 
     /**
-     * @brief Repeats elements of an expression along a given axis.
+     * Repeat elements of an expression along a given axis.
      *
+     * @ingroup xt_xmanipulation
      * @param e the input xexpression
-     * @param repeats The number of repetition of each elements. The size of \ref repeats
-     * must match the shape of the given \ref axis.
+     * @param repeats The number of repetition of each elements.
+     *     The size of @p repeats must match the shape of the given @p axis.
      * @param axis the axis along which to repeat the value
      *
      * @return an expression which as the same shape as \ref e, except along the given \ref axis
@@ -983,13 +1018,13 @@ namespace xt
     }
 
     /**
-     * @brief Repeats elements of an expression along a given axis.
+     * Repeat elements of an expression along a given axis.
      *
+     * @ingroup xt_xmanipulation
      * @param e the input xexpression
-     * @param repeats The number of repetition of each elements. The size of \ref repeats
-     * must match the shape of the given \ref axis.
+     * @param repeats The number of repetition of each elements.
+     *     The size of @p repeats must match the shape of the given @p axis.
      * @param axis the axis along which to repeat the value
-     *
      * @return an expression which as the same shape as \ref e, except along the given \ref axis
      */
     template <class E>
