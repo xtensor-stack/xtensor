@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <utility>
 
+#include <xtl/xcompare.hpp>
 #include <xtl/xsequence.hpp>
 
 #include "xbuilder.hpp"
@@ -318,6 +319,60 @@ namespace xt
 
         using strides_t = get_strides_t<typename std::decay_t<E>::shape_type>;
         return transpose(std::forward<E>(e), detail::swapaxes_perm<strides_t>(dim, axis1, axis2));
+    }
+
+    /*****************************
+     *  moveaxis implementation  *
+     *****************************/
+
+    namespace detail
+    {
+        template <class S>
+        inline S moveaxis_perm(std::size_t dim, std::ptrdiff_t src, std::ptrdiff_t dest)
+        {
+            using id_t = typename S::value_type;
+
+            std::size_t const src_norm = normalize_axis(dim, src);
+            std::size_t const dest_norm = normalize_axis(dim, dest);
+
+            // Initializing to src_norm handles case where `dest == -1` and the loop
+            // does not go check `perm_idx == dest_norm` a `dim+1`th time.
+            auto perm = xtl::make_sequence<S>(dim, src_norm);
+            id_t perm_idx = 0;
+            for (id_t i = 0; xtl::cmp_less(i, dim); ++i)
+            {
+                if (xtl::cmp_equal(perm_idx, dest_norm))
+                {
+                    perm[perm_idx] = src_norm;
+                    ++perm_idx;
+                }
+                if (xtl::cmp_not_equal(i, src_norm))
+                {
+                    perm[perm_idx] = i;
+                    ++perm_idx;
+                }
+            }
+            return perm;
+        }
+    }
+
+    /**
+     * Return a new expression with an axis move to a new position.
+     *
+     * @ingroup xt_xmanipulation
+     * @param e The input expression
+     * @param src Original position of the axis to move
+     * @param dest Destination position for the original axis.
+     */
+    template <class E>
+    inline auto moveaxis(E&& e, std::ptrdiff_t src, std::ptrdiff_t dest)
+    {
+        auto const dim = e.dimension();
+        check_axis_in_dim(src, dim, "Parameter src");
+        check_axis_in_dim(dest, dim, "Parameter dest");
+
+        using strides_t = get_strides_t<typename std::decay_t<E>::shape_type>;
+        return xt::transpose(std::forward<E>(e), detail::moveaxis_perm<strides_t>(e.dimension(), src, dest));
     }
 
     /************************************
