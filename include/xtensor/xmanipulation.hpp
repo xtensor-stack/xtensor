@@ -741,60 +741,62 @@ namespace xt
      * rot90 implementation *
      ************************/
 
-    template <std::ptrdiff_t N>
-    struct rot90_impl;
+    namespace detail {
+        template <std::ptrdiff_t N>
+        struct rot90_impl;
 
-    template <>
-    struct rot90_impl<0>
-    {
-        template <class E>
-        inline auto operator()(E&& e, const std::array<std::size_t, 2>& /*axes*/)
+        template <>
+        struct rot90_impl<0>
         {
-            return std::forward<E>(e);
-        }
-    };
+            template <class E>
+            inline auto operator()(E&& e, const std::array<std::size_t, 2>& /*axes*/)
+            {
+                return std::forward<E>(e);
+            }
+        };
 
-    template <>
-    struct rot90_impl<1>
-    {
-        template <class E>
-        inline auto operator()(E&& e, const std::array<std::size_t, 2>& axes)
+        template <>
+        struct rot90_impl<1>
         {
-            using std::swap;
+            template <class E>
+            inline auto operator()(E&& e, const std::array<std::size_t, 2>& axes)
+            {
+                using std::swap;
 
-            dynamic_shape<std::ptrdiff_t> axes_list(e.shape().size());
-            std::iota(axes_list.begin(), axes_list.end(), 0);
-            swap(axes_list[axes[0]], axes_list[axes[1]]);
+                dynamic_shape<std::ptrdiff_t> axes_list(e.shape().size());
+                std::iota(axes_list.begin(), axes_list.end(), 0);
+                swap(axes_list[axes[0]], axes_list[axes[1]]);
 
-            return transpose(flip(std::forward<E>(e), axes[1]), std::move(axes_list));
-        }
-    };
+                return transpose(flip(std::forward<E>(e), axes[1]), std::move(axes_list));
+            }
+        };
 
-    template <>
-    struct rot90_impl<2>
-    {
-        template <class E>
-        inline auto operator()(E&& e, const std::array<std::size_t, 2>& axes)
+        template <>
+        struct rot90_impl<2>
         {
-            return flip(flip(std::forward<E>(e), axes[0]), axes[1]);
-        }
-    };
+            template <class E>
+            inline auto operator()(E&& e, const std::array<std::size_t, 2>& axes)
+            {
+                return flip(flip(std::forward<E>(e), axes[0]), axes[1]);
+            }
+        };
 
-    template <>
-    struct rot90_impl<3>
-    {
-        template <class E>
-        inline auto operator()(E&& e, const std::array<std::size_t, 2>& axes)
+        template <>
+        struct rot90_impl<3>
         {
-            using std::swap;
+            template <class E>
+            inline auto operator()(E&& e, const std::array<std::size_t, 2>& axes)
+            {
+                using std::swap;
 
-            dynamic_shape<std::ptrdiff_t> axes_list(e.shape().size());
-            std::iota(axes_list.begin(), axes_list.end(), 0);
-            swap(axes_list[axes[0]], axes_list[axes[1]]);
+                dynamic_shape<std::ptrdiff_t> axes_list(e.shape().size());
+                std::iota(axes_list.begin(), axes_list.end(), 0);
+                swap(axes_list[axes[0]], axes_list[axes[1]]);
 
-            return flip(transpose(std::forward<E>(e), std::move(axes_list)), axes[1]);
-        }
-    };
+                return flip(transpose(std::forward<E>(e), std::move(axes_list)), axes[1]);
+            }
+        };
+    }
 
     /**
      * Rotate an array by 90 degrees in the plane specified by axes.
@@ -820,7 +822,7 @@ namespace xt
         auto norm_axes = forward_normalize<std::array<std::size_t, 2>>(e, axes);
         constexpr std::ptrdiff_t n = (4 + (N % 4)) % 4;
 
-        return rot90_impl<n>()(std::forward<E>(e), norm_axes);
+        return detail::rot90_impl<n>()(std::forward<E>(e), norm_axes);
     }
 
     /***********************
