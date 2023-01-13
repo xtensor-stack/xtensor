@@ -15,7 +15,9 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 
+#include <xtl/xcompare.hpp>
 #include <xtl/xsequence.hpp>
 #include <xtl/xspan_impl.hpp>
 
@@ -274,6 +276,24 @@ namespace xt
                 std::out_of_range,
                 "Number of arguments (" + std::to_string(sizeof...(Args))
                     + ") is greater than the number of dimensions (" + std::to_string(shape.size()) + ")"
+            );
+        }
+    }
+
+    /*******************************
+     *  check_axis implementation  *
+     *******************************/
+
+    template <class A, class D>
+    inline void check_axis_in_dim(A axis, D dim, const char* subject = "Axis")
+    {
+        auto const sdim = static_cast<std::make_signed_t<D>>(dim);
+        if (xtl::cmp_greater_equal(axis, dim) || xtl::cmp_less(axis, -sdim))
+        {
+            XTENSOR_THROW(
+                std::out_of_range,
+                std::string(subject) + " (" + std::to_string(axis)
+                    + ") is not within the number of dimensions (" + std::to_string(dim) + ')'
             );
         }
     }

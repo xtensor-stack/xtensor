@@ -741,7 +741,8 @@ namespace xt
      * rot90 implementation *
      ************************/
 
-    namespace detail {
+    namespace detail
+    {
         template <std::ptrdiff_t N>
         struct rot90_impl;
 
