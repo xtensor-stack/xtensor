@@ -279,6 +279,8 @@ not modify the underlying xexpression.
      - :cpp:func:`xt::flip(a, 1) <xt::flip>`
    * - :any:`np.transpose(a, (1, 0, 2)) <numpy.transpose>`
      - :cpp:func:`xt::transpose(a, {1, 0, 2}) <xt::transpose>`
+   * - :any:`np.swapaxes(a, 0, -1) <numpy.swapaxes>`
+     - :cpp:func:`xt::swapaxes(a, 0, -1) <xt::swapaxes>`
    * - :any:`np.ravel(a, order='F') <numpy.ravel>`
      - :cpp:func:`xt::ravel\<xt::layout_type::column_major\>(a) <xt::ravel>`
    * - :any:`np.rot90(a) <numpy.rot90>`

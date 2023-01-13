@@ -10,7 +10,13 @@
 #ifndef XTENSOR_MANIPULATION_HPP
 #define XTENSOR_MANIPULATION_HPP
 
+#include <algorithm>
+#include <utility>
+
+#include <xtl/xsequence.hpp>
+
 #include "xbuilder.hpp"
+#include "xexception.hpp"
 #include "xrepeat.hpp"
 #include "xstrided_view.hpp"
 #include "xtensor_config.hpp"
@@ -38,6 +44,9 @@ namespace xt
 
     template <class E, class S, class Tag = check_policy::none>
     auto transpose(E&& e, S&& permutation, Tag check_policy = Tag());
+
+    template <class E>
+    auto swapaxes(E&& e, std::ptrdiff_t axis1, std::ptrdiff_t axis2);
 
     template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E>
     auto ravel(E&& e);
@@ -269,6 +278,47 @@ namespace xt
     }
 
     /// @endcond
+
+    /*****************************
+     *  swapaxes implementation  *
+     *****************************/
+
+    namespace detail
+    {
+        template <class S>
+        inline S swapaxes_perm(std::size_t dim, std::ptrdiff_t axis1, std::ptrdiff_t axis2)
+        {
+            std::size_t const ax1 = normalize_axis(dim, axis1);
+            std::size_t const ax2 = normalize_axis(dim, axis2);
+            auto perm = xtl::make_sequence<S>(dim, 0);
+            using id_t = typename S::value_type;
+            std::iota(perm.begin(), perm.end(), id_t(0));
+            perm[ax1] = ax2;
+            perm[ax2] = ax1;
+            return perm;
+        }
+    }
+
+    /**
+     * Return a new expression with two axes interchanged.
+     *
+     * The two axis parameter @p axis and @p axis2 are interchangable.
+     *
+     * @ingroup xt_xmanipulation
+     * @param e The input expression
+     * @param axis1 First axis to swap
+     * @param axis2 Second axis to swap
+     */
+    template <class E>
+    inline auto swapaxes(E&& e, std::ptrdiff_t axis1, std::ptrdiff_t axis2)
+    {
+        auto const dim = e.dimension();
+        check_axis_in_dim(axis1, dim, "Parameter axis1");
+        check_axis_in_dim(axis2, dim, "Parameter axis2");
+
+        using strides_t = get_strides_t<typename std::decay_t<E>::shape_type>;
+        return transpose(std::forward<E>(e), detail::swapaxes_perm<strides_t>(dim, axis1, axis2));
+    }
 
     /************************************
      * ravel and flatten implementation *
