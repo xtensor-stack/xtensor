@@ -27,7 +27,7 @@ jobs:
     - name: Set mamba environment "test"
       uses: mamba-org/provision-with-micromamba@main
       with:
-        environment-file: docs/ghp_environment.yaml
+        environment-file: docs/ghp_environment.yml
         environment-name: xtensor-doc
 
     - name: Run doxygen
