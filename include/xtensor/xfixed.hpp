@@ -633,9 +633,9 @@ namespace xt
 
     /**
      * Allocates an xfixed_container with shape S with values from a C array.
-     * The type returned by get_init_type_t is raw C array ``value_type[X][Y][Z]`` for ``xt::xshape<X, Y,
-     * Z>``. C arrays can be initialized with the initializer list syntax, but the size is checked at compile
-     * time to prevent errors.
+     * The type returned by get_init_type_t is raw C array ``value_type[X][Y][Z]`` for
+     * ``xt::xshape<X, Y, Z>``. C arrays can be initialized with the initializer list syntax,
+     * but the size is checked at compile time to prevent errors.
      * Note: for clang < 3.8 this is an initializer_list and the size is not checked at compile-or runtime.
      */
     template <class ET, class S, layout_type L, bool SH, class Tag>
