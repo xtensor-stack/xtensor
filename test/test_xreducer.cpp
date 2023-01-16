@@ -1101,9 +1101,9 @@ namespace xt
 
     TEST(xreducer, sum_reshape_view_xfunction)
     {
-        xt::xtensor<double, 1> a = { 0, 1, 2, 3, 4, 5, 6, 7};
-        xt::xtensor<double, 1> b = { 0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5 };
-        xt::svector<double> sh = { 2, 4 };
+        xt::xtensor<double, 1> a = {0, 1, 2, 3, 4, 5, 6, 7};
+        xt::xtensor<double, 1> b = {0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5};
+        xt::svector<double> sh = {2, 4};
 
         auto res = xt::sum(xt::reshape_view(a * b, sh), 0);
 
@@ -1115,7 +1115,7 @@ namespace xt
         auto itres = res.cbegin();
         auto itexp = exp.cbegin();
         auto itexp_end = exp.cend();
-        while(itexp != itexp_end)
+        while (itexp != itexp_end)
         {
             EXPECT_EQ(*itres, *itexp);
             ++itres;
