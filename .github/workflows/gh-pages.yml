@@ -26,7 +26,7 @@ jobs:
         mamba-version: '*'
         channels: conda-forge,defaults
         channel-priority: true
-        environment-file: docs/environment.yaml
+        environment-file: docs/ghp_environment.yaml
         activate-environment: test
         auto-activate-base: false
 
