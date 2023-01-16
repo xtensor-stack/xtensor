@@ -83,15 +83,10 @@ namespace xt
 
     TEST(xnpy, npy_file_move)
     {
-        xarray<bool> barr = {{{ 0, 0, 1},
-                              { 1, 1, 0},
-                              { 1, 0, 1}},
-                             {{ 1, 1, 0},
-                              { 0, 1, 0},
-                              { 0, 1, 0}},
-                             {{ 0, 0, 1},
-                              { 1, 1, 1},
-                              { 0, 0, 0}}};
+        xarray<bool> barr = {
+            {{0, 0, 1}, {1, 1, 0}, {1, 0, 1}},
+            {{1, 1, 0}, {0, 1, 0}, {0, 1, 0}},
+            {{0, 0, 1}, {1, 1, 1}, {0, 0, 0}}};
 
         std::ifstream bstream(get_load_filename("files/xnpy_files/bool"));
         detail::npy_file npy = detail::load_npy_file(bstream);
