@@ -612,7 +612,9 @@ namespace xt
             {
                 std::size_t cn = s / cs;
                 if (s % cs > 0)
+                {
                     cn += std::size_t(1);  // edge_chunk
+                }
                 return cn;
             }
         );

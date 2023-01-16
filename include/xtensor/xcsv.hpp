@@ -62,7 +62,9 @@ namespace xt
         {
             size_t first = cell.find_first_not_of(' ');
             if (first == std::string::npos)
+            {
                 return cell;
+            }
 
             size_t last = cell.find_last_not_of(' ');
             return cell.substr(first, last == std::string::npos ? cell.size() : last + 1);

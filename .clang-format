@@ -84,3 +84,4 @@ SpacesInSquareBrackets: false
 Standard: c++14
 TabWidth: '4'
 UseTab: Never
+InsertBraces: true
