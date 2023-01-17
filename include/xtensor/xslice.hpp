@@ -1640,7 +1640,9 @@ namespace xt
             auto iter = --m_inc.lower_bound(i);
             auto check = iter->first + iter->second;
             if (check > i)
+            {
                 --iter;
+            }
             return i - iter->second;
         }
     }

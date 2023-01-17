@@ -237,18 +237,30 @@ namespace xt
         {
             dofval.fill(0.0);
             for (size_t e = 0; e < M_NELEM; ++e)
+            {
                 for (size_t m = 0; m < M_NNE; ++m)
+                {
                     for (size_t i = 0; i < M_NDIM; ++i)
+                    {
                         dofval(m_dofs(m_conn(e, m), i)) += elemvec(e, m, i);
+                    }
+                }
+            }
         }
 
         auto calc_dofval_simple(simple_array<double, 3>& elemvec, simple_array<double, 1>& dofval)
         {
             dofval.fill(0.0);
             for (size_t e = 0; e < M_NELEM; ++e)
+            {
                 for (size_t m = 0; m < M_NNE; ++m)
+                {
                     for (size_t i = 0; i < M_NDIM; ++i)
+                    {
                         dofval(m_dofs(m_conn(e, m), i)) += elemvec(e, m, i);
+                    }
+                }
+            }
         }
 
         auto calc_unchecked_dofval(xt::xtensor<double, 3, L>& elemvec, xt::xtensor<double, 1, L>& dofval)

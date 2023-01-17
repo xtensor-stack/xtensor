@@ -776,7 +776,9 @@ namespace xt
             // This check is necessary as column major "broadcasting" is still
             // performed in a row major fashion
             if (s1.size() != s2.size())
+            {
                 return 0;
+            }
 
             auto size = s2.size();
 

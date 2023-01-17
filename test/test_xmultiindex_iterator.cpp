@@ -24,12 +24,16 @@ namespace xt
 
             shape_type should(3);
             for (should[0] = roi_begin[0]; should[0] < roi_end[0]; ++should[0])
+            {
                 for (should[1] = roi_begin[1]; should[1] < roi_end[1]; ++should[1])
+                {
                     for (should[2] = roi_begin[2]; should[2] < roi_end[2]; ++should[2])
                     {
                         EXPECT_EQ(*iter, should);
                         ++iter;
                     }
+                }
+            }
             EXPECT_TRUE(iter == end);
         }
     }

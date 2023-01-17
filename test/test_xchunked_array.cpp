@@ -37,9 +37,13 @@ namespace xt
 
         val = 3.;
         for (auto& it : a)
+        {
             it = val;
+        }
         for (auto it : a)
+        {
             ASSERT_EQ(it, val);
+        }
     }
 
     TEST(xchunked_array, assign_expression)

@@ -82,45 +82,81 @@ namespace xt
         inline char map_type()
         {
             if (std::is_same<T, float>::value)
+            {
                 return 'f';
+            }
             if (std::is_same<T, double>::value)
+            {
                 return 'f';
+            }
             if (std::is_same<T, long double>::value)
+            {
                 return 'f';
+            }
 
             if (std::is_same<T, char>::value)
+            {
                 return 'i';
+            }
             if (std::is_same<T, signed char>::value)
+            {
                 return 'i';
+            }
             if (std::is_same<T, short>::value)
+            {
                 return 'i';
+            }
             if (std::is_same<T, int>::value)
+            {
                 return 'i';
+            }
             if (std::is_same<T, long>::value)
+            {
                 return 'i';
+            }
             if (std::is_same<T, long long>::value)
+            {
                 return 'i';
+            }
 
             if (std::is_same<T, unsigned char>::value)
+            {
                 return 'u';
+            }
             if (std::is_same<T, unsigned short>::value)
+            {
                 return 'u';
+            }
             if (std::is_same<T, unsigned int>::value)
+            {
                 return 'u';
+            }
             if (std::is_same<T, unsigned long>::value)
+            {
                 return 'u';
+            }
             if (std::is_same<T, unsigned long long>::value)
+            {
                 return 'u';
+            }
 
             if (std::is_same<T, bool>::value)
+            {
                 return 'b';
+            }
 
             if (std::is_same<T, std::complex<float>>::value)
+            {
                 return 'c';
+            }
             if (std::is_same<T, std::complex<double>>::value)
+            {
                 return 'c';
+            }
             if (std::is_same<T, std::complex<long double>>::value)
+            {
                 return 'c';
+            }
 
             XTENSOR_THROW(std::runtime_error, "Type not known.");
         }
