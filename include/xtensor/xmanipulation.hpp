@@ -289,8 +289,8 @@ namespace xt
         template <class S>
         inline S swapaxes_perm(std::size_t dim, std::ptrdiff_t axis1, std::ptrdiff_t axis2)
         {
-            std::size_t const ax1 = normalize_axis(dim, axis1);
-            std::size_t const ax2 = normalize_axis(dim, axis2);
+            const std::size_t ax1 = normalize_axis(dim, axis1);
+            const std::size_t ax2 = normalize_axis(dim, axis2);
             auto perm = xtl::make_sequence<S>(dim, 0);
             using id_t = typename S::value_type;
             std::iota(perm.begin(), perm.end(), id_t(0));
@@ -313,7 +313,7 @@ namespace xt
     template <class E>
     inline auto swapaxes(E&& e, std::ptrdiff_t axis1, std::ptrdiff_t axis2)
     {
-        auto const dim = e.dimension();
+        const auto dim = e.dimension();
         check_axis_in_dim(axis1, dim, "Parameter axis1");
         check_axis_in_dim(axis2, dim, "Parameter axis2");
 
@@ -332,8 +332,8 @@ namespace xt
         {
             using id_t = typename S::value_type;
 
-            std::size_t const src_norm = normalize_axis(dim, src);
-            std::size_t const dest_norm = normalize_axis(dim, dest);
+            const std::size_t src_norm = normalize_axis(dim, src);
+            const std::size_t dest_norm = normalize_axis(dim, dest);
 
             // Initializing to src_norm handles case where `dest == -1` and the loop
             // does not go check `perm_idx == dest_norm` a `dim+1`th time.
