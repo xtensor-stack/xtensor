@@ -80,6 +80,39 @@ namespace xt
         EXPECT_EQ(fun2(1, 2), tr2(2, 1));
     }
 
+    TEST(xmanipulation, swapaxes)
+    {
+        auto const a = xarray<double>::from_shape({1, 2, 3, 4, 5});
+        using shape_type = decltype(a)::shape_type;
+
+        EXPECT_EQ(swapaxes(a, 0, 1).shape(), (shape_type{2, 1, 3, 4, 5}));
+        EXPECT_EQ(swapaxes(a, 1, 3).shape(), (shape_type{1, 4, 3, 2, 5}));
+        EXPECT_EQ(swapaxes(a, 1, -1).shape(), (shape_type{1, 5, 3, 4, 2}));
+        // Symetry
+        EXPECT_EQ(swapaxes(a, 0, 1).shape(), swapaxes(a, 1, 0).shape());
+        EXPECT_EQ(swapaxes(a, 1, 4).shape(), swapaxes(a, 4, 1).shape());
+        EXPECT_EQ(swapaxes(a, -1, 0).shape(), swapaxes(a, 0, -1).shape());
+        // No Op
+        EXPECT_EQ(swapaxes(a, 0, 0).shape(), a.shape());
+        EXPECT_EQ(swapaxes(a, -1, -1).shape(), a.shape());
+    }
+
+    TEST(xmanipulation, moveaxis)
+    {
+        auto const a = xarray<double>::from_shape({1, 2, 3, 4, 5});
+        using shape_type = decltype(a)::shape_type;
+
+        EXPECT_EQ(moveaxis(a, 0, 1).shape(), (shape_type{2, 1, 3, 4, 5}));
+        EXPECT_EQ(moveaxis(a, 1, 0).shape(), (shape_type{2, 1, 3, 4, 5}));
+        EXPECT_EQ(moveaxis(a, 1, 3).shape(), (shape_type{1, 3, 4, 2, 5}));
+        EXPECT_EQ(moveaxis(a, 3, 1).shape(), (shape_type{1, 4, 2, 3, 5}));
+        EXPECT_EQ(moveaxis(a, 1, -1).shape(), (shape_type{1, 3, 4, 5, 2}));
+        EXPECT_EQ(moveaxis(a, -1, 1).shape(), (shape_type{1, 5, 2, 3, 4}));
+        // No Op
+        EXPECT_EQ(moveaxis(a, 0, 0).shape(), a.shape());
+        EXPECT_EQ(moveaxis(a, -1, -1).shape(), a.shape());
+    }
+
     TEST(xmanipulation, ravel)
     {
         xarray<int, layout_type::row_major> a = {{0, 1, 2}, {3, 4, 5}};
