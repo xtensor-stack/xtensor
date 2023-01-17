@@ -34,7 +34,7 @@ namespace xt
      * Force evaluation of xexpression.
      *
      * \code{.cpp}
-     * xt::xarray<double> a = {1,2,3,4};
+     * xt::xarray<double> a = {1, 2, 3, 4};
      * auto&& b = xt::eval(a); // b is a reference to a, no copy!
      * auto&& c = xt::eval(a + b); // c is xarray<double>, not an xexpression
      * \endcode
@@ -121,12 +121,22 @@ namespace xt
      * and convert to the required layout.
      *
      * \code{.cpp}
-     * xt::xarray<double, xt::layout_type::row_major> a = {1,2,3,4};
-     * auto&& b = xt::as_strided(a); // b is a reference to a, no copy!
-     * auto&& c = xt::as_strided<xt::layout_type::column_major>(a); // b is xarray<double> with the required
-     * layout auto&& a_cast = xt::cast<int>(a); // a_cast is an xexpression auto&& d = xt::as_strided(a_cast);
-     * // d is xarray<int>, not an xexpression auto&& e =
-     * xt::as_strided<xt::layout_type::column_major>(a_cast); // d is xarray<int> with the required layout
+     * xt::xarray<double, xt::layout_type::row_major> a = {1, 2, 3, 4};
+     *
+     * // take reference to a (no copy!)
+     * auto&& b = xt::as_strided(a);
+     *
+     * // xarray<double> with the required layout
+     * auto&& c = xt::as_strided<xt::layout_type::column_major>(a);
+     *
+     * // xexpression
+     * auto&& a_cast = xt::cast<int>(a);
+     *
+     * // xarray<int>, not an xexpression
+     * auto&& d = xt::as_strided(a_cast);
+     *
+     * // xarray<int> with the required layout
+     * auto&& e = xt::as_strided<xt::layout_type::column_major>(a_cast);
      * \endcode
      *
      * @warning This function should be used in a local context only.

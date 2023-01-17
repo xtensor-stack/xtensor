@@ -255,10 +255,16 @@ namespace xt
         {
             dofval.fill(0.0);
             for (size_t e = 0; e < M_NELEM; ++e)
+            {
                 for (size_t m = 0; m < M_NNE; ++m)
+                {
                     for (size_t i = 0; i < M_NDIM; ++i)
-                        dofval.unchecked(m_dofs.unchecked(m_conn.unchecked(e, m), i)
-                        ) += elemvec.unchecked(e, m, i);
+                    {
+                        auto d = m_dofs.unchecked(m_conn.unchecked(e, m), i);
+                        dofval.unchecked(d) += elemvec.unchecked(e, m, i);
+                    }
+                }
+            }
         }
 
         X m_dofs, m_conn;

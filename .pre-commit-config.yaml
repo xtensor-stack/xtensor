@@ -1,6 +1,6 @@
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.3.0
+  rev: v4.4.0
   hooks:
   - id: check-added-large-files
   - id: check-case-conflict
@@ -31,7 +31,7 @@ repos:
   hooks:
   - id: cpp_comment_format
 - repo: https://github.com/tdegeus/conda_envfile
-  rev: v0.4.1
+  rev: v0.4.2
   hooks:
   - id: conda_envfile_parse
     files: environment.yaml
