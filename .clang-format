@@ -67,6 +67,8 @@ PenaltyBreakTemplateDeclaration: 0
 PenaltyExcessCharacter: 10
 PenaltyIndentedWhitespace: 0
 PenaltyReturnTypeOnItsOwnLine: 10
+QualifierAlignment: Custom  # Experimental
+QualifierOrder: [inline, static, constexpr, const, volatile, type]
 ReflowComments: true
 SeparateDefinitionBlocks: Always
 SortIncludes: CaseInsensitive
