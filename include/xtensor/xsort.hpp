@@ -918,19 +918,12 @@ namespace xt
     template <class T = double, class E, class P>
     inline auto quantile(E&& e, const P& probas, std::ptrdiff_t axis, T alpha, T beta)
     {
-        // Check inputs
-        if (any((probas < 0.) || (1. < probas)))
-        {
-            XTENSOR_THROW(std::runtime_error, "p must be between 0 and 1");
-        }
-        if ((alpha < 0) || (1 < alpha))
-        {
-            XTENSOR_THROW(std::runtime_error, "alpha must be between 0 and 1");
-        }
-        if ((beta < 0) || (1 < beta))
-        {
-            XTENSOR_THROW(std::runtime_error, "beta must be between 0 and 1");
-        }
+        XTENSOR_ASSERT(all(0. <= probas));
+        XTENSOR_ASSERT(all(probas <= 1.));
+        XTENSOR_ASSERT(0. <= alpha);
+        XTENSOR_ASSERT(alpha <= 1.);
+        XTENSOR_ASSERT(0. <= beta);
+        XTENSOR_ASSERT(beta <= 1.);
 
         using tmp_shape_t = get_strides_t<typename std::decay_t<E>::shape_type>;
         using id_t = typename tmp_shape_t::value_type;
