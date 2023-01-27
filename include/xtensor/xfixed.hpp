@@ -99,33 +99,33 @@ namespace xt
         template <std::size_t I, std::size_t Y, std::size_t... X>
         struct calculate_stride<layout_type::column_major, I, Y, X...>
         {
-            constexpr static std::ptrdiff_t value = Y
+            static constexpr std::ptrdiff_t value = Y
                                                     * calculate_stride<layout_type::column_major, I - 1, X...>::value;
         };
 
         template <std::size_t Y, std::size_t... X>
         struct calculate_stride<layout_type::column_major, 0, Y, X...>
         {
-            constexpr static std::ptrdiff_t value = 1;
+            static constexpr std::ptrdiff_t value = 1;
         };
 
         template <std::size_t I, std::size_t... X>
         struct calculate_stride_row_major
         {
-            constexpr static std::ptrdiff_t value = at<sizeof...(X) - I, X...>::value
+            static constexpr std::ptrdiff_t value = at<sizeof...(X) - I, X...>::value
                                                     * calculate_stride_row_major<I - 1, X...>::value;
         };
 
         template <std::size_t... X>
         struct calculate_stride_row_major<0, X...>
         {
-            constexpr static std::ptrdiff_t value = 1;
+            static constexpr std::ptrdiff_t value = 1;
         };
 
         template <std::size_t I, std::size_t... X>
         struct calculate_stride<layout_type::row_major, I, X...>
         {
-            constexpr static std::ptrdiff_t value = calculate_stride_row_major<sizeof...(X) - I - 1, X...>::value;
+            static constexpr std::ptrdiff_t value = calculate_stride_row_major<sizeof...(X) - I - 1, X...>::value;
         };
 
         namespace workaround
@@ -136,7 +136,7 @@ namespace xt
             template <layout_type L, size_t I, size_t... X>
             struct computed_strides<L, I, std::index_sequence<X...>>
             {
-                constexpr static std::ptrdiff_t value = calculate_stride<L, I, X...>::value;
+                static constexpr std::ptrdiff_t value = calculate_stride<L, I, X...>::value;
             };
 
             template <layout_type L, size_t I, class SEQ>
@@ -173,20 +173,20 @@ namespace xt
         template <std::size_t Y, std::size_t... X>
         struct fixed_compute_size_impl<Y, X...>
         {
-            constexpr static std::size_t value = Y * fixed_compute_size_impl<X...>::value;
+            static constexpr std::size_t value = Y * fixed_compute_size_impl<X...>::value;
         };
 
         template <std::size_t X>
         struct fixed_compute_size_impl<X>
         {
-            constexpr static std::size_t value = X;
+            static constexpr std::size_t value = X;
         };
 
         template <>
         struct fixed_compute_size_impl<>
         {
             // support for 0D xtensor fixed (empty shape = xshape<>)
-            constexpr static std::size_t value = 1;
+            static constexpr std::size_t value = 1;
         };
 
         // TODO unify with constexpr compute_size when dropping MSVC 2015
@@ -196,7 +196,7 @@ namespace xt
         template <std::size_t... X>
         struct fixed_compute_size<xt::fixed_shape<X...>>
         {
-            constexpr static std::size_t value = fixed_compute_size_impl<X...>::value;
+            static constexpr std::size_t value = fixed_compute_size_impl<X...>::value;
         };
 
         template <class V, std::size_t... X>
@@ -317,8 +317,8 @@ namespace xt
         using temporary_type = typename semantic_base::temporary_type;
         using expression_tag = Tag;
 
-        constexpr static std::size_t N = std::tuple_size<shape_type>::value;
-        constexpr static std::size_t rank = N;
+        static constexpr std::size_t N = std::tuple_size<shape_type>::value;
+        static constexpr std::size_t rank = N;
 
         xfixed_container() = default;
         xfixed_container(const value_type& v);
@@ -354,7 +354,7 @@ namespace xt
         void resize(ST&& shape, const strides_type& strides) const;
 
         template <class ST = std::array<std::size_t, N>>
-        auto const& reshape(ST&& shape, layout_type layout = L) const;
+        const auto& reshape(ST&& shape, layout_type layout = L) const;
 
         template <class ST>
         bool broadcast_shape(ST& s, bool reuse_cache = false) const;
@@ -463,7 +463,7 @@ namespace xt
         using temporary_type = typename semantic_base::temporary_type;
         using expression_tag = Tag;
 
-        constexpr static std::size_t N = S::size();
+        static constexpr std::size_t N = S::size();
 
         xfixed_adaptor(storage_type&& data);
         xfixed_adaptor(const storage_type& data);
@@ -726,7 +726,7 @@ namespace xt
      */
     template <class ET, class S, layout_type L, bool SH, class Tag>
     template <class ST>
-    inline auto const& xfixed_container<ET, S, L, SH, Tag>::reshape(ST&& shape, layout_type layout) const
+    inline const auto& xfixed_container<ET, S, L, SH, Tag>::reshape(ST&& shape, layout_type layout) const
     {
         if (!(std::equal(shape.begin(), shape.end(), m_shape.begin()) && shape.size() == m_shape.size()
               && layout == L))
@@ -923,7 +923,7 @@ namespace xt
      */
     template <class ET, class S, layout_type L, bool SH, class Tag>
     template <class ST>
-    inline auto const& xfixed_adaptor<ET, S, L, SH, Tag>::reshape(ST&& shape, layout_type layout) const
+    inline const auto& xfixed_adaptor<ET, S, L, SH, Tag>::reshape(ST&& shape, layout_type layout) const
     {
         if (!(std::equal(shape.begin(), shape.end(), m_shape.begin()) && shape.size() == m_shape.size()
               && layout == L))

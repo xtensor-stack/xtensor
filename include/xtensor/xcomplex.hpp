@@ -48,14 +48,14 @@ namespace xt
         struct complex_helper
         {
             template <class E>
-            static inline auto real(E&& e) noexcept
+            inline static auto real(E&& e) noexcept
             {
                 using real_type = typename std::decay_t<E>::value_type::value_type;
                 return xoffset_view<xclosure_t<E>, real_type, 0>(std::forward<E>(e));
             }
 
             template <class E>
-            static inline auto imag(E&& e) noexcept
+            inline static auto imag(E&& e) noexcept
             {
                 using real_type = typename std::decay_t<E>::value_type::value_type;
                 return xoffset_view<xclosure_t<E>, real_type, sizeof(real_type)>(std::forward<E>(e));
@@ -66,13 +66,13 @@ namespace xt
         struct complex_helper<false>
         {
             template <class E>
-            static inline decltype(auto) real(E&& e) noexcept
+            inline static decltype(auto) real(E&& e) noexcept
             {
                 return std::forward<E>(e);
             }
 
             template <class E>
-            static inline auto imag(E&& e) noexcept
+            inline static auto imag(E&& e) noexcept
             {
                 return zeros<typename std::decay_t<E>::value_type>(e.shape());
             }
@@ -82,7 +82,7 @@ namespace xt
         struct complex_expression_helper
         {
             template <class E>
-            static inline decltype(auto) real(E&& e) noexcept
+            inline static decltype(auto) real(E&& e) noexcept
             {
                 return detail::complex_helper<xtl::is_complex<typename std::decay_t<E>::value_type>::value>::real(
                     std::forward<E>(e)
@@ -90,7 +90,7 @@ namespace xt
             }
 
             template <class E>
-            static inline decltype(auto) imag(E&& e) noexcept
+            inline static decltype(auto) imag(E&& e) noexcept
             {
                 return detail::complex_helper<xtl::is_complex<typename std::decay_t<E>::value_type>::value>::imag(
                     std::forward<E>(e)
@@ -102,13 +102,13 @@ namespace xt
         struct complex_expression_helper<false>
         {
             template <class E>
-            static inline decltype(auto) real(E&& e) noexcept
+            inline static decltype(auto) real(E&& e) noexcept
             {
                 return xtl::forward_real(std::forward<E>(e));
             }
 
             template <class E>
-            static inline decltype(auto) imag(E&& e) noexcept
+            inline static decltype(auto) imag(E&& e) noexcept
             {
                 return xtl::forward_imag(std::forward<E>(e));
             }

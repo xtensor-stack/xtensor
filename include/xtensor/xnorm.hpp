@@ -559,7 +559,7 @@ namespace xt
         using value_type = typename std::decay_t<E>::value_type;
         using result_type = norm_type_t<std::decay_t<E>>;
 
-        auto reduce_func = [p](result_type const& r, value_type const& v)
+        auto reduce_func = [p](const result_type& r, const value_type& v)
         {
             return r + norm_lp_to_p(v, p);
         };

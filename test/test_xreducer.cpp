@@ -194,7 +194,7 @@ namespace xt
 
     TEST(xreducer, functor_type)
     {
-        auto sum = [](auto const& left, auto const& right)
+        auto sum = [](const auto& left, const auto& right)
         {
             return left + right;
         };

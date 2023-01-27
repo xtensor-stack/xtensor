@@ -17,7 +17,7 @@
 
 namespace xt
 {
-    std::string get_load_filename(std::string const& npy_prefix, layout_type lt = layout_type::row_major)
+    std::string get_load_filename(const std::string& npy_prefix, layout_type lt = layout_type::row_major)
     {
         std::string lts = lt == layout_type::row_major ? "" : "_fortran";
         std::string endianness;
@@ -124,7 +124,7 @@ namespace xt
 
     std::string read_file(const std::string& name)
     {
-        return static_cast<std::stringstream const&>(std::stringstream() << std::ifstream(name).rdbuf()).str();
+        return static_cast<const std::stringstream&>(std::stringstream() << std::ifstream(name).rdbuf()).str();
     }
 
     TEST(xnpy, dump)

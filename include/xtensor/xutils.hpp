@@ -947,13 +947,13 @@ namespace xt
     template <class E, typename = void>
     struct get_rank
     {
-        constexpr static std::size_t value = SIZE_MAX;
+        static constexpr std::size_t value = SIZE_MAX;
     };
 
     template <class E>
     struct get_rank<E, decltype((void) E::rank, void())>
     {
-        constexpr static std::size_t value = E::rank;
+        static constexpr std::size_t value = E::rank;
     };
 
     /******************

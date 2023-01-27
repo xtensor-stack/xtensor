@@ -80,13 +80,13 @@ namespace xt
             using flag_expression = decltype(ones<bool>(std::declval<T>().shape()));
 
             template <class U>
-            static inline U&& value(U&& arg)
+            inline static U&& value(U&& arg)
             {
                 return std::forward<U>(arg);
             }
 
             template <class U>
-            static inline flag_expression has_value(U&& arg)
+            inline static flag_expression has_value(U&& arg)
             {
                 return ones<bool>(arg.shape());
             }
@@ -99,13 +99,13 @@ namespace xt
             using flag_expression = xscalar<bool>;
 
             template <class U>
-            static inline U&& value(U&& arg)
+            inline static U&& value(U&& arg)
             {
                 return std::forward<U>(arg);
             }
 
             template <class U>
-            static inline flag_expression has_value(U&&)
+            inline static flag_expression has_value(U&&)
             {
                 return xscalar<bool>(true);
             }
@@ -125,13 +125,13 @@ namespace xt
                 conditional_t<is_const, typename decay_type::const_flag_expression, typename decay_type::flag_expression>;
 
             template <class U>
-            static inline value_expression value(U&& arg)
+            inline static value_expression value(U&& arg)
             {
                 return arg.value();
             }
 
             template <class U>
-            static inline flag_expression has_value(U&& arg)
+            inline static flag_expression has_value(U&& arg)
             {
                 return arg.has_value();
             }

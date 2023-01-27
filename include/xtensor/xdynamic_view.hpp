@@ -48,9 +48,9 @@ namespace xt
         using inner_backstrides_type = inner_shape_type;
 
 #if defined(__GNUC__) && !defined(__clang__) && __GNUC__ == 8
-        constexpr static auto
+        static constexpr auto
             random_instantiation_var_for_gcc8_data_iface = has_data_interface<xdynamic_view<CT, S, L, FST>>::value;
-        constexpr static auto
+        static constexpr auto
             random_instantiation_var_for_gcc8_has_strides = has_strides<xdynamic_view<CT, S, L, FST>>::value;
 #endif
 

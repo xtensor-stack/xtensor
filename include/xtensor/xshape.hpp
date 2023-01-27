@@ -262,10 +262,10 @@ namespace xt
     template <layout_type L, class S>
     struct select_layout
     {
-        constexpr static std::ptrdiff_t static_dimension = xt::static_dimension<S>::value;
-        constexpr static bool is_any = static_dimension != -1 && static_dimension <= 1
+        static constexpr std::ptrdiff_t static_dimension = xt::static_dimension<S>::value;
+        static constexpr bool is_any = static_dimension != -1 && static_dimension <= 1
                                        && L != layout_type::dynamic;
-        constexpr static layout_type value = is_any ? layout_type::any : L;
+        static constexpr layout_type value = is_any ? layout_type::any : L;
     };
 
     /*************************************
@@ -300,8 +300,8 @@ namespace xt
         template <std::size_t IDX, std::size_t... X>
         struct at
         {
-            constexpr static std::size_t arr[sizeof...(X)] = {X...};
-            constexpr static std::size_t value = (IDX < sizeof...(X)) ? arr[IDX] : 0;
+            static constexpr std::size_t arr[sizeof...(X)] = {X...};
+            static constexpr std::size_t value = (IDX < sizeof...(X)) ? arr[IDX] : 0;
         };
 
         template <class S1, class S2>

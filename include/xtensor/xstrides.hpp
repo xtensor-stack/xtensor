@@ -331,7 +331,7 @@ namespace xt
         struct layout_data_offset
         {
             template <std::size_t dim, class S, class Arg, class... Args>
-            static inline auto run(const S& strides, Arg arg, Args... args) noexcept
+            inline static auto run(const S& strides, Arg arg, Args... args) noexcept
             {
                 return raw_data_offset<dim>(strides, arg, args...);
             }
@@ -343,7 +343,7 @@ namespace xt
             using self_type = layout_data_offset<layout_type::row_major, static_dim>;
 
             template <std::size_t dim, class S, class Arg>
-            static inline auto run(const S& strides, Arg arg) noexcept
+            inline static auto run(const S& strides, Arg arg) noexcept
             {
                 if (std::ptrdiff_t(dim) + 1 == static_dim)
                 {
@@ -356,7 +356,7 @@ namespace xt
             }
 
             template <std::size_t dim, class S, class Arg, class... Args>
-            static inline auto run(const S& strides, Arg arg, Args... args) noexcept
+            inline static auto run(const S& strides, Arg arg, Args... args) noexcept
             {
                 return arg * strides[dim] + self_type::template run<dim + 1>(strides, args...);
             }
@@ -368,7 +368,7 @@ namespace xt
             using self_type = layout_data_offset<layout_type::column_major, static_dim>;
 
             template <std::size_t dim, class S, class Arg>
-            static inline auto run(const S& strides, Arg arg) noexcept
+            inline static auto run(const S& strides, Arg arg) noexcept
             {
                 if (dim == 0)
                 {
@@ -381,7 +381,7 @@ namespace xt
             }
 
             template <std::size_t dim, class S, class Arg, class... Args>
-            static inline auto run(const S& strides, Arg arg, Args... args) noexcept
+            inline static auto run(const S& strides, Arg arg, Args... args) noexcept
             {
                 if (dim == 0)
                 {

@@ -984,7 +984,7 @@ namespace xt
     template <class C, bool is_const>
     inline void xindexed_stepper<C, is_const>::to_end(layout_type l)
     {
-        auto const& shape = p_e->shape();
+        const auto& shape = p_e->shape();
         std::transform(
             shape.cbegin(),
             shape.cend(),

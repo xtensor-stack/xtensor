@@ -1877,7 +1877,7 @@ namespace xt
             class D,
             class EVS,
             XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::is_integral<D>)>
-        inline auto mean(E&& e, X&& axes, D const& ddof, EVS es)
+        inline auto mean(E&& e, X&& axes, const D& ddof, EVS es)
         {
             // sum cannot always be a double. It could be a complex number which cannot operate on
             // std::plus<double>.
@@ -2067,7 +2067,7 @@ namespace xt
         class D,
         class EVS = DEFAULT_STRATEGY_REDUCERS,
         XTL_REQUIRES(is_reducer_options<EVS>, xtl::is_integral<D>)>
-    inline auto variance(E&& e, D const& ddof, EVS es = EVS())
+    inline auto variance(E&& e, const D& ddof, EVS es = EVS())
     {
         auto cached_mean = mean<T>(e, es)();
         return detail::mean_noaxis<T>(square(std::forward<E>(e) - std::move(cached_mean)), ddof, es);
@@ -2209,7 +2209,7 @@ namespace xt
     }
 
     template <class T = void, class E, class A, std::size_t N, class D, class EVS = DEFAULT_STRATEGY_REDUCERS>
-    inline auto variance(E&& e, const A (&axes)[N], D const& ddof, EVS es = EVS())
+    inline auto variance(E&& e, const A (&axes)[N], const D& ddof, EVS es = EVS())
     {
         return variance<T>(
             std::forward<E>(e),

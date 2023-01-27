@@ -211,8 +211,8 @@ namespace xt
 
                 size_type i = 0;
                 size_type elems_on_line = 0;
-                size_type const ewp2 = static_cast<size_type>(element_width) + size_type(2);
-                size_type const line_lim = static_cast<size_type>(std::floor(line_width / ewp2));
+                const size_type ewp2 = static_cast<size_type>(element_width) + size_type(2);
+                const size_type line_lim = static_cast<size_type>(std::floor(line_width / ewp2));
 
                 out << '{';
                 for (; i != size_type(view.shape()[0] - 1); ++i)

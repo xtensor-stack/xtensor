@@ -159,7 +159,7 @@ namespace xt
         template <class D, class M>
         xmasked_view(D&& data, M&& mask);
 
-        xmasked_view(xmasked_view const&) = default;
+        xmasked_view(const xmasked_view&) = default;
 
         size_type size() const noexcept;
         const inner_shape_type& shape() const noexcept;
