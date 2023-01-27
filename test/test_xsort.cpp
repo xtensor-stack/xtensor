@@ -12,6 +12,7 @@
 #include "xtensor/xfixed.hpp"
 #include "xtensor/xinfo.hpp"
 #include "xtensor/xio.hpp"
+#include "xtensor/xmath.hpp"
 #include "xtensor/xrandom.hpp"
 #include "xtensor/xslice.hpp"
 #include "xtensor/xsort.hpp"
@@ -379,6 +380,40 @@ namespace xt
         auto b = xt::adapt(arr, s, xt::no_ownership(), sh);
         auto r2 = xt::argpartition(b, 2);
         EXPECT_TRUE(check_argpartition(b, r2, 2));
+    }
+
+    TEST(xsort, quantile)
+    {
+        const xt::xtensor_fixed<double, xt::xshape<4, 2, 2>> data = {
+            {{3., 4.}, {2., 1.}},
+            {{-1., 1.}, {3., 2.}},
+            {{-9., -0.}, {-9., -3.}},
+            {{12., 12.}, {12., 12.}},
+        };
+
+        {
+            auto q = xt::quantile(data, {.3, .0, 1.});
+            const xt::xtensor_fixed<double, xt::xshape<3>> expected = {0.5, -9., 12.};
+            EXPECT_TRUE(xt::equal(q, expected)(0));
+        }
+
+        const xt::xtensor_fixed<double, xt::xshape<3, 4, 2>> expected1 = {
+            {{2.3, 1.9}, {0.2, 1.3}, {-9., -2.1}, {12., 12.}},
+            {{2., 1.}, {-1., 1.}, {-9., -3.}, {12., 12.}},
+            {{3., 4.}, {3., 2.}, {-9., 0.}, {12., 12.}},
+        };
+        {
+            auto q1 = xt::quantile(data, {.3, .0, 1.}, 1);
+            EXPECT_TRUE(xt::equal(q1, expected1)(0));
+        }
+        {
+            auto q1 = xt::quantile(xt::xtensor<float, 3>(data), {.3, .0, 1.}, 1);
+            EXPECT_TRUE(xt::equal(q1, expected1)(0));
+        }
+        {
+            auto q1 = xt::quantile(xt::xarray<float>(data), {.3, .0, 1.}, 1);
+            EXPECT_TRUE(xt::equal(q1, expected1)(0));
+        }
     }
 
     TEST(xsort, median)
