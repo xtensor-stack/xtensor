@@ -788,11 +788,11 @@ namespace xt
     {
         template <class S, class I, class K, class O>
         inline void select_indices_impl(
-            S const& shape,
-            I const& indices,
+            const S& shape,
+            const I& indices,
             std::size_t axis,
             std::size_t current_dim,
-            K const& current_index,
+            const K& current_index,
             O& out
         )
         {
@@ -836,7 +836,7 @@ namespace xt
         }
 
         template <class S, class I>
-        inline auto select_indices(S const& shape, I const& indices, std::size_t axis)
+        inline auto select_indices(const S& shape, const I& indices, std::size_t axis)
         {
             using index_type = get_strides_t<S>;
             auto out = std::vector<index_type>();
@@ -847,7 +847,7 @@ namespace xt
         // TODO remove when fancy index views are implemented
         // Poor man's indexing along a single axis as in NumPy a[:, [1, 3, 4]]
         template <class E, class I>
-        inline auto fancy_indexing(E&& e, I const& indices, std::ptrdiff_t axis)
+        inline auto fancy_indexing(E&& e, const I& indices, std::ptrdiff_t axis)
         {
             std::size_t const ax = normalize_axis(e.dimension(), axis);
             using shape_t = get_strides_t<typename std::decay_t<E>::shape_type>;
@@ -860,24 +860,24 @@ namespace xt
         }
 
         template <class T, class I, class P>
-        inline auto quantile_kth_gamma(std::size_t n, P const& probas, T alpha, T beta)
+        inline auto quantile_kth_gamma(std::size_t n, const P& probas, T alpha, T beta)
         {
-            auto const m = alpha + probas * (T(1) - alpha - beta);
+            const auto m = alpha + probas * (T(1) - alpha - beta);
             // Evaluting since reused a lot
-            auto const p_n_m = eval(probas * static_cast<T>(n) + m - 1);
+            const auto p_n_m = eval(probas * static_cast<T>(n) + m - 1);
             // Previous (virtual) index, may be out of bounds
-            auto const j = floor(p_n_m);
-            auto const j_jp1 = concatenate(xtuple(j, j + 1));
+            const auto j = floor(p_n_m);
+            const auto j_jp1 = concatenate(xtuple(j, j + 1));
             // Both interpolation indices, k and k+1
-            auto const k_kp1 = xt::cast<std::size_t>(clip(j_jp1, T(0), T(n - 1)));
+            const auto k_kp1 = xt::cast<std::size_t>(clip(j_jp1, T(0), T(n - 1)));
             // Both interpolation coefficients, 1-gamma and gamma
-            auto const omg_g = concatenate(xtuple(T(1) - (p_n_m - j), p_n_m - j));
+            const auto omg_g = concatenate(xtuple(T(1) - (p_n_m - j), p_n_m - j));
             return std::make_pair(eval(k_kp1), eval(omg_g));
         }
 
         // TODO should implement unsqueeze rather
         template <class S>
-        inline auto unsqueeze_shape(S const& shape, std::size_t axis)
+        inline auto unsqueeze_shape(const S& shape, std::size_t axis)
         {
             XTENSOR_ASSERT(axis <= shape.size());
             auto new_shape = xtl::forward_sequence<xt::svector<std::size_t>, decltype(shape)>(shape);
@@ -916,7 +916,7 @@ namespace xt
      * @see https://en.wikipedia.org/wiki/Quantile
      */
     template <class T = double, class E, class P>
-    inline auto quantile(E&& e, P const& probas, std::ptrdiff_t axis, T alpha, T beta)
+    inline auto quantile(E&& e, const P& probas, std::ptrdiff_t axis, T alpha, T beta)
     {
         // Check inputs
         if (any((probas < 0.) || (1. < probas)))
@@ -977,7 +977,7 @@ namespace xt
      * @see xt::quantile(E&& e, P const& probas, std::ptrdiff_t axis, T alpha, T beta)
      */
     template <class T = double, class E, class P>
-    inline auto quantile(E&& e, P const& probas, T alpha, T beta)
+    inline auto quantile(E&& e, const P& probas, T alpha, T beta)
     {
         return quantile(xt::ravel(std::forward<E>(e)), probas, 0, alpha, beta);
     }
@@ -1027,7 +1027,7 @@ namespace xt
      */
     template <class T = double, class E, class P>
     inline auto
-    quantile(E&& e, P const& probas, std::ptrdiff_t axis, quantile_method method = quantile_method::linear)
+    quantile(E&& e, const P& probas, std::ptrdiff_t axis, quantile_method method = quantile_method::linear)
     {
         T alpha = 0.;
         T beta = 0.;
@@ -1093,7 +1093,7 @@ namespace xt
      * @see xt::quantile(E&& e, P const& probas, std::ptrdiff_t axis, xt::quantile_method method)
      */
     template <class T = double, class E, class P>
-    inline auto quantile(E&& e, P const& probas, quantile_method method = quantile_method::linear)
+    inline auto quantile(E&& e, const P& probas, quantile_method method = quantile_method::linear)
     {
         return quantile(xt::ravel(std::forward<E>(e)), probas, 0, method);
     }

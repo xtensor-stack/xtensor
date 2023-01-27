@@ -384,7 +384,7 @@ namespace xt
 
     TEST(xsort, quantile)
     {
-        xt::xtensor_fixed<double, xt::xshape<4, 2, 2>> const data = {
+        const xt::xtensor_fixed<double, xt::xshape<4, 2, 2>> data = {
             {{3., 4.}, {2., 1.}},
             {{-1., 1.}, {3., 2.}},
             {{-9., -0.}, {-9., -3.}},
@@ -393,11 +393,11 @@ namespace xt
 
         {
             auto q = xt::quantile(data, {.3, .0, 1.});
-            xt::xtensor_fixed<double, xt::xshape<3>> const expected = {0.5, -9., 12.};
+            const xt::xtensor_fixed<double, xt::xshape<3>> expected = {0.5, -9., 12.};
             EXPECT_TRUE(xt::equal(q, expected)(0));
         }
 
-        xt::xtensor_fixed<double, xt::xshape<3, 4, 2>> const expected1 = {
+        const xt::xtensor_fixed<double, xt::xshape<3, 4, 2>> expected1 = {
             {{2.3, 1.9}, {0.2, 1.3}, {-9., -2.1}, {12., 12.}},
             {{2., 1.}, {-1., 1.}, {-9., -3.}, {12., 12.}},
             {{3., 4.}, {3., 2.}, {-9., 0.}, {12., 12.}},
