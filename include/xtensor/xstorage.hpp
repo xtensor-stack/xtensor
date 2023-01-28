@@ -627,13 +627,13 @@ namespace xt
         template <class T>
         struct allocator_alignment
         {
-            constexpr static std::size_t value = 0;
+            static constexpr std::size_t value = 0;
         };
 
         template <class T, std::size_t A>
         struct allocator_alignment<xt_simd::aligned_allocator<T, A>>
         {
-            constexpr static std::size_t value = A;
+            static constexpr std::size_t value = A;
         };
     }
 
@@ -658,9 +658,9 @@ namespace xt
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
 #if defined(_MSC_VER) && _MSC_VER < 1910
-        constexpr static std::size_t alignment = detail::allocator_alignment<A>::value;
+        static constexpr std::size_t alignment = detail::allocator_alignment<A>::value;
 #else
-        constexpr static std::size_t alignment = detail::allocator_alignment<A>::value != 0
+        static constexpr std::size_t alignment = detail::allocator_alignment<A>::value != 0
                                                      ? detail::allocator_alignment<A>::value
                                                      : alignof(T);
 #endif
@@ -1673,13 +1673,13 @@ namespace xt
         using size_type = std::size_t;
         using const_iterator = typename cast_type::const_iterator;
 
-        constexpr static std::size_t size()
+        static constexpr std::size_t size()
         {
             return sizeof...(X);
         }
 
         template <std::size_t idx>
-        constexpr static auto get()
+        static constexpr auto get()
         {
             using tmp_cast_type = std::array<std::size_t, sizeof...(X)>;
             return std::get<idx>(tmp_cast_type{X...});

@@ -58,10 +58,10 @@ namespace xt
 
     TEST(xindex_view, indices_const)
     {
-        xarray<double> const e = xt::random::rand<double>({3, 3});
+        const xarray<double> e = xt::random::rand<double>({3, 3});
         auto v = index_view(e, {{1ul, 1ul}, {1ul, 2ul}, {2ul, 2ul}});
         EXPECT_EQ(e(1, 1), v(0));
-        auto const vc = index_view(e, {{1ul, 1ul}, {1ul, 2ul}, {2ul, 2ul}});
+        const auto vc = index_view(e, {{1ul, 1ul}, {1ul, 2ul}, {2ul, 2ul}});
         EXPECT_EQ(vc(0), v(0));
     }
 

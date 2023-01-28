@@ -287,7 +287,7 @@ namespace xt
     template <class A, class D>
     inline void check_axis_in_dim(A axis, D dim, const char* subject = "Axis")
     {
-        auto const sdim = static_cast<std::make_signed_t<D>>(dim);
+        const auto sdim = static_cast<std::make_signed_t<D>>(dim);
         if (xtl::cmp_greater_equal(axis, dim) || xtl::cmp_less(axis, -sdim))
         {
             XTENSOR_THROW(

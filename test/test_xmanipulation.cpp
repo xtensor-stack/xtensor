@@ -82,7 +82,7 @@ namespace xt
 
     TEST(xmanipulation, swapaxes)
     {
-        auto const a = xarray<double>::from_shape({1, 2, 3, 4, 5});
+        const auto a = xarray<double>::from_shape({1, 2, 3, 4, 5});
         using shape_type = decltype(a)::shape_type;
 
         EXPECT_EQ(swapaxes(a, 0, 1).shape(), (shape_type{2, 1, 3, 4, 5}));
@@ -99,7 +99,7 @@ namespace xt
 
     TEST(xmanipulation, moveaxis)
     {
-        auto const a = xarray<double>::from_shape({1, 2, 3, 4, 5});
+        const auto a = xarray<double>::from_shape({1, 2, 3, 4, 5});
         using shape_type = decltype(a)::shape_type;
 
         EXPECT_EQ(moveaxis(a, 0, 1).shape(), (shape_type{2, 1, 3, 4, 5}));

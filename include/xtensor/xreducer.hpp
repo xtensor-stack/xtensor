@@ -153,7 +153,7 @@ namespace xt
         using keep_dims = std::
             conditional_t<tuple_idx_of<xt::keep_dims_type, d_t>::value != -1, std::true_type, std::false_type>;
 
-        constexpr static bool has_initial_value = initial_val_idx != std::tuple_size<d_t>::value;
+        static constexpr bool has_initial_value = initial_val_idx != std::tuple_size<d_t>::value;
 
         R initial_value;
 
@@ -1148,7 +1148,7 @@ namespace xt
         template <std::size_t X, std::size_t... I>
         struct in
         {
-            constexpr static bool value = xtl::disjunction<std::integral_constant<bool, X == I>...>::value;
+            static constexpr bool value = xtl::disjunction<std::integral_constant<bool, X == I>...>::value;
         };
 
         template <std::size_t Z, class S1, class S2, class R>
@@ -1302,7 +1302,7 @@ namespace xt
     struct xreducer_shape_type<fixed_shape<I...>, std::array<I2, N2>, std::true_type>
     {
         template <std::size_t... X>
-        constexpr static auto get_type(std::index_sequence<X...>)
+        static constexpr auto get_type(std::index_sequence<X...>)
         {
             return fixed_shape<X...>{};
         }

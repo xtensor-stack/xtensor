@@ -19,7 +19,7 @@ namespace xt
 
     TEST(xrepeat, const_array)
     {
-        xarray<size_t> const array = {1, 2, 3};
+        const xarray<size_t> array = {1, 2, 3};
 
         const auto repeated_array = xt::repeat(array, 1, 0);
 

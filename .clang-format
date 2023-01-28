@@ -1,4 +1,5 @@
 BasedOnStyle: Mozilla
+
 AccessModifierOffset: '-4'
 AlignAfterOpenBracket: BlockIndent
 AlignEscapedNewlines: Left
@@ -12,10 +13,9 @@ AllowShortIfStatementsOnASingleLine: false
 # single instructions lambdas are too long.
 AllowShortLambdasOnASingleLine: Empty
 AllowShortLoopsOnASingleLine: false
-AlwaysBreakAfterReturnType: None
 AlwaysBreakAfterDefinitionReturnType: None
+AlwaysBreakAfterReturnType: None
 AlwaysBreakTemplateDeclarations: Yes
-SpaceAfterTemplateKeyword: true
 BinPackArguments: false
 BinPackParameters: false
 BreakBeforeBinaryOperators: NonAssignment
@@ -30,9 +30,9 @@ ContinuationIndentWidth: '4'
 Cpp11BracedListStyle: true
 DerivePointerAlignment: false
 DisableFormat: false
-ExperimentalAutoDetectBinPacking: true
 EmptyLineAfterAccessModifier: Always
 EmptyLineBeforeAccessModifier: Always
+ExperimentalAutoDetectBinPacking: true
 IncludeBlocks: Regroup
 IncludeCategories:
 - Regex: <[^.]+>
@@ -48,6 +48,7 @@ IncludeCategories:
 IndentCaseLabels: true
 IndentWidth: '4'
 IndentWrappedFunctionNames: false
+InsertBraces: true
 InsertTrailingCommas: Wrapped
 KeepEmptyLinesAtTheStartOfBlocks: false
 LambdaBodyIndentation: Signature
@@ -57,7 +58,6 @@ NamespaceIndentation: All
 ObjCBlockIndentWidth: '4'
 ObjCSpaceAfterProperty: false
 ObjCSpaceBeforeProtocolList: false
-PointerAlignment: Left
 PackConstructorInitializers: Never
 PenaltyBreakAssignment: 100000
 PenaltyBreakBeforeFirstCallParameter: 0
@@ -67,11 +67,15 @@ PenaltyBreakTemplateDeclaration: 0
 PenaltyExcessCharacter: 10
 PenaltyIndentedWhitespace: 0
 PenaltyReturnTypeOnItsOwnLine: 10
+PointerAlignment: Left
+QualifierAlignment: Custom  # Experimental
+QualifierOrder: [inline, static, constexpr, const, volatile, type]
 ReflowComments: true
 SeparateDefinitionBlocks: Always
 SortIncludes: CaseInsensitive
 SortUsingDeclarations: true
 SpaceAfterCStyleCast: true
+SpaceAfterTemplateKeyword: true
 SpaceBeforeAssignmentOperators: true
 SpaceBeforeParens: ControlStatements
 SpaceInEmptyParentheses: false
@@ -84,4 +88,3 @@ SpacesInSquareBrackets: false
 Standard: c++14
 TabWidth: '4'
 UseTab: Never
-InsertBraces: true

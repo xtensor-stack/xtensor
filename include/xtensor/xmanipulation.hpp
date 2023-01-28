@@ -367,7 +367,7 @@ namespace xt
     template <class E>
     inline auto moveaxis(E&& e, std::ptrdiff_t src, std::ptrdiff_t dest)
     {
-        auto const dim = e.dimension();
+        const auto dim = e.dimension();
         check_axis_in_dim(src, dim, "Parameter src");
         check_axis_in_dim(dest, dim, "Parameter dest");
 
@@ -976,7 +976,7 @@ namespace xt
          */
 
         template <class To, class From, class S>
-        To roll(To to, From from, std::ptrdiff_t shift, std::size_t axis, S const& shape, std::size_t M)
+        To roll(To to, From from, std::ptrdiff_t shift, std::size_t axis, const S& shape, std::size_t M)
         {
             std::ptrdiff_t dim = std::ptrdiff_t(shape[M]);
             std::ptrdiff_t offset = std::accumulate(
@@ -1049,7 +1049,7 @@ namespace xt
     inline auto roll(E&& e, std::ptrdiff_t shift, std::ptrdiff_t axis)
     {
         auto cpy = empty_like(e);
-        auto const& shape = cpy.shape();
+        const auto& shape = cpy.shape();
         std::size_t saxis = static_cast<std::size_t>(axis);
         if (axis < 0)
         {

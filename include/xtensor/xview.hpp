@@ -445,7 +445,7 @@ namespace xt
 
         using container_iterator = pointer;
         using const_container_iterator = const_pointer;
-        constexpr static std::size_t rank = SIZE_MAX;
+        static constexpr std::size_t rank = SIZE_MAX;
 
         // The FSL argument prevents the compiler from calling this constructor
         // instead of the copy constructor when sizeof...(SL) == 0.
@@ -1845,7 +1845,7 @@ namespace xt
         public:
 
             template <class E>
-            static inline auto make(E&& e, const std::ptrdiff_t index)
+            inline static auto make(E&& e, const std::ptrdiff_t index)
             {
                 const auto shape = e.shape();
                 check_dimension(shape);
@@ -1855,7 +1855,7 @@ namespace xt
         private:
 
             template <class S>
-            static inline void check_dimension(const S& shape)
+            inline static void check_dimension(const S& shape)
             {
                 if (shape.size() != 2)
                 {
@@ -1867,7 +1867,7 @@ namespace xt
             }
 
             template <class T, std::size_t N>
-            static inline void check_dimension(const std::array<T, N>&)
+            inline static void check_dimension(const std::array<T, N>&)
             {
                 static_assert(N == 2, "A row can only be accessed on an expression with exact two dimensions");
             }
@@ -1878,7 +1878,7 @@ namespace xt
         public:
 
             template <class E>
-            static inline auto make(E&& e, const std::ptrdiff_t index)
+            inline static auto make(E&& e, const std::ptrdiff_t index)
             {
                 const auto shape = e.shape();
                 check_dimension(shape);
@@ -1888,7 +1888,7 @@ namespace xt
         private:
 
             template <class S>
-            static inline void check_dimension(const S& shape)
+            inline static void check_dimension(const S& shape)
             {
                 if (shape.size() != 2)
                 {
@@ -1900,7 +1900,7 @@ namespace xt
             }
 
             template <class T, std::size_t N>
-            static inline void check_dimension(const std::array<T, N>&)
+            inline static void check_dimension(const std::array<T, N>&)
             {
                 static_assert(N == 2, "A column can only be accessed on an expression with exact two dimensions");
             }

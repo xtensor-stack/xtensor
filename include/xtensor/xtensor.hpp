@@ -105,7 +105,7 @@ namespace xt
         using inner_strides_type = typename base_type::inner_strides_type;
         using temporary_type = typename semantic_base::temporary_type;
         using expression_tag = Tag;
-        constexpr static std::size_t rank = N;
+        static constexpr std::size_t rank = N;
 
         xtensor_container();
         xtensor_container(nested_initializer_list_t<value_type, N> t);
@@ -225,7 +225,7 @@ namespace xt
         using backstrides_type = typename base_type::backstrides_type;
         using temporary_type = typename semantic_base::temporary_type;
         using expression_tag = Tag;
-        constexpr static std::size_t rank = N;
+        static constexpr std::size_t rank = N;
 
         xtensor_adaptor(storage_type&& storage);
         xtensor_adaptor(const storage_type& storage);

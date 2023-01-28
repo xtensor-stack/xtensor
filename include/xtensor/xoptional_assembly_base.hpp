@@ -334,7 +334,7 @@ namespace xt
      * Returns the number of dimensions of the optional assembly.
      */
     template <class D>
-    inline auto constexpr xoptional_assembly_base<D>::dimension() const noexcept -> size_type
+    inline constexpr auto xoptional_assembly_base<D>::dimension() const noexcept -> size_type
     {
         return value().dimension();
     }
