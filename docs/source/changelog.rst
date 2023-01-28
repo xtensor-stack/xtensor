@@ -7,6 +7,46 @@
 Changelog
 =========
 
+0.24.4
+------
+
+- Align qualifiers using clang-format
+  `# 2647 https://github.com/xtensor-stack/xtensor/pull/2647`
+- Add xt::quantile
+  `# 2614 https://github.com/xtensor-stack/xtensor/pull/2614`
+- Add swapaxes and moveaxis
+  `# 2638 https://github.com/xtensor-stack/xtensor/pull/2638`
+- Enforce { ... }
+  `# 2641 https://github.com/xtensor-stack/xtensor/pull/2641`
+- Manual style fixes
+  `# 2642 https://github.com/xtensor-stack/xtensor/pull/2642`
+- Do not step further than last element in xreducer_stepper aggregation
+  `# 2636 https://github.com/xtensor-stack/xtensor/pull/2636`
+- Upgraded to xsimd 10.0.0
+  `# 2635 https://github.com/xtensor-stack/xtensor/pull/2635`
+- Explicitly declare test_xtensor_core_lib as STATIC
+  `# 2586 https://github.com/xtensor-stack/xtensor/pull/2586`
+- fix npy_file move assignment
+  `# 2585 https://github.com/xtensor-stack/xtensor/pull/2585`
+- Install as arch-independent
+  `# 2588 https://github.com/xtensor-stack/xtensor/pull/2588`
+- Change extended tests test header
+  `# 2630 https://github.com/xtensor-stack/xtensor/pull/2630`
+- argmax crashes when compiled using Visual Studio compiler with O1/O2 optimizations
+  `# 2568 https://github.com/xtensor-stack/xtensor/pull/2568`
+- Fix xindexed_view::to_end
+  `# 2627 https://github.com/xtensor-stack/xtensor/pull/2627`
+- Change xindex_view reference type to handle const data
+  `# 2622 https://github.com/xtensor-stack/xtensor/pull/2622`
+- Fix TBB target in CMake exported interface
+  `# 2617 https://github.com/xtensor-stack/xtensor/pull/2617`
+- Document missing xsort functions
+  `# 2608 https://github.com/xtensor-stack/xtensor/pull/2608`
+- Specialize get_strides_type for xbuffer_adaptor
+  `# 2606 https://github.com/xtensor-stack/xtensor/pull/2606`
+- find external packages (threads) after defining project
+  `# 2575 https://github.com/xtensor-stack/xtensor/pull/2575`
+
 0.24.3
 ------
 
