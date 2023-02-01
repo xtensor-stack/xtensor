@@ -1162,10 +1162,10 @@ namespace xt
         if (outer_loop_size > 20) {
           tbb::static_partitioner sp;
           tbb::parallel_for(tbb::blocked_range<size_t>(0ul, outer_loop_size),
-                          [is_row_major, step_dim, simd_size, simd_rest, &max_shape, &fct_stepper_=fct_stepper, &res_stepper_=res_stepper, &idx_=idx](tbb::blocked_range<size_t> const &r) {
+                          [&e1, &e2, is_row_major, step_dim, simd_size, simd_rest, &max_shape, &idx_=idx](tbb::blocked_range<size_t> const &r) {
                               auto idx = idx_;
-                              auto res_stepper = res_stepper_;
-                              auto fct_stepper = fct_stepper_;
+                              auto fct_stepper = e2.stepper_begin(e1.shape());
+                              auto res_stepper = e1.stepper_begin(e1.shape());
                               std::size_t first_step = true;
 //#pragma omp parallel for schedule(static) firstprivate(first_step, fct_stepper, res_stepper, idx)
                               for (std::size_t ox = r.begin(); ox < r.end(); ++ox) {
