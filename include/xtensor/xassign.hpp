@@ -1052,12 +1052,12 @@ namespace xt
 
         bool de1_row_contiguous = e1.strides()[e1.strides().size()-1] == 1;
         bool de1_col_contiguous = e1.strides()[0] == 1;
-        bool de2_row_contiguous = e2.strides()[e2.strides().size()-1] == 1;
-        bool de2_col_contiguous = e2.strides()[0] == 1;
+        //bool de2_row_contiguous = e2.strides()[e2.strides().size()-1] == 1;
+        //bool de2_col_contiguous = e2.strides()[0] == 1;
 
-        if (de1_row_contiguous && de2_row_contiguous)
+        if (de1_row_contiguous)// && de2_row_contiguous)
             is_row_major = true;
-        else if (de1_col_contiguous && de2_col_contiguous)
+        else if (de1_col_contiguous)// && de2_col_contiguous)
             is_row_major = false;
         else
             return fallback_assigner(e1, e2).run();
@@ -1161,8 +1161,11 @@ namespace xt
 		else {
 #elif defined(strided_parallel_assign) && defined(XTENSOR_USE_TBB)
         if (outer_loop_size > 20) {
-          tbb::parallel_for(0ul, outer_loop_size,
-                          [&, fct_stepper, res_stepper, idx](tbb::blocked_range<size_t> const &r) {
+          tbb::parallel_for(tbb::blocked_range<size_t>(0ul, outer_loop_size),
+                          [is_row_major, step_dim, simd_size, simd_rest, &max_shape, &fct_stepper_=fct_stepper, &res_stepper_=res_stepper, &idx_=idx](tbb::blocked_range<size_t> const &r) {
+                              auto idx = idx_;
+                              auto res_stepper = res_stepper_;
+                              auto fct_stepper = fct_stepper_;
                               std::size_t first_step = true;
 //#pragma omp parallel for schedule(static) firstprivate(first_step, fct_stepper, res_stepper, idx)
                               for (std::size_t ox = r.begin(); ox < r.end(); ++ox) {
@@ -1245,7 +1248,7 @@ namespace xt
                 }
             }
         }
-#if defined(XTENSOR_USE_OPENMP) && defined(strided_parallel_assign)
+#if (defined(XTENSOR_USE_OPENMP) || defined(XTENSOR_USE_TBB)) && defined(strided_parallel_assign)
 		}
 #endif
 	}
