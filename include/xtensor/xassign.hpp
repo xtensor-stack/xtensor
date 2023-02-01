@@ -435,7 +435,6 @@ namespace xt
         constexpr bool simd_assign = traits::simd_assign();
         constexpr bool simd_linear_assign = traits::simd_linear_assign();
         constexpr bool simd_strided_assign = traits::simd_strided_assign();
-        constexpr bool strided_assign = traits::strided_assign();
         if (linear_assign)
         {
             if (simd_linear_assign || traits::simd_linear_assign(de1, de2))
