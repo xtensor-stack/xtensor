@@ -715,7 +715,7 @@ namespace xt
 #if defined(XTENSOR_USE_TBB)
         if (size >= XTENSOR_TBB_THRESHOLD)
         {
-            static tbb::affinity_partitioner ap;
+            tbb::static_partitioner ap;
             tbb::parallel_for(
                 align_begin,
                 align_end,
@@ -794,14 +794,14 @@ namespace xt
         size_type n = e1.size();
 // 		std::cout << "Linear assigner LOOP SIZE is " << n <<std::endl;
 #if defined(XTENSOR_USE_TBB)
+        tbb::static_partitioner sp;
         tbb::parallel_for(
             std::ptrdiff_t(0),
             static_cast<std::ptrdiff_t>(n),
             [&](std::ptrdiff_t i)
             {
                 *(dst + i) = static_cast<value_type>(*(src + i));
-            }
-        );
+            }, sp);
 #elif defined(XTENSOR_USE_OPENMP)
         if (n >= XTENSOR_OPENMP_TRESHOLD)
         {
@@ -1161,6 +1161,7 @@ namespace xt
 		else {
 #elif defined(strided_parallel_assign) && defined(XTENSOR_USE_TBB)
         if (outer_loop_size > 20) {
+          tbb::static_partitioner sp;
           tbb::parallel_for(tbb::blocked_range<size_t>(0ul, outer_loop_size),
                           [is_row_major, step_dim, simd_size, simd_rest, &max_shape, &fct_stepper_=fct_stepper, &res_stepper_=res_stepper, &idx_=idx](tbb::blocked_range<size_t> const &r) {
                               auto idx = idx_;
@@ -1206,7 +1207,7 @@ namespace xt
                                       res_stepper.step(i + step_dim, idx[i]);
                                   }
                               }
-                          });
+                          }, sp);
     }
 		else {
 
