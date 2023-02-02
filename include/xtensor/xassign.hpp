@@ -955,6 +955,7 @@ namespace xt
             template <class T, layout_type LE = L>
             std::enable_if_t<LE == layout_type::row_major, std::size_t> operator()(const T& el)
             {
+                // All dimenions less than var have differing strides
                 auto var = check_strides_overlap<layout_type::row_major>::get(m_strides, el.strides());
                 if (var > m_cut)
                 {
@@ -967,6 +968,7 @@ namespace xt
             std::enable_if_t<LE == layout_type::column_major, std::size_t> operator()(const T& el)
             {
                 auto var = check_strides_overlap<layout_type::column_major>::get(m_strides, el.strides());
+                // All dimensions >= var have differing strides
                 if (var < m_cut)
                 {
                     m_cut = var;
@@ -996,16 +998,18 @@ namespace xt
         template <class E1, class E2>
         auto get_loop_sizes(const E1& e1, const E2& e2, bool is_row_major)
         {
+            // Cut is the number of dimensions in the outer loop
             std::size_t cut = 0;
 
             // TODO! if E1 is !contiguous --> initialize cut to sensible value!
-            if (E1::static_layout == layout_type::row_major || is_row_major)
+            if (is_row_major)
             {
                 auto csf = check_strides_functor<layout_type::row_major, decltype(e1.strides())>(e1.strides());
                 cut = csf(e2);
+                // This makes that only one dimension will be treated in the inner loop.
 				if (cut<e1.strides().size()-1) cut = e1.strides().size()-1;
             }
-            else if (E1::static_layout == layout_type::column_major || !is_row_major)
+            else if (!is_row_major)
             {
                 auto csf = check_strides_functor<layout_type::column_major, decltype(e1.strides())>(e1.strides()
                 );
@@ -1027,7 +1031,7 @@ namespace xt
                 std::multiplies<shape_value_type>{}
             ));
 
-            if (E1::static_layout == layout_type::column_major || !is_row_major)
+            if (!is_row_major)
             {
                 std::swap(outer_loop_size, inner_loop_size);
             }
@@ -1044,23 +1048,21 @@ namespace xt
         bool is_row_major = true;
         using fallback_assigner = stepper_assigner<E1, E2, default_assignable_layout(E1::static_layout)>;
 
-        bool mismatch_colrow = (e1.layout() == layout_type::row_major && e2.layout() == layout_type::column_major)
-                               || (e2.layout() == layout_type::row_major && e1.layout() == layout_type::column_major);
-        if (mismatch_colrow)
-            return fallback_assigner(e1, e2).run();
-
+        // Try to find a row-major scheme first, where the outer loop is on the first N = `cut` dimensions,
+        // and the inner loop is
+        is_row_major = true;
         bool de1_row_contiguous = e1.strides()[e1.strides().size()-1] == 1;
         bool de1_col_contiguous = e1.strides()[0] == 1;
-        //bool de2_row_contiguous = e2.strides()[e2.strides().size()-1] == 1;
-        //bool de2_col_contiguous = e2.strides()[0] == 1;
-
-        if (de1_row_contiguous)// && de2_row_contiguous)
+        if (de1_row_contiguous)
             is_row_major = true;
-        else if (de1_col_contiguous)// && de2_col_contiguous)
+        else if (de1_col_contiguous) // If first stride is 1, and we don't have a one-dimensional container
             is_row_major = false;
         else
-            return fallback_assigner(e1, e2).run();
+            // We might be dealing with a broadcasted dimension at the end.
+            // Since this is not detected explicitly, just try row-major by default
+            is_row_major = true;
 
+        // cut is the number of dimensions that the outer loop takes care of.
         std::size_t inner_loop_size, outer_loop_size, cut;
         std::tie(inner_loop_size, outer_loop_size, cut) = strided_assign_detail::get_loop_sizes(
             e1,
