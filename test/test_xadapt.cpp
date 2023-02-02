@@ -505,6 +505,23 @@ namespace xt
         }
     }
 
+    TEST(xtensor_adaptor, pointer_strided_fill)
+    {
+        auto data = std::vector<double>{1, 2, 3, 4, 5, 6, 7, 8};
+        auto adapter = xt::adapt(
+            data.data(),
+            4,
+            xt::no_ownership(),
+            std::vector<size_t>{4, 1},
+            std::vector<size_t>{2, 1}
+        );
+        adapter.fill(0);
+        EXPECT_EQ(data[0], 0);
+        EXPECT_EQ(data[3], 4);
+        EXPECT_EQ(data[4], 0);
+        EXPECT_EQ(data[5], 6);
+    }
+
     TEST(xtensor_adaptor, smart_ptr)
     {
         auto data = std::vector<double>{1, 2, 3, 4, 5, 6, 7, 8};

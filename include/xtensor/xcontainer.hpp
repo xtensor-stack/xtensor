@@ -422,7 +422,14 @@ namespace xt
     template <class T>
     inline void xcontainer<D>::fill(const T& value)
     {
-        std::fill(linear_begin(), linear_end(), value);
+        if (contiguous_layout)
+        {
+            std::fill(this->linear_begin(), this->linear_end(), value);
+        }
+        else
+        {
+            std::fill(this->begin(), this->end(), value);
+        }
     }
 
     /**
