@@ -396,7 +396,7 @@ namespace xt
         bool res = true;
         for (std::size_t i = 0; i < pos; ++i)
         {
-            res = res && arr(idxs[i]) < arr(idxs[pos]);
+            res = res && arr(idxs[i]) <= arr(idxs[pos]);
         }
         for (std::size_t i = pos; i < arr.size(); ++i)
         {
@@ -407,16 +407,53 @@ namespace xt
 
     TEST(xsort, argpartition)
     {
-        xt::xarray<int> a = {3, 4, 2, 1};
-        auto r1 = xt::argpartition(a, 2);
-        EXPECT_TRUE(check_argpartition(a, r1, 2));
+        SUBCASE("simple")
+        {
+            xt::xarray<int> a = {3, 4, 2, 1};
+            auto r1 = xt::argpartition(a, 2);
+            EXPECT_TRUE(check_argpartition(a, r1, 2));
 
-        std::size_t s = a.size();
-        int* arr = a.data();
-        dynamic_shape<std::size_t> sh = {s};
-        auto b = xt::adapt(arr, s, xt::no_ownership(), sh);
-        auto r2 = xt::argpartition(b, 2);
-        EXPECT_TRUE(check_argpartition(b, r2, 2));
+            SUBCASE("adapt")
+            {
+                std::size_t s = a.size();
+                int* arr = a.data();
+                dynamic_shape<std::size_t> sh = {s};
+                auto b = xt::adapt(arr, s, xt::no_ownership(), sh);
+                auto r2 = xt::argpartition(b, 2);
+                EXPECT_TRUE(check_argpartition(b, r2, 2));
+            }
+        }
+
+        SUBCASE("complex")
+        {
+            xt::xarray<double> a = {
+                1014., 1017., 1019., 1020., 1023., 1026., 1026., 1028., 1030., 1032., 1039., 1047., 1071.,
+                927.,  932.,  935.,  943.,  944.,  944.,  945.,  948.,  952.,  962.,  968.,  968.,  969.,
+                969.,  974.,  981.,  993.,  994.,  994.,  1003., 1007., 1008., 1008., 1012., 1013., 1014.,
+                1080., 1085., 1088., 1111., 1112., 1117., 1119., 1128., 1130., 1209., 1309., 1426.};
+            xt::xtensor_fixed<std::size_t, xt::xshape<4>> kth = {17, 32, 18, 33};
+
+            SUBCASE("1D")
+            {
+                const auto argpart = xt::argpartition(a, kth);
+                for (std::size_t k : kth)
+                {
+                    CAPTURE(k);
+                    EXPECT_TRUE(check_argpartition(a, argpart, k));
+                }
+            }
+
+            SUBCASE("2D")
+            {
+                a.reshape({1, a.size()});
+                const auto argpart = xt::argpartition(a, kth, 1);
+                for (std::size_t k : kth)
+                {
+                    CAPTURE(k);
+                    EXPECT_TRUE(check_argpartition(a, argpart, k));
+                }
+            }
+        }
     }
 
     TEST(xsort, quantile)
