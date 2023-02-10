@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <iterator>
 #include <utility>
 
 #include <xtl/xcompare.hpp>
@@ -424,6 +425,52 @@ namespace xt
      * Implementation of partition and argpartition *
      ************************************************/
 
+    namespace detail
+    {
+        /**
+         * Partition a given random iterator.
+         *
+         * @param data_begin Start of the data to partition.
+         * @param data_end Past end of the data to partition.
+         * @param kth_start Start of the indices to partition.
+         *        Indices must be sorted in decreasing order.
+         * @param kth_end Past end of the indices to partition.
+         *        Indices must be sorted in decreasing order.
+         * @param comp Comparison function for `x < y`.
+         */
+        template <class RandomIt, class Iter, class Compare>
+        inline void
+        partition_iter(RandomIt data_begin, RandomIt data_end, Iter kth_begin, Iter kth_end, Compare comp)
+        {
+            XTENSOR_ASSERT(std::distance(data_begin, data_end) >= 0);
+            XTENSOR_ASSERT(std::distance(kth_begin, kth_end) >= 0);
+
+            using idx_type = typename std::iterator_traits<Iter>::value_type;
+
+            idx_type k_last = static_cast<idx_type>(std::distance(data_begin, data_end));
+            for (; kth_begin != kth_end; ++kth_begin)
+            {
+                std::nth_element(data_begin, data_begin + *kth_begin, data_begin + k_last, std::move(comp));
+                k_last = *kth_begin;
+            }
+        }
+
+        template <class RandomIt, class Iter>
+        inline void partition_iter(RandomIt data_begin, RandomIt data_end, Iter kth_begin, Iter kth_end)
+        {
+            return partition_iter(
+                std::move(data_begin),
+                std::move(data_end),
+                std::move(kth_begin),
+                std::move(kth_end),
+                [](const auto& x, const auto& y) -> bool
+                {
+                    return x < y;
+                }
+            );
+        }
+    }
+
     /**
      * Partially sort xexpression
      *
@@ -468,14 +515,8 @@ namespace xt
         }
 
         std::copy(de.linear_cbegin(), de.linear_cend(), ev.linear_begin());  // flatten
-        std::size_t k_last = kth_copy.back();
-        std::nth_element(ev.linear_begin(), ev.linear_begin() + k_last, ev.linear_end());
 
-        for (auto it = (kth_copy.rbegin() + 1); it != kth_copy.rend(); ++it)
-        {
-            std::nth_element(ev.linear_begin(), ev.linear_begin() + *it, ev.linear_begin() + k_last);
-            k_last = *it;
-        }
+        detail::partition_iter(ev.linear_begin(), ev.linear_end(), kth_copy.rbegin(), kth_copy.rend());
 
         return ev;
     }
@@ -508,17 +549,9 @@ namespace xt
             return partition<E, C, eval_type>(de, kth_container, xnone());
         }
 
-        C kth_copy = kth_container;
-        if (kth_copy.size() > 1)
-        {
-            std::sort(kth_copy.begin(), kth_copy.end());
-        }
-
         std::size_t ax = normalize_axis(de.dimension(), axis);
 
         eval_type res;
-
-        std::size_t kth = kth_copy.back();
 
         dynamic_shape<std::size_t> permutation, reverse_permutation;
         bool is_leading_axis = (ax == detail::leading_axis(de));
@@ -533,17 +566,18 @@ namespace xt
             res = de;
         }
 
-        auto lambda = [&kth](auto begin, auto end)
+        C kth_copy = kth_container;
+        if (kth_copy.size() > 1)
         {
-            std::nth_element(begin, begin + kth, end);
-        };
-        detail::call_over_leading_axis(res, lambda);
-
-        for (auto it = kth_copy.rbegin() + 1; it != kth_copy.rend(); ++it)
-        {
-            kth = *it;
-            detail::call_over_leading_axis(res, lambda);
+            std::sort(kth_copy.begin(), kth_copy.end());
         }
+        detail::call_over_leading_axis(
+            res,
+            [&kth_copy](auto begin, auto end)
+            {
+                detail::partition_iter(begin, end, kth_copy.rbegin(), kth_copy.rend());
+            }
+        );
 
         if (!is_leading_axis)
         {
@@ -906,7 +940,7 @@ namespace xt
      *        distribution.
      * @param alpha Interpolation parameter. Must be in the range ``[0, 1]]``.
      * @param beta Interpolation parameter. Must be in the range ``[0, 1]]``.
-     * @tparam T The type in which the quatile are computed.
+     * @tparam T The type in which the quantile are computed.
      * @return An expression with as many dimensions as the input @p e.
      *         The first axis correspond to the quantiles.
      *         The other axes are the axes that remain after the reduction of @p e.
