@@ -76,11 +76,11 @@ namespace xt
                 secondary_stride = adjust_secondary_stride(ev.strides()[1], *(ev.shape().begin()));
             }
 
-            std::ptrdiff_t offset = 0;
-
-            for (std::size_t i = 0; i < n_iters; ++i, offset += secondary_stride)
+            const auto begin = ev.data();
+            const auto end = begin + n_iters * secondary_stride;
+            for (auto iter = begin; iter < end; iter += secondary_stride)
             {
-                fct(ev.data() + offset, ev.data() + offset + secondary_stride);
+                fct(iter, iter + secondary_stride);
             }
         }
 
@@ -549,41 +549,29 @@ namespace xt
             return partition<E, C, eval_type>(de, kth_container, xnone());
         }
 
-        std::size_t ax = normalize_axis(de.dimension(), axis);
-
-        eval_type res;
-
-        dynamic_shape<std::size_t> permutation, reverse_permutation;
-        bool is_leading_axis = (ax == detail::leading_axis(de));
-
-        if (!is_leading_axis)
-        {
-            std::tie(permutation, reverse_permutation) = detail::get_permutations(de.dimension(), ax, de.layout());
-            res = transpose(de, permutation);
-        }
-        else
-        {
-            res = de;
-        }
-
         C kth_copy = kth_container;
         if (kth_copy.size() > 1)
         {
             std::sort(kth_copy.begin(), kth_copy.end());
         }
-        detail::call_over_leading_axis(
-            res,
-            [&kth_copy](auto begin, auto end)
-            {
-                detail::partition_iter(begin, end, kth_copy.rbegin(), kth_copy.rend());
-            }
-        );
-
-        if (!is_leading_axis)
+        const auto partition_w_kth = [&kth_copy](auto begin, auto end)
         {
-            res = transpose(res, reverse_permutation);
+            detail::partition_iter(begin, end, kth_copy.rbegin(), kth_copy.rend());
+        };
+
+        std::size_t const ax = normalize_axis(de.dimension(), axis);
+        if (ax == detail::leading_axis(de))
+        {
+            eval_type res = de;
+            detail::call_over_leading_axis(res, partition_w_kth);
+            return res;
         }
 
+        dynamic_shape<std::size_t> permutation, reverse_permutation;
+        std::tie(permutation, reverse_permutation) = detail::get_permutations(de.dimension(), ax, de.layout());
+        eval_type res = transpose(de, permutation);
+        detail::call_over_leading_axis(res, partition_w_kth);
+        res = transpose(res, reverse_permutation);
         return res;
     }
 
