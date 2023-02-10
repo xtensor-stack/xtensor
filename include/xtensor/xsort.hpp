@@ -173,23 +173,30 @@ namespace xt
             return std::make_pair(std::move(permutation), std::move(reverse_permutation));
         }
 
-        template <class E, class R, class F>
-        inline auto run_lambda_over_axis(const E& e, R& res, std::size_t axis, F&& lambda)
+        template <class R, class E, class F>
+        inline R map_axis(const E& e, std::ptrdiff_t axis, F&& lambda)
         {
-            if (axis != detail::leading_axis(e))
+            if (e.dimension() == 1)
             {
-                dynamic_shape<std::size_t> permutation, reverse_permutation;
-                std::tie(permutation, reverse_permutation) = get_permutations(e.dimension(), axis, e.layout());
+                R res = e;
+                lambda(res.begin(), res.end());
+                return res;
+            }
 
-                res = transpose(e, permutation);
-                detail::call_over_leading_axis(res, std::forward<F>(lambda));
-                res = transpose(res, reverse_permutation);
-            }
-            else
+            std::size_t const ax = normalize_axis(e.dimension(), axis);
+            if (ax == detail::leading_axis(e))
             {
-                res = e;
+                R res = e;
                 detail::call_over_leading_axis(res, std::forward<F>(lambda));
+                return res;
             }
+
+            dynamic_shape<std::size_t> permutation, reverse_permutation;
+            std::tie(permutation, reverse_permutation) = get_permutations(e.dimension(), axis, e.layout());
+            R res = transpose(e, permutation);
+            detail::call_over_leading_axis(res, std::forward<F>(lambda));
+            res = transpose(res, reverse_permutation);
+            return res;
         }
 
         template <class VT>
@@ -269,26 +276,14 @@ namespace xt
     {
         using eval_type = typename detail::sort_eval_type<E>::type;
 
-        const auto& de = e.derived_cast();
-
-        if (de.dimension() == 1)
-        {
-            return detail::flat_sort_impl<std::decay_t<decltype(de)>, eval_type>(de);
-        }
-
-        std::size_t ax = normalize_axis(de.dimension(), axis);
-
-        eval_type res;
-        detail::run_lambda_over_axis(
-            de,
-            res,
-            ax,
+        return detail::map_axis<eval_type>(
+            e.derived_cast(),
+            axis,
             [](auto begin, auto end)
             {
                 std::sort(begin, end);
             }
         );
-        return res;
     }
 
     namespace detail
@@ -551,41 +546,20 @@ namespace xt
     }
 
     template <class E, class C, class = std::enable_if_t<!xtl::is_integral<C>::value, int>>
-    inline auto partition(const xexpression<E>& e, const C& kth_container, std::ptrdiff_t axis = -1)
+    inline auto partition(const xexpression<E>& e, C kth_container, std::ptrdiff_t axis = -1)
     {
         using eval_type = typename detail::sort_eval_type<E>::type;
 
-        const auto& de = e.derived_cast();
+        std::sort(kth_container.begin(), kth_container.end());
 
-        if (de.dimension() == 1)
-        {
-            return partition<E, C, eval_type>(de, kth_container, xnone());
-        }
-
-        C kth_copy = kth_container;
-        if (kth_copy.size() > 1)
-        {
-            std::sort(kth_copy.begin(), kth_copy.end());
-        }
-        const auto partition_w_kth = [&kth_copy](auto begin, auto end)
-        {
-            detail::partition_iter(begin, end, kth_copy.rbegin(), kth_copy.rend());
-        };
-
-        std::size_t const ax = normalize_axis(de.dimension(), axis);
-        if (ax == detail::leading_axis(de))
-        {
-            eval_type res = de;
-            detail::call_over_leading_axis(res, partition_w_kth);
-            return res;
-        }
-
-        dynamic_shape<std::size_t> permutation, reverse_permutation;
-        std::tie(permutation, reverse_permutation) = detail::get_permutations(de.dimension(), ax, de.layout());
-        eval_type res = transpose(de, permutation);
-        detail::call_over_leading_axis(res, partition_w_kth);
-        res = transpose(res, reverse_permutation);
-        return res;
+        return detail::map_axis<eval_type>(
+            e.derived_cast(),
+            axis,
+            [&kth_container](auto begin, auto end)
+            {
+                detail::partition_iter(begin, end, kth_container.rbegin(), kth_container.rend());
+            }
+        );
     }
 
     template <class E, class T, std::size_t N>
