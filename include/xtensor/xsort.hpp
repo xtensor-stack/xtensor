@@ -349,50 +349,6 @@ namespace xt
                 typename T::temporary_type>::type;
         };
 
-        template <class Ed, class Ei>
-        inline void argsort_over_leading_axis(const Ed& data, Ei& inds)
-        {
-            std::size_t n_iters = 1;
-            std::ptrdiff_t data_secondary_stride, inds_secondary_stride;
-
-            if (data.layout() == layout_type::row_major)
-            {
-                n_iters = std::accumulate(
-                    data.shape().begin(),
-                    data.shape().end() - 1,
-                    std::size_t(1),
-                    std::multiplies<>()
-                );
-                data_secondary_stride = static_cast<std::ptrdiff_t>(data.shape(data.dimension() - 1));
-                inds_secondary_stride = static_cast<std::ptrdiff_t>(inds.shape(inds.dimension() - 1));
-            }
-            else
-            {
-                n_iters = std::accumulate(
-                    data.shape().begin() + 1,
-                    data.shape().end(),
-                    std::size_t(1),
-                    std::multiplies<>()
-                );
-                data_secondary_stride = static_cast<std::ptrdiff_t>(data.shape(0));
-                inds_secondary_stride = static_cast<std::ptrdiff_t>(inds.shape(0));
-            }
-
-            auto ptr = data.data();
-            auto indices_ptr = inds.data();
-
-            for (std::size_t i = 0; i < n_iters;
-                 ++i, ptr += data_secondary_stride, indices_ptr += inds_secondary_stride)
-            {
-                auto comp = [&ptr](std::size_t x, std::size_t y)
-                {
-                    return *(ptr + x) < *(ptr + y);
-                };
-                std::iota(indices_ptr, indices_ptr + inds_secondary_stride, 0);
-                std::sort(indices_ptr, indices_ptr + inds_secondary_stride, comp);
-            }
-        }
-
         template <class E, class R = typename detail::linear_argsort_result_type<E>::type>
         inline auto flatten_argsort_impl(const xexpression<E>& e)
         {
@@ -449,23 +405,33 @@ namespace xt
             return detail::flatten_argsort_impl<E, result_type>(e);
         }
 
-        if (ax != detail::leading_axis(de))
+        const auto argsort = [](auto res_begin, auto res_end, auto ev_begin, auto /*ev_end*/)
         {
-            dynamic_shape<std::size_t> permutation, reverse_permutation;
-            std::tie(permutation, reverse_permutation) = detail::get_permutations(de.dimension(), ax, de.layout());
+            std::iota(res_begin, res_end, 0);
+            std::sort(
+                res_begin,
+                res_end,
+                [&ev_begin](auto const& i, auto const& j)
+                {
+                    return *(ev_begin + i) < *(ev_begin + j);
+                }
+            );
+        };
 
-            eval_type ev = transpose(de, permutation);
-            result_type res = result_type::from_shape(ev.shape());
-            detail::argsort_over_leading_axis(ev, res);
-            res = transpose(res, reverse_permutation);
-            return res;
-        }
-        else
+        if (ax == detail::leading_axis(de))
         {
             result_type res = result_type::from_shape(de.shape());
-            detail::argsort_over_leading_axis(de, res);
+            detail::call_over_leading_axis(res, de, argsort);
             return res;
         }
+
+        dynamic_shape<std::size_t> permutation, reverse_permutation;
+        std::tie(permutation, reverse_permutation) = detail::get_permutations(de.dimension(), ax, de.layout());
+        eval_type ev = transpose(de, permutation);
+        result_type res = result_type::from_shape(ev.shape());
+        detail::call_over_leading_axis(res, ev, argsort);
+        res = transpose(res, reverse_permutation);
+        return res;
     }
 
     /************************************************
