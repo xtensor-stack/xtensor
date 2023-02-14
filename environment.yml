@@ -4,4 +4,4 @@ channels:
 dependencies:
 - xtensor=0.24.5
 - xtensor-blas=0.20.0
-- xeus-cling=0.13.0
+- xeus-cling=0.15.0

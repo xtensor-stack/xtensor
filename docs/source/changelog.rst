@@ -7,6 +7,16 @@
 Changelog
 =========
 
+0.25.5
+------
+
+- Add space before pragma diagnostic
+  `# 2654 https://github.com/xtensor-stack/xtensor/pull/2654` - Update xtl requirement in cmake
+  `# 2649 https://github.com/xtensor-stack/xtensor/pull/2649` 
+- Fix a bug where .fill doesn't work for a xcontainer that is non-contiguous
+  `# 2650 https://github.com/xtensor-stack/xtensor/pull/2650`
+
+
 0.24.4
 ------
 
