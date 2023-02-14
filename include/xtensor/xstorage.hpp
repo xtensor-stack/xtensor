@@ -1941,10 +1941,13 @@ namespace xt
 // G++ 8 C++ library does define it as a struct hence we get
 // clang warnings here
 
+// Do not remove space between "#" and "pragma". This is required for CRAN checks.
+// clang-format off
 #if defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmismatched-tags"
+ # pragma clang diagnostic push
+ # pragma clang diagnostic ignored "-Wmismatched-tags"
 #endif
+// clang-format on
 
 namespace std
 {
@@ -1969,9 +1972,12 @@ namespace std
     class tuple_size<xt::sequence_view<T, Start, -1>>;
 }
 
+// Do not remove space between "#" and "pragma". This is required for CRAN checks.
+// clang-format off
 #if defined(__clang__)
-#pragma clang diagnostic pop
+ # pragma clang diagnostic pop
 #endif
+// clang-format on
 
 #undef XTENSOR_CONST
 
