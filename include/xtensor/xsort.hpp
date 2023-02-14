@@ -46,35 +46,39 @@ namespace xt
             return stride != 0 ? stride : static_cast<std::ptrdiff_t>(shape);
         }
 
-        template <class E, class F>
-        inline void call_over_leading_axis(E& ev, F&& fct)
+        template <class E>
+        inline std::ptrdiff_t get_secondary_stride(const E& ev)
         {
-            std::size_t n_iters = 1;
-            std::ptrdiff_t secondary_stride;
-
             if (ev.layout() == layout_type::row_major)
             {
-                n_iters = std::accumulate(
+                return adjust_secondary_stride(ev.strides()[ev.dimension() - 2], *(ev.shape().end() - 1));
+            }
+
+            return adjust_secondary_stride(ev.strides()[1], *(ev.shape().begin()));
+        }
+
+        template <class E>
+        inline std::size_t leading_axis_n_iters(const E& ev)
+        {
+            if (ev.layout() == layout_type::row_major)
+            {
+                return std::accumulate(
                     ev.shape().begin(),
                     ev.shape().end() - 1,
                     std::size_t(1),
                     std::multiplies<>()
                 );
-                secondary_stride = adjust_secondary_stride(
-                    ev.strides()[ev.dimension() - 2],
-                    *(ev.shape().end() - 1)
-                );
             }
-            else
-            {
-                n_iters = std::accumulate(
-                    ev.shape().begin() + 1,
-                    ev.shape().end(),
-                    std::size_t(1),
-                    std::multiplies<>()
-                );
-                secondary_stride = adjust_secondary_stride(ev.strides()[1], *(ev.shape().begin()));
-            }
+            return std::accumulate(ev.shape().begin() + 1, ev.shape().end(), std::size_t(1), std::multiplies<>());
+        }
+
+        template <class E, class F>
+        inline void call_over_leading_axis(E& ev, F&& fct)
+        {
+            XTENSOR_ASSERT(ev.dimension() >= 2);
+
+            const std::size_t n_iters = leading_axis_n_iters(ev);
+            const std::ptrdiff_t secondary_stride = get_secondary_stride(ev);
 
             const auto begin = ev.data();
             const auto end = begin + n_iters * secondary_stride;
@@ -87,37 +91,13 @@ namespace xt
         template <class E1, class E2, class F>
         inline void call_over_leading_axis(E1& e1, E2& e2, F&& fct)
         {
-            std::size_t n_iters = 1;
-            std::ptrdiff_t secondary_stride1, secondary_stride2;
+            XTENSOR_ASSERT(e1.dimension() >= 2);
+            XTENSOR_ASSERT(e1.dimension() == e2.dimension());
 
-            if (e1.layout() == layout_type::row_major)
-            {
-                n_iters = std::accumulate(
-                    e1.shape().begin(),
-                    e1.shape().end() - 1,
-                    std::size_t(1),
-                    std::multiplies<>()
-                );
-                secondary_stride1 = adjust_secondary_stride(
-                    e1.strides()[e1.dimension() - 2],
-                    *(e1.shape().end() - 1)
-                );
-                secondary_stride2 = adjust_secondary_stride(
-                    e2.strides()[e2.dimension() - 2],
-                    *(e2.shape().end() - 2)
-                );
-            }
-            else
-            {
-                n_iters = std::accumulate(
-                    e1.shape().begin() + 1,
-                    e1.shape().end(),
-                    std::size_t(1),
-                    std::multiplies<>()
-                );
-                secondary_stride1 = adjust_secondary_stride(e1.strides()[1], *(e1.shape().begin()));
-                secondary_stride2 = adjust_secondary_stride(e2.strides()[1], *(e2.shape().begin()));
-            }
+            const std::size_t n_iters = leading_axis_n_iters(e1);
+            std::ptrdiff_t const secondary_stride1 = get_secondary_stride(e1);
+            std::ptrdiff_t const secondary_stride2 = get_secondary_stride(e2);
+            XTENSOR_ASSERT(secondary_stride1 == secondary_stride2);
 
             const auto begin1 = e1.data();
             const auto end1 = begin1 + n_iters * secondary_stride1;
@@ -192,7 +172,7 @@ namespace xt
             }
 
             dynamic_shape<std::size_t> permutation, reverse_permutation;
-            std::tie(permutation, reverse_permutation) = get_permutations(e.dimension(), axis, e.layout());
+            std::tie(permutation, reverse_permutation) = get_permutations(e.dimension(), ax, e.layout());
             R res = transpose(e, permutation);
             detail::call_over_leading_axis(res, std::forward<F>(lambda));
             res = transpose(res, reverse_permutation);
