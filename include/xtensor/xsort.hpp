@@ -268,6 +268,49 @@ namespace xt
 
     namespace detail
     {
+        template <class ConstRandomIt, class RandomIt, class Compare>
+        inline void argsort_iter(
+            ConstRandomIt data_begin,
+            ConstRandomIt data_end,
+            RandomIt idx_begin,
+            [[maybe_unused]] RandomIt idx_end,
+            Compare comp
+        )
+        {
+            XTENSOR_ASSERT(std::distance(data_begin, data_end) >= 0);
+            XTENSOR_ASSERT(std::distance(idx_begin, idx_end) == std::distance(data_begin, data_end));
+
+            std::iota(idx_begin, idx_end, 0);
+            std::sort(
+                idx_begin,
+                idx_end,
+                [&](const auto i, const auto j)
+                {
+                    return comp(*(data_begin + i), *(data_begin + j));
+                }
+            );
+        }
+
+        template <class ConstRandomIt, class RandomIt>
+        inline void argsort_iter(
+            ConstRandomIt data_begin,
+            ConstRandomIt data_end,
+            RandomIt idx_begin,
+            [[maybe_unused]] RandomIt idx_end
+        )
+        {
+            return argsort_iter(
+                std::move(data_begin),
+                std::move(data_end),
+                std::move(idx_begin),
+                std::move(idx_end),
+                [](const auto& x, const auto& y) -> bool
+                {
+                    return x < y;
+                }
+            );
+        }
+
         template <class VT, class T>
         struct rebind_value_type
         {
@@ -336,12 +379,8 @@ namespace xt
             using result_type = R;
             result_type result;
             result.resize({de.size()});
-            auto comp = [&ad](std::size_t x, std::size_t y)
-            {
-                return ad[x] < ad[y];
-            };
-            std::iota(result.begin(), result.end(), 0);
-            std::sort(result.begin(), result.end(), comp);
+
+            detail::argsort_iter(de.cbegin(), de.cend(), result.begin(), result.end());
 
             return result;
         }
@@ -380,17 +419,9 @@ namespace xt
             return detail::flatten_argsort_impl<E, result_type>(e);
         }
 
-        const auto argsort = [](auto res_begin, auto res_end, auto ev_begin, auto /*ev_end*/)
+        const auto argsort = [](auto res_begin, auto res_end, auto ev_begin, auto ev_end)
         {
-            std::iota(res_begin, res_end, 0);
-            std::sort(
-                res_begin,
-                res_end,
-                [&ev_begin](auto const& i, auto const& j)
-                {
-                    return *(ev_begin + i) < *(ev_begin + j);
-                }
-            );
+            detail::argsort_iter(ev_begin, ev_end, res_begin, res_end);
         };
 
         if (ax == detail::leading_axis(de))
