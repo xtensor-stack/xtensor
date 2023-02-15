@@ -2069,7 +2069,7 @@ namespace xt
         XTL_REQUIRES(is_reducer_options<EVS>, xtl::is_integral<D>)>
     inline auto variance(E&& e, const D& ddof, EVS es = EVS())
     {
-        auto cached_mean = mean<T>(e, es)();
+        auto cached_mean = mean<T>(e, evaluation_strategy::immediate)();
         return detail::mean_noaxis<T>(square(std::forward<E>(e) - std::move(cached_mean)), ddof, es);
     }
 
@@ -2118,11 +2118,10 @@ namespace xt
         XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::is_integral<D>)>
     inline auto variance(E&& e, X&& axes, const D& ddof, EVS es = EVS())
     {
-        decltype(auto) sc = detail::shared_forward<E>(e);
         // note: forcing copy of first axes argument -- is there a better solution?
         auto axes_copy = axes;
         // always eval to prevent repeated evaluations in the next calls
-        auto inner_mean = eval(mean<T>(sc, std::move(axes_copy), evaluation_strategy::immediate));
+        auto inner_mean = eval(mean<T>(e, std::move(axes_copy), evaluation_strategy::immediate));
 
         // fake keep_dims = 1
         // Since the inner_shape might have a reference semantic (e.g. xbuffer_adaptor in bindings)
@@ -2136,7 +2135,7 @@ namespace xt
         }
 
         auto mrv = reshape_view<XTENSOR_DEFAULT_LAYOUT>(std::move(inner_mean), std::move(keep_dim_shape));
-        return detail::mean<T>(square(sc - std::move(mrv)), std::forward<X>(axes), ddof, es);
+        return detail::mean<T>(square(std::forward<E>(e) - std::move(mrv)), std::forward<X>(axes), ddof, es);
     }
 
     template <
@@ -2786,8 +2785,8 @@ namespace xt
     template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS, XTL_REQUIRES(is_reducer_options<EVS>)>
     inline auto nanvar(E&& e, EVS es = EVS())
     {
-        decltype(auto) sc = detail::shared_forward<E>(e);
-        return nanmean<T>(square(sc - nanmean<T>(sc)), es);
+        auto cached_mean = nanmean<T>(e, evaluation_strategy::immediate)();
+        return nanmean<T>(square(std::forward<E>(e) - std::move(cached_mean)), es);
     }
 
     template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS, XTL_REQUIRES(is_reducer_options<EVS>)>
@@ -2824,11 +2823,10 @@ namespace xt
         XTL_REQUIRES(xtl::negation<is_reducer_options<X>>)>
     inline auto nanvar(E&& e, X&& axes, EVS es = EVS())
     {
-        decltype(auto) sc = detail::shared_forward<E>(e);
         // note: forcing copy of first axes argument -- is there a better solution?
         auto axes_copy = axes;
         using result_type = typename std::conditional_t<std::is_same<T, void>::value, double, T>;
-        auto inner_mean = nanmean<result_type>(sc, std::move(axes_copy));
+        auto inner_mean = eval(nanmean<result_type>(e, std::move(axes_copy), evaluation_strategy::immediate));
 
         // fake keep_dims = 1
         // Since the inner_shape might have a reference semantic (e.g. xbuffer_adaptor in bindings)
@@ -2841,7 +2839,11 @@ namespace xt
             keep_dim_shape[el] = 1;
         }
         auto mrv = reshape_view<XTENSOR_DEFAULT_LAYOUT>(std::move(inner_mean), std::move(keep_dim_shape));
-        return nanmean<result_type>(square(cast<result_type>(sc) - std::move(mrv)), std::forward<X>(axes), es);
+        return nanmean<result_type>(
+            square(cast<result_type>(std::forward<E>(e)) - std::move(mrv)),
+            std::forward<X>(axes),
+            es
+        );
     }
 
     /**
