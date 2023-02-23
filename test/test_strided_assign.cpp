@@ -70,6 +70,15 @@ namespace xt
                 EXPECT_FALSE(check_linear_assign(adapter_strided_noncont, view_noncont));
                 EXPECT_TRUE(check_strided_assign(adapter_strided_noncont, view_noncont));
             }
+            {
+                auto view_cont = xt::view(simple_xtensor_16, xt::range(0,1), xt::range(0,4));
+                auto view_cont2 = xt::view(simple_xtensor_16, xt::range(3,4), xt::range(0,4));
+                EXPECT_TRUE(check_linear_assign(view_cont, view_cont2));
+                auto view_noncont = xt::view(simple_xtensor_16, xt::range(0,4), xt::range(0,3));
+                auto view_noncont2 = xt::view(simple_xtensor_16, xt::range(0,4), xt::range(1,4));
+                EXPECT_FALSE(check_linear_assign(view_noncont, view_noncont2));
+                EXPECT_TRUE(check_strided_assign(view_noncont, view_noncont2));
+            }
 
             {
                 std::vector<double> data2{-1, -1, -1, -1};

@@ -544,10 +544,8 @@ namespace xt
         {
             for (std::size_t i = strides.size(); i != 0; --i)
             {
-// 				std::cout << "matching: " << strides[i - 1] << " && " << shape[i - 1]<< " && " << data_size << std::endl;
                 if (!stride_match_condition(strides[i - 1], shape[i - 1], data_size, zero_strides))
                 {
-// 					std::cout << "non-matching: " << strides[i - 1] << " != " << data_size << std::endl;
                     return false;
                 }
                 data_size *= static_cast<value_type>(shape[i - 1]);
