@@ -940,7 +940,7 @@ namespace xt
             // If the array has strides of zero, it is a constant, and therefore contiguous.
             return it == m_strides.end() || *it == str_type(1);
         } else {
-            m_strides.empty();
+            return m_strides.empty();
         }
     }
 
