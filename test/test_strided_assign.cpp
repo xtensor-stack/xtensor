@@ -39,6 +39,20 @@ namespace xt
             return strided_assign_detail::get_loop_sizes(a, b).can_do_strided_assign;
         };
         {
+            size_t size = 50;
+            const std::array<size_t, 3> shape = {size, size, size};
+            xt::xtensor<double, 3> a(shape), b(shape);
+            auto core = xt::range(1, size - 1);
+            auto lhs = xt::view(b, core, core, core);
+            auto rhs = 1.0 / 7.0
+                       * (xt::view(a, core, core, core) + xt::view(a, core, xt::range(2, size), core)
+                          + xt::view(a, core, xt::range(0, size - 2), core)
+                          + xt::view(a, xt::range(2, size), core, core)
+                          + xt::view(a, xt::range(0, size - 2), core, core));
+            xt::noalias(lhs) = rhs;
+            EXPECT_TRUE(check_strided_assign(lhs, rhs));
+        }
+        {
             auto data = std::vector<double>{
                 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
             auto simple_xtensor_12 = xt::xtensor<double, 2>{{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}};
