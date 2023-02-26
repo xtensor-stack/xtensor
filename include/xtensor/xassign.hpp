@@ -903,16 +903,8 @@ namespace xt
                 for (size_type i = 0; i < outer_shape.size(); i++)
                 {
                     auto d_idx = n / stride_sizes[i];
-                    if (d_idx < outer_shape[i])
-                    {
-                        outer_index[i] = d_idx;
-                        n -= d_idx * stride_sizes[i];
-                    }
-                    else
-                    {
-                        // that may not happen
-                        outer_index[i] = 0;
-                    }
+                    outer_index[i] = d_idx;
+                    n -= d_idx * stride_sizes[i];
                 }
             }
         };
@@ -959,12 +951,8 @@ namespace xt
                 {
                     i--;
                     auto d_idx = n / stride_sizes[i];
-                    if (d_idx < (outer_shape[i] - 1))
-                    {
-                        outer_index[i] = d_idx;
-                        n -= d_idx * stride_sizes[i];
-                    }
-                    // 					else {}   // that may not happen
+                    outer_index[i] = d_idx;
+                    n -= d_idx * stride_sizes[i];
                 }
             }
         };
@@ -1023,13 +1011,13 @@ namespace xt
             const strides_type& m_strides;
         };
 
-        template <bool possible = true, class E1, class E2, std::enable_if_t<!has_strides<E1>::value || !has_strides<E2>::value || !possible, bool> = true>
+        template <bool possible = true, class E1, class E2, std::enable_if_t<!has_strides<E1>::value || !possible, bool> = true>
         loop_sizes_t get_loop_sizes(const E1& e1, const E2&)
         {
             return {false, true, 1, e1.size(), e1.dimension(), e1.dimension()};
         }
 
-        template <bool possible = true, class E1, class E2, std::enable_if_t<has_strides<E1>::value && has_strides<E2>::value && possible, bool> = true>
+        template <bool possible = true, class E1, class E2, std::enable_if_t<has_strides<E1>::value && possible, bool> = true>
         loop_sizes_t get_loop_sizes(const E1& e1, const E2& e2)
         {
             using shape_value_type = typename E1::shape_type::value_type;
