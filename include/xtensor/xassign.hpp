@@ -1167,7 +1167,7 @@ namespace xt
             step_dim = cut;
         }
 #if defined(XTENSOR_USE_OPENMP) && defined(strided_parallel_assign)
-        if (outer_loop_size > 20)
+        if (outer_loop_size >= XTENSOR_OPENMP_THRESHOLD / inner_loop_size)
         {
             std::size_t first_step = true;
 #pragma omp parallel for schedule(static) firstprivate(first_step, fct_stepper, res_stepper, idx)
@@ -1216,7 +1216,7 @@ namespace xt
         else
         {
 #elif defined(strided_parallel_assign) && defined(XTENSOR_USE_TBB)
-        if (outer_loop_size > 20)
+        if (outer_loop_size > XTENSOR_TBB_THRESHOLD / inner_loop_size)
         {
             tbb::static_partitioner sp;
             tbb::parallel_for(
