@@ -9,6 +9,7 @@
 
 #include <type_traits>
 #include <vector>
+#include <iterator>
 
 #include "xtensor/xarray.hpp"
 #include "xtensor/xassign.hpp"
@@ -80,6 +81,15 @@ public:
     auto begin() const
     {
         return m_data.begin();
+    }
+
+    auto rbegin() const
+    {
+        return std::make_reverse_iterator(end());
+    }
+    auto rend() const
+    {
+        return std::make_reverse_iterator(begin());
     }
 
     auto empty() const

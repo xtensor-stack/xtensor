@@ -172,29 +172,32 @@ namespace xt
      * strided_loop_assigner *
      *************************/
 
-    namespace strided_assign_detail {
-        struct loop_sizes_t {
+    namespace strided_assign_detail
+    {
+        struct loop_sizes_t
+        {
+            bool can_do_strided_assign;
             bool is_row_major;
             std::size_t inner_loop_size;
             std::size_t outer_loop_size;
             std::size_t cut;
             std::size_t dimension;
-            inline bool can_do_strided_assign() { // Is it actually useful to do a strided assign?
-                return inner_loop_size > 1;
-                //return !((is_row_major && cut == dimension) || (!is_row_major && cut == 0)) && inner_loop_size != 1;
-            };
         };
     }
+
     template <bool simd>
     class strided_loop_assigner
     {
     public:
+
         using loop_sizes_t = strided_assign_detail::loop_sizes_t;
         // is_row_major, inner_loop_size, outer_loop_size, cut
         template <class E1, class E2>
-        static void run(E1& e1, const E2& e2, const loop_sizes_t &loop_sizes);
+        static void run(E1& e1, const E2& e2, const loop_sizes_t& loop_sizes);
         template <class E1, class E2>
         static loop_sizes_t get_loop_sizes(E1& e1, const E2& e2);
+        template <class E1, class E2>
+        static void run(E1& e1, const E2& e2);
     };
 
     /***********************************
@@ -471,11 +474,7 @@ namespace xt
         {
             if (simd_strided_assign)
             {
-                strided_assign_detail::loop_sizes_t loop_sizes = strided_loop_assigner<simd_strided_assign>::get_loop_sizes(de1, de2);
-                if (loop_sizes.can_do_strided_assign())
-                    strided_loop_assigner<simd_strided_assign>::run(de1, de2, loop_sizes);
-                else
-                    stepper_assigner<E1, E2, default_assignable_layout(E1::static_layout)>(de1, de2).run();
+                strided_loop_assigner<simd_strided_assign>::run(de1, de2);
             }
             else
             {
@@ -1024,7 +1023,13 @@ namespace xt
             const strides_type& m_strides;
         };
 
-        template <class E1, class E2>
+        template <bool possible = true, class E1, class E2, std::enable_if_t<!has_strides<E1>::value || !has_strides<E2>::value || !possible, bool> = true>
+        loop_sizes_t get_loop_sizes(const E1& e1, const E2&)
+        {
+            return {false, true, 1, e1.size(), e1.dimension(), e1.dimension()};
+        }
+
+        template <bool possible = true, class E1, class E2, std::enable_if_t<has_strides<E1>::value && has_strides<E2>::value && possible, bool> = true>
         loop_sizes_t get_loop_sizes(const E1& e1, const E2& e2)
         {
             using shape_value_type = typename E1::shape_type::value_type;
@@ -1033,8 +1038,11 @@ namespace xt
             // Try to find a row-major scheme first, where the outer loop is on the first N = `cut`
             // dimensions, and the inner loop is
             is_row_major = true;
-            auto is_zero = [](auto i){return i == 0;};
-            auto &&strides = e1.strides();
+            auto is_zero = [](auto i)
+            {
+                return i == 0;
+            };
+            auto&& strides = e1.strides();
             auto it_bwd = std::find_if_not(strides.rbegin(), strides.rend(), is_zero);
             bool de1_row_contiguous = it_bwd != strides.rend() && *it_bwd == 1;
             auto it_fwd = std::find_if_not(strides.begin(), strides.end(), is_zero);
@@ -1050,7 +1058,7 @@ namespace xt
             else
             {
                 // No strided loop possible.
-                return {true, 1, e1.size(), e1.dimension(), e1.dimension()};
+                return {false, true, 1, e1.size(), e1.dimension(), e1.dimension()};
             }
 
             // Cut is the number of dimensions in the outer loop
@@ -1069,7 +1077,8 @@ namespace xt
             }
             else if (!is_row_major)
             {
-                auto csf = check_strides_functor<layout_type::column_major, decltype(e1.strides())>(e1.strides());
+                auto csf = check_strides_functor<layout_type::column_major, decltype(e1.strides())>(e1.strides()
+                );
                 cut = csf(e2);
                 if (cut > 1)
                 {
@@ -1096,7 +1105,7 @@ namespace xt
                 std::swap(outer_loop_size, inner_loop_size);
             }
 
-            return {is_row_major, inner_loop_size, outer_loop_size, cut, e1.dimension()};
+            return {inner_loop_size > 1, is_row_major, inner_loop_size, outer_loop_size, cut, e1.dimension()};
         }
     }
 
@@ -1104,14 +1113,14 @@ namespace xt
     template <class E1, class E2>
     inline strided_assign_detail::loop_sizes_t strided_loop_assigner<simd>::get_loop_sizes(E1& e1, const E2& e2)
     {
-        return strided_assign_detail::get_loop_sizes(e1, e2);
+        return strided_assign_detail::get_loop_sizes<simd>(e1, e2);
     }
 
 #define strided_parallel_assign
 
     template <bool simd>
     template <class E1, class E2>
-    inline void strided_loop_assigner<simd>::run(E1& e1, const E2& e2, const loop_sizes_t &loop_sizes)
+    inline void strided_loop_assigner<simd>::run(E1& e1, const E2& e2, const loop_sizes_t& loop_sizes)
     {
         bool is_row_major = loop_sizes.is_row_major;
         std::size_t inner_loop_size = loop_sizes.inner_loop_size;
@@ -1244,7 +1253,7 @@ namespace xt
 
                         for (std::size_t i = 0; i < simd_size; ++i)
                         {
-                            res_stepper.template store_simd<simd_type>(
+                            res_stepper.template store_simd(
                                 fct_stepper.template step_simd<value_type>()
                             );
                         }
@@ -1318,15 +1327,34 @@ namespace xt
         }
 #endif
     }
+    template <>
+    template <class E1, class E2>
+    inline void strided_loop_assigner<true>::run(E1& e1, const E2& e2)
+    {
+        strided_assign_detail::loop_sizes_t
+            loop_sizes = strided_loop_assigner<true>::get_loop_sizes(e1, e2);
+        if (loop_sizes.can_do_strided_assign)
+        {
+            run(e1, e2, loop_sizes);
+        }
+        else
+        {
+            // trigger the fallback assigner
+            stepper_assigner<E1, E2, default_assignable_layout(E1::static_layout)>(e1, e2).run();
+        }
+    }
 
     template <>
     template <class E1, class E2>
-    inline void strided_loop_assigner<false>::run(
-        E1& /*e1*/,
-        const E2& /*e2*/,
-        loop_sizes_t const &
-    )
+    inline void strided_loop_assigner<false>::run(E1& /*e1*/, const E2& /*e2*/, const loop_sizes_t&)
     {
+    }
+    template <>
+    template <class E1, class E2>
+    inline void strided_loop_assigner<false>::run(E1& e1, const E2& e2)
+    {
+        // trigger the fallback assigner
+        stepper_assigner<E1, E2, default_assignable_layout(E1::static_layout)>(e1, e2).run();
     }
 }
 
