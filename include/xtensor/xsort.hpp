@@ -82,7 +82,7 @@ namespace xt
 
             const auto begin = ev.data();
             const auto end = begin + n_iters * secondary_stride;
-            for (auto iter = begin; iter < end; iter += secondary_stride)
+            for (auto iter = begin; iter != end; iter += secondary_stride)
             {
                 fct(iter, iter + secondary_stride);
             }
@@ -105,7 +105,7 @@ namespace xt
             const auto end2 = begin2 + n_iters * secondary_stride2;
             auto iter1 = begin1;
             auto iter2 = begin2;
-            for (; (iter1 < end1) && (iter2 < end2); iter1 += secondary_stride1, iter2 += secondary_stride2)
+            for (; (iter1 != end1) && (iter2 != end2); iter1 += secondary_stride1, iter2 += secondary_stride2)
             {
                 fct(iter1, iter1 + secondary_stride1, iter2, iter2 + secondary_stride2);
             }
@@ -269,16 +269,12 @@ namespace xt
     namespace detail
     {
         template <class ConstRandomIt, class RandomIt, class Compare>
-        inline void argsort_iter(
-            ConstRandomIt data_begin,
-            ConstRandomIt data_end,
-            RandomIt idx_begin,
-            [[maybe_unused]] RandomIt idx_end,
-            Compare comp
-        )
+        inline void
+        argsort_iter(ConstRandomIt data_begin, ConstRandomIt data_end, RandomIt idx_begin, RandomIt idx_end, Compare comp)
         {
             XTENSOR_ASSERT(std::distance(data_begin, data_end) >= 0);
             XTENSOR_ASSERT(std::distance(idx_begin, idx_end) == std::distance(data_begin, data_end));
+            (void) idx_end;  // TODO(C++17) [[maybe_unused]] only used in assertion.
 
             std::iota(idx_begin, idx_end, 0);
             std::sort(
@@ -292,12 +288,8 @@ namespace xt
         }
 
         template <class ConstRandomIt, class RandomIt>
-        inline void argsort_iter(
-            ConstRandomIt data_begin,
-            ConstRandomIt data_end,
-            RandomIt idx_begin,
-            [[maybe_unused]] RandomIt idx_end
-        )
+        inline void
+        argsort_iter(ConstRandomIt data_begin, ConstRandomIt data_end, RandomIt idx_begin, RandomIt idx_end)
         {
             return argsort_iter(
                 std::move(data_begin),
