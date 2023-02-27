@@ -13,6 +13,7 @@
 #include "xtensor/xadapt.hpp"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xassign.hpp"
+#include "xtensor/xlayout.hpp"
 #include "xtensor/xnoalias.hpp"
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xview.hpp"
@@ -55,8 +56,11 @@ namespace xt
         {
             auto data = std::vector<double>{
                 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
-            auto simple_xtensor_12 = xt::xtensor<double, 2>{{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}};
-            auto simple_xtensor_16 = xt::xtensor<double, 2>{
+            auto simple_xtensor_12 = xt::xtensor<double, 2, layout_type::row_major>{
+                {1, 2, 3, 4},
+                {5, 6, 7, 8},
+                {9, 10, 11, 12}};
+            auto simple_xtensor_16 = xt::xtensor<double, 2, layout_type::row_major>{
                 {1, 2, 3, 4},
                 {5, 6, 7, 8},
                 {9, 10, 11, 12},
@@ -111,8 +115,18 @@ namespace xt
 
             {
                 std::vector<double> data2{-1, -1, -1, -1};
-                auto linear_adapter = xt::adapt(data2.data(), 4, xt::no_ownership(), std::vector<size_t>{4, 1});
-                auto adapter_cont2 = xt::adapt(data.data(), 4, xt::no_ownership(), std::vector<size_t>{1, 4});
+                auto linear_adapter = xt::adapt<layout_type::row_major>(
+                    data2.data(),
+                    4,
+                    xt::no_ownership(),
+                    std::vector<size_t>{4, 1}
+                );
+                auto adapter_cont2 = xt::adapt<layout_type::row_major>(
+                    data.data(),
+                    4,
+                    xt::no_ownership(),
+                    std::vector<size_t>{1, 4}
+                );
                 EXPECT_TRUE(linear_adapter.is_contiguous());
                 EXPECT_TRUE(adapter_cont2.is_contiguous());
                 bool success_one = check_linear_assign(linear_adapter, xt::transpose(adapter_cont2));
@@ -154,7 +168,12 @@ namespace xt
 
             {
                 std::vector<double> data2{-1, -1, -1, -1, -1, -1};
-                auto linear_adapter2 = xt::adapt(data2.data(), 6, xt::no_ownership(), std::vector<size_t>{3, 2});
+                auto linear_adapter2 = xt::adapt<layout_type::row_major>(
+                    data2.data(),
+                    6,
+                    xt::no_ownership(),
+                    std::vector<size_t>{3, 2}
+                );
                 auto strided_adapter = xt::adapt(
                     data.data(),
                     6,
