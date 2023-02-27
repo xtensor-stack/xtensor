@@ -7,9 +7,9 @@
  * The full license is in the file LICENSE, distributed with this software. *
  ****************************************************************************/
 
+#include <iterator>
 #include <type_traits>
 #include <vector>
-#include <iterator>
 
 #include "xtensor/xarray.hpp"
 #include "xtensor/xassign.hpp"
@@ -87,6 +87,7 @@ public:
     {
         return std::make_reverse_iterator(end());
     }
+
     auto rend() const
     {
         return std::make_reverse_iterator(begin());

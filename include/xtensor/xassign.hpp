@@ -1346,6 +1346,7 @@ namespace xt
     inline void strided_loop_assigner<false>::run(E1& /*e1*/, const E2& /*e2*/, const loop_sizes_t&)
     {
     }
+
     template <>
     template <class E1, class E2>
     inline void strided_loop_assigner<false>::run(E1& e1, const E2& e2)
