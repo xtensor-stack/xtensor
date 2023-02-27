@@ -1177,7 +1177,7 @@ namespace xt
 
                 for (std::size_t i = 0; i < simd_size; ++i)
                 {
-                    res_stepper.template store_simd<simd_type>(fct_stepper.template step_simd<value_type>());
+                    res_stepper.template store_simd(fct_stepper.template step_simd<value_type>());
                 }
                 for (std::size_t i = 0; i < simd_rest; ++i)
                 {
@@ -1191,13 +1191,24 @@ namespace xt
                     ? strided_assign_detail::idx_tools<layout_type::row_major>::next_idx(idx, max_shape)
                     : strided_assign_detail::idx_tools<layout_type::column_major>::next_idx(idx, max_shape);
 
-                // need to step E1 as well if not contigous assign (e.g. view)
                 fct_stepper.to_begin();
-                res_stepper.to_begin();
-                for (std::size_t i = 0; i < idx.size(); ++i)
+
+                // need to step E1 as well if not contigous assign (e.g. view)
+                if (!E1::contiguous_layout)
                 {
-                    fct_stepper.step(i + step_dim, idx[i]);
-                    res_stepper.step(i + step_dim, idx[i]);
+                    res_stepper.to_begin();
+                    for (std::size_t i = 0; i < idx.size(); ++i)
+                    {
+                        fct_stepper.step(i + step_dim, idx[i]);
+                        res_stepper.step(i + step_dim, idx[i]);
+                    }
+                }
+                else
+                {
+                    for (std::size_t i = 0; i < idx.size(); ++i)
+                    {
+                        fct_stepper.step(i + step_dim, idx[i]);
+                    }
                 }
             }
         }
