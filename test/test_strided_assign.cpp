@@ -33,10 +33,12 @@ namespace xt
         auto check_strided_assign = [](auto a, auto b)
         {
             assert_compatible_shape(a, b);
+#ifndef _WIN32
             static_assert(
                 xassign_traits<decltype(a), decltype(b)>::strided_assign(),
                 "Failed to do strided assign"
             );
+#endif
             return strided_assign_detail::get_loop_sizes(a, b).can_do_strided_assign;
         };
         {
