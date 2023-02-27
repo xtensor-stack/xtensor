@@ -924,10 +924,15 @@ namespace xt
     inline bool xstrided_container<D>::is_contiguous() const noexcept
     {
         using str_type = typename inner_strides_type::value_type;
-        auto is_zero = [](auto i){return i == 0;};
+        auto is_zero = [](auto i)
+        {
+            return i == 0;
+        };
         // This is unsafe if the strides are all 0. Does that happen?
         if (!is_contiguous_container<storage_type>::value)
+        {
             return false;
+        }
         if (m_layout == layout_type::row_major)
         {
             auto it = std::find_if_not(m_strides.rbegin(), m_strides.rend(), is_zero);
@@ -939,7 +944,9 @@ namespace xt
             auto it = std::find_if_not(m_strides.begin(), m_strides.end(), is_zero);
             // If the array has strides of zero, it is a constant, and therefore contiguous.
             return it == m_strides.end() || *it == str_type(1);
-        } else {
+        }
+        else
+        {
             return m_strides.empty();
         }
     }
