@@ -480,14 +480,6 @@ namespace xt
                 }
             );
         }
-
-        template <class C>
-        inline auto sorted(C&& container)
-        {
-            auto container_copy = std::forward<C>(container);
-            std::sort(container_copy.begin(), container_copy.end());
-            return std::move(container_copy);
-        }
     }
 
     /**
@@ -522,16 +514,16 @@ namespace xt
         class C,
         class R = detail::flatten_sort_result_type_t<E>,
         class = std::enable_if_t<!xtl::is_integral<C>::value, int>>
-    inline R partition(const xexpression<E>& e, C&& kth_container, placeholders::xtuph /*ax*/)
+    inline R partition(const xexpression<E>& e, C kth_container, placeholders::xtuph /*ax*/)
     {
         const auto& de = e.derived_cast();
 
         R ev = R::from_shape({de.size()});
-        auto kth_sorted = detail::sorted(std::forward<C>(kth_container));
+        std::sort(kth_container.begin(), kth_container.end());
 
         std::copy(de.linear_cbegin(), de.linear_cend(), ev.linear_begin());  // flatten
 
-        detail::partition_iter(ev.linear_begin(), ev.linear_end(), kth_sorted.rbegin(), kth_sorted.rend());
+        detail::partition_iter(ev.linear_begin(), ev.linear_end(), kth_container.rbegin(), kth_container.rend());
 
         return ev;
     }
@@ -553,18 +545,18 @@ namespace xt
     }
 
     template <class E, class C, class = std::enable_if_t<!xtl::is_integral<C>::value, int>>
-    inline auto partition(const xexpression<E>& e, C&& kth_container, std::ptrdiff_t axis = -1)
+    inline auto partition(const xexpression<E>& e, C kth_container, std::ptrdiff_t axis = -1)
     {
         using eval_type = typename detail::sort_eval_type<E>::type;
 
-        auto kth_sorted = detail::sorted(std::forward<C>(kth_container));
+        std::sort(kth_container.begin(), kth_container.end());
 
         return detail::map_axis<eval_type>(
             e.derived_cast(),
             axis,
-            [&kth_sorted](auto begin, auto end)
+            [&kth_container](auto begin, auto end)
             {
-                detail::partition_iter(begin, end, kth_sorted.rbegin(), kth_sorted.rend());
+                detail::partition_iter(begin, end, kth_container.rbegin(), kth_container.rend());
             }
         );
     }
@@ -617,7 +609,7 @@ namespace xt
         class C,
         class R = typename detail::linear_argsort_result_type<typename detail::sort_eval_type<E>::type>::type,
         class = std::enable_if_t<!xtl::is_integral<C>::value, int>>
-    inline R argpartition(const xexpression<E>& e, C&& kth_container, placeholders::xtuph)
+    inline R argpartition(const xexpression<E>& e, C kth_container, placeholders::xtuph)
     {
         using eval_type = typename detail::sort_eval_type<E>::type;
         using result_type = typename detail::linear_argsort_result_type<eval_type>::type;
@@ -626,15 +618,15 @@ namespace xt
 
         result_type res = result_type::from_shape({de.size()});
 
-        auto kth_sorted = detail::sorted(std::forward<C>(kth_container));
+        std::sort(kth_container.begin(), kth_container.end());
 
         std::iota(res.linear_begin(), res.linear_end(), 0);
 
         detail::partition_iter(
             res.linear_begin(),
             res.linear_end(),
-            kth_sorted.rbegin(),
-            kth_sorted.rend(),
+            kth_container.rbegin(),
+            kth_container.rend(),
             [&de](std::size_t a, std::size_t b)
             {
                 return de[a] < de[b];
@@ -661,7 +653,7 @@ namespace xt
     }
 
     template <class E, class C, class = std::enable_if_t<!xtl::is_integral<C>::value, int>>
-    inline auto argpartition(const xexpression<E>& e, C&& kth_container, std::ptrdiff_t axis = -1)
+    inline auto argpartition(const xexpression<E>& e, C kth_container, std::ptrdiff_t axis = -1)
     {
         using eval_type = typename detail::sort_eval_type<E>::type;
         using result_type = typename detail::argsort_result_type<eval_type>::type;
@@ -673,16 +665,16 @@ namespace xt
             return argpartition<E, C, result_type>(e, std::forward<C>(kth_container), xnone());
         }
 
-        auto kth_sorted = detail::sorted(std::forward<C>(kth_container));
+        std::sort(kth_container.begin(), kth_container.end());
         const auto argpartition_w_kth =
-            [&kth_sorted](auto res_begin, auto res_end, auto ev_begin, auto /*ev_end*/)
+            [&kth_container](auto res_begin, auto res_end, auto ev_begin, auto /*ev_end*/)
         {
             std::iota(res_begin, res_end, 0);
             detail::partition_iter(
                 res_begin,
                 res_end,
-                kth_sorted.rbegin(),
-                kth_sorted.rend(),
+                kth_container.rbegin(),
+                kth_container.rend(),
                 [&ev_begin](auto const& i, auto const& j)
                 {
                     return *(ev_begin + i) < *(ev_begin + j);
