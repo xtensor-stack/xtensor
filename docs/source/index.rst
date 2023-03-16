@@ -25,8 +25,8 @@ Containers of *xtensor* are inspired by `NumPy`_, the Python array programming
 library. **Adaptors** for existing data structures to be plugged into the
 expression system can easily be written.
 
-In fact, *xtensor* can be used to **process numpy data structures in-place**
-using Python's `buffer protocol`_. For more details on the numpy bindings,
+In fact, *xtensor* can be used to **process NumPy data structures in-place**
+using Python's `buffer protocol`_. For more details on the NumPy bindings,
 check out the xtensor-python_ project. Language bindings for R and Julia are
 also available.
 

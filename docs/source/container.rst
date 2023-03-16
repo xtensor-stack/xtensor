@@ -79,7 +79,7 @@ Runtime vs Compile-time dimensionality
 Three container classes implementing multidimensional arrays are provided: :cpp:type:`xt::xarray` and
 :cpp:type:`xt::xtensor` and :cpp:type:`xt::xtensor_fixed`.
 
-- :cpp:type:`xt::xarray` can be reshaped dynamically to any number of dimensions. It is the container that is the most similar to numpy arrays.
+- :cpp:type:`xt::xarray` can be reshaped dynamically to any number of dimensions. It is the container that is the most similar to NumPy arrays.
 - :cpp:type:`xt::xtensor` has a dimension set at compilation time, which enables many optimizations.
   For example, shapes and strides of :cpp:type:`xt::xtensor` instances are allocated on the stack instead of the heap.
 - :cpp:type:`xt::xtensor_fixed` has a shape fixed at compile time.

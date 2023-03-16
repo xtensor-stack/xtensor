@@ -324,10 +324,10 @@ namespace xt
         };
 
         /**
-         * Considering the assigment LHS = RHS, if the requested value type used for
+         * Considering the assignment LHS = RHS, if the requested value type used for
          * loading simd from RHS is not complex while LHS value_type is complex,
          * the assignment fails. The reason is that SIMD batches of complex values cannot
-         * be implicitly instanciated from batches of scalar values.
+         * be implicitly instantiated from batches of scalar values.
          * Making the constructor implicit does not fix the issue since in the end,
          * the assignment is done with vec.store(buffer) where vec is a batch of scalars
          * and buffer an array of complex. SIMD batches of scalars do not provide overloads
@@ -1144,7 +1144,7 @@ namespace xt
         auto fct_stepper = e2.stepper_begin(e1.shape());
         auto res_stepper = e1.stepper_begin(e1.shape());
 
-        // TODO in 1D case this is ambigous -- could be RM or CM.
+        // TODO in 1D case this is ambiguous -- could be RM or CM.
         //      Use default layout to make decision
         std::size_t step_dim = 0;
         if (!is_row_major)  // row major case

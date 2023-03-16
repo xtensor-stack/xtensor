@@ -228,7 +228,7 @@ namespace xt
     /**
      * Calculates the phase angle elementwise for the complex numbers in @p e.
      *
-     * Note that this function might be slightly less perfomant than xt::arg.
+     * Note that this function might be slightly less performant than xt::arg.
      *
      * @ingroup xt_xcomplex
      * @param e the xt::xexpression

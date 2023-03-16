@@ -392,7 +392,7 @@ namespace xt
     }
 
     // xtensor_view can be used on pseudo containers, i.e. containers
-    // whowe access operator does not return a reference. Since it
+    // whose access operator does not return a reference. Since it
     // is not possible to take the address f a temporary, the load_simd
     // method implementation leads to a compilation error.
     template <class EC, std::size_t N, layout_type L, class Tag>

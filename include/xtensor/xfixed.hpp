@@ -544,7 +544,7 @@ namespace xt
 
     /**
      * Create an uninitialized xfixed_container.
-     * Note this function is only provided for homogenity, and the shape & layout argument is
+     * Note this function is only provided for homogeneity, and the shape & layout argument is
      * disregarded (the template shape is always used).
      *
      * @param shape the shape of the xfixed_container (unused!)
@@ -571,7 +571,7 @@ namespace xt
 
     /**
      * Create an xfixed_container, and initialize with the value of v.
-     * Note, the shape argument to this function is only provided for homogenity,
+     * Note, the shape argument to this function is only provided for homogeneity,
      * and the shape argument is disregarded (the template shape is always used).
      *
      * @param shape the shape of the xfixed_container (unused!)
