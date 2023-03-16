@@ -191,7 +191,7 @@ namespace xt
     }
 
     /**
-     * @brief Dump tensor to CSV. (see declaration for more details)
+     * @brief Dump tensor to CSV.
      *
      * @param stream the output stream to write the CSV encoded values
      * @param e the tensor expression to serialize
