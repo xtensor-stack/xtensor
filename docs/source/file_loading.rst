@@ -13,7 +13,7 @@ format.
 Please note that many more input and output formats are available in the `xtensor-io
 <https://github.com/xtensor-stack/xtensor-io>`_ package.
 `xtensor-io` offers functions to load and store from image files (``jpg``, ``gif``, ``png``...),
-sound files (``wav``, ``ogg``...), HDF5 files (``h5``, ``hdf5``, ...), and compressed numpy format (``npz``).
+sound files (``wav``, ``ogg``...), HDF5 files (``h5``, ``hdf5``, ...), and compressed NumPy format (``npz``).
 
 
 Loading CSV data into xtensor

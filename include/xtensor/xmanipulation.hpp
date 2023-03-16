@@ -429,7 +429,7 @@ namespace xt
      * Return a flatten view of the given expression.
      *
      * No copy is made.
-     * This method is equivalent to ravel and is provided for API sameness with Numpy.
+     * This method is equivalent to ravel and is provided for API sameness with NumPy.
      *
      * @ingroup xt_xmanipulation
      * @param e the input expression

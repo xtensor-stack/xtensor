@@ -272,7 +272,7 @@ namespace xt
      *
      * @warning This method is meant for performance, for expressions with a dynamic
      * number of dimensions (i.e. not known at compile time). Since it may have
-     * undefined behavior (see parameters), operator() should be prefered whenever
+     * undefined behavior (see parameters), operator() should be preferred whenever
      * it is possible.
      * @warning This method is NOT compatible with broadcasting, meaning the following
      *  code has undefined behavior:
@@ -384,7 +384,7 @@ namespace xt
      * auto a = xt::arange<double>(50).reshape({-1, 10});
      * //a.shape() is {5, 10}
      * \endcode
-     * @param shape the new shape (has to have same number of elements as the original genrator)
+     * @param shape the new shape (has to have same number of elements as the original generator)
      */
     template <class F, class R, class S>
     template <class O>

@@ -270,8 +270,8 @@ If you read the entire code of ``xcontainer``, you'll notice that two types are 
 strides and backstrides: ``shape_type`` and ``inner_shape_type``, ``strides_type`` and
 ``inner_strides_type``, and ``backstrides_type`` and ``inner_backstrides_type``. The distinction
 between ``inner_shape_type`` and ``shape_type`` was motivated by the xtensor-python wrapper around
-numpy data structures, where the inner shape type is a proxy on the shape section of the numpy
-arrayobject. It cannot have a value semantics on its own as it is bound to the entire numpy array.
+NumPy data structures, where the inner shape type is a proxy on the shape section of the NumPy
+arrayobject. It cannot have a value semantics on its own as it is bound to the entire NumPy array.
 
 ``xstrided_container`` inherits from ``xcontainer``; it represents a container that holds its shape
 and strides. It provides methods for reshaping the container:

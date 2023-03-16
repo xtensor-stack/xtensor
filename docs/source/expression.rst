@@ -90,7 +90,7 @@ Broadcasting
 
 The number of dimensions of an :cpp:type:`xt::xexpression` and the sizes of these dimensions are provided by the :cpp:func:`~xt::xexpression::shape` method, which returns a sequence of unsigned integers
 specifying the size of each dimension. We can operate on expressions of different shapes of dimensions in an elementwise fashion.
-Broadcasting rules of *xtensor* are similar to those of Numpy_ and libdynd_.
+Broadcasting rules of *xtensor* are similar to those of NumPy_ and libdynd_.
 
 In an operation involving two arrays of different dimensions, the array with the lesser dimensions is broadcast across the leading dimensions of the other.
 For example, if ``A`` has shape ``(2, 3)``, and ``B`` has shape ``(4, 2, 3)``, the result of a broadcast operation with ``A`` and ``B`` has shape ``(4, 2, 3)``.

@@ -41,7 +41,7 @@ html_js_files = [
     'goatcounter.js'
 ]
 
-# Automatically link to numpy doc
+# Automatically link to NumPy doc
 extensions += ['sphinx.ext.intersphinx']
 intersphinx_mapping = {
     "numpy": ("https://numpy.org/doc/stable/", None),

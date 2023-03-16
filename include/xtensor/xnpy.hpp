@@ -247,7 +247,7 @@ namespace xt
             //
             // The next 1 byte is an unsigned byte: the minor version number of the file
             // format, e.g. x00. Note: the version of the file format is not tied to the
-            // version of the numpy package.
+            // version of the NumPy package.
             //
             // The next 2 bytes form a little-endian unsigned short int: the length of the
             // header data HEADER_LEN.
@@ -761,7 +761,7 @@ namespace xt
     }
 
     /**
-     * Loads a npy file (the numpy storage format)
+     * Loads a npy file (the NumPy storage format)
      *
      * @param stream An input stream from which to load the file
      * @tparam T select the type of the npy file (note: currently there is
@@ -778,7 +778,7 @@ namespace xt
     }
 
     /**
-     * Loads a npy file (the numpy storage format)
+     * Loads a npy file (the NumPy storage format)
      *
      * @param filename The filename or path to the file
      * @tparam T select the type of the npy file (note: currently there is
