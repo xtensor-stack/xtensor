@@ -4,13 +4,10 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-xstrides
-========
+Shape/index manipulation
+========================
 
-Defined in ``xtensor/xstrides.hpp``
+.. toctree::
 
-.. cpp:namespace-push:: xt
-
-.. doxygengroup:: xt_xstrides
-
-.. cpp:namespace-pop::
+   xshape
+   xstrides
