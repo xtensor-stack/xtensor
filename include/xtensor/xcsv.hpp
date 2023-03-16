@@ -62,7 +62,7 @@ namespace xt
      *
      */
     template <class E>
-    void dump_csv(std::ostream &stream, const xexpression<E> &e, const std::string &sep = ",", const std::vector<std::string> &col_names = {""});
+    void dump_csv(std::ostream &stream, const xexpression<E> &e, const std::string &sep, const std::vector<std::string> &col_names);
 
     /*****************************************
      * load_csv and dump_csv implementations *
