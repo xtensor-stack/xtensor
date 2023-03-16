@@ -470,16 +470,13 @@ namespace xt
                 linear_assigner<false>::run(de1, de2);
             }
         }
+        else if (simd_strided_assign)
+        {
+            strided_loop_assigner<simd_strided_assign>::run(de1, de2);
+        }
         else
         {
-            if (simd_strided_assign)
-            {
-                strided_loop_assigner<simd_strided_assign>::run(de1, de2);
-            }
-            else
-            {
-                stepper_assigner<E1, E2, default_assignable_layout(E1::static_layout)>(de1, de2).run();
-            }
+            stepper_assigner<E1, E2, default_assignable_layout(E1::static_layout)>(de1, de2).run();
         }
     }
 

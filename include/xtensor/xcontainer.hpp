@@ -928,11 +928,12 @@ namespace xt
         {
             return i == 0;
         };
-        // This is unsafe if the strides are all 0. Does that happen?
         if (!is_contiguous_container<storage_type>::value)
         {
             return false;
         }
+        // We need to make sure the inner-most non-zero stride is one.
+        // Trailing zero strides are ignored because they indicate bradcasted dimensions.
         if (m_layout == layout_type::row_major)
         {
             auto it = std::find_if_not(m_strides.rbegin(), m_strides.rend(), is_zero);
