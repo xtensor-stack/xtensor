@@ -190,6 +190,12 @@ namespace xt
         return tensor_type(std::move(data), std::move(shape), std::move(strides));
     }
 
+    /**
+     * @brief Dump tensor to CSV. (see declaration for more details)
+     *
+     * @param stream the output stream to write the CSV encoded values
+     * @param e the tensor expression to serialize
+     */
     template <class E>
     void dump_csv(std::ostream& stream, const xexpression<E>& e, const std::string& sep, const std::string& head)
     {
