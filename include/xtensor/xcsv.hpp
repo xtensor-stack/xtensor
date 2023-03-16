@@ -34,8 +34,35 @@ namespace xt
     template <class T, class A = std::allocator<T>>
     xcsv_tensor<T, A> load_csv(std::istream& stream, const char delimiter = ',', const std::size_t skip_rows = 0, const std::ptrdiff_t max_rows = -1, const std::string comments = "#");
 
+    /**
+     * @brief dump xexpression to std::ostream (usually csv file)
+     *
+     * Example output with sep="@" and `head="xANDy"`:
+     *
+     * ```
+     * xANDy
+     * -1.45@-2.18
+     * -1.05@6.91
+     * -2.10@1.61
+     * ```
+     *
+     * @tparam E xexpression type
+     * @param stream reference to std::ostream where the expression is dumped to
+     * @param e xpression<E>
+     * @param sep column separator
+     * @param head header std::string
+     */
     template <class E>
-    void dump_csv(std::ostream& stream, const xexpression<E>& e, const std::string& sep=",", const std::string& head="");
+    void dump_csv(std::ostream &stream, const xexpression<E> &e, const std::string &sep = ",", const std::string &head = "");
+
+    /**
+     * @brief dump_csv() overloading: dumping with header equal to column names
+     *
+     * the header std::string is the concatenation of the elements of `col_names`, separated by `sep`
+     *
+     */
+    template <class E>
+    void dump_csv(std::ostream &stream, const xexpression<E> &e, const std::string &sep = ",", const std::vector<std::string> &col_names = {""});
 
     /*****************************************
      * load_csv and dump_csv implementations *
@@ -163,12 +190,6 @@ namespace xt
         return tensor_type(std::move(data), std::move(shape), std::move(strides));
     }
 
-    /**
-     * @brief Dump tensor to CSV.
-     * 
-     * @param stream the output stream to write the CSV encoded values
-     * @param e the tensor expression to serialize
-     */
     template <class E>
     void dump_csv(std::ostream& stream, const xexpression<E>& e, const std::string& sep, const std::string& head)
     {
@@ -201,6 +222,22 @@ namespace xt
                 }
             }
         }
+    }
+
+    template <class E>
+    void dump_csv(std::ostream &stream, const xexpression<E> &e, const std::string &sep, const std::vector<std::string> &col_names)
+    {
+        std::string head = "";
+        const size_t nc = col_names.size();
+        for (size_t i = 0; i <= nc - 2; i++)
+        {
+            head += col_names[i] + sep
+        }
+        if (nc > 0)
+        {
+            head += col_names[nc - 1];
+        }
+        dump_csv(stream, e, sep, head);
     }
 
     struct xcsv_config
