@@ -7,6 +7,7 @@
  * The full license is in the file LICENSE, distributed with this software. *
  ****************************************************************************/
 
+#include <iterator>
 #include <type_traits>
 #include <vector>
 
@@ -80,6 +81,16 @@ public:
     auto begin() const
     {
         return m_data.begin();
+    }
+
+    auto rbegin() const
+    {
+        return std::make_reverse_iterator(end());
+    }
+
+    auto rend() const
+    {
+        return std::make_reverse_iterator(begin());
     }
 
     auto empty() const

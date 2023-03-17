@@ -931,9 +931,32 @@ namespace xt
     inline bool xstrided_container<D>::is_contiguous() const noexcept
     {
         using str_type = typename inner_strides_type::value_type;
-        return is_contiguous_container<storage_type>::value
-               && (m_strides.empty() || (m_layout == layout_type::row_major && m_strides.back() == str_type(1))
-                   || (m_layout == layout_type::column_major && m_strides.front() == str_type(1)));
+        auto is_zero = [](auto i)
+        {
+            return i == 0;
+        };
+        if (!is_contiguous_container<storage_type>::value)
+        {
+            return false;
+        }
+        // We need to make sure the inner-most non-zero stride is one.
+        // Trailing zero strides are ignored because they indicate bradcasted dimensions.
+        if (m_layout == layout_type::row_major)
+        {
+            auto it = std::find_if_not(m_strides.rbegin(), m_strides.rend(), is_zero);
+            // If the array has strides of zero, it is a constant, and therefore contiguous.
+            return it == m_strides.rend() || *it == str_type(1);
+        }
+        else if (m_layout == layout_type::column_major)
+        {
+            auto it = std::find_if_not(m_strides.begin(), m_strides.end(), is_zero);
+            // If the array has strides of zero, it is a constant, and therefore contiguous.
+            return it == m_strides.end() || *it == str_type(1);
+        }
+        else
+        {
+            return m_strides.empty();
+        }
     }
 
     namespace detail

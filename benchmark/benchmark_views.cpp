@@ -195,6 +195,76 @@ namespace xt
         BENCHMARK_TEMPLATE(view_assign_strided_view_noalias, float);
     }
 
+    namespace finite_diff
+    {
+        inline auto stencil_threedirections(benchmark::State& state, size_t size)
+        {
+            for (auto _ : state)
+            {
+                const std::array<size_t, 3> shape = {size, size, size};
+                xt::xtensor<double, 3> a(shape), b(shape);
+                auto core = xt::range(1, size - 1);
+                xt::noalias(xt::view(b, core, core, core)
+                ) = 1.0 / 7.0
+                    * (xt::view(a, core, core, core) + xt::view(a, core, core, xt::range(2, size))
+                       + xt::view(a, core, core, xt::range(0, size - 2))
+                       + xt::view(a, core, xt::range(2, size), core)
+                       + xt::view(a, core, xt::range(0, size - 2), core)
+                       + xt::view(a, xt::range(2, size), core, core)
+                       + xt::view(a, xt::range(0, size - 2), core, core));
+                benchmark::DoNotOptimize(b);
+            }
+        }
+
+        inline auto stencil_twodirections(benchmark::State& state, size_t size)
+        {
+            for (auto _ : state)
+            {
+                const std::array<size_t, 3> shape = {size, size, size};
+                xt::xtensor<double, 3> a(shape), b(shape);
+                auto core = xt::range(1, size - 1);
+                xt::noalias(xt::view(b, core, core, core)
+                ) = 1.0 / 7.0
+                    * (xt::view(a, core, core, core) + xt::view(a, core, xt::range(2, size), core)
+                       + xt::view(a, core, xt::range(0, size - 2), core)
+                       + xt::view(a, xt::range(2, size), core, core)
+                       + xt::view(a, xt::range(0, size - 2), core, core));
+                benchmark::DoNotOptimize(b);
+            }
+        }
+
+        inline auto stencil_onedirection(benchmark::State& state, size_t size)
+        {
+            for (auto _ : state)
+            {
+                const std::array<size_t, 3> shape = {size, size, size};
+                xt::xtensor<double, 3> a(shape), b(shape);
+                auto core = xt::range(1, size - 1);
+                xt::noalias(xt::view(b, core, core, core)
+                ) = 1.0 / 2.0
+                    * (xt::view(a, xt::range(2, size), core, core)
+                       - xt::view(a, xt::range(0, size - 2), core, core));
+                benchmark::DoNotOptimize(b);
+            }
+        }
+
+        BENCHMARK_CAPTURE(stencil_threedirections, stencil_threedirections_50, 50);
+        BENCHMARK_CAPTURE(stencil_threedirections, stencil_threedirections_100, 100);
+        BENCHMARK_CAPTURE(stencil_threedirections, stencil_threedirections_200, 200);
+        BENCHMARK_CAPTURE(stencil_threedirections, stencil_threedirections_300, 300);
+        BENCHMARK_CAPTURE(stencil_threedirections, stencil_threedirections_500, 500);
+        BENCHMARK_CAPTURE(stencil_twodirections, stencil_twodirections_50, 50);
+        BENCHMARK_CAPTURE(stencil_twodirections, stencil_twodirections_100, 100);
+        BENCHMARK_CAPTURE(stencil_twodirections, stencil_twodirections_200, 200);
+        BENCHMARK_CAPTURE(stencil_twodirections, stencil_twodirections_300, 300);
+        BENCHMARK_CAPTURE(stencil_twodirections, stencil_twodirections_500, 500);
+        BENCHMARK_CAPTURE(stencil_onedirection, stencil_onedirections_50, 50);
+        BENCHMARK_CAPTURE(stencil_onedirection, stencil_onedirections_100, 100);
+        BENCHMARK_CAPTURE(stencil_onedirection, stencil_onedirections_200, 200);
+        BENCHMARK_CAPTURE(stencil_onedirection, stencil_onedirections_300, 300);
+        BENCHMARK_CAPTURE(stencil_onedirection, stencil_onedirections_500, 500);
+    }
+
     namespace stridedview
     {
 

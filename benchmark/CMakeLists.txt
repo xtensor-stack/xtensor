@@ -134,7 +134,16 @@ set(XTENSOR_BENCHMARK
 
 set(XTENSOR_BENCHMARK_TARGET benchmark_xtensor)
 add_executable(${XTENSOR_BENCHMARK_TARGET} EXCLUDE_FROM_ALL ${XTENSOR_BENCHMARK} ${XTENSOR_HEADERS})
-target_link_libraries(${XTENSOR_BENCHMARK_TARGET} xtensor ${GBENCHMARK_LIBRARIES})
+target_link_libraries(${XTENSOR_BENCHMARK_TARGET} PUBLIC xtensor ${GBENCHMARK_LIBRARIES})
+
+if(XTENSOR_USE_TBB)
+    target_compile_definitions(${XTENSOR_BENCHMARK_TARGET} PUBLIC XTENSOR_USE_TBB)
+    target_include_directories(${XTENSOR_BENCHMARK_TARGET} PUBLIC ${TBB_INCLUDE_DIRS})
+    target_link_libraries(${XTENSOR_BENCHMARK_TARGET} PUBLIC ${TBB_LIBRARIES})
+endif()
+if(XTENSOR_USE_OPENMP)
+    target_compile_definitions(${XTENSOR_BENCHMARK_TARGET} PUBLIC XTENSOR_USE_OPENMP)
+endif()
 
 add_custom_target(xbenchmark
     COMMAND benchmark_xtensor
