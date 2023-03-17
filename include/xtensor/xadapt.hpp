@@ -24,6 +24,10 @@
 
 namespace xt
 {
+    /**
+     * @defgroup xt_xadapt Adaptors of STL-like containers
+     */
+
     namespace detail
     {
         template <class>
@@ -66,6 +70,8 @@ namespace xt
     /**
      * Constructs an xarray_adaptor of the given stl-like container,
      * with the specified shape and layout.
+     *
+     * @ingroup xt_xadapt
      * @param container the container to adapt
      * @param shape the shape of the xarray_adaptor
      * @param l the layout_type of the xarray_adaptor
@@ -85,6 +91,8 @@ namespace xt
 
     /**
      * Constructs an non-owning xarray_adaptor from a pointer with the specified shape and layout.
+     *
+     * @ingroup xt_xadapt
      * @param pointer the container to adapt
      * @param shape the shape of the xarray_adaptor
      * @param l the layout_type of the xarray_adaptor
@@ -106,6 +114,8 @@ namespace xt
     /**
      * Constructs an xarray_adaptor of the given stl-like container,
      * with the specified shape and strides.
+     *
+     * @ingroup xt_xadapt
      * @param container the container to adapt
      * @param shape the shape of the xarray_adaptor
      * @param strides the strides of the xarray_adaptor
@@ -130,6 +140,8 @@ namespace xt
     /**
      * Constructs an xarray_adaptor of the given dynamically allocated C array,
      * with the specified shape and layout.
+     *
+     * @ingroup xt_xadapt
      * @param pointer the pointer to the beginning of the dynamic array
      * @param size the size of the dynamic array
      * @param ownership indicates whether the adaptor takes ownership of the array.
@@ -165,6 +177,8 @@ namespace xt
     /**
      * Constructs an xarray_adaptor of the given dynamically allocated C array,
      * with the specified shape and strides.
+     *
+     * @ingroup xt_xadapt
      * @param pointer the pointer to the beginning of the dynamic array
      * @param size the size of the dynamic array
      * @param ownership indicates whether the adaptor takes ownership of the array.
@@ -196,8 +210,10 @@ namespace xt
     }
 
     /**
-     * Contructs an xarray_adaptor of the given C array allocated on the stack, with the
+     * Constructs an xarray_adaptor of the given C array allocated on the stack, with the
      * specified shape and layout.
+     *
+     * @ingroup xt_xadapt
      * @param c_array the C array allocated on the stack
      * @param shape the shape of the xarray_adaptor
      * @param l the layout_type of the xarray_adaptor
@@ -214,8 +230,10 @@ namespace xt
     }
 
     /**
-     * Contructs an xarray_adaptor of the given C array allocated on the stack, with the
+     * Constructs an xarray_adaptor of the given C array allocated on the stack, with the
      * specified shape and stirdes.
+     *
+     * @ingroup xt_xadapt
      * @param c_array the C array allocated on the stack
      * @param shape the shape of the xarray_adaptor
      * @param strides the strides of the xarray_adaptor
@@ -238,6 +256,8 @@ namespace xt
     /**
      * Constructs a 1-D xtensor_adaptor of the given stl-like container,
      * with the specified layout_type.
+     *
+     * @ingroup xt_xadapt
      * @param container the container to adapt
      * @param l the layout_type of the xtensor_adaptor
      */
@@ -252,6 +272,8 @@ namespace xt
     /**
      * Constructs an xtensor_adaptor of the given stl-like container,
      * with the specified shape and layout_type.
+     *
+     * @ingroup xt_xadapt
      * @param container the container to adapt
      * @param shape the shape of the xtensor_adaptor
      * @param l the layout_type of the xtensor_adaptor
@@ -272,6 +294,8 @@ namespace xt
 
     /**
      * Constructs an non-owning xtensor_adaptor from a pointer with the specified shape and layout.
+     *
+     * @ingroup xt_xadapt
      * @param pointer the pointer to adapt
      * @param shape the shape of the xtensor_adaptor
      * @param l the layout_type of the xtensor_adaptor
@@ -293,6 +317,8 @@ namespace xt
     /**
      * Constructs an xtensor_adaptor of the given stl-like container,
      * with the specified shape and strides.
+     *
+     * @ingroup xt_xadapt
      * @param container the container to adapt
      * @param shape the shape of the xtensor_adaptor
      * @param strides the strides of the xtensor_adaptor
@@ -318,6 +344,8 @@ namespace xt
     /**
      * Constructs a 1-D xtensor_adaptor of the given dynamically allocated C array,
      * with the specified layout.
+     *
+     * @ingroup xt_xadapt
      * @param pointer the pointer to the beginning of the dynamic array
      * @param size the size of the dynamic array
      * @param ownership indicates whether the adaptor takes ownership of the array.
@@ -340,6 +368,8 @@ namespace xt
     /**
      * Constructs an xtensor_adaptor of the given dynamically allocated C array,
      * with the specified shape and layout.
+     *
+     * @ingroup xt_xadapt
      * @param pointer the pointer to the beginning of the dynamic array
      * @param size the size of the dynamic array
      * @param ownership indicates whether the adaptor takes ownership of the array.
@@ -377,6 +407,8 @@ namespace xt
     /**
      * Constructs an xtensor_adaptor of the given dynamically allocated C array,
      * with the specified shape and strides.
+     *
+     * @ingroup xt_xadapt
      * @param pointer the pointer to the beginning of the dynamic array
      * @param size the size of the dynamic array
      * @param ownership indicates whether the adaptor takes ownership of the array.
@@ -409,8 +441,10 @@ namespace xt
     }
 
     /**
-     * Contructs an xtensor_adaptor of the given C array allocated on the stack, with the
+     * Constructs an xtensor_adaptor of the given C array allocated on the stack, with the
      * specified shape and layout.
+     *
+     * @ingroup xt_xadapt
      * @param c_array the C array allocated on the stack
      * @param shape the shape of the xarray_adaptor
      * @param l the layout_type of the xarray_adaptor
@@ -427,8 +461,10 @@ namespace xt
     }
 
     /**
-     * Contructs an xtensor_adaptor of the given C array allocated on the stack, with the
-     * specified shape and stirdes.
+     * Constructs an xtensor_adaptor of the given C array allocated on the stack, with the
+     * specified shape and strides.
+     *
+     * @ingroup xt_xadapt
      * @param c_array the C array allocated on the stack
      * @param shape the shape of the xarray_adaptor
      * @param strides the strides of the xarray_adaptor
@@ -447,6 +483,8 @@ namespace xt
     /**
      * Constructs an non-owning xtensor_fixed_adaptor from a pointer with the
      * specified shape and layout.
+     *
+     * @ingroup xt_xadapt
      * @param pointer the pointer to adapt
      * @param shape the shape of the xtensor_fixed_adaptor
      */
@@ -478,6 +516,8 @@ namespace xt
      *
      * from the given stl-like container or pointer, with the specified shape and layout.
      * If the adaptor is built from a pointer, it does not take its ownership.
+     *
+     * @ingroup xt_xadapt
      * @param container the container or pointer to adapt
      * @param shape the shape of the adaptor
      * @param l the layout_type of the adaptor
@@ -491,6 +531,8 @@ namespace xt
      * - an xtensor_adaptor if SC is an array type
      *
      * from the given stl-like container with the specified shape and strides.
+     *
+     * @ingroup xt_xadapt
      * @param container the container to adapt
      * @param shape the shape of the adaptor
      * @param strides the strides of the adaptor
@@ -504,6 +546,8 @@ namespace xt
      * - an xtensor_adaptor if SC is an array type
      *
      * of the given dynamically allocated C array, with the specified shape and layout.
+     *
+     * @ingroup xt_xadapt
      * @param pointer the pointer to the beginning of the dynamic array
      * @param size the size of the dynamic array
      * @param ownership indicates whether the adaptor takes ownership of the array.
@@ -528,6 +572,8 @@ namespace xt
      * - an xtensor_adaptor if SC is an array type
      *
      * of the given dynamically allocated C array, with the specified shape and strides.
+     *
+     * @ingroup xt_xadapt
      * @param pointer the pointer to the beginning of the dynamic array
      * @param size the size of the dynamic array
      * @param ownership indicates whether the adaptor takes ownership of the array.
@@ -541,11 +587,13 @@ namespace xt
     adapt(P&& pointer, typename A::size_type size, O ownership, SC&& shape, SS&& strides, const A& alloc = A());
 
     /**
-     * Contructs:
+     * Constructs:
      * - an xarray_adaptor if SC is not an array type
      * - an xtensor_adaptor if SC is an array type
      *
      * of the given C array allocated on the stack, with the specified shape and layout.
+     *
+     * @ingroup xt_xadapt
      * @param c_array the C array allocated on the stack
      * @param shape the shape of the adaptor
      * @param l the layout_type of the adaptor
@@ -554,12 +602,14 @@ namespace xt
     inline auto adapt(T (&c_array)[N], const SC& shape, layout_type l = L);
 
     /**
-     * Contructs:
+     * Constructs:
      * - an xarray_adaptor if SC is not an array type
      * - an xtensor_adaptor if SC is an array type
      *
      * of the given C array allocated on the stack, with the
      * specified shape and strides.
+     *
+     * @ingroup xt_xadapt
      * @param c_array the C array allocated on the stack
      * @param shape the shape of the adaptor
      * @param strides the strides of the adaptor
@@ -570,6 +620,8 @@ namespace xt
     /**
      * Constructs an non-owning xtensor_fixed_adaptor from a pointer with the
      * specified shape and layout.
+     *
+     * @ingroup xt_xadapt
      * @param pointer the pointer to adapt
      * @param shape the shape of the xtensor_fixed_adaptor
      */
@@ -579,6 +631,8 @@ namespace xt
     /**
      * Constructs a 1-D xtensor_adaptor of the given stl-like container,
      * with the specified layout_type.
+     *
+     * @ingroup xt_xadapt
      * @param container the container to adapt
      * @param l the layout_type of the xtensor_adaptor
      */
@@ -588,6 +642,8 @@ namespace xt
     /**
      * Constructs a 1-D xtensor_adaptor of the given dynamically allocated C array,
      * with the specified layout.
+     *
+     * @ingroup xt_xadapt
      * @param pointer the pointer to the beginning of the dynamic array
      * @param size the size of the dynamic array
      * @param ownership indicates whether the adaptor takes ownership of the array.
@@ -620,6 +676,7 @@ namespace xt
      * std::cout << xptr;
      * \endcode
      *
+     * @ingroup xt_xadapt
      * @param smart_ptr a smart pointer to a memory block of T[]
      * @param shape The desired shape
      * @param l The desired memory layout
@@ -678,6 +735,7 @@ namespace xt
      * }
      * \endcode
      *
+     * @ingroup xt_xadapt
      * @param data_ptr A pointer to a typed data block (e.g. double*)
      * @param shape The desired shape
      * @param smart_ptr A smart pointer to move or copy, in order to manage memory
@@ -716,6 +774,7 @@ namespace xt
      * std::cout << xptr;
      * \endcode
      *
+     * @ingroup xt_xadapt
      * @param smart_ptr a smart pointer to a memory block of T[]
      * @param shape The desired shape
      * @param l The desired memory layout
@@ -775,6 +834,7 @@ namespace xt
      * }
      * \endcode
      *
+     * @ingroup xt_xadapt
      * @param data_ptr A pointer to a typed data block (e.g. double*)
      * @param shape The desired shape
      * @param smart_ptr A smart pointer to move or copy, in order to manage memory
@@ -802,6 +862,60 @@ namespace xt
             l
         );
     }
+
+    /**
+     * @brief xtensor adaptor for a pointer.
+     *
+     * Construct for example with:
+     *
+     * \code{.cpp}
+     * #include <xtensor/xadapt.hpp>
+     *
+     * std::array<size_t, 2> shape = {2, 2};
+     * std::vector<double> data = {1, 2, 3, 4};
+     *
+     * xt::xtensor_pointer<double, 2> a = xt::adapt(data.data(), 4, xt::no_ownership(), shape);
+     * \endcode
+     *
+     * @ingroup xt_xadapt
+     * @tparam T The data type (e.g. ``double``).
+     * @tparam N The number of dimensions.
+     * @tparam L The xt::layout_type() of the xtensor.
+     */
+    template <class T, std::size_t N, layout_type L = XTENSOR_DEFAULT_LAYOUT>
+    using xtensor_pointer = xtensor_adaptor<
+        xbuffer_adaptor<xtl::closure_type_t<T*>, xt::no_ownership, detail::default_allocator_for_ptr_t<T>>,
+        N,
+        L>;
+
+    /**
+     * @brief xarray adaptor for a pointer.
+     *
+     * Construct for example with:
+     *
+     * \code{.cpp}
+     * #include <xtensor/xadapt.hpp>
+     *
+     * std::vector<int> data(4, 0);
+     * xt::svector<size_t> shape({2, 2});
+     *
+     * xt::xarray_pointer<int> a = xt::adapt(data.data(), data.size(), xt::no_ownership(), shape);
+     * \endcode
+     *
+     * @ingroup xt_xadapt
+     * @tparam T The data type (e.g. ``double``).
+     * @tparam L The xt::layout_type() of the xarray.
+     * @tparam SC The shape container type (e.g. ``xt::svector<size_t>``). Default matches
+     *      xt::adapt(P&&, typename A::size_type, O, const SC&, layout_type, const A& alloc)
+     */
+    template <
+        class T,
+        layout_type L = XTENSOR_DEFAULT_LAYOUT,
+        class SC = XTENSOR_DEFAULT_SHAPE_CONTAINER(T, std::allocator<std::size_t>, std::allocator<std::size_t>)>
+    using xarray_pointer = xarray_adaptor<
+        xbuffer_adaptor<xtl::closure_type_t<T*>, xt::no_ownership, detail::default_allocator_for_ptr_t<T>>,
+        L,
+        SC>;
 }
 
 #endif
