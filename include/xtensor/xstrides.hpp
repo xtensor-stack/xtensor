@@ -28,6 +28,10 @@ namespace xt
     template <class shape_type>
     std::size_t compute_size(const shape_type& shape) noexcept;
 
+    /**
+     * @defgroup xt_xstrides Support functions swich between array indices and flat indices
+     */
+
     /***************
      * data offset *
      ***************/
@@ -35,6 +39,29 @@ namespace xt
     template <class offset_type, class S>
     offset_type data_offset(const S& strides) noexcept;
 
+    /**
+     * @brief Return the flat index for an array index.
+     *
+     * Given ``m`` arguments, and dimension ``n``of the array (``n == strides.size()``).
+     *
+     *  -   If ``m == n``, the index is
+     *      ``strides[0] * index[0] + ... + strides[n - 1] * index[n - 1]``.
+     *
+     *  -   If ``m < n`` and the last argument is ``xt::missing`` the indices are zero-padded at
+     *      the end to match the dimension of the array. The index is then
+     *      ``strides[0] * index[0] + ... + strides[m - 1] * index[m - 1]``.
+     *
+     *  -   If ``m < n`` (and the last argument is not ``xt::missing``), the index is
+     *      ``strides[n - m - 1] * index[0] + ... + strides[n - 1] * index[m - 1]``.
+     *
+     *  -   If ``m > n``, then the first ``m - n`` arguments are ignored. The index is then
+     *      ``strides[0] * index[m - n] + ... + strides[n - 1] * index[m - 1]``.
+     *
+     * @ingroup xt_xstrides
+     * @param strides Strides of the array.
+     * @param args Array index.
+     * @return The flat index.
+     */
     template <class offset_type, class S, class Arg, class... Args>
     offset_type data_offset(const S& strides, Arg arg, Args... args) noexcept;
 
@@ -48,6 +75,15 @@ namespace xt
      * strides builder *
      *******************/
 
+    /**
+     * @brief Compute the strides given the shape and the layout of an array.
+     *
+     * @ingroup xt_xstrides
+     * @param shape Shape of the array.
+     * @param l Layout type, see xt::layout_type().
+     * @param strides (output) Strides of the array.
+     * @return The size: the product of the shape.
+     */
     template <layout_type L = layout_type::dynamic, class shape_type, class strides_type>
     std::size_t compute_strides(const shape_type& shape, layout_type l, strides_type& strides);
 
@@ -100,6 +136,14 @@ namespace xt
      * check bounds, without throwing *
      **********************************/
 
+    /**
+     * @brief Check if the index is within the bounds of the array.
+     *
+     * @param shape Shape of the array.
+     * @param args Array index.
+     * @return true If the index is within the bounds of the array.
+     * @return false Otherwise.
+     */
     template <class S, class... Args>
     bool in_bounds(const S& shape, Args&... args);
 
@@ -107,6 +151,14 @@ namespace xt
      * apply periodicity to indices *
      *******************************/
 
+    /**
+     * @brief Normalise an index of a periodic array.
+     * For example if the shape is ``(3, 4)`` and the index is ``(3, -4)`` the result is ``(0, 0)``.
+     *
+     * @ingroup xt_xstrides
+     * @param shape Shape of the array.
+     * @param args (input/output) Array index.
+     */
     template <class S, class... Args>
     void normalize_periodic(const S& shape, Args&... args);
 
@@ -175,10 +227,8 @@ namespace xt
     }
 
     /**
-     * @ingroup strides
-     * @brief strides_type
-     *
-     * Choose stride type
+     * @brief Choose stride type
+     * @ingroup xt_xstrides
      */
     enum class stride_type
     {
@@ -188,10 +238,9 @@ namespace xt
     };
 
     /**
-     * @ingroup strides
-     * @brief strides
+     * @brief Get strides of an object.
      *
-     * Get strides of an object.
+     * @ingroup xt_xstrides
      * @param a an array
      * @return array
      */
@@ -233,10 +282,9 @@ namespace xt
     }
 
     /**
-     * @ingroup strides
-     * @brief strides
+     * @brief Get stride of an object along an axis.
      *
-     * Get stride of an object along an axis.
+     * @ingroup xt_xstrides
      * @param a an array
      * @return integer
      */
