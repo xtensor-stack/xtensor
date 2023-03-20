@@ -7,11 +7,28 @@
 Changelog
 =========
 
-0.25.5
+0.24.6
+------
+
+- Improving documentation xstrides
+  `# 2664 https://github.com/xtensor-stack/xtensor/pull/2664`
+- Parallel and more aggressive strided assigner
+  `# 2660 https://github.com/xtensor-stack/xtensor/pull/2660`
+- Removing duplicates from documentation
+  `# 2669 https://github.com/xtensor-stack/xtensor/pull/2669`
+- Adding aliases xt::xtensor_pointer and xt::xarray_pointer
+  `# 2665 https://github.com/xtensor-stack/xtensor/pull/2665`
+- Fix and refactor partition
+  `# 2652 https://github.com/xtensor-stack/xtensor/pull/2652`
+- Fix and update pre-commit
+  `# 2657 https://github.com/xtensor-stack/xtensor/pull/2657`
+
+0.24.5
 ------
 
 - Add space before pragma diagnostic
-  `# 2654 https://github.com/xtensor-stack/xtensor/pull/2654` - Update xtl requirement in cmake
+  `# 2654 https://github.com/xtensor-stack/xtensor/pull/2654`
+- Update xtl requirement in cmake
   `# 2649 https://github.com/xtensor-stack/xtensor/pull/2649`
 - Fix a bug where .fill doesn't work for a xcontainer that is non-contiguous
   `# 2650 https://github.com/xtensor-stack/xtensor/pull/2650`
