@@ -9,7 +9,7 @@
 Closure semantics
 =================
 
-The *xtensor* library is a tensor expression library implementing numpy-style broadcasting and universal functions but in a lazy fashion.
+The *xtensor* library is a tensor expression library implementing NumPy-style broadcasting and universal functions but in a lazy fashion.
 
 If ``x`` and ``y`` are two tensor expressions with compatible shapes, the result of ``x + y`` is not a tensor but an expression that does
 not hold any value. Values of ``x + y`` are computed upon access or when the result is assigned to a container such as :cpp:type:`xt::xtensor` or

@@ -339,7 +339,7 @@ namespace xt
      * Returns an iterator to the element following the last element of
      * the expression for the specified axis
      *
-     * @param e the expession to iterate over
+     * @param e the expression to iterate over
      * @param axis the axis to iterate over
      * @return an instance of xaxis_slice_iterator
      */

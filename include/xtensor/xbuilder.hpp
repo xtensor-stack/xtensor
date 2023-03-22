@@ -849,7 +849,7 @@ namespace xt
     /**
      * @brief Stack xexpressions in sequence horizontally (column wise).
      * This is equivalent to concatenation along the second axis, except for 1-D
-     * xexpressions where it concatenate along the firts axis.
+     * xexpressions where it concatenate along the first axis.
      *
      * @param t \ref xtuple of xexpressions to stack
      * @return xgenerator evaluating to stacked elements
@@ -1109,7 +1109,7 @@ namespace xt
         auto shape = arr.shape();
         auto dimension = arr.dimension();
 
-        // The following shape calculation code is an almost verbatim adaptation of numpy:
+        // The following shape calculation code is an almost verbatim adaptation of NumPy:
         // https://github.com/numpy/numpy/blob/2aabeafb97bea4e1bfa29d946fbf31e1104e7ae0/numpy/core/src/multiarray/item_selection.c#L1799
         auto ret_shape = xtl::make_sequence<shape_type>(dimension - 1, 0);
         int dim_1 = static_cast<int>(shape[axis_1]);

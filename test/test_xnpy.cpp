@@ -61,7 +61,7 @@ namespace xt
 
         std::ifstream dstream(get_load_filename("files/xnpy_files/double"));
         auto darr_loaded_stream = load_npy<double>(dstream);
-        CHECK_MESSAGE(all(isclose(darr, darr_loaded_stream)), "Loading double numpy array from stream failed");
+        CHECK_MESSAGE(all(isclose(darr, darr_loaded_stream)), "Loading double NumPy array from stream failed");
         dstream.close();
 
         auto barr_loaded = load_npy<bool>(get_load_filename("files/xnpy_files/bool"));
@@ -69,7 +69,7 @@ namespace xt
 
         std::ifstream bstream(get_load_filename("files/xnpy_files/bool"));
         auto barr_loaded_stream = load_npy<bool>(bstream);
-        CHECK_MESSAGE(all(equal(barr, barr_loaded_stream)), "Loading boolean numpy array from stream failed");
+        CHECK_MESSAGE(all(equal(barr, barr_loaded_stream)), "Loading boolean NumPy array from stream failed");
         bstream.close();
 
         auto dfarr_loaded = load_npy<double, layout_type::column_major>(
@@ -144,7 +144,7 @@ namespace xt
 
         std::string barr_str = dump_npy(barr);
         std::string barr_disk = read_file(compare_name);
-        CHECK_MESSAGE(barr_str == barr_disk, "Dumping boolean numpy file to string failed");
+        CHECK_MESSAGE(barr_str == barr_disk, "Dumping boolean NumPy file to string failed");
 
         std::remove(filename.c_str());
 
@@ -159,7 +159,7 @@ namespace xt
 
         std::string ularr_str = dump_npy(ularr);
         std::string ularr_disk = read_file(compare_name);
-        CHECK_MESSAGE(ularr_str == ularr_disk, "Dumping boolean numpy file to string failed");
+        CHECK_MESSAGE(ularr_str == ularr_disk, "Dumping boolean NumPy file to string failed");
 
         std::remove(filename.c_str());
     }
