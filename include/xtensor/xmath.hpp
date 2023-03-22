@@ -20,11 +20,9 @@
 #include <complex>
 #include <type_traits>
 
-
 #include <xtl/xcomplex.hpp>
 #include <xtl/xsequence.hpp>
 #include <xtl/xtype_traits.hpp>
-
 
 #include "xaccumulator.hpp"
 #include "xeval.hpp"
@@ -1711,7 +1709,6 @@ namespace xt
     {
         return detail::make_xfunction<math::isnan_fun>(std::forward<E>(e));
     }
-
 
     namespace detail
     {

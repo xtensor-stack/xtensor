@@ -34,4 +34,3 @@ xexpression API is actually implemented in ``xstrided_container`` and ``xcontain
    xfunctor_view
    xrepeat
    xfft
-   

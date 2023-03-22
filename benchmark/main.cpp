@@ -5,8 +5,9 @@
  *                                                                          *
  * The full license is in the file LICENSE, distributed with this software. *
  ****************************************************************************/
- 
+
 #include <iostream>
+
 #include <benchmark/benchmark.h>
 
 #include "xtensor/xarray.hpp"
