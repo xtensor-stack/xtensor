@@ -1,7 +1,8 @@
-#include <cstddef>
 #include <chrono>
-#include <string>
+#include <cstddef>
 #include <random>
+#include <string>
+
 #include <benchmark/benchmark.h>
 
 #include "xtensor/xfft.hpp"
@@ -14,8 +15,9 @@ namespace xt
         void xfft_double(benchmark::State& state)
         {
             size_t n = state.range(0);
-            xt::xarray<double> x = xt::xarray<double>::from_shape({ n });
-            for (auto _ : state) {
+            xt::xarray<double> x = xt::xarray<double>::from_shape({n});
+            for (auto _ : state)
+            {
                 auto z = xt::fft::fft(x);
                 benchmark::DoNotOptimize(z);
                 x[0] += 8 * std::numeric_limits<double>::epsilon();
@@ -26,8 +28,9 @@ namespace xt
         void xfft_single(benchmark::State& state)
         {
             size_t n = state.range(0);
-            xt::xarray<float> x = xt::xarray<float>::from_shape({ n });
-            for (auto _ : state) {
+            xt::xarray<float> x = xt::xarray<float>::from_shape({n});
+            for (auto _ : state)
+            {
                 auto z = xt::fft::fft(x);
                 benchmark::DoNotOptimize(z);
                 x[0] += 8 * std::numeric_limits<float>::epsilon();
