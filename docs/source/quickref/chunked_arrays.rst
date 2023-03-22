@@ -65,5 +65,5 @@ These are arrays whose chunks are stored on a file system, allowing for
 persistence of data. In particular, they are used as a building block for the
 `xtensor-zarr <https://github.com/xtensor-stack/xtensor-zarr>`_ library.
 
-For further dedails, please refer to the documentation
+For further details, please refer to the documentation
 of `xtensor-io <https://xtensor-io.readthedocs.io>`_.

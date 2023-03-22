@@ -1,11 +1,11 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 /**
  * @brief construct histogram
@@ -14,9 +14,9 @@
 #ifndef XTENSOR_HISTOGRAM_HPP
 #define XTENSOR_HISTOGRAM_HPP
 
-#include "xtensor.hpp"
-#include "xsort.hpp"
 #include "xset_operation.hpp"
+#include "xsort.hpp"
+#include "xtensor.hpp"
 #include "xview.hpp"
 
 using namespace xt::placeholders;
@@ -60,7 +60,7 @@ namespace xt
             XTENSOR_ASSERT(std::is_sorted(bin_edges.cbegin(), bin_edges.cend()));
 
             size_t n_bins = bin_edges.size() - 1;
-            xt::xtensor<value_type, 1> count = xt::zeros<value_type>({ n_bins });
+            xt::xtensor<value_type, 1> count = xt::zeros<value_type>({n_bins});
 
             if (equal_bins)
             {
@@ -126,7 +126,7 @@ namespace xt
             return prob;
         }
 
-    } //detail
+    }  // detail
 
     /**
      * @ingroup histogram
@@ -141,11 +141,13 @@ namespace xt
     template <class R = double, class E1, class E2, class E3>
     inline auto histogram(E1&& data, E2&& bin_edges, E3&& weights, bool density = false)
     {
-        return detail::histogram_imp<R>(std::forward<E1>(data),
-                                        std::forward<E2>(bin_edges),
-                                        std::forward<E3>(weights),
-                                        density,
-                                        false);
+        return detail::histogram_imp<R>(
+            std::forward<E1>(data),
+            std::forward<E2>(bin_edges),
+            std::forward<E3>(weights),
+            density,
+            false
+        );
     }
 
     /**
@@ -164,11 +166,13 @@ namespace xt
 
         auto n = data.size();
 
-        return detail::histogram_imp<R>(std::forward<E1>(data),
-                                        std::forward<E2>(bin_edges),
-                                        xt::ones<value_type>({ n }),
-                                        density,
-                                        false);
+        return detail::histogram_imp<R>(
+            std::forward<E1>(data),
+            std::forward<E2>(bin_edges),
+            xt::ones<value_type>({n}),
+            density,
+            false
+        );
     }
 
     /**
@@ -187,11 +191,13 @@ namespace xt
 
         auto n = data.size();
 
-        return detail::histogram_imp<R>(std::forward<E1>(data),
-                                        histogram_bin_edges(data, xt::ones<value_type>({ n }), bins),
-                                        xt::ones<value_type>({ n }),
-                                        density,
-                                        true);
+        return detail::histogram_imp<R>(
+            std::forward<E1>(data),
+            histogram_bin_edges(data, xt::ones<value_type>({n}), bins),
+            xt::ones<value_type>({n}),
+            density,
+            true
+        );
     }
 
     /**
@@ -212,11 +218,13 @@ namespace xt
 
         auto n = data.size();
 
-        return detail::histogram_imp<R>(std::forward<E1>(data),
-                                        histogram_bin_edges(data, left, right, bins),
-                                        xt::ones<value_type>({ n }),
-                                        density,
-                                        true);
+        return detail::histogram_imp<R>(
+            std::forward<E1>(data),
+            histogram_bin_edges(data, left, right, bins),
+            xt::ones<value_type>({n}),
+            density,
+            true
+        );
     }
 
     /**
@@ -232,11 +240,13 @@ namespace xt
     template <class R = double, class E1, class E2>
     inline auto histogram(E1&& data, std::size_t bins, E2&& weights, bool density = false)
     {
-        return detail::histogram_imp<R>(std::forward<E1>(data),
-                                        histogram_bin_edges(data, weights, bins),
-                                        std::forward<E2>(weights),
-                                        density,
-                                        true);
+        return detail::histogram_imp<R>(
+            std::forward<E1>(data),
+            histogram_bin_edges(data, weights, bins),
+            std::forward<E2>(weights),
+            density,
+            true
+        );
     }
 
     /**
@@ -254,11 +264,13 @@ namespace xt
     template <class R = double, class E1, class E2, class E3>
     inline auto histogram(E1&& data, std::size_t bins, E2&& weights, E3 left, E3 right, bool density = false)
     {
-        return detail::histogram_imp<R>(std::forward<E1>(data),
-                                        histogram_bin_edges(data, weights, left, right, bins),
-                                        std::forward<E2>(weights),
-                                        density,
-                                        true);
+        return detail::histogram_imp<R>(
+            std::forward<E1>(data),
+            histogram_bin_edges(data, weights, left, right, bins),
+            std::forward<E2>(weights),
+            density,
+            true
+        );
     }
 
     /**
@@ -286,12 +298,14 @@ namespace xt
      * @return An one-dimensional xarray<double>, length: bins+1.
      */
     template <class E1, class E2, class E3>
-    inline auto histogram_bin_edges(E1&& data,
-                                    E2&& weights,
-                                    E3 left,
-                                    E3 right,
-                                    std::size_t bins = 10,
-                                    histogram_algorithm mode = histogram_algorithm::automatic)
+    inline auto histogram_bin_edges(
+        E1&& data,
+        E2&& weights,
+        E3 left,
+        E3 right,
+        std::size_t bins = 10,
+        histogram_algorithm mode = histogram_algorithm::automatic
+    )
     {
         // counter and return type
         using size_type = common_size_type_t<std::decay_t<E1>, std::decay_t<E2>>;
@@ -315,27 +329,25 @@ namespace xt
             // bins of equal width
             case histogram_algorithm::automatic:
             {
-                xt::xtensor<value_type, 1> bin_edges
-                    = xt::linspace<value_type>(left, right, bins + 1);
+                xt::xtensor<value_type, 1> bin_edges = xt::linspace<value_type>(left, right, bins + 1);
                 return bin_edges;
             }
 
             // bins of equal width
             case histogram_algorithm::linspace:
             {
-                xt::xtensor<value_type, 1> bin_edges
-                    = xt::linspace<value_type>(left, right, bins + 1);
+                xt::xtensor<value_type, 1> bin_edges = xt::linspace<value_type>(left, right, bins + 1);
                 return bin_edges;
             }
 
             // bins of logarithmically increasing size
             case histogram_algorithm::logspace:
             {
-                using rhs_value_type
-                    = std::conditional_t<xtl::is_integral<value_type>::value, double, value_type>;
+                using rhs_value_type = std::conditional_t<xtl::is_integral<value_type>::value, double, value_type>;
 
                 xtensor<value_type, 1> bin_edges = xt::cast<value_type>(
-                    xt::logspace<rhs_value_type>(std::log10(left), std::log10(right), bins + 1));
+                    xt::logspace<rhs_value_type>(std::log10(left), std::log10(right), bins + 1)
+                );
 
                 // TODO: replace above with below after 'xsimd' fix
                 // xt::xtensor<value_type,1> bin_edges = xt::logspace<value_type>(
@@ -352,17 +364,16 @@ namespace xt
 
                 // histogram: all of equal 'height'
                 // - height
-                weights_type w
-                    = xt::sum<weights_type>(weights)[0] / static_cast<weights_type>(bins);
+                weights_type w = xt::sum<weights_type>(weights)[0] / static_cast<weights_type>(bins);
                 // - apply to all bins
-                xt::xtensor<weights_type, 1> count = w * xt::ones<weights_type>({ bins });
+                xt::xtensor<weights_type, 1> count = w * xt::ones<weights_type>({bins});
 
                 // take cumulative sum, to act as easy look-up
                 count = xt::cumsum(count);
 
                 // edges
                 // - allocate
-                std::vector<size_t> shape = { bins + 1 };
+                std::vector<size_t> shape = {bins + 1};
                 xt::xtensor<value_type, 1> bin_edges = xtensor<value_type, 1>::from_shape(shape);
                 // - first/last edge
                 bin_edges[0] = left;
@@ -387,8 +398,7 @@ namespace xt
             // bins of equal width
             default:
             {
-                xt::xtensor<value_type, 1> bin_edges
-                    = xt::linspace<value_type>(left, right, bins + 1);
+                xt::xtensor<value_type, 1> bin_edges = xt::linspace<value_type>(left, right, bins + 1);
                 return bin_edges;
             }
         }
@@ -405,21 +415,25 @@ namespace xt
      * @return An one-dimensional xarray<double>, length: bins+1.
      */
     template <class E1, class E2>
-    inline auto histogram_bin_edges(E1&& data,
-                                    E2&& weights,
-                                    std::size_t bins = 10,
-                                    histogram_algorithm mode = histogram_algorithm::automatic)
+    inline auto histogram_bin_edges(
+        E1&& data,
+        E2&& weights,
+        std::size_t bins = 10,
+        histogram_algorithm mode = histogram_algorithm::automatic
+    )
     {
         using value_type = typename std::decay_t<E1>::value_type;
         std::array<value_type, 2> left_right;
         left_right = xt::minmax(data)();
 
-        return histogram_bin_edges(std::forward<E1>(data),
-                                   std::forward<E2>(weights),
-                                   left_right[0],
-                                   left_right[1],
-                                   bins,
-                                   mode);
+        return histogram_bin_edges(
+            std::forward<E1>(data),
+            std::forward<E2>(weights),
+            left_right[0],
+            left_right[1],
+            bins,
+            mode
+        );
     }
 
     /**
@@ -432,9 +446,8 @@ namespace xt
      * @return An one-dimensional xarray<double>, length: bins+1.
      */
     template <class E1>
-    inline auto histogram_bin_edges(E1&& data,
-                                    std::size_t bins = 10,
-                                    histogram_algorithm mode = histogram_algorithm::automatic)
+    inline auto
+    histogram_bin_edges(E1&& data, std::size_t bins = 10, histogram_algorithm mode = histogram_algorithm::automatic)
     {
         using value_type = typename std::decay_t<E1>::value_type;
 
@@ -442,12 +455,14 @@ namespace xt
         std::array<value_type, 2> left_right;
         left_right = xt::minmax(data)();
 
-        return histogram_bin_edges(std::forward<E1>(data),
-                                   xt::ones<value_type>({ n }),
-                                   left_right[0],
-                                   left_right[1],
-                                   bins,
-                                   mode);
+        return histogram_bin_edges(
+            std::forward<E1>(data),
+            xt::ones<value_type>({n}),
+            left_right[0],
+            left_right[1],
+            bins,
+            mode
+        );
     }
 
     /**
@@ -462,18 +477,19 @@ namespace xt
      * @return An one-dimensional xarray<double>, length: bins+1.
      */
     template <class E1, class E2>
-    inline auto histogram_bin_edges(E1&& data,
-                                    E2 left,
-                                    E2 right,
-                                    std::size_t bins = 10,
-                                    histogram_algorithm mode = histogram_algorithm::automatic)
+    inline auto histogram_bin_edges(
+        E1&& data,
+        E2 left,
+        E2 right,
+        std::size_t bins = 10,
+        histogram_algorithm mode = histogram_algorithm::automatic
+    )
     {
         using value_type = typename std::decay_t<E1>::value_type;
 
         auto n = data.size();
 
-        return histogram_bin_edges(
-            std::forward<E1>(data), xt::ones<value_type>({ n }), left, right, bins, mode);
+        return histogram_bin_edges(std::forward<E1>(data), xt::ones<value_type>({n}), left, right, bins, mode);
     }
 
     /**
@@ -500,8 +516,10 @@ namespace xt
         using input_value_type = typename std::decay_t<E1>::value_type;
         using size_type = typename std::decay_t<E1>::size_type;
 
-        static_assert(xtl::is_integral<typename std::decay_t<E1>::value_type>::value,
-                      "Bincount data has to be integral type.");
+        static_assert(
+            xtl::is_integral<typename std::decay_t<E1>::value_type>::value,
+            "Bincount data has to be integral type."
+        );
         XTENSOR_ASSERT(data.dimension() == 1);
         XTENSOR_ASSERT(weights.dimension() == 1);
 
@@ -510,12 +528,11 @@ namespace xt
 
         if (left_right[0] < input_value_type(0))
         {
-            XTENSOR_THROW(std::runtime_error,
-                "Data argument for bincount can only contain positive integers!");
+            XTENSOR_THROW(std::runtime_error, "Data argument for bincount can only contain positive integers!");
         }
 
-        xt::xtensor<result_value_type, 1> res = xt::zeros<result_value_type>(
-            { (std::max)(minlength, std::size_t(left_right[1] + 1)) });
+        xt::xtensor<result_value_type, 1> res = xt::zeros<result_value_type>({(std::max
+        )(minlength, std::size_t(left_right[1] + 1))});
 
         for (size_type i = 0; i < data.size(); ++i)
         {
@@ -528,9 +545,11 @@ namespace xt
     template <class E1>
     inline auto bincount(E1&& data, std::size_t minlength = 0)
     {
-        return bincount(std::forward<E1>(data),
-                        xt::ones<typename std::decay_t<E1>::value_type>(data.shape()),
-                        minlength);
+        return bincount(
+            std::forward<E1>(data),
+            xt::ones<typename std::decay_t<E1>::value_type>(data.shape()),
+            minlength
+        );
     }
 
     /**
@@ -551,12 +570,12 @@ namespace xt
             return n;
         }
 
-        #ifdef XTENSOR_ENABLE_ASSERT
+#ifdef XTENSOR_ENABLE_ASSERT
         using value_type = typename std::decay_t<E>::value_type;
 
         XTENSOR_ASSERT(xt::all(weights >= static_cast<value_type>(0)));
         XTENSOR_ASSERT(xt::sum(weights)() > static_cast<value_type>(0));
-        #endif
+#endif
 
         xt::xtensor<double, 1> P = xt::cast<double>(weights) / static_cast<double>(xt::sum(weights)());
         xt::xtensor<size_t, 1> n = xt::ceil(static_cast<double>(N) * P);
@@ -585,7 +604,7 @@ namespace xt
      *
      * @return 1D container with the number of items per bin
      */
-    inline xt::xtensor<size_t,1> bin_items(size_t N, size_t bins)
+    inline xt::xtensor<size_t, 1> bin_items(size_t N, size_t bins)
     {
         return bin_items(N, xt::ones<double>({bins}));
     }

@@ -3,7 +3,11 @@ name: gh-pages
 on:
   push:
     branches:
-      - master
+    - master
+
+defaults:
+  run:
+    shell: bash -l {0}
 
 jobs:
 
@@ -20,15 +24,11 @@ jobs:
     - name: Basic GitHub action setup
       uses: actions/checkout@v2
 
-    - name: Set conda environment "test"
-      uses: conda-incubator/setup-miniconda@v2
+    - name: Set mamba environment "test"
+      uses: mamba-org/provision-with-micromamba@main
       with:
-        mamba-version: "*"
-        channels: conda-forge,defaults
-        channel-priority: true
-        environment-file: docs/environment.yaml
-        activate-environment: test
-        auto-activate-base: false
+        environment-file: docs/ghp_environment.yml
+        environment-name: xtensor-doc
 
     - name: Run doxygen
       working-directory: docs

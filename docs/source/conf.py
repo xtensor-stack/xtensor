@@ -20,6 +20,7 @@ def setup(app):
 
 extensions = ['breathe']
 breathe_projects = { 'xtensor': '../xml' }
+breathe_default_project = "xtensor"
 templates_path = ['_templates']
 html_static_path = ['_static']
 source_suffix = '.rst'

@@ -9,7 +9,7 @@
 Views
 =====
 
-Views are used to adapt the shape of an :cpp:type:`xt::xexpression` without changing it, nor copying it. Views are 
+Views are used to adapt the shape of an :cpp:type:`xt::xexpression` without changing it, nor copying it. Views are
 convenient tools for assigning parts of an expression: since they do not copy the underlying expression,
 assigning to the view actually assigns to the underlying expression. *xtensor* provides many kinds of views.
 

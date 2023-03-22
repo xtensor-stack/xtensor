@@ -1,11 +1,11 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_OPERATION_HPP
 #define XTENSOR_OPERATION_HPP
@@ -18,8 +18,8 @@
 
 #include "xfunction.hpp"
 #include "xscalar.hpp"
-#include "xstrides.hpp"
 #include "xstrided_view.hpp"
+#include "xstrides.hpp"
 
 namespace xt
 {
@@ -28,57 +28,57 @@ namespace xt
      * helpers *
      ***********/
 
-#define UNARY_OPERATOR_FUNCTOR(NAME, OP)                                        \
-    struct NAME                                                                 \
-    {                                                                           \
-        template <class A1>                                                     \
-        constexpr auto operator()(const A1& arg) const                          \
-        {                                                                       \
-            return OP arg;                                                      \
-        }                                                                       \
-        template <class B>                                                      \
-        constexpr auto simd_apply(const B& arg) const                           \
-        {                                                                       \
-            return OP arg;                                                      \
-        }                                                                       \
+#define UNARY_OPERATOR_FUNCTOR(NAME, OP)               \
+    struct NAME                                        \
+    {                                                  \
+        template <class A1>                            \
+        constexpr auto operator()(const A1& arg) const \
+        {                                              \
+            return OP arg;                             \
+        }                                              \
+        template <class B>                             \
+        constexpr auto simd_apply(const B& arg) const  \
+        {                                              \
+            return OP arg;                             \
+        }                                              \
     }
 
-#define DEFINE_COMPLEX_OVERLOAD(OP)                                                       \
-template <class T1, class T2, XTL_REQUIRES(xtl::negation<std::is_same<T1, T2>>)>          \
-constexpr auto operator OP(const std::complex<T1>& arg1, const std::complex<T2>& arg2)    \
-{                                                                                         \
-    using result_type = typename xtl::promote_type_t<std::complex<T1>, std::complex<T2>>; \
-    return (result_type(arg1) OP result_type(arg2));                                      \
-}                                                                                         \
-                                                                                          \
-template <class T1, class T2, XTL_REQUIRES(xtl::negation<std::is_same<T1, T2>>)>          \
-constexpr auto operator OP(const T1& arg1, const std::complex<T2>& arg2)                  \
-{                                                                                         \
-    using result_type = typename xtl::promote_type_t<T1, std::complex<T2>>;               \
-    return (result_type(arg1) OP result_type(arg2));                                      \
-}                                                                                         \
-                                                                                          \
-template <class T1, class T2, XTL_REQUIRES(xtl::negation<std::is_same<T1, T2>>)>          \
-constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)                  \
-{                                                                                         \
-    using result_type = typename xtl::promote_type_t<std::complex<T1>, T2>;               \
-    return (result_type(arg1) OP result_type(arg2));                                      \
-}
+#define DEFINE_COMPLEX_OVERLOAD(OP)                                                           \
+    template <class T1, class T2, XTL_REQUIRES(xtl::negation<std::is_same<T1, T2>>)>          \
+    constexpr auto operator OP(const std::complex<T1>& arg1, const std::complex<T2>& arg2)    \
+    {                                                                                         \
+        using result_type = typename xtl::promote_type_t<std::complex<T1>, std::complex<T2>>; \
+        return (result_type(arg1) OP result_type(arg2));                                      \
+    }                                                                                         \
+                                                                                              \
+    template <class T1, class T2, XTL_REQUIRES(xtl::negation<std::is_same<T1, T2>>)>          \
+    constexpr auto operator OP(const T1& arg1, const std::complex<T2>& arg2)                  \
+    {                                                                                         \
+        using result_type = typename xtl::promote_type_t<T1, std::complex<T2>>;               \
+        return (result_type(arg1) OP result_type(arg2));                                      \
+    }                                                                                         \
+                                                                                              \
+    template <class T1, class T2, XTL_REQUIRES(xtl::negation<std::is_same<T1, T2>>)>          \
+    constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)                  \
+    {                                                                                         \
+        using result_type = typename xtl::promote_type_t<std::complex<T1>, T2>;               \
+        return (result_type(arg1) OP result_type(arg2));                                      \
+    }
 
-#define BINARY_OPERATOR_FUNCTOR(NAME, OP)                                        \
-    struct NAME                                                                  \
-    {                                                                            \
-        template <class T1, class T2>                                            \
-        constexpr auto operator()(T1&& arg1, T2&& arg2) const                    \
-        {                                                                        \
-            using xt::detail::operator OP;                                       \
-            return (std::forward<T1>(arg1) OP std::forward<T2>(arg2));           \
-        }                                                                        \
-        template <class B>                                                       \
-        constexpr auto simd_apply(const B& arg1, const B& arg2) const            \
-        {                                                                        \
-            return (arg1 OP arg2);                                               \
-        }                                                                        \
+#define BINARY_OPERATOR_FUNCTOR(NAME, OP)                              \
+    struct NAME                                                        \
+    {                                                                  \
+        template <class T1, class T2>                                  \
+        constexpr auto operator()(T1&& arg1, T2&& arg2) const          \
+        {                                                              \
+            using xt::detail::operator OP;                             \
+            return (std::forward<T1>(arg1) OP std::forward<T2>(arg2)); \
+        }                                                              \
+        template <class B>                                             \
+        constexpr auto simd_apply(const B& arg1, const B& arg2) const  \
+        {                                                              \
+            return (arg1 OP arg2);                                     \
+        }                                                              \
     }
 
     namespace detail
@@ -137,9 +137,7 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
             }
 
             template <class B>
-            constexpr B simd_apply(const get_batch_bool<B>& t1,
-                                   const B& t2,
-                                   const B& t3) const noexcept
+            constexpr B simd_apply(const get_batch_bool<B>& t1, const B& t2, const B& t3) const noexcept
             {
                 return xt_simd::select(t1, t2, t3);
             }
@@ -157,6 +155,7 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
                 {
                     return static_cast<R>(arg);
                 }
+
                 // SIMD conversion disabled for now since it does not make sense
                 // in most of the cases
                 /*constexpr simd_result_type simd_apply(const simd_value_type& arg) const
@@ -189,9 +188,7 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
         {
             using expression_tag = xexpression_tag_t<E...>;
             using functor_type = F;
-            using type = select_xfunction_expression_t<expression_tag,
-                                                       functor_type,
-                                                       const_xclosure_t<E>...>;
+            using type = select_xfunction_expression_t<expression_tag, functor_type, const_xclosure_t<E>...>;
         };
 
         template <class F, class... E>
@@ -205,11 +202,11 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
 
         // On MSVC, the second argument of enable_if_t is always evaluated, even if the condition is false.
         // Wrapping the xfunction type in the xfunction_type metafunction avoids this evaluation when
-        // the condition is false, since it leads to a tricky bug preventing from using operator+ and operator-
-        // on vector and arrays iterators.
+        // the condition is false, since it leads to a tricky bug preventing from using operator+ and
+        // operator- on vector and arrays iterators.
         template <class F, class... E>
-        using xfunction_type_t = typename std::enable_if_t<has_xexpression<std::decay_t<E>...>::value,
-                                                           xfunction_type<F, E...>>::type;
+        using xfunction_type_t = typename std::
+            enable_if_t<has_xexpression<std::decay_t<E>...>::value, xfunction_type<F, E...>>::type;
     }
 
 #undef UNARY_OPERATOR_FUNCTOR
@@ -233,92 +230,86 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
      * @return an \ref xfunction
      */
     template <class E>
-    inline auto operator+(E&& e) noexcept
-        -> detail::xfunction_type_t<detail::identity, E>
+    inline auto operator+(E&& e) noexcept -> detail::xfunction_type_t<detail::identity, E>
     {
         return detail::make_xfunction<detail::identity>(std::forward<E>(e));
     }
 
     /**
-    * @ingroup arithmetic_operators
-    * @brief Opposite
-    *
-    * Returns an \ref xfunction for the element-wise opposite
-    * of \a e.
-    * @param e an \ref xexpression
-    * @return an \ref xfunction
-    */
+     * @ingroup arithmetic_operators
+     * @brief Opposite
+     *
+     * Returns an \ref xfunction for the element-wise opposite
+     * of \a e.
+     * @param e an \ref xexpression
+     * @return an \ref xfunction
+     */
     template <class E>
-    inline auto operator-(E&& e) noexcept
-        -> detail::xfunction_type_t<detail::negate, E>
+    inline auto operator-(E&& e) noexcept -> detail::xfunction_type_t<detail::negate, E>
     {
         return detail::make_xfunction<detail::negate>(std::forward<E>(e));
     }
 
     /**
-    * @ingroup arithmetic_operators
-    * @brief Addition
-    *
-    * Returns an \ref xfunction for the element-wise addition
-    * of \a e1 and \a e2.
-    * @param e1 an \ref xexpression or a scalar
-    * @param e2 an \ref xexpression or a scalar
-    * @return an \ref xfunction
-    */
+     * @ingroup arithmetic_operators
+     * @brief Addition
+     *
+     * Returns an \ref xfunction for the element-wise addition
+     * of \a e1 and \a e2.
+     * @param e1 an \ref xexpression or a scalar
+     * @param e2 an \ref xexpression or a scalar
+     * @return an \ref xfunction
+     */
     template <class E1, class E2>
-    inline auto operator+(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_type_t<detail::plus, E1, E2>
+    inline auto operator+(E1&& e1, E2&& e2) noexcept -> detail::xfunction_type_t<detail::plus, E1, E2>
     {
         return detail::make_xfunction<detail::plus>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**
-    * @ingroup arithmetic_operators
-    * @brief Substraction
-    *
-    * Returns an \ref xfunction for the element-wise substraction
-    * of \a e2 to \a e1.
-    * @param e1 an \ref xexpression or a scalar
-    * @param e2 an \ref xexpression or a scalar
-    * @return an \ref xfunction
-    */
+     * @ingroup arithmetic_operators
+     * @brief Substraction
+     *
+     * Returns an \ref xfunction for the element-wise substraction
+     * of \a e2 to \a e1.
+     * @param e1 an \ref xexpression or a scalar
+     * @param e2 an \ref xexpression or a scalar
+     * @return an \ref xfunction
+     */
     template <class E1, class E2>
-    inline auto operator-(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_type_t<detail::minus, E1, E2>
+    inline auto operator-(E1&& e1, E2&& e2) noexcept -> detail::xfunction_type_t<detail::minus, E1, E2>
     {
         return detail::make_xfunction<detail::minus>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**
-    * @ingroup arithmetic_operators
-    * @brief Multiplication
-    *
-    * Returns an \ref xfunction for the element-wise multiplication
-    * of \a e1 by \a e2.
-    * @param e1 an \ref xexpression or a scalar
-    * @param e2 an \ref xexpression or a scalar
-    * @return an \ref xfunction
-    */
+     * @ingroup arithmetic_operators
+     * @brief Multiplication
+     *
+     * Returns an \ref xfunction for the element-wise multiplication
+     * of \a e1 by \a e2.
+     * @param e1 an \ref xexpression or a scalar
+     * @param e2 an \ref xexpression or a scalar
+     * @return an \ref xfunction
+     */
     template <class E1, class E2>
-    inline auto operator*(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_type_t<detail::multiplies, E1, E2>
+    inline auto operator*(E1&& e1, E2&& e2) noexcept -> detail::xfunction_type_t<detail::multiplies, E1, E2>
     {
         return detail::make_xfunction<detail::multiplies>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**
-    * @ingroup arithmetic_operators
-    * @brief Division
-    *
-    * Returns an \ref xfunction for the element-wise division
-    * of \a e1 by \a e2.
-    * @param e1 an \ref xexpression or a scalar
-    * @param e2 an \ref xexpression or a scalar
-    * @return an \ref xfunction
-    */
+     * @ingroup arithmetic_operators
+     * @brief Division
+     *
+     * Returns an \ref xfunction for the element-wise division
+     * of \a e1 by \a e2.
+     * @param e1 an \ref xexpression or a scalar
+     * @param e2 an \ref xexpression or a scalar
+     * @return an \ref xfunction
+     */
     template <class E1, class E2>
-    inline auto operator/(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_type_t<detail::divides, E1, E2>
+    inline auto operator/(E1&& e1, E2&& e2) noexcept -> detail::xfunction_type_t<detail::divides, E1, E2>
     {
         return detail::make_xfunction<detail::divides>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
@@ -334,8 +325,7 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
      * @return an \ref xfunction
      */
     template <class E1, class E2>
-    inline auto operator%(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_type_t<detail::modulus, E1, E2>
+    inline auto operator%(E1&& e1, E2&& e2) noexcept -> detail::xfunction_type_t<detail::modulus, E1, E2>
     {
         return detail::make_xfunction<detail::modulus>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
@@ -355,41 +345,38 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
      * @return an \ref xfunction
      */
     template <class E1, class E2>
-    inline auto operator||(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_type_t<detail::logical_or, E1, E2>
+    inline auto operator||(E1&& e1, E2&& e2) noexcept -> detail::xfunction_type_t<detail::logical_or, E1, E2>
     {
         return detail::make_xfunction<detail::logical_or>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**
-    * @ingroup logical_operators
-    * @brief And
-    *
-    * Returns an \ref xfunction for the element-wise and
-    * of \a e1 and \a e2.
-    * @param e1 an \ref xexpression or a scalar
-    * @param e2 an \ref xexpression or a scalar
-    * @return an \ref xfunction
-    */
+     * @ingroup logical_operators
+     * @brief And
+     *
+     * Returns an \ref xfunction for the element-wise and
+     * of \a e1 and \a e2.
+     * @param e1 an \ref xexpression or a scalar
+     * @param e2 an \ref xexpression or a scalar
+     * @return an \ref xfunction
+     */
     template <class E1, class E2>
-    inline auto operator&&(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_type_t<detail::logical_and, E1, E2>
+    inline auto operator&&(E1&& e1, E2&& e2) noexcept -> detail::xfunction_type_t<detail::logical_and, E1, E2>
     {
         return detail::make_xfunction<detail::logical_and>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**
-    * @ingroup logical_operators
-    * @brief Not
-    *
-    * Returns an \ref xfunction for the element-wise not
-    * of \a e.
-    * @param e an \ref xexpression
-    * @return an \ref xfunction
-    */
+     * @ingroup logical_operators
+     * @brief Not
+     *
+     * Returns an \ref xfunction for the element-wise not
+     * of \a e.
+     * @param e an \ref xexpression
+     * @return an \ref xfunction
+     */
     template <class E>
-    inline auto operator!(E&& e) noexcept
-        -> detail::xfunction_type_t<detail::logical_not, E>
+    inline auto operator!(E&& e) noexcept -> detail::xfunction_type_t<detail::logical_not, E>
     {
         return detail::make_xfunction<detail::logical_not>(std::forward<E>(e));
     }
@@ -409,8 +396,7 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
      * @return an \ref xfunction
      */
     template <class E1, class E2>
-    inline auto operator&(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_type_t<detail::bitwise_and, E1, E2>
+    inline auto operator&(E1&& e1, E2&& e2) noexcept -> detail::xfunction_type_t<detail::bitwise_and, E1, E2>
     {
         return detail::make_xfunction<detail::bitwise_and>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
@@ -426,8 +412,7 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
      * @return an \ref xfunction
      */
     template <class E1, class E2>
-    inline auto operator|(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_type_t<detail::bitwise_or, E1, E2>
+    inline auto operator|(E1&& e1, E2&& e2) noexcept -> detail::xfunction_type_t<detail::bitwise_or, E1, E2>
     {
         return detail::make_xfunction<detail::bitwise_or>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
@@ -443,8 +428,7 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
      * @return an \ref xfunction
      */
     template <class E1, class E2>
-    inline auto operator^(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_type_t<detail::bitwise_xor, E1, E2>
+    inline auto operator^(E1&& e1, E2&& e2) noexcept -> detail::xfunction_type_t<detail::bitwise_xor, E1, E2>
     {
         return detail::make_xfunction<detail::bitwise_xor>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
@@ -459,8 +443,7 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
      * @return an \ref xfunction
      */
     template <class E>
-    inline auto operator~(E&& e) noexcept
-        -> detail::xfunction_type_t<detail::bitwise_not, E>
+    inline auto operator~(E&& e) noexcept -> detail::xfunction_type_t<detail::bitwise_not, E>
     {
         return detail::make_xfunction<detail::bitwise_not>(std::forward<E>(e));
     }
@@ -476,8 +459,7 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
      * @return an \ref xfunction
      */
     template <class E1, class E2>
-    inline auto left_shift(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_type_t<detail::left_shift, E1, E2>
+    inline auto left_shift(E1&& e1, E2&& e2) noexcept -> detail::xfunction_type_t<detail::left_shift, E1, E2>
     {
         return detail::make_xfunction<detail::left_shift>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
@@ -493,8 +475,7 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
      * @return an \ref xfunction
      */
     template <class E1, class E2>
-    inline auto right_shift(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_type_t<detail::right_shift, E1, E2>
+    inline auto right_shift(E1&& e1, E2&& e2) noexcept -> detail::xfunction_type_t<detail::right_shift, E1, E2>
     {
         return detail::make_xfunction<detail::right_shift>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
@@ -524,8 +505,9 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
         using eval_enable_if_t = typename eval_enable_if<B, T>::type;
 
         template <class F, class E1, class E2>
-        using shift_return_type_t = eval_enable_if_t<is_xexpression<std::decay_t<E1>>::value,
-                                                     shift_function_getter<F, E1, E2>>;
+        using shift_return_type_t = eval_enable_if_t<
+            is_xexpression<std::decay_t<E1>>::value,
+            shift_function_getter<F, E1, E2>>;
     }
 
     /**
@@ -558,8 +540,7 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
      * @sa right_shift
      */
     template <class E1, class E2>
-    inline auto operator>>(E1&& e1, E2&& e2)
-        -> detail::shift_return_type_t<detail::right_shift, E1, E2>
+    inline auto operator>>(E1&& e1, E2&& e2) -> detail::shift_return_type_t<detail::right_shift, E1, E2>
     {
         return right_shift(std::forward<E1>(e1), std::forward<E2>(e2));
     }
@@ -579,8 +560,7 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
      * @return an \ref xfunction
      */
     template <class E1, class E2>
-    inline auto operator<(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_type_t<detail::less, E1, E2>
+    inline auto operator<(E1&& e1, E2&& e2) noexcept -> detail::xfunction_type_t<detail::less, E1, E2>
     {
         return detail::make_xfunction<detail::less>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
@@ -596,8 +576,7 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
      * @return an \ref xfunction
      */
     template <class E1, class E2>
-    inline auto operator<=(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_type_t<detail::less_equal, E1, E2>
+    inline auto operator<=(E1&& e1, E2&& e2) noexcept -> detail::xfunction_type_t<detail::less_equal, E1, E2>
     {
         return detail::make_xfunction<detail::less_equal>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
@@ -613,8 +592,7 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
      * @return an \ref xfunction
      */
     template <class E1, class E2>
-    inline auto operator>(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_type_t<detail::greater, E1, E2>
+    inline auto operator>(E1&& e1, E2&& e2) noexcept -> detail::xfunction_type_t<detail::greater, E1, E2>
     {
         return detail::make_xfunction<detail::greater>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
@@ -653,7 +631,8 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
     {
         const E1& de1 = e1.derived_cast();
         const E2& de2 = e2.derived_cast();
-        bool res = de1.dimension() == de2.dimension() && std::equal(de1.shape().begin(), de1.shape().end(), de2.shape().begin());
+        bool res = de1.dimension() == de2.dimension()
+                   && std::equal(de1.shape().begin(), de1.shape().end(), de2.shape().begin());
         auto iter1 = de1.begin();
         auto iter2 = de2.begin();
         auto iter_end = de1.end();
@@ -692,8 +671,7 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
      * @return an \ref xfunction
      */
     template <class E1, class E2>
-    inline auto equal(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_type_t<detail::equal_to, E1, E2>
+    inline auto equal(E1&& e1, E2&& e2) noexcept -> detail::xfunction_type_t<detail::equal_to, E1, E2>
     {
         return detail::make_xfunction<detail::equal_to>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
@@ -709,8 +687,7 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
      * @return an \ref xfunction
      */
     template <class E1, class E2>
-    inline auto not_equal(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_type_t<detail::not_equal_to, E1, E2>
+    inline auto not_equal(E1&& e1, E2&& e2) noexcept -> detail::xfunction_type_t<detail::not_equal_to, E1, E2>
     {
         return detail::make_xfunction<detail::not_equal_to>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
@@ -727,8 +704,7 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
      * @return an \ref xfunction
      */
     template <class E1, class E2>
-    inline auto less(E1&& e1, E2&& e2) noexcept
-        -> decltype(std::forward<E1>(e1) < std::forward<E2>(e2))
+    inline auto less(E1&& e1, E2&& e2) noexcept -> decltype(std::forward<E1>(e1) < std::forward<E2>(e2))
     {
         return std::forward<E1>(e1) < std::forward<E2>(e2);
     }
@@ -745,8 +721,7 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
      * @return an \ref xfunction
      */
     template <class E1, class E2>
-    inline auto less_equal(E1&& e1, E2&& e2) noexcept
-        -> decltype(std::forward<E1>(e1) <= std::forward<E2>(e2))
+    inline auto less_equal(E1&& e1, E2&& e2) noexcept -> decltype(std::forward<E1>(e1) <= std::forward<E2>(e2))
     {
         return std::forward<E1>(e1) <= std::forward<E2>(e2);
     }
@@ -763,8 +738,7 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
      * @return an \ref xfunction
      */
     template <class E1, class E2>
-    inline auto greater(E1&& e1, E2&& e2) noexcept
-        -> decltype(std::forward<E1>(e1) > std::forward<E2>(e2))
+    inline auto greater(E1&& e1, E2&& e2) noexcept -> decltype(std::forward<E1>(e1) > std::forward<E2>(e2))
     {
         return std::forward<E1>(e1) > std::forward<E2>(e2);
     }
@@ -788,22 +762,26 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
     }
 
     /**
-    * @ingroup logical_operators
-    * @brief Ternary selection
-    *
-    * Returns an \ref xfunction for the element-wise
-    * ternary selection (i.e. operator ? :) of \a e1,
-    * \a e2 and \a e3.
-    * @param e1 a boolean \ref xexpression
-    * @param e2 an \ref xexpression or a scalar
-    * @param e3 an \ref xexpression or a scalar
-    * @return an \ref xfunction
-    */
+     * @ingroup logical_operators
+     * @brief Ternary selection
+     *
+     * Returns an \ref xfunction for the element-wise
+     * ternary selection (i.e. operator ? :) of \a e1,
+     * \a e2 and \a e3.
+     * @param e1 a boolean \ref xexpression
+     * @param e2 an \ref xexpression or a scalar
+     * @param e3 an \ref xexpression or a scalar
+     * @return an \ref xfunction
+     */
     template <class E1, class E2, class E3>
     inline auto where(E1&& e1, E2&& e2, E3&& e3) noexcept
         -> detail::xfunction_type_t<detail::conditional_ternary, E1, E2, E3>
     {
-        return detail::make_xfunction<detail::conditional_ternary>(std::forward<E1>(e1), std::forward<E2>(e2), std::forward<E3>(e3));
+        return detail::make_xfunction<detail::conditional_ternary>(
+            std::forward<E1>(e1),
+            std::forward<E2>(e2),
+            std::forward<E3>(e3)
+        );
     }
 
     namespace detail
@@ -841,9 +819,9 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
             template <class S, class I>
             inline auto operator()(const S& shape, I& idx)
             {
-                for(std::size_t i = 0; i < shape.size(); ++i)
+                for (std::size_t i = 0; i < shape.size(); ++i)
                 {
-                    if(idx[i] >= shape[i] - 1)
+                    if (idx[i] >= shape[i] - 1)
                     {
                         idx[i] = 0;
                     }
@@ -946,37 +924,51 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
     }
 
     /**
-    * @ingroup logical_operators
-    * @brief Any
-    *
-    * Returns true if any of the values of \a e is truthy,
-    * false otherwise.
-    * @param e an \ref xexpression
-    * @return a boolean
-    */
+     * @ingroup logical_operators
+     * @brief Any
+     *
+     * Returns true if any of the values of \a e is truthy,
+     * false otherwise.
+     * @param e an \ref xexpression
+     * @return a boolean
+     */
     template <class E>
     inline bool any(E&& e)
     {
         using xtype = std::decay_t<E>;
         using value_type = typename xtype::value_type;
-        return std::any_of(e.cbegin(), e.cend(), [](const value_type& el) { return el; });
+        return std::any_of(
+            e.cbegin(),
+            e.cend(),
+            [](const value_type& el)
+            {
+                return el;
+            }
+        );
     }
 
     /**
-    * @ingroup logical_operators
-    * @brief Any
-    *
-    * Returns true if all of the values of \a e are truthy,
-    * false otherwise.
-    * @param e an \ref xexpression
-    * @return a boolean
-    */
+     * @ingroup logical_operators
+     * @brief Any
+     *
+     * Returns true if all of the values of \a e are truthy,
+     * false otherwise.
+     * @param e an \ref xexpression
+     * @return a boolean
+     */
     template <class E>
     inline bool all(E&& e)
     {
         using xtype = std::decay_t<E>;
         using value_type = typename xtype::value_type;
-        return std::all_of(e.cbegin(), e.cend(), [](const value_type& el) { return el; });
+        return std::all_of(
+            e.cbegin(),
+            e.cend(),
+            [](const value_type& el)
+            {
+                return el;
+            }
+        );
     }
 
     /**
@@ -995,8 +987,7 @@ constexpr auto operator OP(const std::complex<T1>& arg1, const T2& arg2)        
      */
 
     template <class R, class E>
-    inline auto cast(E&& e) noexcept
-        -> detail::xfunction_type_t<typename detail::cast<R>::functor, E>
+    inline auto cast(E&& e) noexcept -> detail::xfunction_type_t<typename detail::cast<R>::functor, E>
     {
         return detail::make_xfunction<typename detail::cast<R>::functor>(std::forward<E>(e));
     }

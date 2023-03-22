@@ -10,5 +10,4 @@ xrepeat
 Defined in ``xtensor/xrepeat.hpp``
 
 .. doxygenclass:: xt::xrepeat
-   :project: xtensor
    :members:

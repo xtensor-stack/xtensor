@@ -59,6 +59,20 @@ cmake -DCMAKE_INSTALL_PREFIX=your_install_prefix
 make install
 ```
 
+### Installing xtensor using vcpkg
+
+You can download and install xtensor using the [vcpkg](https://github.com/Microsoft/vcpkg) dependency manager:
+
+```bash
+git clone https://github.com/Microsoft/vcpkg.git
+cd vcpkg
+./bootstrap-vcpkg.sh
+./vcpkg integrate install
+./vcpkg install xtensor
+```
+
+The xtensor port in vcpkg is kept up to date by Microsoft team members and community contributors. If the version is out of date, please [create an issue or pull request](https://github.com/Microsoft/vcpkg) on the vcpkg repository.
+
 ## Trying it online
 
 You can play with `xtensor` interactively in a Jupyter notebook right now! Just click on the binder link below:
@@ -83,9 +97,8 @@ library:
 
 | `xtensor` | `xtl`   |`xsimd` (optional) |
 |-----------|---------|-------------------|
-|  master   | ^0.7.0  |       ^8.0.3      |
-|  0.24.1   | ^0.7.0  |       ^8.0.3      |
-|  0.24.0   | ^0.7.0  |       ^8.0.3      |
+|  master   | ^0.7.5  |       ^10.0.0      |
+|  0.24.x   | ^0.7.0  |       ^8.0.3      |
 |  0.23.x   | ^0.7.0  |       ^7.4.8      |
 |  0.22.0   | ^0.6.23 |       ^7.4.8      |
 

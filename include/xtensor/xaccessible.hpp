@@ -1,11 +1,11 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_ACCESSIBLE_HPP
 #define XTENSOR_ACCESSIBLE_HPP
@@ -110,9 +110,9 @@ namespace xt
 
         using base_type::at;
         using base_type::operator[];
-        using base_type::periodic;
-        using base_type::front;
         using base_type::back;
+        using base_type::front;
+        using base_type::periodic;
 
     protected:
 
@@ -285,8 +285,7 @@ namespace xt
      */
     template <class D>
     template <class S>
-    inline auto xaccessible<D>::operator[](const S& index)
-        -> disable_integral_t<S, reference>
+    inline auto xaccessible<D>::operator[](const S& index) -> disable_integral_t<S, reference>
     {
         return derived_cast().element(index.cbegin(), index.cend());
     }
@@ -346,4 +345,3 @@ namespace xt
 }
 
 #endif
-

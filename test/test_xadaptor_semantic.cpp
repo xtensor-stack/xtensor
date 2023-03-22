@@ -1,11 +1,11 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #include "test_common.hpp"
 #include "test_xsemantic.hpp"
@@ -40,17 +40,18 @@ namespace xt
     class adaptor_semantic
     {
     public:
+
         using container_type = C;
         using adaptor_type = get_test_adaptor_t<C>;
     };
 
-    #define ADAPTOR_SEMANTIC_TYPES xarray_dynamic, xtensor_dynamic
+#define ADAPTOR_SEMANTIC_TYPES xarray_dynamic, xtensor_dynamic
 
     TEST_CASE_TEMPLATE("xsimd_info", TypeParam, ADAPTOR_SEMANTIC_TYPES)
     {
 #if defined(XTENSOR_USE_XSIMD)
         std::cout << "Built with XSIMD" << std::endl;
-        std::cout << " arch "<<xsimd::default_arch::name() << std::endl;
+        std::cout << " arch " << xsimd::default_arch::name() << std::endl;
 #else
         std::cout << "Built without XSIMD" << std::endl;
 #endif
@@ -374,6 +375,8 @@ namespace xt
             EXPECT_EQ(tester.res_ru, b);
         }
     }
-    #undef ADAPTOR_SEMANTIC_TYPES
+
+#undef ADAPTOR_SEMANTIC_TYPES
 }
+
 TEST_SUITE_END();

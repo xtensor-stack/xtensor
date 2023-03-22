@@ -1,24 +1,23 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_XMASKED_VIEW_HPP
 #define XTENSOR_XMASKED_VIEW_HPP
 
-#include "xtl/xmasked_value.hpp"
-
 #include "xaccessible.hpp"
 #include "xexpression.hpp"
 #include "xiterable.hpp"
-#include "xutils.hpp"
-#include "xshape.hpp"
 #include "xsemantic.hpp"
+#include "xshape.hpp"
 #include "xtensor_forward.hpp"
+#include "xtl/xmasked_value.hpp"
+#include "xutils.hpp"
 
 namespace xt
 {
@@ -160,7 +159,7 @@ namespace xt
         template <class D, class M>
         xmasked_view(D&& data, M&& mask);
 
-        xmasked_view(xmasked_view const&) = default;
+        xmasked_view(const xmasked_view&) = default;
 
         size_type size() const noexcept;
         const inner_shape_type& shape() const noexcept;
@@ -189,10 +188,10 @@ namespace xt
 
         using accessible_base::at;
         using accessible_base::operator[];
-        using accessible_base::periodic;
-        using accessible_base::in_bounds;
-        using accessible_base::front;
         using accessible_base::back;
+        using accessible_base::front;
+        using accessible_base::in_bounds;
+        using accessible_base::periodic;
 
         template <class It>
         reference element(It first, It last);
@@ -210,13 +209,13 @@ namespace xt
         const mask_type& visible() const noexcept;
 
         using iterable_base::begin;
-        using iterable_base::end;
         using iterable_base::cbegin;
         using iterable_base::cend;
-        using iterable_base::rbegin;
-        using iterable_base::rend;
         using iterable_base::crbegin;
         using iterable_base::crend;
+        using iterable_base::end;
+        using iterable_base::rbegin;
+        using iterable_base::rend;
 
         template <class S>
         stepper stepper_begin(const S& shape) noexcept;
@@ -258,22 +257,16 @@ namespace xt
         using self_type = xmasked_view_stepper<D, is_const>;
         using masked_view_type = std::decay_t<D>;
         using value_type = typename masked_view_type::value_type;
-        using reference = std::conditional_t<is_const,
-                                             typename masked_view_type::const_reference,
-                                             typename masked_view_type::reference>;
-        using pointer = std::conditional_t<is_const,
-                                           typename masked_view_type::const_pointer,
-                                           typename masked_view_type::pointer>;
+        using reference = std::
+            conditional_t<is_const, typename masked_view_type::const_reference, typename masked_view_type::reference>;
+        using pointer = std::
+            conditional_t<is_const, typename masked_view_type::const_pointer, typename masked_view_type::pointer>;
         using size_type = typename masked_view_type::size_type;
         using difference_type = typename masked_view_type::difference_type;
         using data_type = typename masked_view_type::data_type;
         using mask_type = typename masked_view_type::mask_type;
-        using value_stepper = std::conditional_t<is_const,
-                                                 typename data_type::const_stepper,
-                                                 typename data_type::stepper>;
-        using mask_stepper = std::conditional_t<is_const,
-                                                typename mask_type::const_stepper,
-                                                typename mask_type::stepper>;
+        using value_stepper = std::conditional_t<is_const, typename data_type::const_stepper, typename data_type::stepper>;
+        using mask_stepper = std::conditional_t<is_const, typename mask_type::const_stepper, typename mask_type::stepper>;
 
         xmasked_view_stepper(value_stepper vs, mask_stepper fs) noexcept;
 
@@ -314,8 +307,8 @@ namespace xt
     template <class CTD, class CTM>
     template <class D, class M>
     inline xmasked_view<CTD, CTM>::xmasked_view(D&& data, M&& mask)
-        : m_data(std::forward<D>(data)),
-          m_mask(std::forward<M>(mask))
+        : m_data(std::forward<D>(data))
+        , m_mask(std::forward<M>(mask))
     {
     }
 
@@ -358,6 +351,7 @@ namespace xt
     {
         return m_data.backstrides();
     }
+
     //@}
 
     /**
@@ -496,6 +490,7 @@ namespace xt
     {
         return const_reference(m_data.element(first, last), m_mask.element(first, last));
     }
+
     //@}
 
     template <class CTD, class CTM>
@@ -564,7 +559,8 @@ namespace xt
 
     template <class CTD, class CTM>
     template <class S>
-    inline auto xmasked_view<CTD, CTM>::stepper_end(const S& shape, layout_type l) const noexcept -> const_stepper
+    inline auto xmasked_view<CTD, CTM>::stepper_end(const S& shape, layout_type l) const noexcept
+        -> const_stepper
     {
         return const_stepper(value().stepper_end(shape, l), visible().stepper_end(shape, l));
     }
@@ -609,7 +605,8 @@ namespace xt
 
     template <class D, bool C>
     inline xmasked_view_stepper<D, C>::xmasked_view_stepper(value_stepper vs, mask_stepper ms) noexcept
-        : m_vs(vs), m_ms(ms)
+        : m_vs(vs)
+        , m_ms(ms)
     {
     }
 

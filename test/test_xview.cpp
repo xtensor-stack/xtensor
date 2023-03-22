@@ -1,15 +1,14 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #include <algorithm>
 
-#include "test_common_macros.hpp"
 #include "test_common_macros.hpp"
 
 // Workaround to avoid warnings regarding initialization
@@ -25,12 +24,12 @@
 #include "xtensor/xarray.hpp"
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xfixed.hpp"
-#include "xtensor/xnoalias.hpp"
-#include "xtensor/xstrided_view.hpp"
 #include "xtensor/xmanipulation.hpp"
+#include "xtensor/xnoalias.hpp"
+#include "xtensor/xrandom.hpp"
+#include "xtensor/xstrided_view.hpp"
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xview.hpp"
-#include "xtensor/xrandom.hpp"
 
 namespace xt
 {
@@ -55,7 +54,8 @@ namespace xt
             view_shape_type shape = {3, 4};
             xarray<double> a(shape);
             auto view1 = view(a, 1, range(1, 4));
-            bool check = std::is_same<xarray<double>, typename xcontainer_inner_types<decltype(view1)>::temporary_type>::value;
+            bool check = std::
+                is_same<xarray<double>, typename xcontainer_inner_types<decltype(view1)>::temporary_type>::value;
             EXPECT_TRUE(check);
         }
 
@@ -63,11 +63,15 @@ namespace xt
             xtensor<double, 2>::shape_type shape = {3, 4};
             xtensor<double, 2> a(shape);
             auto view1 = view(a, 1, range(1, 4));
-            bool check1 = std::is_same<xtensor<double, 1>, typename xcontainer_inner_types<decltype(view1)>::temporary_type>::value;
+            bool check1 = std::is_same<
+                xtensor<double, 1>,
+                typename xcontainer_inner_types<decltype(view1)>::temporary_type>::value;
             EXPECT_TRUE(check1);
 
             auto view2 = view(a, all(), newaxis(), range(1, 4));
-            bool check2 = std::is_same<xtensor<double, 3>, typename xcontainer_inner_types<decltype(view2)>::temporary_type>::value;
+            bool check2 = std::is_same<
+                xtensor<double, 3>,
+                typename xcontainer_inner_types<decltype(view2)>::temporary_type>::value;
             EXPECT_TRUE(check2);
         }
     }
@@ -153,9 +157,9 @@ namespace xt
 
     TEST(xview, stored_range)
     {
-        view_shape_type shape = { 3, 4 };
+        view_shape_type shape = {3, 4};
         xarray<double> a(shape);
-        std::vector<double> data = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+        std::vector<double> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
 
         auto r0 = range(1, 3);
@@ -173,9 +177,9 @@ namespace xt
 
     TEST(xview, copy_semantic)
     {
-        view_shape_type shape = { 3, 4 };
+        view_shape_type shape = {3, 4};
         xarray<double> a(shape);
-        std::vector<double> data = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+        std::vector<double> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
 
         SUBCASE("copy constructor")
@@ -208,9 +212,9 @@ namespace xt
 
     TEST(xview, move_semantic)
     {
-        view_shape_type shape = { 3, 4 };
+        view_shape_type shape = {3, 4};
         xarray<double> a(shape);
-        std::vector<double> data = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+        std::vector<double> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
 
         SUBCASE("copy constructor")
@@ -244,22 +248,11 @@ namespace xt
     TEST(xview, three_dimensional)
     {
         view_shape_type shape = {3, 4, 2};
-        std::vector<double> data = {
-            1, 2,
-            3, 4,
-            5, 6,
-            7, 8,
+        std::vector<double> data = {1,  2,  3,  4,  5,  6,   7,   8,
 
-            9, 10,
-            11, 12,
-            21, 22,
-            23, 24,
+                                    9,  10, 11, 12, 21, 22,  23,  24,
 
-            25, 26,
-            27, 28,
-            29, 210,
-            211, 212
-        };
+                                    25, 26, 27, 28, 29, 210, 211, 212};
         xarray<double> a(shape);
         std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
 
@@ -310,13 +303,9 @@ namespace xt
 
     TEST(xview, temporary_view)
     {
-        xt::xarray<double> arr1
-         {{1.0, 2.0, 3.0},
-          {2.0, 5.0, 7.0},
-          {2.0, 5.0, 7.0}};
+        xt::xarray<double> arr1{{1.0, 2.0, 3.0}, {2.0, 5.0, 7.0}, {2.0, 5.0, 7.0}};
 
-        xt::xarray<double> arr2
-         {5.0, 6.0, 7.0};
+        xt::xarray<double> arr2{5.0, 6.0, 7.0};
 
         xt::xarray<double> res = xt::view(arr1, 1) + arr2;
         EXPECT_EQ(7., res(0));
@@ -326,10 +315,7 @@ namespace xt
 
     TEST(xview, access)
     {
-        xt::xarray<double> arr
-        {{ 1.0, 2.0, 3.0 },
-         { 2.0, 5.0, 7.0 },
-         { 2.0, 5.0, 7.0 }};
+        xt::xarray<double> arr{{1.0, 2.0, 3.0}, {2.0, 5.0, 7.0}, {2.0, 5.0, 7.0}};
 
         auto v1 = xt::view(arr, 1, xt::range(1, 3));
         EXPECT_EQ(v1(), arr(0, 1));
@@ -337,22 +323,19 @@ namespace xt
         EXPECT_EQ(v1(1, 1), arr(1, 2));
 
         auto v2 = xt::view(arr, all(), newaxis(), all());
-        //EXPECT_EQ(v2(1), arr(0, 1));
+        // EXPECT_EQ(v2(1), arr(0, 1));
         EXPECT_EQ(v2(1, 0, 2), arr(1, 2));
         EXPECT_EQ(v2(2, 1, 0, 2), arr(1, 2));
 
         auto v3 = xt::view(arr, xt::range(0, 2), xt::range(1, 3));
-        //EXPECT_EQ(v3(1), arr(0, 2));
+        // EXPECT_EQ(v3(1), arr(0, 2));
         EXPECT_EQ(v3(1, 1), arr(1, 2));
         EXPECT_EQ(v3(2, 3, 1, 1), arr(1, 2));
     }
 
     TEST(xview, unchecked)
     {
-        xt::xarray<double> arr
-        { { 1.0, 2.0, 3.0 },
-        { 2.0, 5.0, 7.0 },
-        { 2.0, 5.0, 7.0 } };
+        xt::xarray<double> arr{{1.0, 2.0, 3.0}, {2.0, 5.0, 7.0}, {2.0, 5.0, 7.0}};
 
         auto v1 = xt::view(arr, 1, xt::range(1, 3));
         EXPECT_EQ(v1.unchecked(1), arr(1, 2));
@@ -368,8 +351,8 @@ namespace xt
     {
         view_shape_type shape = {2, 3, 4};
         xarray<double, layout_type::row_major> a(shape);
-        std::vector<double> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
-                                    13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
+        std::vector<double> data = {
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
         std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
 
         auto view1 = view(a, range(0, 2), 1, range(1, 4));
@@ -407,13 +390,13 @@ namespace xt
 
     TEST(xview, fill)
     {
-        view_shape_type shape = { 2, 3, 4 };
+        view_shape_type shape = {2, 3, 4};
         xarray<double, layout_type::row_major> a(shape), res(shape);
-        std::vector<double> data = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
-            13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24 };
+        std::vector<double> data = {
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
         std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
-        std::vector<double> data_res = { 1, 2, 3, 4, 5, 4, 4, 4, 9, 10, 11, 12,
-            13, 14, 15, 16, 17, 4, 4, 4, 21, 22, 23, 24 };
+        std::vector<double> data_res = {
+            1, 2, 3, 4, 5, 4, 4, 4, 9, 10, 11, 12, 13, 14, 15, 16, 17, 4, 4, 4, 21, 22, 23, 24};
         std::copy(data_res.cbegin(), data_res.cend(), res.template begin<layout_type::row_major>());
         auto view1 = view(a, range(0, 2), 1, range(1, 4));
         view1.fill(4);
@@ -424,8 +407,8 @@ namespace xt
     {
         view_shape_type shape = {2, 3, 4};
         xarray<double, layout_type::row_major> a(shape);
-        std::vector<double> data = {1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
-            13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
+        std::vector<double> data = {
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
         std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
 
         auto view1 = view(a, range(0, 2), 1, range(1, 4));
@@ -567,7 +550,9 @@ namespace xt
         EXPECT_EQ(count1, size_t(3));
         size_t count2 = newaxis_count<xnewaxis<size_t>, xrange<size_t>, xnewaxis<size_t>>();
         EXPECT_EQ(count2, size_t(2));
-        size_t count3 = newaxis_count_before<xnewaxis<size_t>, xnewaxis<size_t>, xnewaxis<size_t>, xrange<size_t>>(3);
+        size_t count3 = newaxis_count_before<xnewaxis<size_t>, xnewaxis<size_t>, xnewaxis<size_t>, xrange<size_t>>(
+            3
+        );
         EXPECT_EQ(count3, size_t(3));
         size_t count4 = newaxis_count_before<xnewaxis<size_t>, xrange<size_t>, xnewaxis<size_t>>(2);
         EXPECT_EQ(count4, size_t(1));
@@ -625,7 +610,7 @@ namespace xt
         std::array<std::size_t, 2> idx3 = {1, 2};
         EXPECT_EQ(a(1, 2), view3.element(idx3.begin(), idx3.end()));
 
-        xt::xarray<float> x5 = xt::ones<float>({1,4,16,16});
+        xt::xarray<float> x5 = xt::ones<float>({1, 4, 16, 16});
         auto view7 = xt::view(x5, xt::all(), xt::newaxis(), xt::all(), xt::all(), xt::all());
         std::array<std::size_t, 5> idx4 = {0, 0, 2, 14, 12};
         EXPECT_EQ(view7.element(idx4.begin(), idx4.end()), 1.f);
@@ -813,16 +798,14 @@ namespace xt
 
     TEST(xview, strides_type)
     {
-        xt::xtensor<float, 2> a{
-            { 1, 2 },
-            { 3, 4 },
-            { 5, 6 }
-        };
+        xt::xtensor<float, 2> a{{1, 2}, {3, 4}, {5, 6}};
         auto row = xt::view(a, 1, xt::all());
         if (a.layout() == layout_type::row_major)
         {
             bool cond1 = std::is_same<decltype(row)::strides_type, std::array<std::ptrdiff_t, 1>>::value;
-            bool cond2 = std::is_same<decltype(row.strides()), const xt::sequence_view<std::array<std::ptrdiff_t, 2>, 1, 2>&>::value;
+            bool cond2 = std::is_same<
+                decltype(row.strides()),
+                const xt::sequence_view<std::array<std::ptrdiff_t, 2>, 1, 2>&>::value;
             EXPECT_TRUE(cond1);
             EXPECT_TRUE(cond2);
         }
@@ -905,7 +888,7 @@ namespace xt
 
     TEST(xview, to_scalar)
     {
-        std::array<std::size_t, 3> sh{2,2,2};
+        std::array<std::size_t, 3> sh{2, 2, 2};
         xtensor<double, 3> a(sh, 123);
         xtensor_fixed<double, xshape<2, 2, 2>> af = a;
         xarray<double> b = a;
@@ -933,7 +916,7 @@ namespace xt
         ax = is_xscalar<decltype(afv1)>::value;
         EXPECT_TRUE(ax);
 
-        const xtensor<double, 2> ac = {{1,2}, {3,4}};
+        const xtensor<double, 2> ac = {{1, 2}, {3, 4}};
         double a1 = view(ac, 0, 0);
         const double& a2 = view(ac, 0, 0);
 
@@ -956,7 +939,8 @@ namespace xt
 
         auto citer_expv1 = exp.template begin<layout_type::column_major>();
         for (auto iter = v.template begin<layout_type::column_major>();
-            iter != v.template end<layout_type::column_major>(); ++iter)
+             iter != v.template end<layout_type::column_major>();
+             ++iter)
         {
             EXPECT_EQ(*iter, *citer_expv1);
             ++citer_expv1;
@@ -990,22 +974,11 @@ namespace xt
         xt::xarray<double> expected;
         if (XTENSOR_DEFAULT_TRAVERSAL == layout_type::row_major)
         {
-           expected = {
-               0, 1, 2, 3,
-               20, 21, 22, 23,
-               40, 41, 42, 43,
-               60, 61, 62, 63,
-               80, 81, 82, 83
-           };
+            expected = {0, 1, 2, 3, 20, 21, 22, 23, 40, 41, 42, 43, 60, 61, 62, 63, 80, 81, 82, 83};
         }
         else
         {
-           expected = {
-               0, 1, 2, 3, 4,
-               25, 26, 27, 28, 29,
-               50, 51, 52, 53, 54,
-               75, 76, 77, 78, 79
-           };
+            expected = {0, 1, 2, 3, 4, 25, 26, 27, 28, 29, 50, 51, 52, 53, 54, 75, 76, 77, 78, 79};
         }
         auto v = xt::view(x, all(), 0);
 
@@ -1022,12 +995,10 @@ namespace xt
 
     TEST(xview, keep_slice)
     {
-        xtensor<double, 3, layout_type::row_major> a = {{{ 1, 2, 3, 4},
-                                                         { 5, 6, 7, 8}},
-                                                        {{ 9,10,11,12},
-                                                         {13,14,15,16}},
-                                                        {{17,18,19,20},
-                                                         {21,22,23,24}}};
+        xtensor<double, 3, layout_type::row_major> a = {
+            {{1, 2, 3, 4}, {5, 6, 7, 8}},
+            {{9, 10, 11, 12}, {13, 14, 15, 16}},
+            {{17, 18, 19, 20}, {21, 22, 23, 24}}};
 
         auto v1 = xt::view(a, keep(1), keep(0, 1), keep(0, 3));
         xtensor<double, 3> exp_v1 = {{{9, 12}, {13, 16}}};
@@ -1046,8 +1017,7 @@ namespace xt
         test_view_iter(v3, exp_v3);
 
         auto v4 = xt::view(a, keep(0, 2), keep(0));
-        xtensor<double, 3> exp_v4 = {{{  1.,   2.,   3.,   4.}},
-                                     {{ 17.,  18.,  19.,  20.}}};
+        xtensor<double, 3> exp_v4 = {{{1., 2., 3., 4.}}, {{17., 18., 19., 20.}}};
         EXPECT_EQ(v4, exp_v4);
 
         v4(0, 0) = 123;
@@ -1066,12 +1036,10 @@ namespace xt
 
     TEST(xview, keep_negative)
     {
-        xtensor<double, 3, layout_type::row_major> a = {{{ 1, 2, 3, 4},
-                                                         { 5, 6, 7, 8}},
-                                                        {{ 9,10,11,12},
-                                                         {13,14,15,16}},
-                                                        {{17,18,19,20},
-                                                         {21,22,23,24}}};
+        xtensor<double, 3, layout_type::row_major> a = {
+            {{1, 2, 3, 4}, {5, 6, 7, 8}},
+            {{9, 10, 11, 12}, {13, 14, 15, 16}},
+            {{17, 18, 19, 20}, {21, 22, 23, 24}}};
 
         auto v1 = xt::view(a, keep(-2), keep(-0, -1), keep(0, -1));
         xtensor<double, 3> exp_v1 = {{{9, 12}, {13, 16}}};
@@ -1089,15 +1057,13 @@ namespace xt
 
     TEST(xview, drop_slice)
     {
-        xtensor<double, 3, layout_type::row_major> a = {{{ 1, 2, 3, 4},
-                                                         { 5, 6, 7, 8}},
-                                                        {{ 9,10,11,12},
-                                                         {13,14,15,16}},
-                                                        {{17,18,19,20},
-                                                         {21,22,23,24}}};
+        xtensor<double, 3, layout_type::row_major> a = {
+            {{1, 2, 3, 4}, {5, 6, 7, 8}},
+            {{9, 10, 11, 12}, {13, 14, 15, 16}},
+            {{17, 18, 19, 20}, {21, 22, 23, 24}}};
 
         auto v1 = xt::view(a, drop(0, 2), keep(0, 1), drop(1, 2));
-        xtensor<double, 3> exp_v1 = { { { 9, 12 },{ 13, 16 } } };
+        xtensor<double, 3> exp_v1 = {{{9, 12}, {13, 16}}};
         EXPECT_EQ(v1, exp_v1);
         test_view_iter(v1, exp_v1);
 
@@ -1106,8 +1072,7 @@ namespace xt
         EXPECT_EQ(v2, exp_v1);
 
         auto v4 = xt::view(a, drop(1), drop(1));
-        xtensor<double, 3> exp_v4 = {{{ 1.,   2.,   3.,   4.}},
-                                     {{17.,  18.,  19.,  20.}}};
+        xtensor<double, 3> exp_v4 = {{{1., 2., 3., 4.}}, {{17., 18., 19., 20.}}};
         EXPECT_EQ(v4, exp_v4);
 
         v4(0, 0) = 123;
@@ -1129,16 +1094,14 @@ namespace xt
 
     TEST(xview, drop_negative)
     {
-        xtensor<double, 3, layout_type::row_major> a = {{{ 1, 2, 3, 4},
-                                                         { 5, 6, 7, 8}},
-                                                        {{ 9,10,11,12},
-                                                         {13,14,15,16}},
-                                                        {{17,18,19,20},
-                                                         {21,22,23,24}}};
+        xtensor<double, 3, layout_type::row_major> a = {
+            {{1, 2, 3, 4}, {5, 6, 7, 8}},
+            {{9, 10, 11, 12}, {13, 14, 15, 16}},
+            {{17, 18, 19, 20}, {21, 22, 23, 24}}};
 
-        //auto v1 = xt::view(a, keep(-2), keep(-0, -1), keep(0, -1));
+        // auto v1 = xt::view(a, keep(-2), keep(-0, -1), keep(0, -1));
         auto v1 = xt::view(a, drop(-3, -1), keep(0, 1), drop(-3, -2));
-        xtensor<double, 3> exp_v1 = { { { 9, 12 },{ 13, 16 } } };
+        xtensor<double, 3> exp_v1 = {{{9, 12}, {13, 16}}};
         EXPECT_EQ(v1, exp_v1);
     }
 
@@ -1151,7 +1114,7 @@ namespace xt
         auto dv = xt::view(xs, didx);
         xt::xtensor<double, 1> kres = kv;
         xt::xtensor<double, 1> dres = dv;
-        xt::xtensor<double, 1> expected = { 0., 3., 5. };
+        xt::xtensor<double, 1> expected = {0., 3., 5.};
         EXPECT_EQ(kres, expected);
         EXPECT_EQ(dres, expected);
     }
@@ -1160,12 +1123,12 @@ namespace xt
     {
         xt::xarray<std::uint8_t> input;
         xt::xarray<float> output;
-        input.resize({ { 50,16,16,3 } });
-        output.resize({ { 50,16,16,3 } });
+        input.resize({{50, 16, 16, 3}});
+        output.resize({{50, 16, 16, 3}});
 
         input.fill(std::uint8_t(1));
         output.fill(float(2.));
-        for (int i = 0; i<50; ++i)
+        for (int i = 0; i < 50; ++i)
         {
             auto in_view = xt::view(input, i);
             auto out_view = xt::view(output, i);
@@ -1232,8 +1195,8 @@ namespace xt
     {
         using vector_type = std::vector<int>;
         using array_type = std::array<int, 7>;
-        auto a = vector_type({0,1,2,3,4,5,6});
-        auto b = array_type({0,1,2,3,4,5,6});
+        auto a = vector_type({0, 1, 2, 3, 4, 5, 6});
+        auto b = array_type({0, 1, 2, 3, 4, 5, 6});
 
         auto va = sequence_view<vector_type, 3>(a);
         auto vb = sequence_view<array_type, 3>(b);
@@ -1252,8 +1215,8 @@ namespace xt
 
         vector_type cvta = va;
         std::array<int, 4> cvtb = vb;
-        vector_type cvta_expected = { 3, 4, 5, 6 };
-        std::array<int, 4> cvtb_expected = { 3, 4, 5, 6};
+        vector_type cvta_expected = {3, 4, 5, 6};
+        std::array<int, 4> cvtb_expected = {3, 4, 5, 6};
 
         EXPECT_EQ(cvta, cvta_expected);
         EXPECT_EQ(cvtb, cvtb_expected);
@@ -1335,29 +1298,41 @@ namespace xt
 
             using assign_traits = xassign_traits<decltype(vxt), decltype(b)>;
 
-    #if XTENSOR_USE_XSIMD
+#if XTENSOR_USE_XSIMD
             EXPECT_TRUE(assign_traits::simd_linear_assign());
-    #endif
+#endif
 
             using assign_traits2 = xassign_traits<decltype(b), decltype(vxa)>;
 
-    #if XTENSOR_USE_XSIMD
+#if XTENSOR_USE_XSIMD
             EXPECT_FALSE(assign_traits2::simd_linear_assign());
-    #endif
+#endif
         }
     }
 
-    xt::xtensor<double,2> view_assign_func(const xt::xtensor<double, 2>& a, int idx)
+    xt::xtensor<double, 2> view_assign_func(const xt::xtensor<double, 2>& a, int idx)
     {
         xt::xtensor<double, 2> b;
-        switch(idx)
+        switch (idx)
         {
-            case 1: b = xt::view(a,      xt::all(), xt::range(0, 1)); break;
-            case 2: b.assign(xt::view(a, xt::all(), xt::range(0, 1))); break;
-            case 3: b = xt::view(a,      xt::all(), xt::range(0, 2)); break;
-            case 4: b = 2.*xt::view(a,   xt::all(), xt::range(0, 1)); break;
-            case 5: b = xt::view(2.*a,   xt::all(), xt::range(0, 1)); break;
-            default: b = a; break;
+            case 1:
+                b = xt::view(a, xt::all(), xt::range(0, 1));
+                break;
+            case 2:
+                b.assign(xt::view(a, xt::all(), xt::range(0, 1)));
+                break;
+            case 3:
+                b = xt::view(a, xt::all(), xt::range(0, 2));
+                break;
+            case 4:
+                b = 2. * xt::view(a, xt::all(), xt::range(0, 1));
+                break;
+            case 5:
+                b = xt::view(2. * a, xt::all(), xt::range(0, 1));
+                break;
+            default:
+                b = a;
+                break;
         }
         return b;
     }
@@ -1380,9 +1355,9 @@ namespace xt
     TEST(xview, view_on_strided_view)
     {
         // Compilation test only
-        xt::xarray<float> original = xt::xarray<float>::from_shape({ 3, 2, 5 });
+        xt::xarray<float> original = xt::xarray<float>::from_shape({3, 2, 5});
         original.fill(float(0.));
-        auto str_view = xt::strided_view(original, { 1, xt::ellipsis() }); //i is an int
+        auto str_view = xt::strided_view(original, {1, xt::ellipsis()});  // i is an int
         auto result = xt::view(str_view, xt::all(), xt::all());
         EXPECT_EQ(result(0), 0.f);
     }
@@ -1397,10 +1372,7 @@ namespace xt
 
     TEST(xview, assign_scalar_to_contiguous_view_of_view)
     {
-        xt::xarray<double> arr
-          {{0., 1., 2.},
-           {3., 4., 5.},
-           {6., 7., 8.}};
+        xt::xarray<double> arr{{0., 1., 2.}, {3., 4., 5.}, {6., 7., 8.}};
         auto vv = xt::view(xt::view(arr, 1), 0);
         vv = 100.0;
         EXPECT_EQ(arr(1, 0), 100.0);
@@ -1408,15 +1380,12 @@ namespace xt
 
     TEST(xview, keep_assign)
     {
-        xt::xtensor<int, 2> a = { {1, 2, 3, 4},
-                                  {5, 6, 7, 8},
-                                  {9, 10, 11, 12},
-                                  {13, 14, 15, 16} };
+        xt::xtensor<int, 2> a = {{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}, {13, 14, 15, 16}};
 
         auto v = xt::view(xt::view(a, xt::all(), xt::keep(0, 1)), xt::all(), 0);
         xt::xtensor<int, 1> res = v;
 
-        xt::xtensor<int, 1> exp = { 1, 5, 9, 13 };
+        xt::xtensor<int, 1> exp = {1, 5, 9, 13};
         EXPECT_EQ(res, exp);
     }
 
@@ -1425,7 +1394,7 @@ namespace xt
         xt::xtensor<double, 4> a = xt::random::rand<double>({5, 5, 5, 5});
 
         std::size_t sa = 0, sb = 2;
-        auto start = xt::view(a, 1); //3D
+        auto start = xt::view(a, 1);  // 3D
         auto res = xt::view(start, xt::all(), xt::all(), xt::keep(sa, sb));
 
         auto expres = xt::exp(res);
@@ -1437,34 +1406,35 @@ namespace xt
 
     TEST(xview, view_on_fixed)
     {
-        xt::xtensor_fixed<double, xt::xshape<3>> a{1./8, 1, -1./8};
+        xt::xtensor_fixed<double, xt::xshape<3>> a{1. / 8, 1, -1. / 8};
         auto v = xt::view(a, xt::all(), xt::newaxis());
         EXPECT_EQ(v.dimension(), 2u);
         EXPECT_EQ(v.shape(), (std::array<std::size_t, 2>{3, 1}));
 
         auto b = a * xt::view(a, xt::all(), xt::newaxis());
 
-        xt::xarray<double> exp = {{ 0.015625,  0.125   , -0.015625},
-                                  { 0.125   ,  1.      , -0.125   },
-                                  {-0.015625, -0.125   ,  0.015625}};
+        xt::xarray<double> exp = {
+            {0.015625, 0.125, -0.015625},
+            {0.125, 1., -0.125},
+            {-0.015625, -0.125, 0.015625}};
 
         EXPECT_EQ(b, exp);
     }
 
     TEST(xview, periodic)
     {
-        xt::xtensor<size_t,2> a = {{0,1,2}, {3,4,5}};
-        xt::xtensor<size_t,2> b = {{0,1,2}, {30,40,50}};
+        xt::xtensor<size_t, 2> a = {{0, 1, 2}, {3, 4, 5}};
+        xt::xtensor<size_t, 2> b = {{0, 1, 2}, {30, 40, 50}};
         auto view = xt::view(a, xt::keep(1), xt::all());
-        view.periodic(-1,3) = 30;
-        view.periodic(-1,4) = 40;
-        view.periodic(-1,5) = 50;
+        view.periodic(-1, 3) = 30;
+        view.periodic(-1, 4) = 40;
+        view.periodic(-1, 5) = 50;
         EXPECT_EQ(a, b);
     }
 
     TEST(xview, front)
     {
-        xt::xtensor<size_t,2> a = {{1,2,3}, {4,5,6}};
+        xt::xtensor<size_t, 2> a = {{1, 2, 3}, {4, 5, 6}};
         auto v = xt::view(a, 0, xt::all());
         auto w = xt::view(a, 1, xt::all());
         EXPECT_EQ(v.front(), 1);
@@ -1473,7 +1443,7 @@ namespace xt
 
     TEST(xview, back)
     {
-        xt::xtensor<size_t,2> a = {{1,2,3}, {4,5,6}};
+        xt::xtensor<size_t, 2> a = {{1, 2, 3}, {4, 5, 6}};
         auto v = xt::view(a, 0, xt::all());
         auto w = xt::view(a, 1, xt::all());
         EXPECT_EQ(v.back(), 3);
@@ -1482,8 +1452,8 @@ namespace xt
 
     TEST(xview, flat)
     {
-        xt::xtensor<size_t, 2, xt::layout_type::row_major> a = {{0,1,2}, {3,4,5}};
-        xt::xtensor<size_t, 2, xt::layout_type::row_major> b = {{0,1,2}, {30,40,50}};
+        xt::xtensor<size_t, 2, xt::layout_type::row_major> a = {{0, 1, 2}, {3, 4, 5}};
+        xt::xtensor<size_t, 2, xt::layout_type::row_major> b = {{0, 1, 2}, {30, 40, 50}};
         auto view = xt::view(a, 1, xt::all());
         view.flat(0) = 30;
         view.flat(1) = 40;
@@ -1493,10 +1463,10 @@ namespace xt
 
     TEST(xview, in_bounds)
     {
-        xt::xtensor<size_t,2> a = {{0,1,2}, {3,4,5}};
+        xt::xtensor<size_t, 2> a = {{0, 1, 2}, {3, 4, 5}};
         auto view = xt::view(a, xt::keep(1), xt::all());
-        EXPECT_TRUE(view.in_bounds(0,0) == true);
-        EXPECT_TRUE(view.in_bounds(2,0) == false);
+        EXPECT_TRUE(view.in_bounds(0, 0) == true);
+        EXPECT_TRUE(view.in_bounds(2, 0) == false);
     }
 
     TEST(xview, strides_compute_out_of_bounds)
@@ -1512,8 +1482,9 @@ namespace xt
     }
 
     template <class E>
-    auto transform(E& x) {
-      x += 2;
+    auto transform(E& x)
+    {
+        x += 2;
     }
 
     TEST(xview, nontrivial_strides)
@@ -1545,17 +1516,17 @@ namespace xt
 
     TEST(xview, element)
     {
-        xarray<int> a = { {1, 2, 3}, {4, 5, 6} };
+        xarray<int> a = {{1, 2, 3}, {4, 5, 6}};
         auto v = view(a, 0);
-        std::array<std::size_t, 2> idx = { 0, 1 };
+        std::array<std::size_t, 2> idx = {0, 1};
         int res = v.element(idx.cbegin(), idx.cend());
         EXPECT_EQ(res, 2);
     }
 
     TEST(xview, view_reshape_view)
     {
-        xtensor<int, 1> a = { 0, 1, 2 };
-        xtensor<int, 1> b = { 2, 3, 4 };
+        xtensor<int, 1> a = {0, 1, 2};
+        xtensor<int, 1> b = {2, 3, 4};
         auto tmp = reshape_view(a, {3});
         auto res = view(std::move(tmp), xt::all());
         noalias(view(reshape_view(a, {3}), xt::all())) = b;
@@ -1564,9 +1535,9 @@ namespace xt
 
     TEST(xview, view_on_bool)
     {
-        xt::xarray<bool> a { { false, false }, { false, false } };
-        xt::xarray<bool> b { {  true,  true }, {  true,  true } };
-        xt::view( a, 0 ) = xt::view( b, 0 );
+        xt::xarray<bool> a{{false, false}, {false, false}};
+        xt::xarray<bool> b{{true, true}, {true, true}};
+        xt::view(a, 0) = xt::view(b, 0);
         EXPECT_TRUE(a(0, 0));
         EXPECT_TRUE(a(0, 1));
         EXPECT_FALSE(a(1, 0));
@@ -1576,8 +1547,8 @@ namespace xt
     TEST(xview, first_rows_on_2dim_xarray)
     {
         xt::xarray<int> array{
-            { 1, 2 },
-            { 3, 4 },
+            {1, 2},
+            {3, 4},
         };
 
         const auto first_row = xt::row(array, 0);
@@ -1592,9 +1563,9 @@ namespace xt
     TEST(xview, last_rows_on_2dim_xarray)
     {
         xt::xarray<int> array{
-            { 1, 2 },
-            { 3, 4 },
-            { 5, 6 },
+            {1, 2},
+            {3, 4},
+            {5, 6},
         };
 
         const auto last_row = xt::row(array, -1);
@@ -1609,8 +1580,8 @@ namespace xt
     TEST(xiew, row_on_2dim_xtensor)
     {
         xt::xtensor<int, 2> tensor{
-            { 1, 2 },
-            { 3, 4 },
+            {1, 2},
+            {3, 4},
         };
 
         const auto row0 = xt::row(tensor, 0);
@@ -1625,8 +1596,8 @@ namespace xt
     TEST(xiew, row_on_2dim_xtensor_fixed)
     {
         xt::xtensor_fixed<int, xshape<2, 2>> tensor_fixed{
-            { 1, 2 },
-            { 3, 4 },
+            {1, 2},
+            {3, 4},
         };
 
         const auto row0 = xt::row(tensor_fixed, 0);
@@ -1641,21 +1612,18 @@ namespace xt
     TEST(xview, row_on_3dim_array)
     {
         xt::xarray<int> arr{
-            { { 1, 2 }, { 3, 4 } },
-            { { 5, 6 }, { 7, 8 } },
+            {{1, 2}, {3, 4}},
+            {{5, 6}, {7, 8}},
         };
 
-        XT_ASSERT_THROW(
-            const auto row = xt::row(arr, 0),
-            std::invalid_argument
-        );
+        XT_ASSERT_THROW(const auto row = xt::row(arr, 0), std::invalid_argument);
     }
 
     TEST(xview, first_cols_on_2dim_xarray)
     {
         xt::xarray<int> array{
-            { 1, 2 },
-            { 3, 4 },
+            {1, 2},
+            {3, 4},
         };
 
         const auto first_col = xt::col(array, 0);
@@ -1670,8 +1638,8 @@ namespace xt
     TEST(xview, last_cols_on_2dim_xarray)
     {
         xt::xarray<int> array{
-            { 1, 2, 3 },
-            { 4, 5, 6 },
+            {1, 2, 3},
+            {4, 5, 6},
         };
 
         const auto last_col = xt::col(array, -1);
@@ -1686,8 +1654,8 @@ namespace xt
     TEST(xview, col_on_2dim_xtensor)
     {
         xt::xtensor<int, 2> tensor{
-            { 1, 2 },
-            { 3, 4 },
+            {1, 2},
+            {3, 4},
         };
 
         const auto col0 = xt::col(tensor, 0);
@@ -1702,8 +1670,8 @@ namespace xt
     TEST(xview, col_on_2dim_xtensor_fixed)
     {
         xt::xtensor_fixed<int, xshape<2, 2>> tensor_fixed{
-            { 1, 2 },
-            { 3, 4 },
+            {1, 2},
+            {3, 4},
         };
 
         const auto col0 = xt::col(tensor_fixed, 0);
@@ -1718,13 +1686,10 @@ namespace xt
     TEST(xview, col_on_3dim_array)
     {
         xt::xarray<int> arr{
-            { { 1, 2 }, { 3, 4 } },
-            { { 5, 6 }, { 7, 8 } },
+            {{1, 2}, {3, 4}},
+            {{5, 6}, {7, 8}},
         };
 
-        XT_ASSERT_THROW(
-            const auto col = xt::col(arr, 0),
-            std::invalid_argument
-        );
+        XT_ASSERT_THROW(const auto col = xt::col(arr, 0), std::invalid_argument);
     }
 }

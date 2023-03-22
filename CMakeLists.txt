@@ -29,7 +29,7 @@ message(STATUS "Building xtensor v${${PROJECT_NAME}_VERSION}")
 # Dependencies
 # ============
 
-set(xtl_REQUIRED_VERSION 0.7.0)
+set(xtl_REQUIRED_VERSION 0.7.5)
 if(TARGET xtl)
     set(xtl_VERSION ${XTL_VERSION_MAJOR}.${XTL_VERSION_MINOR}.${XTL_VERSION_PATCH})
     # Note: This is not SEMVER compatible comparison
@@ -59,7 +59,7 @@ if(XTENSOR_USE_TBB AND XTENSOR_USE_OPENMP)
 endif()
 
 if(XTENSOR_USE_XSIMD)
-    set(xsimd_REQUIRED_VERSION 8.0.2)
+    set(xsimd_REQUIRED_VERSION 10.0.0)
     if(TARGET xsimd)
         set(xsimd_VERSION ${XSIMD_VERSION_MAJOR}.${XSIMD_VERSION_MINOR}.${XSIMD_VERSION_PATCH})
         # Note: This is not SEMVER compatible comparison
@@ -262,7 +262,7 @@ export(EXPORT ${PROJECT_NAME}-targets
 install(FILES ${XTENSOR_HEADERS}
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/xtensor)
 
-set(XTENSOR_CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}" CACHE
+set(XTENSOR_CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_DATADIR}/cmake/${PROJECT_NAME}" CACHE
     STRING "install path for xtensorConfig.cmake")
 
 configure_package_config_file(${PROJECT_NAME}Config.cmake.in
@@ -289,7 +289,7 @@ configure_file(${PROJECT_NAME}.pc.in
                "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc"
                 @ONLY)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc"
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig/")
+        DESTINATION "${CMAKE_INSTALL_DATADIR}/pkgconfig/")
 
 # Write single include
 # ====================

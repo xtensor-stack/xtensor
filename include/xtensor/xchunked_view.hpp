@@ -1,27 +1,27 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_CHUNKED_VIEW_HPP
 #define XTENSOR_CHUNKED_VIEW_HPP
 
 #include <xtl/xsequence.hpp>
 
+#include "xchunked_array.hpp"
 #include "xnoalias.hpp"
 #include "xstorage.hpp"
 #include "xstrided_view.hpp"
-#include "xchunked_array.hpp"
 
 namespace xt
 {
 
     template <class E>
-    struct is_chunked_t: detail::chunk_helper<E>::is_chunked
+    struct is_chunked_t : detail::chunk_helper<E>::is_chunked
     {
     };
 
@@ -124,9 +124,9 @@ namespace xt
     {
         // compute chunk number in each dimension
         m_grid_shape.resize(m_shape.size());
-        std::transform
-        (
-            m_shape.cbegin(), m_shape.cend(),
+        std::transform(
+            m_shape.cbegin(),
+            m_shape.cend(),
             m_chunk_shape.cbegin(),
             m_grid_shape.begin(),
             [](auto s, auto cs)
@@ -134,17 +134,23 @@ namespace xt
                 std::size_t cn = s / cs;
                 if (s % cs > 0)
                 {
-                    cn++; // edge_chunk
+                    cn++;  // edge_chunk
                 }
                 return cn;
             }
         );
-        m_chunk_nb = std::accumulate(std::begin(m_grid_shape), std::end(m_grid_shape), std::size_t(1), std::multiplies<>());
+        m_chunk_nb = std::accumulate(
+            std::begin(m_grid_shape),
+            std::end(m_grid_shape),
+            std::size_t(1),
+            std::multiplies<>()
+        );
     }
 
     template <class E>
     template <class OE>
-    typename std::enable_if_t<!is_chunked_t<OE>::value, xchunked_view<E>&> xchunked_view<E>::operator=(const OE& e)
+    typename std::enable_if_t<!is_chunked_t<OE>::value, xchunked_view<E>&>
+    xchunked_view<E>::operator=(const OE& e)
     {
         auto end = chunk_end();
         for (auto it = chunk_begin(); it != end; ++it)
@@ -157,7 +163,8 @@ namespace xt
 
     template <class E>
     template <class OE>
-    typename std::enable_if_t<is_chunked_t<OE>::value, xchunked_view<E>&> xchunked_view<E>::operator=(const OE& e)
+    typename std::enable_if_t<is_chunked_t<OE>::value, xchunked_view<E>&>
+    xchunked_view<E>::operator=(const OE& e)
     {
         m_chunk_shape.resize(e.dimension());
         const auto& cs = e.chunk_shape();
@@ -173,8 +180,15 @@ namespace xt
             if (lhs_shape != el2.shape())
             {
                 xstrided_slice_vector esv(el2.dimension());  // element slice in edge chunk
-                std::transform(lhs_shape.begin(), lhs_shape.end(), esv.begin(),
-                               [](auto size) { return range(0, size); });
+                std::transform(
+                    lhs_shape.begin(),
+                    lhs_shape.end(),
+                    esv.begin(),
+                    [](auto size)
+                    {
+                        return range(0, size);
+                    }
+                );
                 noalias(el1) = strided_view(el2, esv);
             }
             else

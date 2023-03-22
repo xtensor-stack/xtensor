@@ -10,9 +10,6 @@ xtensor_fixed
 Defined in ``xtensor/xfixed.hpp``
 
 .. doxygenclass:: xt::xfixed_container
-   :project: xtensor
    :members:
 
 .. doxygentypedef:: xt::xtensor_fixed
-   :project: xtensor
-

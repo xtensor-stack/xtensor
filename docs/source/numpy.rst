@@ -4,7 +4,7 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-From numpy to xtensor
+From NumPy to xtensor
 =====================
 
 .. image:: numpy.svg
@@ -90,7 +90,7 @@ and :cpp:type:`xt::xtensor` (static number of dimensions).
    :widths: 50 50
 
    +------------------------------------------------------+------------------------------------------------------------------------+
-   |             Python 3 - numpy                         |               C++ 14 - xtensor                                         |
+   |             Python 3 - NumPy                         |               C++ 14 - xtensor                                         |
    +======================================================+========================================================================+
    | :any:`np.array([[3, 4], [5, 6]]) <numpy.array>`      || :cpp:type:`xt::xarray\<double\>({{3, 4}, {5, 6}}) <xt::xarray>`       |
    |                                                      || :cpp:type:`xt::xtensor\<double, 2\>({{3, 4}, {5, 6}}) <xt::xtensor>`  |
@@ -111,7 +111,7 @@ expressions.
    :widths: 50 50
 
    +----------------------------------------------------------------+-------------------------------------------------------------------+
-   |             Python 3 - numpy                                   |               C++ 14 - xtensor                                    |
+   |             Python 3 - NumPy                                   |               C++ 14 - xtensor                                    |
    +================================================================+===================================================================+
    | :any:`np.linspace(1.0, 10.0, 100) <numpy.linspace>`            | :cpp:func:`xt::linspace\<double\>(1.0, 10.0, 100) <xt::linspace>` |
    +----------------------------------------------------------------+-------------------------------------------------------------------+
@@ -141,7 +141,7 @@ See :any:`numpy indexing <numpy:arrays.indexing>` page.
    :widths: 50 50
 
    +-----------------------------------------+---------------------------------------------------------------------------+
-   |             Python 3 - numpy            |                   C++ 14 - xtensor                                        |
+   |             Python 3 - NumPy            |                   C++ 14 - xtensor                                        |
    +=========================================+===========================================================================+
    | ``a[3, 2]``                             | :cpp:func:`a(3, 2) <xt::xcontainer::operator()>`                          |
    +-----------------------------------------+---------------------------------------------------------------------------+
@@ -153,7 +153,7 @@ See :any:`numpy indexing <numpy:arrays.indexing>` page.
    | ``a[:, 2]``                             || :cpp:func:`xt::view(a, xt::all(), 2) <xt::view>`                         |
    |                                         || :cpp:func:`xt::col(a, 2) <xt::col>`                                      |
    +-----------------------------------------+---------------------------------------------------------------------------+
-   | ``a[:5, 1:]``                           | :cpp:func:`xt::view(a, xt::range(_, 5), xt::range(1, _)) <xt::range>`     | 
+   | ``a[:5, 1:]``                           | :cpp:func:`xt::view(a, xt::range(_, 5), xt::range(1, _)) <xt::range>`     |
    +-----------------------------------------+---------------------------------------------------------------------------+
    | ``a[5:1:-1, :]``                        | :cpp:func:`xt::view(a, xt::range(5, 1, -1), xt::all()) <xt::all>`         |
    +-----------------------------------------+---------------------------------------------------------------------------+
@@ -172,7 +172,7 @@ or temporary variables are created.
    :widths: 50 50
 
    +-----------------------------------------------------+------------------------------------------------------------------+
-   |             Python 3 - numpy                        |                   C++ 14 - xtensor                               |
+   |             Python 3 - NumPy                        |                   C++ 14 - xtensor                               |
    +=====================================================+==================================================================+
    | :any:`np.broadcast(a, [4, 5, 7]) <numpy.broadcast>` | :cpp:func:`xt::broadcast(a, {4, 5, 7}) <xt::broadcast>`          |
    +-----------------------------------------------------+------------------------------------------------------------------+
@@ -193,7 +193,7 @@ See :any:`numpy.random` and :ref:`xtensor random <random>` page.
    :widths: 50 50
 
    +-----------------------------------------------------------------------+-----------------------------------------------------------------------------------+
-   |            Python 3 - numpy                                           |                C++ 14 - xtensor                                                   |
+   |            Python 3 - NumPy                                           |                C++ 14 - xtensor                                                   |
    +=======================================================================+===================================================================================+
    | :any:`np.random.seed(0) <numpy.random.seed>`                          | :cpp:func:`xt::random::seed(0) <xt::random::seed>`                                |
    +-----------------------------------------------------------------------+-----------------------------------------------------------------------------------+
@@ -220,7 +220,7 @@ closures on the specified arguments.
    :widths: 50 50
 
    +-----------------------------------------------------------------------------+----------------------------------------------------------------------------+
-   |            Python 3 - numpy                                                 |                C++ 14 - xtensor                                            |
+   |            Python 3 - NumPy                                                 |                C++ 14 - xtensor                                            |
    +=============================================================================+============================================================================+
    | :any:`np.stack([a, b, c], axis=1) <numpy.stack>`                            | :cpp:func:`xt::stack(xtuple(a, b, c), 1) <xt::stack>`                      |
    +-----------------------------------------------------------------------------+----------------------------------------------------------------------------+
@@ -255,36 +255,42 @@ Rearrange elements
 In the same spirit as concatenation, the following operations do not allocate any memory and do
 not modify the underlying xexpression.
 
-.. table::
+.. list-table::
    :widths: 50 50
+   :header-rows: 1
 
-   +-----------------------------------------------------+-----------------------------------------------------------------------+
-   |            Python 3 - numpy                         |                C++ 14 - xtensor                                       |
-   +=====================================================+=======================================================================+
-   | :any:`np.diag(a) <numpy.diag>`                      | :cpp:func:`xt::diag(a) <xt::diag>`                                    |
-   +-----------------------------------------------------+-----------------------------------------------------------------------+
-   | :any:`np.diagonal(a) <numpy.diagonal>`              | :cpp:func:`xt::diagonal(a) <xt::diagonal>`                            |
-   +-----------------------------------------------------+-----------------------------------------------------------------------+
-   | :any:`np.triu(a) <numpy.triu>`                      | :cpp:func:`xt::triu(a) <xt::triu>`                                    |
-   +-----------------------------------------------------+-----------------------------------------------------------------------+
-   | :any:`np.tril(a, k=1) <numpy.tril>`                 | :cpp:func:`xt::tril(a, 1) <xt::tril>`                                 |
-   +-----------------------------------------------------+-----------------------------------------------------------------------+
-   | :any:`np.flip(a, axis=3) <numpy.flip>`              | :cpp:func:`xt::flip(a, 3) <xt::flip>`                                 |
-   +-----------------------------------------------------+-----------------------------------------------------------------------+
-   | :any:`np.flipud(a) <numpy.flipud>`                  | :cpp:func:`xt::flip(a, 0) <xt::flip>`                                 |
-   +-----------------------------------------------------+-----------------------------------------------------------------------+
-   | :any:`np.fliplr(a) <numpy.fliplr>`                  | :cpp:func:`xt::flip(a, 1) <xt::flip>`                                 |
-   +-----------------------------------------------------+-----------------------------------------------------------------------+
-   | :any:`np.transpose(a, (1, 0, 2)) <numpy.transpose>` | :cpp:func:`xt::transpose(a, {1, 0, 2}) <xt::transpose>`               |
-   +-----------------------------------------------------+-----------------------------------------------------------------------+
-   | :any:`np.ravel(a, order='F') <numpy.ravel>`         | :cpp:func:`xt::ravel\<xt::layout_type::column_major\>(a) <xt::ravel>` |
-   +-----------------------------------------------------+-----------------------------------------------------------------------+
-   | :any:`np.rot90(a) <numpy.rot90>`                    | :cpp:func:`xt::rot90(a) <xt::rot90>`                                  |
-   +-----------------------------------------------------+-----------------------------------------------------------------------+
-   | :any:`np.rot90(a, 2, (1, 2)) <numpy.rot90>`         | :cpp:func:`xt::rot90\<2\>(a, {1, 2}) <xt::rot90>`                     |
-   +-----------------------------------------------------+-----------------------------------------------------------------------+
-   | :any:`np.roll(a, 2, axis=1) <numpy.roll>`           | :cpp:func:`xt::roll(a, 2, 1) <xt::roll>`                              |
-   +-----------------------------------------------------+-----------------------------------------------------------------------+
+   * - Python3 - NumPy
+     - C++14 - xtensor
+   * - :any:`np.nan_to_num(a) <numpy.nan_to_num>`
+     - :cpp:func:`xt::nan_to_num(a) <xt::nan_to_num>`
+   * - :any:`np.diag(a) <numpy.diag>`
+     - :cpp:func:`xt::diag(a) <xt::diag>`
+   * - :any:`np.diagonal(a) <numpy.diagonal>`
+     - :cpp:func:`xt::diagonal(a) <xt::diagonal>`
+   * - :any:`np.triu(a) <numpy.triu>`
+     - :cpp:func:`xt::triu(a) <xt::triu>`
+   * - :any:`np.tril(a, k=1) <numpy.tril>`
+     - :cpp:func:`xt::tril(a, 1) <xt::tril>`
+   * - :any:`np.flip(a, axis=3) <numpy.flip>`
+     - :cpp:func:`xt::flip(a, 3) <xt::flip>`
+   * - :any:`np.flipud(a) <numpy.flipud>`
+     - :cpp:func:`xt::flip(a, 0) <xt::flip>`
+   * - :any:`np.fliplr(a) <numpy.fliplr>`
+     - :cpp:func:`xt::flip(a, 1) <xt::flip>`
+   * - :any:`np.transpose(a, (1, 0, 2)) <numpy.transpose>`
+     - :cpp:func:`xt::transpose(a, {1, 0, 2}) <xt::transpose>`
+   * - :any:`np.swapaxes(a, 0, -1) <numpy.swapaxes>`
+     - :cpp:func:`xt::swapaxes(a, 0, -1) <xt::swapaxes>`
+   * - :any:`np.moveaxis(a, 0, -1) <numpy.moveaxis>`
+     - :cpp:func:`xt::moveaxis(a, 0, -1) <xt::moveaxis>`
+   * - :any:`np.ravel(a, order='F') <numpy.ravel>`
+     - :cpp:func:`xt::ravel\<xt::layout_type::column_major\>(a) <xt::ravel>`
+   * - :any:`np.rot90(a) <numpy.rot90>`
+     - :cpp:func:`xt::rot90(a) <xt::rot90>`
+   * - :any:`np.rot90(a, 2, (1, 2)) <numpy.rot90>`
+     - :cpp:func:`xt::rot90\<2\>(a, {1, 2}) <xt::rot90>`
+   * - :any:`np.roll(a, 2, axis=1) <numpy.roll>`
+     - :cpp:func:`xt::roll(a, 2, 1) <xt::roll>`
 
 Iteration
 ---------
@@ -296,7 +302,7 @@ different fashions.
    :widths: 50 50
 
    +-----------------------------------------------------------+------------------------------------------------+
-   |            Python 3 - numpy                               |                C++ 14 - xtensor                |
+   |            Python 3 - NumPy                               |                C++ 14 - xtensor                |
    +===========================================================+================================================+
    | :any:`for x in np.nditer(a): <numpy.nditer>`              |  ``for(auto it=a.begin(); it!=a.end(); ++it)`` |
    +-----------------------------------------------------------+------------------------------------------------+
@@ -321,7 +327,7 @@ is falsy, and it does not evaluate ``b`` where ``condition`` is truthy.
    :widths: 50 50
 
    +-------------------------------------------------+------------------------------------------------+
-   |            Python 3 - numpy                     |                C++ 14 - xtensor                |
+   |            Python 3 - NumPy                     |                C++ 14 - xtensor                |
    +=================================================+================================================+
    | :any:`np.where(a > 5, a, b) <numpy.where>`      | :cpp:func:`xt::where(a > 5, a, b) <xt::where>` |
    +-------------------------------------------------+------------------------------------------------+
@@ -355,7 +361,7 @@ Indices
    :widths: 50 50
 
    +-------------------------------------------------------------------------+-----------------------------------------------------------------------+
-   |            Python 3 - numpy                                             |                C++ 14 - xtensor                                       |
+   |            Python 3 - NumPy                                             |                C++ 14 - xtensor                                       |
    +=========================================================================+=======================================================================+
    | :any:`np.ravel_multi_index(indices, a.shape) <numpy.ravel_multi_index>` | :cpp:func:`xt::ravel_indices(indices, a.shape()) <xt::ravel_indices>` |
    +-------------------------------------------------------------------------+-----------------------------------------------------------------------+
@@ -367,7 +373,7 @@ Comparisons
    :widths: 50 50
 
    +-----------------------------------------------------+----------------------------------------------------------+
-   |            Python 3 - numpy                         |                C++ 14 - xtensor                          |
+   |            Python 3 - NumPy                         |                C++ 14 - xtensor                          |
    +=====================================================+==========================================================+
    | :any:`np.equal(a, b) <numpy.equal>`                 | :cpp:func:`xt::equal(a, b) <xt::equal>`                  |
    +-----------------------------------------------------+----------------------------------------------------------+
@@ -393,36 +399,40 @@ Comparisons
 Minimum, Maximum, Sorting
 -------------------------
 
-.. table::
+.. list-table::
    :widths: 50 50
+   :header-rows: 1
 
-   +-----------------------------------------------------+---------------------------------------------------------+
-   |            Python 3 - numpy                         |                C++ 14 - xtensor                         |
-   +=====================================================+=========================================================+
-   | :any:`np.amin(a) <numpy.amin>`                      | :cpp:func:`xt::amin(a) <xt::amin>`                      |
-   +-----------------------------------------------------+---------------------------------------------------------+
-   | :any:`np.amax(a) <numpy.amax>`                      | :cpp:func:`xt::amax(a) <xt::amax>`                      |
-   +-----------------------------------------------------+---------------------------------------------------------+
-   | :any:`np.argmin(a) <numpy.argmin>`                  | :cpp:func:`xt::argmin(a) <xt::argmin>`                  |
-   +-----------------------------------------------------+---------------------------------------------------------+
-   | :any:`np.argmax(a, axis=1) <numpy.argmax>`          | :cpp:func:`xt::argmax(a, 1) <xt::argmax>`               |
-   +-----------------------------------------------------+---------------------------------------------------------+
-   | :any:`np.sort(a, axis=1) <numpy.sort>`              | :cpp:func:`xt::sort(a, 1) <xt::sort>`                   |
-   +-----------------------------------------------------+---------------------------------------------------------+
-   | :any:`np.argsort(a, axis=1) <numpy.argsort>`        | :cpp:func:`xt::argsort(a, 1) <xt::argsort>`             |
-   +-----------------------------------------------------+---------------------------------------------------------+
-   | :any:`np.unique(a) <numpy.unique>`                  | :cpp:func:`xt::unique(a) <xt::unique>`                  |
-   +-----------------------------------------------------+---------------------------------------------------------+
-   | :any:`np.setdiff1d(ar1, ar2) <numpy.setdiff1d>`     | :cpp:func:`xt::setdiff1d(ar1, ar2) <xt::setdiff1d>`     |
-   +-----------------------------------------------------+---------------------------------------------------------+
-   | :any:`np.diff(a[, n, axis]) <numpy.diff>`           | :cpp:func:`xt::diff(a[, n, axis]) <xt::diff>`           |
-   +-----------------------------------------------------+---------------------------------------------------------+
-   | :any:`np.partition(a, kth) <numpy.partition>`       | :cpp:func:`xt::partition(a, kth) <xt::partition>`       |
-   +-----------------------------------------------------+---------------------------------------------------------+
-   | :any:`np.argpartition(a, kth) <numpy.argpartition>` | :cpp:func:`xt::argpartition(a, kth) <xt::argpartition>` |
-   +-----------------------------------------------------+---------------------------------------------------------+
-   | :any:`np.median(a, axis) <numpy.median>`            | :cpp:func:`xt::median(a, axis) <xt::median>`            |
-   +-----------------------------------------------------+---------------------------------------------------------+
+   * - Python3 - NumPy
+     - C++14 - xtensor
+   * - :any:`np.amin(a) <numpy.amin>`
+     - :cpp:func:`xt::amin(a) <xt::amin>`
+   * - :any:`np.amax(a) <numpy.amax>`
+     - :cpp:func:`xt::amax(a) <xt::amax>`
+   * - :any:`np.argmin(a) <numpy.argmin>`
+     - :cpp:func:`xt::argmin(a) <xt::argmin>`
+   * - :any:`np.argmax(a, axis=1) <numpy.argmax>`
+     - :cpp:func:`xt::argmax(a, 1) <xt::argmax>`
+   * - :any:`np.sort(a, axis=1) <numpy.sort>`
+     - :cpp:func:`xt::sort(a, 1) <xt::sort>`
+   * - :any:`np.argsort(a, axis=1) <numpy.argsort>`
+     - :cpp:func:`xt::argsort(a, 1) <xt::argsort>`
+   * - :any:`np.unique(a) <numpy.unique>`
+     - :cpp:func:`xt::unique(a) <xt::unique>`
+   * - :any:`np.setdiff1d(ar1, ar2) <numpy.setdiff1d>`
+     - :cpp:func:`xt::setdiff1d(ar1, ar2) <xt::setdiff1d>`
+   * - :any:`np.partition(a, kth) <numpy.partition>`
+     - :cpp:func:`xt::partition(a, kth) <xt::partition>`
+   * - :any:`np.argpartition(a, kth) <numpy.argpartition>`
+     - :cpp:func:`xt::argpartition(a, kth) <xt::argpartition>`
+   * - :any:`np.quantile(a, [.1 .3], method="linear") <numpy.quantile>`
+     - :cpp:func:`xt::quantile(a, {.1, .3}, xt::quantile_method::linear) <xt::quantile>`
+   * - :any:`np.quantile(a, [.1, .3], axis=1 method="linear") <numpy.quantile>`
+     - :cpp:func:`xt::quantile(a, {.1, .3}, 1, xt::quantile_method::linear) <xt::quantile>`
+   * -
+     - :cpp:func:`xt::quantile(a, {.1, .3}, 1, 1.0, 1.0) <xt::quantile>`
+   * - :any:`np.median(a, axis=1) <numpy.median>`
+     - :cpp:func:`xt::median(a, 1) <xt::median>`
 
 Complex numbers
 ---------------
@@ -435,7 +445,7 @@ The returned value is an expression holding a closure on the passed argument.
    :widths: 50 50
 
    +--------------------------------+------------------------------------+
-   |            Python 3 - numpy    |                C++ 14 - xtensor    |
+   |            Python 3 - NumPy    |                C++ 14 - xtensor    |
    +================================+====================================+
    | :any:`np.real(a) <numpy.real>` | :cpp:func:`xt::real(a) <xt::real>` |
    +--------------------------------+------------------------------------+
@@ -462,7 +472,7 @@ hold any values and are computed upon access or assignment.
    :widths: 50 50
 
    +---------------------------------------------------------------+--------------------------------------------------------------+
-   |            Python 3 - numpy                                   |                C++ 14 - xtensor                              |
+   |            Python 3 - NumPy                                   |                C++ 14 - xtensor                              |
    +===============================================================+==============================================================+
    | :any:`np.sum(a, axis=(0, 1)) <numpy.sum>`                     | :cpp:func:`xt::sum(a, {0, 1}) <xt::sum>`                     |
    +---------------------------------------------------------------+--------------------------------------------------------------+
@@ -486,6 +496,8 @@ hold any values and are computed upon access or assignment.
    +---------------------------------------------------------------+--------------------------------------------------------------+
    | :any:`np.var(a, [axis]) <numpy.var>`                          | :cpp:func:`xt::variance(a, [axis]) <xt::variance>`           |
    +---------------------------------------------------------------+--------------------------------------------------------------+
+   | :any:`np.diff(a[, n, axis]) <numpy.diff>`                     | :cpp:func:`xt::diff(a[, n, axis]) <xt::diff>`                |
+   +---------------------------------------------------------------+--------------------------------------------------------------+
    | :any:`np.trapz(a, dx=2.0, axis=-1) <numpy.trapz>`             | :cpp:func:`xt::trapz(a, 2.0, -1) <xt::trapz>`                |
    +---------------------------------------------------------------+--------------------------------------------------------------+
    | :any:`np.trapz(a, x=b, axis=-1) <numpy.trapz>`                | :cpp:func:`xt::trapz(a, b, -1) <xt::trapz>`                  |
@@ -501,6 +513,61 @@ More generally, one can use the :cpp:func:`xt::reduce(function, input, axes) <xt
 of an arbitrary binary function for the reduction.
 The binary function must be commutative and associative up to rounding errors.
 
+NaN functions
+-------------
+
+NaN functions allow disregarding NaNs during computation, changing the effective number of elements
+considered in reductions.
+
+.. list-table::
+   :widths: 50 50
+   :header-rows: 1
+
+   * - Python3 - NumPy
+     - C++14 - xtensor
+   * - :any:`np.nan_to_num(a) <numpy.nan_to_num>`
+     - :cpp:func:`xt::nan_to_num(a) <xt::nan_to_num>`
+   * - :any:`np.nanmin(a) <numpy.nanmin>`
+     - :cpp:func:`xt::nanmin(a) <xt::nanmin>`
+   * - :any:`np.nanmin(a, axis=(0, 1)) <numpy.nanmin>`
+     - :cpp:func:`xt::nanmin(a, {0, 1}) <xt::nanmin>`
+   * - :any:`np.nanmax(a) <numpy.nanmax>`
+     - :cpp:func:`xt::nanmax(a) <xt::nanmax>`
+   * - :any:`np.nanmax(a, axis=(0, 1)) <numpy.nanmax>`
+     - :cpp:func:`xt::nanmax(a, {0, 1}) <xt::nanmax>`
+   * - :any:`np.nansum(a) <numpy.nansum>`
+     - :cpp:func:`xt::nansum(a) <xt::nansum>`
+   * - :any:`np.nansum(a, axis=0) <numpy.nansum>`
+     - :cpp:func:`xt::nansum(a, 0) <xt::nansum>`
+   * - :any:`np.nansum(a, axis=(0, 1)) <numpy.nansum>`
+     - :cpp:func:`xt::nansum(a, {0, 1}) <xt::nansum>`
+   * - :any:`np.nanprod(a) <numpy.nanprod>`
+     - :cpp:func:`xt::nanprod(a) <xt::nanprod>`
+   * - :any:`np.nanprod(a, axis=0) <numpy.nanprod>`
+     - :cpp:func:`xt::nanprod(a, 0) <xt::nanprod>`
+   * - :any:`np.nanprod(a, axis=(0, 1)) <numpy.nanprod>`
+     - :cpp:func:`xt::nanprod(a, {0, 1}) <xt::nanprod>`
+   * - :any:`np.nancumsum(a) <numpy.nancumsum>`
+     - :cpp:func:`xt::nancumsum(a) <xt::nancumsum>`
+   * - :any:`np.nancumsum(a, axis=0) <numpy.nancumsum>`
+     - :cpp:func:`xt::nancumsum(a, 0) <xt::nancumsum>`
+   * - :any:`np.nancumprod(a) <numpy.nancumsum>`
+     - :cpp:func:`xt::nancumsum(a) <xt::nancumsum>`
+   * - :any:`np.nancumprod(a, axis=0) <numpy.nancumsum>`
+     - :cpp:func:`xt::nancumsum(a, 0) <xt::nancumsum>`
+   * - :any:`np.nanmean(a) <numpy.nanmean>`
+     - :cpp:func:`xt::nanmean(a) <xt::nanmean>`
+   * - :any:`np.nanmean(a, axis=(0, 1)) <numpy.nanmean>`
+     - :cpp:func:`xt::nanmean(a, {0, 1}) <xt::nanmean>`
+   * - :any:`np.nanvar(a) <numpy.nanvar>`
+     - :cpp:func:`xt::nanvar(a) <xt::nanvar>`
+   * - :any:`np.nanvar(a, axis=(0, 1)) <numpy.nanvar>`
+     - :cpp:func:`xt::nanvar(a, {0, 1}) <xt::nanvar>`
+   * - :any:`np.nanstd(a) <numpy.nanstd>`
+     - :cpp:func:`xt::nanstd(a) <xt::nanstd>`
+   * - :any:`np.nanstd(a, axis=(0, 1)) <numpy.nanstd>`
+     - :cpp:func:`xt::nanstd(a, {0, 1}) <xt::nanstd>`
+
 I/O
 ---
 
@@ -512,7 +579,7 @@ These options determine the way floating point numbers, tensors and other xtenso
    :widths: 50 50
 
    +--------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-   |            Python 3 - numpy                                        |                C++ 14 - xtensor                                                        |
+   |            Python 3 - NumPy                                        |                C++ 14 - xtensor                                                        |
    +====================================================================+========================================================================================+
    | :any:`np.set_printoptions(precision=4) <numpy.set_printoptions>`   | :cpp:func:`xt::print_options::set_precision(4) <xt::print_options::set_precision>`     |
    +--------------------------------------------------------------------+----------------------------------------------------------------------------------------+
@@ -531,7 +598,7 @@ Functions :cpp:func:`xt::load_csv` and :cpp:func:`xt::dump_csv` respectively tak
    :widths: 50 50
 
    +------------------------------------------------------------+-------------------------------------------------------------+
-   |            Python 3 - numpy                                |                C++ 14 - xtensor                             |
+   |            Python 3 - NumPy                                |                C++ 14 - xtensor                             |
    +============================================================+=============================================================+
    | :any:`np.load(filename) <numpy.load>`                      | :cpp:func:`xt::load_npy\<double\>(filename) <xt::load_npy>` |
    +------------------------------------------------------------+-------------------------------------------------------------+
@@ -551,7 +618,7 @@ xtensor universal functions are provided for a large set number of mathematical 
    :widths: 50 50
 
    +------------------------------------------------------------+----------------------------------------------------------------+
-   |            Python 3 - numpy                                |                C++ 14 - xtensor                                |
+   |            Python 3 - NumPy                                |                C++ 14 - xtensor                                |
    +============================================================+================================================================+
    | :any:`np.absolute(a) <numpy.absolute>`                     | :cpp:func:`xt::abs(a) <xt::abs>`                               |
    +------------------------------------------------------------+----------------------------------------------------------------+
@@ -584,7 +651,7 @@ xtensor universal functions are provided for a large set number of mathematical 
    :widths: 50 50
 
    +----------------------------------+--------------------------------------+
-   |            Python 3 - numpy      |                C++ 14 - xtensor      |
+   |            Python 3 - NumPy      |                C++ 14 - xtensor      |
    +==================================+======================================+
    | :any:`np.exp(a) <numpy.exp>`     | :cpp:func:`xt::exp(a) <xt::exp>`     |
    +----------------------------------+--------------------------------------+
@@ -601,7 +668,7 @@ xtensor universal functions are provided for a large set number of mathematical 
    :widths: 50 50
 
    +-------------------------------------+----------------------------------------+
-   |            Python 3 - numpy         |                C++ 14 - xtensor        |
+   |            Python 3 - NumPy         |                C++ 14 - xtensor        |
    +=====================================+========================================+
    | :any:`np.power(a, p) <numpy.power>` | :cpp:func:`xt::pow(a, b) <xt::pow>`    |
    +-------------------------------------+----------------------------------------+
@@ -619,7 +686,7 @@ xtensor universal functions are provided for a large set number of mathematical 
    :widths: 50 50
 
    +------------------------------+----------------------------------+
-   |            Python 3 - numpy  |                C++ 14 - xtensor  |
+   |            Python 3 - NumPy  |                C++ 14 - xtensor  |
    +==============================+==================================+
    | :any:`np.sin(a) <numpy.sin>` | :cpp:func:`xt::sin(a) <xt::sin>` |
    +------------------------------+----------------------------------+
@@ -634,7 +701,7 @@ xtensor universal functions are provided for a large set number of mathematical 
    :widths: 50 50
 
    +--------------------------------+------------------------------------+
-   |            Python 3 - numpy    |                C++ 14 - xtensor    |
+   |            Python 3 - NumPy    |                C++ 14 - xtensor    |
    +================================+====================================+
    | :any:`np.sinh(a) <numpy.sinh>` | :cpp:func:`xt::sinh(a) <xt::sinh>` |
    +--------------------------------+------------------------------------+
@@ -649,7 +716,7 @@ xtensor universal functions are provided for a large set number of mathematical 
    :widths: 50 50
 
    +---------------------------------------------------------+----------------------------------------+
-   |            Python 3 - numpy                             |                C++ 14 - xtensor        |
+   |            Python 3 - NumPy                             |                C++ 14 - xtensor        |
    +=========================================================+========================================+
    | :any:`scipy.special.erf(a) <scipy.special.erf>`         | :cpp:func:`xt::erf(a) <xt::erf>`       |
    +---------------------------------------------------------+----------------------------------------+
@@ -664,7 +731,7 @@ xtensor universal functions are provided for a large set number of mathematical 
    :widths: 50 50
 
    +-----------------------------------------------------------+----------------------------------------------------------------+
-   |            Python 3 - numpy                               |                C++ 14 - xtensor                                |
+   |            Python 3 - NumPy                               |                C++ 14 - xtensor                                |
    +===========================================================+================================================================+
    | :any:`np.isnan(a) <numpy.isnan>`                          | :cpp:func:`xt::isnan(a) <xt::isnan>`                           |
    +-----------------------------------------------------------+----------------------------------------------------------------+
@@ -681,7 +748,7 @@ xtensor universal functions are provided for a large set number of mathematical 
    :widths: 50 50
 
    +--------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------+
-   |                           Python 3 - numpy                                                                   |                           C++ 14 - xtensor                                                                       |
+   |                           Python 3 - NumPy                                                                   |                           C++ 14 - xtensor                                                                       |
    +==============================================================================================================+==================================================================================================================+
    | :any:`np.histogram(a, bins[, weights][, density]) <numpy.histogram>`                                         | :cpp:func:`xt::histogram(a, bins[, weights][, density]) <xt::histogram>`                                         |
    +--------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------+
@@ -700,7 +767,7 @@ See :ref:`histogram`.
    :widths: 50 50
 
    +------------------+----------------------------------------------------------------------------+
-   | Python 3 - numpy | C++ 14 - xtensor                                                           |
+   | Python 3 - NumPy | C++ 14 - xtensor                                                           |
    +==================+============================================================================+
    | :any:`numpy.pi`  | :cpp:var:`xt::numeric_constants\<double\>::PI <xt::numeric_constants::PI>` |
    +------------------+----------------------------------------------------------------------------+
@@ -721,7 +788,7 @@ implemented yet. Most prominently that is broadcasting for all functions except 
    :widths: 50 50
 
    +-------------------------------------------------------------------+---------------------------------------------------------------------------------+
-   |              Python 3 - numpy                                     |               C++ 14 - xtensor                                                  |
+   |              Python 3 - NumPy                                     |               C++ 14 - xtensor                                                  |
    +===================================================================+=================================================================================+
    | :any:`np.dot(a, b) <numpy.dot>`                                   | :cpp:func:`xt::linalg::dot(a, b) <xt::linalg::dot>`                             |
    +-------------------------------------------------------------------+---------------------------------------------------------------------------------+
@@ -745,7 +812,7 @@ implemented yet. Most prominently that is broadcasting for all functions except 
    :widths: 50 50
 
    +------------------------------------------------------+------------------------------------------------------------+
-   |       Python 3 - numpy                               |       C++ 14 - xtensor                                     |
+   |       Python 3 - NumPy                               |       C++ 14 - xtensor                                     |
    +======================================================+============================================================+
    | :any:`np.linalg.cholesky(a) <numpy.linalg.cholesky>` | :cpp:func:`xt::linalg::cholesky(a) <xt::linalg::cholesky>` |
    +------------------------------------------------------+------------------------------------------------------------+
@@ -761,7 +828,7 @@ implemented yet. Most prominently that is broadcasting for all functions except 
    :widths: 50 50
 
    +------------------------------------------------------+------------------------------------------------------------+
-   |       Python 3 - numpy                               |       C++ 14 - xtensor                                     |
+   |       Python 3 - NumPy                               |       C++ 14 - xtensor                                     |
    +======================================================+============================================================+
    | :any:`np.linalg.eig(a) <numpy.linalg.eig>`           | :cpp:func:`xt::linalg::eig(a) <xt::linalg::eig>`           |
    +------------------------------------------------------+------------------------------------------------------------+
@@ -778,7 +845,7 @@ implemented yet. Most prominently that is broadcasting for all functions except 
    :widths: 50 50
 
    +------------------------------------------------------------+------------------------------------------------------------------+
-   |        Python 3 - numpy                                    |        C++ 14 - xtensor                                          |
+   |        Python 3 - NumPy                                    |        C++ 14 - xtensor                                          |
    +============================================================+==================================================================+
    | :any:`np.linalg.norm(a, order=2) <numpy.linalg.norm>`      | :cpp:func:`xt::linalg::norm(a, 2) <xt::linalg::norm>`            |
    +------------------------------------------------------------+------------------------------------------------------------------+
@@ -799,7 +866,7 @@ implemented yet. Most prominently that is broadcasting for all functions except 
    :widths: 50 50
 
    +---------------------------------------------------+---------------------------------------------------------+
-   |        Python 3 - numpy                           |        C++ 14 - xtensor                                 |
+   |        Python 3 - NumPy                           |        C++ 14 - xtensor                                 |
    +===================================================+=========================================================+
    | :any:`np.linalg.inv(a) <numpy.linalg.inv>`        | :cpp:func:`xt::linalg::inv(a) <xt::linalg::inv>`        |
    +---------------------------------------------------+---------------------------------------------------------+

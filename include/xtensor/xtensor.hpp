@@ -1,11 +1,11 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_TENSOR_HPP
 #define XTENSOR_TENSOR_HPP
@@ -105,7 +105,7 @@ namespace xt
         using inner_strides_type = typename base_type::inner_strides_type;
         using temporary_type = typename semantic_base::temporary_type;
         using expression_tag = Tag;
-        constexpr static std::size_t rank = N;
+        static constexpr std::size_t rank = N;
 
         xtensor_container();
         xtensor_container(nested_initializer_list_t<value_type, N> t);
@@ -225,6 +225,7 @@ namespace xt
         using backstrides_type = typename base_type::backstrides_type;
         using temporary_type = typename semantic_base::temporary_type;
         using expression_tag = Tag;
+        static constexpr std::size_t rank = N;
 
         xtensor_adaptor(storage_type&& storage);
         xtensor_adaptor(const storage_type& storage);
@@ -246,6 +247,9 @@ namespace xt
 
         template <class E>
         xtensor_adaptor& operator=(const xexpression<E>& e);
+
+        template <class P, class S>
+        void reset_buffer(P&& pointer, S&& size);
 
     private:
 
@@ -410,7 +414,8 @@ namespace xt
      */
     template <class EC, std::size_t N, layout_type L, class Tag>
     inline xtensor_container<EC, N, L, Tag>::xtensor_container()
-        : base_type(), m_storage(N == 0 ? 1 : 0, value_type())
+        : base_type()
+        , m_storage(N == 0 ? 1 : 0, value_type())
     {
     }
 
@@ -422,7 +427,8 @@ namespace xt
         : base_type()
     {
         base_type::resize(xt::shape<shape_type>(t), true);
-        L == layout_type::row_major ? nested_copy(m_storage.begin(), t) : nested_copy(this->template begin<layout_type::row_major>(), t);
+        constexpr auto tmp = layout_type::row_major;
+        L == tmp ? nested_copy(m_storage.begin(), t) : nested_copy(this->template begin<tmp>(), t);
     }
 
     /**
@@ -446,7 +452,11 @@ namespace xt
      * @param l the layout_type of the xtensor_container
      */
     template <class EC, std::size_t N, layout_type L, class Tag>
-    inline xtensor_container<EC, N, L, Tag>::xtensor_container(const shape_type& shape, const_reference value, layout_type l)
+    inline xtensor_container<EC, N, L, Tag>::xtensor_container(
+        const shape_type& shape,
+        const_reference value,
+        layout_type l
+    )
         : base_type()
     {
         base_type::resize(shape, l);
@@ -473,7 +483,11 @@ namespace xt
      * @param value the value of the elements
      */
     template <class EC, std::size_t N, layout_type L, class Tag>
-    inline xtensor_container<EC, N, L, Tag>::xtensor_container(const shape_type& shape, const strides_type& strides, const_reference value)
+    inline xtensor_container<EC, N, L, Tag>::xtensor_container(
+        const shape_type& shape,
+        const strides_type& strides,
+        const_reference value
+    )
         : base_type()
     {
         base_type::resize(shape, strides);
@@ -488,25 +502,33 @@ namespace xt
      * @param strides the strides of the xtensor_container
      */
     template <class EC, std::size_t N, layout_type L, class Tag>
-    inline xtensor_container<EC, N, L, Tag>::xtensor_container(storage_type&& storage, inner_shape_type&& shape, inner_strides_type&& strides)
-        : base_type(std::move(shape), std::move(strides)), m_storage(std::move(storage))
+    inline xtensor_container<EC, N, L, Tag>::xtensor_container(
+        storage_type&& storage,
+        inner_shape_type&& shape,
+        inner_strides_type&& strides
+    )
+        : base_type(std::move(shape), std::move(strides))
+        , m_storage(std::move(storage))
     {
     }
 
     template <class EC, std::size_t N, layout_type L, class Tag>
     template <class SC>
     inline xtensor_container<EC, N, L, Tag>::xtensor_container(xarray_container<EC, L, SC, Tag>&& rhs)
-        : base_type(xtl::forward_sequence<inner_shape_type, decltype(rhs.shape())>(rhs.shape()),
-                    xtl::forward_sequence<inner_strides_type, decltype(rhs.strides())>(rhs.strides()),
-                    xtl::forward_sequence<inner_backstrides_type, decltype(rhs.backstrides())>(rhs.backstrides()),
-                    std::move(rhs.layout())),
-          m_storage(std::move(rhs.storage()))
+        : base_type(
+            xtl::forward_sequence<inner_shape_type, decltype(rhs.shape())>(rhs.shape()),
+            xtl::forward_sequence<inner_strides_type, decltype(rhs.strides())>(rhs.strides()),
+            xtl::forward_sequence<inner_backstrides_type, decltype(rhs.backstrides())>(rhs.backstrides()),
+            std::move(rhs.layout())
+        )
+        , m_storage(std::move(rhs.storage()))
     {
     }
 
     template <class EC, std::size_t N, layout_type L, class Tag>
     template <class SC>
-    inline xtensor_container<EC, N, L, Tag>& xtensor_container<EC, N, L, Tag>::operator=(xarray_container<EC, L, SC, Tag>&& rhs)
+    inline xtensor_container<EC, N, L, Tag>&
+    xtensor_container<EC, N, L, Tag>::operator=(xarray_container<EC, L, SC, Tag>&& rhs)
     {
         XTENSOR_ASSERT_MSG(N == rhs.dimension(), "Cannot change dimension of xtensor.");
         std::copy(rhs.shape().begin(), rhs.shape().end(), this->shape_impl().begin());
@@ -517,7 +539,6 @@ namespace xt
         return *this;
     }
 
-
     template <class EC, std::size_t N, layout_type L, class Tag>
     template <class S>
     inline xtensor_container<EC, N, L, Tag> xtensor_container<EC, N, L, Tag>::from_shape(S&& s)
@@ -526,6 +547,7 @@ namespace xt
         shape_type shape = xtl::forward_sequence<shape_type, S>(s);
         return self_type(shape);
     }
+
     //@}
 
     /**
@@ -559,6 +581,7 @@ namespace xt
     {
         return semantic_base::operator=(e);
     }
+
     //@}
 
     template <class EC, std::size_t N, layout_type L, class Tag>
@@ -587,7 +610,8 @@ namespace xt
      */
     template <class EC, std::size_t N, layout_type L, class Tag>
     inline xtensor_adaptor<EC, N, L, Tag>::xtensor_adaptor(storage_type&& storage)
-        : base_type(), m_storage(std::move(storage))
+        : base_type()
+        , m_storage(std::move(storage))
     {
     }
 
@@ -597,7 +621,8 @@ namespace xt
      */
     template <class EC, std::size_t N, layout_type L, class Tag>
     inline xtensor_adaptor<EC, N, L, Tag>::xtensor_adaptor(const storage_type& storage)
-        : base_type(), m_storage(storage)
+        : base_type()
+        , m_storage(storage)
     {
     }
 
@@ -611,7 +636,8 @@ namespace xt
     template <class EC, std::size_t N, layout_type L, class Tag>
     template <class D>
     inline xtensor_adaptor<EC, N, L, Tag>::xtensor_adaptor(D&& storage, const shape_type& shape, layout_type l)
-        : base_type(), m_storage(std::forward<D>(storage))
+        : base_type()
+        , m_storage(std::forward<D>(storage))
     {
         base_type::resize(shape, l);
     }
@@ -625,11 +651,17 @@ namespace xt
      */
     template <class EC, std::size_t N, layout_type L, class Tag>
     template <class D>
-    inline xtensor_adaptor<EC, N, L, Tag>::xtensor_adaptor(D&& storage, const shape_type& shape, const strides_type& strides)
-        : base_type(), m_storage(std::forward<D>(storage))
+    inline xtensor_adaptor<EC, N, L, Tag>::xtensor_adaptor(
+        D&& storage,
+        const shape_type& shape,
+        const strides_type& strides
+    )
+        : base_type()
+        , m_storage(std::forward<D>(storage))
     {
         base_type::resize(shape, strides);
     }
+
     //@}
 
     template <class EC, std::size_t N, layout_type L, class Tag>
@@ -671,6 +703,7 @@ namespace xt
     {
         return semantic_base::operator=(e);
     }
+
     //@}
 
     template <class EC, std::size_t N, layout_type L, class Tag>
@@ -683,6 +716,13 @@ namespace xt
     inline auto xtensor_adaptor<EC, N, L, Tag>::storage_impl() const noexcept -> const storage_type&
     {
         return m_storage;
+    }
+
+    template <class EC, std::size_t N, layout_type L, class Tag>
+    template <class P, class S>
+    inline void xtensor_adaptor<EC, N, L, Tag>::reset_buffer(P&& pointer, S&& size)
+    {
+        return m_storage.reset_data(std::forward<P>(pointer), std::forward<S>(size));
     }
 
     /*******************************
@@ -699,7 +739,8 @@ namespace xt
      */
     template <class EC, std::size_t N, layout_type L, class Tag>
     inline xtensor_view<EC, N, L, Tag>::xtensor_view(storage_type&& storage)
-        : base_type(), m_storage(std::move(storage))
+        : base_type()
+        , m_storage(std::move(storage))
     {
     }
 
@@ -709,7 +750,8 @@ namespace xt
      */
     template <class EC, std::size_t N, layout_type L, class Tag>
     inline xtensor_view<EC, N, L, Tag>::xtensor_view(const storage_type& storage)
-        : base_type(), m_storage(storage)
+        : base_type()
+        , m_storage(storage)
     {
     }
 
@@ -723,7 +765,8 @@ namespace xt
     template <class EC, std::size_t N, layout_type L, class Tag>
     template <class D>
     inline xtensor_view<EC, N, L, Tag>::xtensor_view(D&& storage, const shape_type& shape, layout_type l)
-        : base_type(), m_storage(std::forward<D>(storage))
+        : base_type()
+        , m_storage(std::forward<D>(storage))
     {
         base_type::resize(shape, l);
     }
@@ -738,10 +781,12 @@ namespace xt
     template <class EC, std::size_t N, layout_type L, class Tag>
     template <class D>
     inline xtensor_view<EC, N, L, Tag>::xtensor_view(D&& storage, const shape_type& shape, const strides_type& strides)
-        : base_type(), m_storage(std::forward<D>(storage))
+        : base_type()
+        , m_storage(std::forward<D>(storage))
     {
         base_type::resize(shape, strides);
     }
+
     //@}
 
     template <class EC, std::size_t N, layout_type L, class Tag>
@@ -773,6 +818,7 @@ namespace xt
     {
         return semantic_base::operator=(e);
     }
+
     //@}
 
     template <class EC, std::size_t N, layout_type L, class Tag>
@@ -809,7 +855,7 @@ namespace xt
      * @return ``xt::xtensor<typename index_type::value_type, 2>`` (e.g. ``xt::xtensor<size_t, 2>``)
      */
     template <class T>
-    inline auto from_indices(const std::vector<T> &idx)
+    inline auto from_indices(const std::vector<T>& idx)
     {
         using return_type = xtensor<typename T::value_type, 2>;
         using size_type = typename return_type::size_type;
@@ -841,7 +887,7 @@ namespace xt
      * @return ``xt::xtensor<typename index_type::value_type, 1>`` (e.g. ``xt::xtensor<size_t, 1>``)
      */
     template <class T>
-    inline auto flatten_indices(const std::vector<T> &idx)
+    inline auto flatten_indices(const std::vector<T>& idx)
     {
         auto n = idx.size();
         if (n != 0)
@@ -852,7 +898,14 @@ namespace xt
         using return_type = xtensor<typename T::value_type, 1>;
         return_type out = return_type::from_shape({n});
         auto iter = out.begin();
-        for_each(idx.begin(), idx.end(), [&iter](const auto& t) { iter = std::copy(t.cbegin(), t.cend(), iter); });
+        for_each(
+            idx.begin(),
+            idx.end(),
+            [&iter](const auto& t)
+            {
+                iter = std::copy(t.cbegin(), t.cend(), iter);
+            }
+        );
 
         return out;
     }
@@ -908,7 +961,8 @@ namespace xt
      * @return ``xt::xtensor<typename index_type::value_type, 1>`` (e.g. ``xt::xtensor<size_t, 1>``)
      */
     template <class Tag = ravel_tensor_tag, class C, class S>
-    ravel_return_type_t<C, Tag> ravel_indices(const C& idx, const S& shape, layout_type l = layout_type::row_major)
+    ravel_return_type_t<C, Tag>
+    ravel_indices(const C& idx, const S& shape, layout_type l = layout_type::row_major)
     {
         using return_type = typename detail::ravel_return_type<C, Tag>::type;
         using value_type = typename detail::ravel_return_type<C, Tag>::value_type;

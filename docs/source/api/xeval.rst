@@ -7,7 +7,8 @@
 xeval
 =====
 
-Defined in ``xtensor/xeval.hpp``
+.. cpp:namespace-push:: xt
 
-.. doxygenfunction:: xt::eval(E&& e)
-   :project: xtensor
+.. doxygengroup:: xt_xeval
+
+.. cpp:namespace-pop::

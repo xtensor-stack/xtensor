@@ -1,11 +1,11 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_STRIDES_HPP
 #define XTENSOR_STRIDES_HPP
@@ -28,6 +28,10 @@ namespace xt
     template <class shape_type>
     std::size_t compute_size(const shape_type& shape) noexcept;
 
+    /**
+     * @defgroup xt_xstrides Support functions swich between array indices and flat indices
+     */
+
     /***************
      * data offset *
      ***************/
@@ -35,6 +39,29 @@ namespace xt
     template <class offset_type, class S>
     offset_type data_offset(const S& strides) noexcept;
 
+    /**
+     * @brief Return the flat index for an array index.
+     *
+     * Given ``m`` arguments, and dimension ``n``of the array (``n == strides.size()``).
+     *
+     *  -   If ``m == n``, the index is
+     *      ``strides[0] * index[0] + ... + strides[n - 1] * index[n - 1]``.
+     *
+     *  -   If ``m < n`` and the last argument is ``xt::missing`` the indices are zero-padded at
+     *      the end to match the dimension of the array. The index is then
+     *      ``strides[0] * index[0] + ... + strides[m - 1] * index[m - 1]``.
+     *
+     *  -   If ``m < n`` (and the last argument is not ``xt::missing``), the index is
+     *      ``strides[n - m - 1] * index[0] + ... + strides[n - 1] * index[m - 1]``.
+     *
+     *  -   If ``m > n``, then the first ``m - n`` arguments are ignored. The index is then
+     *      ``strides[0] * index[m - n] + ... + strides[n - 1] * index[m - 1]``.
+     *
+     * @ingroup xt_xstrides
+     * @param strides Strides of the array.
+     * @param args Array index.
+     * @return The flat index.
+     */
     template <class offset_type, class S, class Arg, class... Args>
     offset_type data_offset(const S& strides, Arg arg, Args... args) noexcept;
 
@@ -48,32 +75,42 @@ namespace xt
      * strides builder *
      *******************/
 
+    /**
+     * @brief Compute the strides given the shape and the layout of an array.
+     *
+     * @ingroup xt_xstrides
+     * @param shape Shape of the array.
+     * @param l Layout type, see xt::layout_type().
+     * @param strides (output) Strides of the array.
+     * @return The size: the product of the shape.
+     */
     template <layout_type L = layout_type::dynamic, class shape_type, class strides_type>
     std::size_t compute_strides(const shape_type& shape, layout_type l, strides_type& strides);
 
     template <layout_type L = layout_type::dynamic, class shape_type, class strides_type, class backstrides_type>
-    std::size_t compute_strides(const shape_type& shape, layout_type l,
-                                strides_type& strides, backstrides_type& backstrides);
+    std::size_t
+    compute_strides(const shape_type& shape, layout_type l, strides_type& strides, backstrides_type& backstrides);
 
     template <class shape_type, class strides_type>
     void adapt_strides(const shape_type& shape, strides_type& strides) noexcept;
 
     template <class shape_type, class strides_type, class backstrides_type>
-    void adapt_strides(const shape_type& shape, strides_type& strides,
-                       backstrides_type& backstrides) noexcept;
+    void adapt_strides(const shape_type& shape, strides_type& strides, backstrides_type& backstrides) noexcept;
 
     /*****************
      * unravel_index *
      *****************/
 
     template <class S>
-    S unravel_from_strides(typename S::value_type index, const S& strides, layout_type l=layout_type::row_major);
+    S unravel_from_strides(typename S::value_type index, const S& strides, layout_type l = layout_type::row_major);
 
     template <class S>
-    get_strides_t<S> unravel_index(typename S::value_type index, const S& shape, layout_type l=layout_type::row_major);
+    get_strides_t<S>
+    unravel_index(typename S::value_type index, const S& shape, layout_type l = layout_type::row_major);
 
     template <class S, class T>
-    std::vector<get_strides_t<S>> unravel_indices(const T& indices, const S& shape, layout_type l=layout_type::row_major);
+    std::vector<get_strides_t<S>>
+    unravel_indices(const T& indices, const S& shape, layout_type l = layout_type::row_major);
 
     /***********************
      * broadcast functions *
@@ -99,6 +136,14 @@ namespace xt
      * check bounds, without throwing *
      **********************************/
 
+    /**
+     * @brief Check if the index is within the bounds of the array.
+     *
+     * @param shape Shape of the array.
+     * @param args Array index.
+     * @return true If the index is within the bounds of the array.
+     * @return false Otherwise.
+     */
     template <class S, class... Args>
     bool in_bounds(const S& shape, Args&... args);
 
@@ -106,6 +151,14 @@ namespace xt
      * apply periodicity to indices *
      *******************************/
 
+    /**
+     * @brief Normalise an index of a periodic array.
+     * For example if the shape is ``(3, 4)`` and the index is ``(3, -4)`` the result is ``(0, 0)``.
+     *
+     * @ingroup xt_xstrides
+     * @param shape Shape of the array.
+     * @param args (input/output) Array index.
+     */
     template <class S, class... Args>
     void normalize_periodic(const S& shape, Args&... args);
 
@@ -142,7 +195,6 @@ namespace xt
         return begin;
     }
 
-
     /***********
      * strides *
      ***********/
@@ -164,7 +216,7 @@ namespace xt
             if (layout == layout_type::column_major)
             {
                 return std::accumulate(
-                   shape.cbegin(),
+                    shape.cbegin(),
                     shape.cbegin() + axis,
                     static_cast<return_type>(1),
                     std::multiplies<return_type>()
@@ -175,26 +227,23 @@ namespace xt
     }
 
     /**
-    * @ingroup strides
-    * @brief strides_type
-    *
-    * Choose stride type
-    */
+     * @brief Choose stride type
+     * @ingroup xt_xstrides
+     */
     enum class stride_type
     {
-        internal = 0, ///< As used internally (with `stride(axis) == 0` if `shape(axis) == 1`)
-        normal = 1, ///< Normal stride corresponding to storage.
-        bytes = 2, ///< Normal stride in bytes.
+        internal = 0,  ///< As used internally (with `stride(axis) == 0` if `shape(axis) == 1`)
+        normal = 1,    ///< Normal stride corresponding to storage.
+        bytes = 2,     ///< Normal stride in bytes.
     };
 
     /**
-    * @ingroup strides
-    * @brief strides
-    *
-    * Get strides of an object.
-    * @param a an array
-    * @return array
-    */
+     * @brief Get strides of an object.
+     *
+     * @ingroup xt_xstrides
+     * @param a an array
+     * @return array
+     */
     template <class E>
     inline auto strides(const E& e, stride_type type = stride_type::normal) noexcept
     {
@@ -219,20 +268,26 @@ namespace xt
         if (type == stride_type::bytes)
         {
             return_type f = static_cast<return_type>(sizeof(typename E::value_type));
-            std::for_each(ret.begin(), ret.end(), [f](auto& c){ c *= f; });
+            std::for_each(
+                ret.begin(),
+                ret.end(),
+                [f](auto& c)
+                {
+                    c *= f;
+                }
+            );
         }
 
         return ret;
     }
 
     /**
-    * @ingroup strides
-    * @brief strides
-    *
-    * Get stride of an object along an axis.
-    * @param a an array
-    * @return integer
-    */
+     * @brief Get stride of an object along an axis.
+     *
+     * @ingroup xt_xstrides
+     * @param a an array
+     * @return integer
+     */
     template <class E>
     inline auto strides(const E& e, std::size_t axis, stride_type type = stride_type::normal) noexcept
     {
@@ -270,22 +325,31 @@ namespace xt
     namespace detail
     {
         template <class shape_type>
-        inline std::size_t compute_size_impl(const shape_type& shape, std::true_type /* is signed */) {
+        inline std::size_t compute_size_impl(const shape_type& shape, std::true_type /* is signed */)
+        {
             using size_type = std::decay_t<typename shape_type::value_type>;
-            return static_cast<std::size_t>(std::abs(std::accumulate(shape.cbegin(), shape.cend(), size_type(1), std::multiplies<size_type>())));
+            return static_cast<std::size_t>(std::abs(
+                std::accumulate(shape.cbegin(), shape.cend(), size_type(1), std::multiplies<size_type>())
+            ));
         }
 
         template <class shape_type>
-        inline std::size_t compute_size_impl(const shape_type& shape, std::false_type /* is not signed */) {
+        inline std::size_t compute_size_impl(const shape_type& shape, std::false_type /* is not signed */)
+        {
             using size_type = std::decay_t<typename shape_type::value_type>;
-            return static_cast<std::size_t>(std::accumulate(shape.cbegin(), shape.cend(), size_type(1), std::multiplies<size_type>()));
+            return static_cast<std::size_t>(
+                std::accumulate(shape.cbegin(), shape.cend(), size_type(1), std::multiplies<size_type>())
+            );
         }
     }
 
     template <class shape_type>
     inline std::size_t compute_size(const shape_type& shape) noexcept
     {
-        return detail::compute_size_impl(shape, xtl::is_signed<std::decay_t<typename std::decay_t<shape_type>::value_type>>());
+        return detail::compute_size_impl(
+            shape,
+            xtl::is_signed<std::decay_t<typename std::decay_t<shape_type>::value_type>>()
+        );
     }
 
     namespace detail
@@ -315,7 +379,7 @@ namespace xt
         struct layout_data_offset
         {
             template <std::size_t dim, class S, class Arg, class... Args>
-            static inline auto run(const S& strides, Arg arg, Args... args) noexcept
+            inline static auto run(const S& strides, Arg arg, Args... args) noexcept
             {
                 return raw_data_offset<dim>(strides, arg, args...);
             }
@@ -327,7 +391,7 @@ namespace xt
             using self_type = layout_data_offset<layout_type::row_major, static_dim>;
 
             template <std::size_t dim, class S, class Arg>
-            static inline auto run(const S& strides, Arg arg) noexcept
+            inline static auto run(const S& strides, Arg arg) noexcept
             {
                 if (std::ptrdiff_t(dim) + 1 == static_dim)
                 {
@@ -340,7 +404,7 @@ namespace xt
             }
 
             template <std::size_t dim, class S, class Arg, class... Args>
-            static inline auto run(const S& strides, Arg arg, Args... args) noexcept
+            inline static auto run(const S& strides, Arg arg, Args... args) noexcept
             {
                 return arg * strides[dim] + self_type::template run<dim + 1>(strides, args...);
             }
@@ -352,7 +416,7 @@ namespace xt
             using self_type = layout_data_offset<layout_type::column_major, static_dim>;
 
             template <std::size_t dim, class S, class Arg>
-            static inline auto run(const S& strides, Arg arg) noexcept
+            inline static auto run(const S& strides, Arg arg) noexcept
             {
                 if (dim == 0)
                 {
@@ -365,7 +429,7 @@ namespace xt
             }
 
             template <std::size_t dim, class S, class Arg, class... Args>
-            static inline auto run(const S& strides, Arg arg, Args... args) noexcept
+            inline static auto run(const S& strides, Arg arg, Args... args) noexcept
             {
                 if (dim == 0)
                 {
@@ -409,29 +473,35 @@ namespace xt
             // Too few arguments: right to left scalar product
             auto view = strides.cend() - nargs;
             return static_cast<offset_type>(detail::raw_data_offset<0>(view, arg, args...));
-
         }
     }
 
     template <class offset_type, layout_type L, class S, class... Args>
     inline offset_type unchecked_data_offset(const S& strides, Args... args) noexcept
     {
-        return static_cast<offset_type>(detail::layout_data_offset<L, static_dimension<S>::value>::template run<0>(strides.cbegin(), args...));
+        return static_cast<offset_type>(
+            detail::layout_data_offset<L, static_dimension<S>::value>::template run<0>(strides.cbegin(), args...)
+        );
     }
 
     template <class offset_type, class S, class It>
     inline offset_type element_offset(const S& strides, It first, It last) noexcept
     {
         using difference_type = typename std::iterator_traits<It>::difference_type;
-        auto size = static_cast<difference_type>((std::min)(static_cast<typename S::size_type>(std::distance(first, last)), strides.size()));
+        auto size = static_cast<difference_type>((std::min
+        )(static_cast<typename S::size_type>(std::distance(first, last)), strides.size()));
         return std::inner_product(last - size, last, strides.cend() - size, offset_type(0));
     }
 
     namespace detail
     {
         template <class shape_type, class strides_type, class bs_ptr>
-        inline void adapt_strides(const shape_type& shape, strides_type& strides,
-                                  bs_ptr backstrides, typename strides_type::size_type i) noexcept
+        inline void adapt_strides(
+            const shape_type& shape,
+            strides_type& strides,
+            bs_ptr backstrides,
+            typename strides_type::size_type i
+        ) noexcept
         {
             if (shape[i] == 1)
             {
@@ -441,8 +511,12 @@ namespace xt
         }
 
         template <class shape_type, class strides_type>
-        inline void adapt_strides(const shape_type& shape, strides_type& strides,
-                                  std::nullptr_t, typename strides_type::size_type i) noexcept
+        inline void adapt_strides(
+            const shape_type& shape,
+            strides_type& strides,
+            std::nullptr_t,
+            typename strides_type::size_type i
+        ) noexcept
         {
             if (shape[i] == 1)
             {
@@ -451,11 +525,20 @@ namespace xt
         }
 
         template <layout_type L, class shape_type, class strides_type, class bs_ptr>
-        inline std::size_t compute_strides(const shape_type& shape, layout_type l,
-                                           strides_type& strides, bs_ptr bs)
+        inline std::size_t
+        compute_strides(const shape_type& shape, layout_type l, strides_type& strides, bs_ptr bs)
         {
             using strides_value_type = typename std::decay_t<strides_type>::value_type;
             strides_value_type data_size = 1;
+
+#if defined(_MSC_VER) && (1931 <= _MSC_VER)
+            // Workaround MSVC compiler optimization bug, xtensor#2568
+            if (0 == shape.size())
+            {
+                return static_cast<std::size_t>(data_size);
+            }
+#endif
+
             if (L == layout_type::row_major || l == layout_type::row_major)
             {
                 for (std::size_t i = shape.size(); i != 0; --i)
@@ -485,23 +568,23 @@ namespace xt
     }
 
     template <layout_type L, class shape_type, class strides_type, class backstrides_type>
-    inline std::size_t compute_strides(const shape_type& shape, layout_type l,
-                                       strides_type& strides,
-                                       backstrides_type& backstrides)
+    inline std::size_t
+    compute_strides(const shape_type& shape, layout_type l, strides_type& strides, backstrides_type& backstrides)
     {
         return detail::compute_strides<L>(shape, l, strides, &backstrides);
     }
 
     template <class T1, class T2>
-    inline bool stride_match_condition(const T1& stride, const T2& shape, const T1& data_size, bool zero_strides)
+    inline bool
+    stride_match_condition(const T1& stride, const T2& shape, const T1& data_size, bool zero_strides)
     {
         return (shape == T2(1) && stride == T1(0) && zero_strides) || (stride == data_size);
     }
 
     // zero_strides should be true when strides are set to 0 if the corresponding dimensions are 1
     template <class shape_type, class strides_type>
-    inline bool do_strides_match(const shape_type& shape, const strides_type& strides,
-                                 layout_type l, bool zero_strides)
+    inline bool
+    do_strides_match(const shape_type& shape, const strides_type& strides, layout_type l, bool zero_strides)
     {
         using value_type = typename strides_type::value_type;
         value_type data_size = 1;
@@ -545,8 +628,8 @@ namespace xt
     }
 
     template <class shape_type, class strides_type, class backstrides_type>
-    inline void adapt_strides(const shape_type& shape, strides_type& strides,
-                              backstrides_type& backstrides) noexcept
+    inline void
+    adapt_strides(const shape_type& shape, strides_type& strides, backstrides_type& backstrides) noexcept
     {
         for (typename shape_type::size_type i = 0; i < shape.size(); ++i)
         {
@@ -622,7 +705,7 @@ namespace xt
         std::vector<get_strides_t<S>> out(idx.size());
         auto out_iter = out.begin();
         auto idx_iter = idx.begin();
-        for ( ; out_iter != out.end(); ++out_iter, ++idx_iter )
+        for (; out_iter != out.end(); ++out_iter, ++idx_iter)
         {
             *out_iter = unravel_from_strides(static_cast<strides_value_type>(*idx_iter), strides, l);
         }
@@ -699,7 +782,8 @@ namespace xt
         bool res = dst_shape.size() >= src_shape.size();
         for (; src_iter != src_shape.crend() && res; ++src_iter, ++dst_iter)
         {
-            res = (static_cast<std::size_t>(*src_iter) == static_cast<std::size_t>(*dst_iter)) || (*src_iter == 1);
+            res = (static_cast<std::size_t>(*src_iter) == static_cast<std::size_t>(*dst_iter))
+                  || (*src_iter == 1);
         }
         return res;
     }
@@ -740,7 +824,9 @@ namespace xt
             // This check is necessary as column major "broadcasting" is still
             // performed in a row major fashion
             if (s1.size() != s2.size())
+            {
                 return 0;
+            }
 
             auto size = s2.size();
 
@@ -778,7 +864,8 @@ namespace xt
             }
             else
             {
-                return arg >= T(0) && arg < static_cast<T>(shape[dim]) && check_in_bounds_impl<S, dim + 1>(shape, args...);
+                return arg >= T(0) && arg < static_cast<T>(shape[dim])
+                       && check_in_bounds_impl<S, dim + 1>(shape, args...);
             }
         }
     }
@@ -811,7 +898,7 @@ namespace xt
             else
             {
                 T n = static_cast<T>(shape[dim]);
-                arg = (n + (arg%n)) % n;
+                arg = (n + (arg % n)) % n;
                 normalize_periodic_impl<S, dim + 1>(shape, args...);
             }
         }

@@ -1,11 +1,11 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_AXIS_ITERATOR_HPP
 #define XTENSOR_AXIS_ITERATOR_HPP
@@ -68,12 +68,10 @@ namespace xt
         value_type m_sv;
 
         template <class T, class CTA>
-        std::enable_if_t<std::is_pointer<T>::value, T>
-        get_storage_init(CTA&& e) const;
+        std::enable_if_t<std::is_pointer<T>::value, T> get_storage_init(CTA&& e) const;
 
         template <class T, class CTA>
-        std::enable_if_t<!std::is_pointer<T>::value, T>
-        get_storage_init(CTA&& e) const;
+        std::enable_if_t<!std::is_pointer<T>::value, T> get_storage_init(CTA&& e) const;
     };
 
     template <class CT>
@@ -101,7 +99,11 @@ namespace xt
     namespace detail
     {
         template <class CT>
-        auto derive_xstrided_view(CT&& e, typename std::decay_t<CT>::size_type axis, typename std::decay_t<CT>::size_type offset)
+        auto derive_xstrided_view(
+            CT&& e,
+            typename std::decay_t<CT>::size_type axis,
+            typename std::decay_t<CT>::size_type offset
+        )
         {
             using xexpression_type = std::decay_t<CT>;
             using shape_type = typename xexpression_type::shape_type;
@@ -117,23 +119,20 @@ namespace xt
             auto nxt_strides = std::copy(e_strides.cbegin(), e_strides.cbegin() + axis, strides.begin());
             std::copy(e_strides.cbegin() + axis + 1, e_strides.end(), nxt_strides);
 
-            return strided_view(std::forward<CT>(e), std::move(shape),
-                std::move(strides), offset, e.layout());
+            return strided_view(std::forward<CT>(e), std::move(shape), std::move(strides), offset, e.layout());
         }
     }
 
     template <class CT>
     template <class T, class CTA>
-    inline std::enable_if_t<std::is_pointer<T>::value, T>
-    xaxis_iterator<CT>::get_storage_init(CTA&& e) const
+    inline std::enable_if_t<std::is_pointer<T>::value, T> xaxis_iterator<CT>::get_storage_init(CTA&& e) const
     {
         return &e;
     }
 
     template <class CT>
     template <class T, class CTA>
-    inline std::enable_if_t<!std::is_pointer<T>::value, T>
-    xaxis_iterator<CT>::get_storage_init(CTA&& e) const
+    inline std::enable_if_t<!std::is_pointer<T>::value, T> xaxis_iterator<CT>::get_storage_init(CTA&& e) const
     {
         return e;
     }
@@ -141,7 +140,7 @@ namespace xt
     /**
      * @name Constructors
      */
-     //@{
+    //@{
     /**
      * Constructs an xaxis_iterator
      *
@@ -172,12 +171,13 @@ namespace xt
         , m_sv(detail::derive_xstrided_view<CTA>(std::forward<CTA>(e), axis, offset))
     {
     }
+
     //@}
 
     /**
      * @name Increment
      */
-     //@{
+    //@{
     /**
      * Increments the iterator to the next position and returns it.
      */
@@ -200,6 +200,7 @@ namespace xt
         ++(*this);
         return tmp;
     }
+
     //@}
 
     /**
@@ -227,6 +228,7 @@ namespace xt
     {
         return xtl::closure_pointer(operator*());
     }
+
     //@}
 
     /*
@@ -242,7 +244,8 @@ namespace xt
     template <class CT>
     inline bool xaxis_iterator<CT>::equal(const self_type& rhs) const
     {
-        return p_expression == rhs.p_expression && m_index == rhs.m_index && m_sv.data_offset() == rhs.m_sv.data_offset();
+        return p_expression == rhs.p_expression && m_index == rhs.m_index
+               && m_sv.data_offset() == rhs.m_sv.data_offset();
     }
 
     /**
@@ -265,6 +268,7 @@ namespace xt
     {
         return !(lhs == rhs);
     }
+
     //@}
 
     /**
@@ -310,7 +314,12 @@ namespace xt
     {
         using size_type = typename std::decay_t<E>::size_type;
         using return_type = xaxis_iterator<xtl::closure_type_t<E>>;
-        return return_type(std::forward<E>(e), 0, e.shape()[0], static_cast<size_type>(e.strides()[0])*e.shape()[0]);
+        return return_type(
+            std::forward<E>(e),
+            0,
+            e.shape()[0],
+            static_cast<size_type>(e.strides()[0]) * e.shape()[0]
+        );
     }
 
     /**
@@ -326,8 +335,14 @@ namespace xt
     {
         using size_type = typename std::decay_t<E>::size_type;
         using return_type = xaxis_iterator<xtl::closure_type_t<E>>;
-        return return_type(std::forward<E>(e), axis, e.shape()[axis], static_cast<size_type>(e.strides()[axis])*e.shape()[axis]);
+        return return_type(
+            std::forward<E>(e),
+            axis,
+            e.shape()[axis],
+            static_cast<size_type>(e.strides()[axis]) * e.shape()[axis]
+        );
     }
+
     //@}
 }
 

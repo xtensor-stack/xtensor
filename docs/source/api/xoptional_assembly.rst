@@ -10,5 +10,4 @@ xoptional_assembly
 Defined in ``xtensor/xoptional_assembly.hpp``
 
 .. doxygenclass:: xt::xoptional_assembly
-   :project: xtensor
    :members:

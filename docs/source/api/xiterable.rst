@@ -10,14 +10,10 @@ xiterable
 Defined in ``xtensor/xiterable.hpp``
 
 .. doxygenclass:: xt::xconst_iterable
-   :project: xtensor
    :members:
 
 .. doxygenclass:: xt::xiterable
-   :project: xtensor
    :members:
 
 .. doxygenclass:: xt::xcontiguous_iterable
-   :project: xtensor
    :members:
-

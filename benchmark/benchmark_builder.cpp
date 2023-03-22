@@ -1,16 +1,16 @@
 /***************************************************************************
-* Copyright (c) 2016, Johan Mabille, Sylvain Corlay and Wolf Vollprecht    *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) 2016, Johan Mabille, Sylvain Corlay and Wolf Vollprecht    *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #include <benchmark/benchmark.h>
 
+#include "xtensor/xarray.hpp"
 #include "xtensor/xnoalias.hpp"
 #include "xtensor/xtensor.hpp"
-#include "xtensor/xarray.hpp"
 
 namespace xt
 {
@@ -42,18 +42,18 @@ namespace xt
     {
         for (auto _ : state)
         {
-            xt::uvector<double> a {};
+            xt::uvector<double> a{};
             a.resize(10000);
             std::iota(a.begin(), a.end(), 0);
             benchmark::DoNotOptimize(a.data());
         }
     }
-    
+
     template <class T>
     inline auto builder_arange_for_loop_assign(benchmark::State& state)
     {
         for (auto _ : state)
-        { 
+        {
             auto expr = xt::arange(0, 10000);
             T res = T::from_shape({10000});
             for (std::size_t i = 0; i < 10000; ++i)
@@ -91,7 +91,7 @@ namespace xt
             auto xend = expr.cend();
             auto reit = res.begin();
             auto it = expr.cbegin();
-            for(ptrdiff_t n = 10000; n > 0; --n)
+            for (ptrdiff_t n = 10000; n > 0; --n)
             {
                 *reit = *it;
                 ++it;
@@ -127,12 +127,11 @@ namespace xt
     inline auto builder_ones(benchmark::State& state)
     {
         for (auto _ : state)
-        { 
+        {
             xt::xarray<double> res = xt::ones<double>({200, 200});
             benchmark::DoNotOptimize(res.data());
         }
     }
-
 
     inline auto builder_ones_assign_iterator(benchmark::State& state)
     {
@@ -155,8 +154,12 @@ namespace xt
             xt::xtensor<double, 2> res(xt::static_shape<size_t, 2>({200, 200}));
             auto xo = xt::ones<double>({200, 200}) * 0.15;
             for (std::size_t i = 0; i < xo.shape()[0]; ++i)
+            {
                 for (std::size_t j = 0; j < xo.shape()[1]; ++j)
+                {
                     res(i, j) = xo(i, j);
+                }
+            }
             benchmark::DoNotOptimize(res.storage().data());
         }
     }

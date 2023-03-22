@@ -1,35 +1,42 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_EXCEPTION_HPP
 #define XTENSOR_EXCEPTION_HPP
 
+#include <iostream>
 #include <iterator>
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#include <iostream>
+#include <type_traits>
 
-#include "xtensor_config.hpp"
+#include <xtl/xcompare.hpp>
 #include <xtl/xsequence.hpp>
 #include <xtl/xspan_impl.hpp>
 
+#include "xtensor_config.hpp"
+
 #ifdef __GNUC__
-#define XTENSOR_UNUSED_VARIABLE __attribute__ ((unused))
+#define XTENSOR_UNUSED_VARIABLE __attribute__((unused))
 #else
 #define XTENSOR_UNUSED_VARIABLE
 #endif
 
 namespace xt
 {
-    struct missing_type {};
-    namespace {
+    struct missing_type
+    {
+    };
+
+    namespace
+    {
         missing_type XTENSOR_UNUSED_VARIABLE missing;
     }
 
@@ -42,8 +49,7 @@ namespace xt
         };
 
         template <>
-        struct last_type_is_missing_impl<>
-            : std::false_type
+        struct last_type_is_missing_impl<> : std::false_type
         {
         };
 
@@ -188,9 +194,11 @@ namespace xt
         {
             if (std::size_t(arg) >= std::size_t(shape[dim]) && shape[dim] != 1)
             {
-                XTENSOR_THROW(std::out_of_range,
-                              "index " + std::to_string(arg) + " is out of bounds for axis " +
-                              std::to_string(dim) + " with size " + std::to_string(shape[dim]));
+                XTENSOR_THROW(
+                    std::out_of_range,
+                    "index " + std::to_string(arg) + " is out of bounds for axis " + std::to_string(dim)
+                        + " with size " + std::to_string(shape[dim])
+                );
             }
             check_index_impl<S, dim + 1>(shape, args...);
         }
@@ -245,11 +253,11 @@ namespace xt
         {
             if (*efirst >= value_type(shape[axis]) && shape[axis] != 1)
             {
-                XTENSOR_THROW(std::out_of_range,
-                                "index " + std::to_string(*efirst) +
-                                " is out of bounds for axis " +
-                                std::to_string(axis) + " with size " +
-                                std::to_string(shape[axis]));
+                XTENSOR_THROW(
+                    std::out_of_range,
+                    "index " + std::to_string(*efirst) + " is out of bounds for axis " + std::to_string(axis)
+                        + " with size " + std::to_string(shape[axis])
+                );
             }
             ++efirst, ++axis;
         }
@@ -264,10 +272,29 @@ namespace xt
     {
         if (sizeof...(Args) > shape.size())
         {
-            XTENSOR_THROW(std::out_of_range,
-                          "Number of arguments (" + std::to_string(sizeof...(Args)) +
-                          ") is greater than the number of dimensions (" +
-                          std::to_string(shape.size()) + ")");
+            XTENSOR_THROW(
+                std::out_of_range,
+                "Number of arguments (" + std::to_string(sizeof...(Args))
+                    + ") is greater than the number of dimensions (" + std::to_string(shape.size()) + ")"
+            );
+        }
+    }
+
+    /*******************************
+     *  check_axis implementation  *
+     *******************************/
+
+    template <class A, class D>
+    inline void check_axis_in_dim(A axis, D dim, const char* subject = "Axis")
+    {
+        const auto sdim = static_cast<std::make_signed_t<D>>(dim);
+        if (xtl::cmp_greater_equal(axis, dim) || xtl::cmp_less(axis, -sdim))
+        {
+            XTENSOR_THROW(
+                std::out_of_range,
+                std::string(subject) + " (" + std::to_string(axis)
+                    + ") is not within the number of dimensions (" + std::to_string(dim) + ')'
+            );
         }
     }
 
@@ -284,16 +311,17 @@ namespace xt
 
 #if (defined(XTENSOR_ENABLE_ASSERT) && !defined(XTENSOR_DISABLE_EXCEPTIONS))
 #define XTENSOR_TRY(expr) XTENSOR_TRY_IMPL(expr, __FILE__, __LINE__)
-#define XTENSOR_TRY_IMPL(expr, file, line)                                \
-    try                                                                   \
-    {                                                                     \
-        expr;                                                             \
-    }                                                                     \
-    catch (std::exception& e)                                             \
-    {                                                                     \
-        XTENSOR_THROW(std::runtime_error,                                 \
-                      std::string(file) + ':' + std::to_string(line) +    \
-                      ": check failed\n\t" + std::string(e.what()));      \
+#define XTENSOR_TRY_IMPL(expr, file, line)                                                                \
+    try                                                                                                   \
+    {                                                                                                     \
+        expr;                                                                                             \
+    }                                                                                                     \
+    catch (std::exception & e)                                                                            \
+    {                                                                                                     \
+        XTENSOR_THROW(                                                                                    \
+            std::runtime_error,                                                                           \
+            std::string(file) + ':' + std::to_string(line) + ": check failed\n\t" + std::string(e.what()) \
+        );                                                                                                \
     }
 #else
 #define XTENSOR_TRY(expr)
@@ -301,12 +329,13 @@ namespace xt
 
 #ifdef XTENSOR_ENABLE_ASSERT
 #define XTENSOR_ASSERT(expr) XTENSOR_ASSERT_IMPL(expr, __FILE__, __LINE__)
-#define XTENSOR_ASSERT_IMPL(expr, file, line)                               \
-    if (!(expr))                                                            \
-    {                                                                       \
-        XTENSOR_THROW(std::runtime_error,                                   \
-                      std::string(file) + ':' + std::to_string(line) +      \
-                      ": assertion failed (" #expr ") \n\t");               \
+#define XTENSOR_ASSERT_IMPL(expr, file, line)                                                      \
+    if (!(expr))                                                                                   \
+    {                                                                                              \
+        XTENSOR_THROW(                                                                             \
+            std::runtime_error,                                                                    \
+            std::string(file) + ':' + std::to_string(line) + ": assertion failed (" #expr ") \n\t" \
+        );                                                                                         \
     }
 #else
 #define XTENSOR_ASSERT(expr)
@@ -319,25 +348,26 @@ namespace xt
 #endif
 
 #ifdef XTENSOR_ENABLE_ASSERT
-#define XTENSOR_ASSERT_MSG(expr, msg)                                       \
-    if (!(expr))                                                            \
-    {                                                                       \
-        XTENSOR_THROW(std::runtime_error,                                   \
-                      std::string("Assertion error!\n") + msg +             \
-                      "\n  " + __FILE__ + '(' + std::to_string(__LINE__) +  \
-                      ")\n");                                               \
+#define XTENSOR_ASSERT_MSG(expr, msg)                                                                            \
+    if (!(expr))                                                                                                 \
+    {                                                                                                            \
+        XTENSOR_THROW(                                                                                           \
+            std::runtime_error,                                                                                  \
+            std::string("Assertion error!\n") + msg + "\n  " + __FILE__ + '(' + std::to_string(__LINE__) + ")\n" \
+        );                                                                                                       \
     }
 #else
 #define XTENSOR_ASSERT_MSG(expr, msg)
 #endif
 
-#define XTENSOR_PRECONDITION(expr, msg)                                     \
-    if (!(expr))                                                            \
-    {                                                                       \
-      XTENSOR_THROW(std::runtime_error,                                     \
-                    std::string("Precondition violation!\n") + msg +        \
-                    "\n  " + __FILE__ + '(' + std::to_string(__LINE__) +    \
-                    ")\n");                                               \
+#define XTENSOR_PRECONDITION(expr, msg)                                              \
+    if (!(expr))                                                                     \
+    {                                                                                \
+        XTENSOR_THROW(                                                               \
+            std::runtime_error,                                                      \
+            std::string("Precondition violation!\n") + msg + "\n  " + __FILE__ + '(' \
+                + std::to_string(__LINE__) + ")\n"                                   \
+        );                                                                           \
     }
 }
 #endif  // XEXCEPTION_HPP

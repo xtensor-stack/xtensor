@@ -50,6 +50,15 @@ In ``xfixed.hpp`` we add a level of indirection to expand one parameter pack bef
 Not doing this results in VS2017 complaining about a parameter pack that needs to be expanded in this
 context while it actually is.
 
+Visual Studio 2022 (19.31+) workaround inline compiler optimization bug
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In ``xstrides.hpp``, added an early return inside ``compute_strides`` when ``shape.size() == 0`` to
+prevent a run time crash from occuring. Without this guard statement, instructions from inside the
+for loop were somehow being reached, despite being logically unreachable.
+Original issue  `here. <https://github.com/xtensor-stack/xtensor/issues/2568>`_
+Upstream issue `here. <https://developercommunity.visualstudio.com/t/Runtime-Crash-msvc--1931-with-optimiz/10134617>`_
+
 GCC-4.9 and Clang < 3.8 and constexpr ``std::min`` and ``std::max``
 -------------------------------------------------------------------
 

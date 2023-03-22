@@ -1,23 +1,23 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_XEXPRESSION_HOLDER_HPP
 #define XTENSOR_XEXPRESSION_HOLDER_HPP
 
-#include <nlohmann/json.hpp>
 #include <memory>
 
-#include "xtl/xany.hpp"
+#include <nlohmann/json.hpp>
 
 #include "xarray.hpp"
 #include "xjson.hpp"
 #include "xtensor_config.hpp"
+#include "xtl/xany.hpp"
 
 namespace xt
 {
@@ -30,7 +30,7 @@ namespace xt
         class xexpression_wrapper;
     }
 
-    class xexpression_holder // Value semantic
+    class xexpression_holder  // Value semantic
     {
     public:
 
@@ -68,11 +68,12 @@ namespace xt
     /// @cond DOXYGEN_INCLUDE_SFINAE
     void to_json(nlohmann::json& j, const xexpression_holder& o);
     void from_json(const nlohmann::json& j, xexpression_holder& o);
+
     /// @endcond
 
     namespace detail
     {
-        class xexpression_holder_impl // Entity semantic
+        class xexpression_holder_impl  // Entity semantic
         {
         public:
 
@@ -96,6 +97,7 @@ namespace xt
         class xexpression_wrapper : public xexpression_holder_impl
         {
         public:
+
             template <class E>
             xexpression_wrapper(E&& expr);
 
@@ -228,6 +230,7 @@ namespace xt
     {
         o.from_json(j);
     }
+
     /// @endcond
 
     namespace detail
@@ -235,8 +238,8 @@ namespace xt
         template <class CTE>
         template <class E>
         inline xexpression_wrapper<CTE>::xexpression_wrapper(E&& expr)
-            : xexpression_holder_impl(),
-              m_expression(std::forward<E>(expr))
+            : xexpression_holder_impl()
+            , m_expression(std::forward<E>(expr))
         {
         }
 
@@ -260,8 +263,8 @@ namespace xt
 
         template <class CTE>
         inline xexpression_wrapper<CTE>::xexpression_wrapper(const xexpression_wrapper& wrapper)
-            : xexpression_holder_impl(),
-              m_expression(wrapper.m_expression)
+            : xexpression_holder_impl()
+            , m_expression(wrapper.m_expression)
         {
         }
     }

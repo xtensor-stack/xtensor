@@ -9,9 +9,6 @@
 
 cmake_minimum_required(VERSION 3.1)
 
-find_package(doctest            REQUIRED)
-find_package(Threads)
-
 if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     project(xtensor-test CXX)
 
@@ -20,6 +17,9 @@ if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     find_package(xtensor REQUIRED CONFIG)
     set(XTENSOR_INCLUDE_DIR ${xtensor_INCLUDE_DIRS})
 endif ()
+
+find_package(doctest            REQUIRED)
+find_package(Threads)
 
 if(NOT CMAKE_BUILD_TYPE)
     message(STATUS "Setting tests build type to Release")
@@ -111,7 +111,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     endif()
   else() # We are using clang-cl
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_cxx_std_flag} /bigobj")
-    set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} /MANIFEST:NO)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /MANIFEST:NO")
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
     add_definitions(-D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
     if (XTENSOR_DISABLE_EXCEPTIONS)
@@ -174,6 +174,7 @@ set(XTENSOR_TESTS
     main.cpp
     test_xaccumulator.cpp
     test_xadapt.cpp
+    test_strided_assign.cpp
     test_xassign.cpp
     test_xaxis_iterator.cpp
     test_xaxis_slice_iterator.cpp
@@ -307,7 +308,7 @@ add_test(NAME xtest COMMAND test_xtensor_lib)
 # Some files will be compiled twice, however compiling common files in a static
 # library and linking test_xtensor_lib with it removes half of the tests at
 # runtime.
-add_library(test_xtensor_core_lib ${COMMON_BASE} ${TEST_HEADERS} ${XTENSOR_HEADERS})
+add_library(test_xtensor_core_lib STATIC ${COMMON_BASE} ${TEST_HEADERS} ${XTENSOR_HEADERS})
 target_include_directories(test_xtensor_core_lib PRIVATE ${XTENSOR_INCLUDE_DIR})
 
 target_link_libraries(test_xtensor_core_lib PRIVATE xtensor doctest::doctest ${CMAKE_THREAD_LIBS_INIT})

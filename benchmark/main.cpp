@@ -1,15 +1,16 @@
 /***************************************************************************
-* Copyright (c) 2016, Johan Mabille, Sylvain Corlay and Wolf Vollprecht    *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) 2016, Johan Mabille, Sylvain Corlay and Wolf Vollprecht    *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
+ 
 #include <iostream>
 #include <benchmark/benchmark.h>
 
-#include "xtensor/xtensor.hpp"
 #include "xtensor/xarray.hpp"
+#include "xtensor/xtensor.hpp"
 
 #ifdef XTENSOR_USE_XSIMD
 #ifdef __GNUC__
@@ -41,6 +42,9 @@ int main(int argc, char** argv)
 {
     print_stats();
     benchmark::Initialize(&argc, argv);
-    if (benchmark::ReportUnrecognizedArguments(argc, argv)) return 1;
+    if (benchmark::ReportUnrecognizedArguments(argc, argv))
+    {
+        return 1;
+    }
     benchmark::RunSpecifiedBenchmarks();
 }

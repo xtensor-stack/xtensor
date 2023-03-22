@@ -1,14 +1,15 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
+
+#include "xtensor/xnoalias.hpp"
 
 #include "test_common_macros.hpp"
-#include "xtensor/xnoalias.hpp"
 #include "test_xsemantic.hpp"
 
 namespace xt
@@ -28,7 +29,7 @@ namespace xt
         using storage_type = C;
     };
 
-    #define SCALAR_SEMANTIC_TEST_TYPES xarray_dynamic, xtensor_dynamic
+#define SCALAR_SEMANTIC_TEST_TYPES xarray_dynamic, xtensor_dynamic
 
     TEST_SUITE("scalar_semantic")
     {
@@ -297,5 +298,5 @@ namespace xt
         }
     }
 
-    #undef SCALAR_SEMANTIC_TEST_TYPES
+#undef SCALAR_SEMANTIC_TEST_TYPES
 }

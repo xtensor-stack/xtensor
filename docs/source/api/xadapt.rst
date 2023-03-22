@@ -4,10 +4,13 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-chunked_array
-=============
+xadapt
+======
 
-Defined in ``xtensor/xchunked_array.hpp``
+Defined in ``xtensor/xadapt.hpp``
 
-.. doxygenfunction:: xt::chunked_array
-   :project: xtensor
+.. cpp:namespace-push:: xt
+
+.. doxygengroup:: xt_xadapt
+
+.. cpp:namespace-pop::

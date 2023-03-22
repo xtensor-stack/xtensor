@@ -1,11 +1,11 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_FUNCTION_HPP
 #define XTENSOR_FUNCTION_HPP
@@ -24,6 +24,7 @@
 #include "xaccessible.hpp"
 #include "xexpression_traits.hpp"
 #include "xiterable.hpp"
+#include "xiterator.hpp"
 #include "xlayout.hpp"
 #include "xscalar.hpp"
 #include "xshape.hpp"
@@ -43,20 +44,22 @@ namespace xt
          * xfunction_cache_impl *
          ************************/
 
-        template<class S, class is_shape_trivial>
+        template <class S, class is_shape_trivial>
         struct xfunction_cache_impl
         {
             S shape;
             bool is_trivial;
             bool is_initialized;
 
-            xfunction_cache_impl() :
-                shape(xtl::make_sequence<S>(0, std::size_t(0))),
-                is_trivial(false),
-                is_initialized(false) {}
+            xfunction_cache_impl()
+                : shape(xtl::make_sequence<S>(0, std::size_t(0)))
+                , is_trivial(false)
+                , is_initialized(false)
+            {
+            }
         };
 
-        template<std::size_t... N, class is_shape_trivial>
+        template <std::size_t... N, class is_shape_trivial>
         struct xfunction_cache_impl<fixed_shape<N...>, is_shape_trivial>
         {
             XTENSOR_CONSTEXPR_ENHANCED_STATIC fixed_shape<N...> shape = fixed_shape<N...>();
@@ -64,17 +67,17 @@ namespace xt
             XTENSOR_CONSTEXPR_ENHANCED_STATIC bool is_initialized = true;
         };
 
-        #ifdef XTENSOR_HAS_CONSTEXPR_ENHANCED
-            // Out of line definitions to prevent linker errors prior to C++17
-            template <std::size_t... N, class is_shape_trivial>
-            constexpr fixed_shape<N...> xfunction_cache_impl<fixed_shape<N...>, is_shape_trivial>::shape;
+#ifdef XTENSOR_HAS_CONSTEXPR_ENHANCED
+        // Out of line definitions to prevent linker errors prior to C++17
+        template <std::size_t... N, class is_shape_trivial>
+        constexpr fixed_shape<N...> xfunction_cache_impl<fixed_shape<N...>, is_shape_trivial>::shape;
 
-            template <std::size_t... N, class is_shape_trivial>
-            constexpr bool xfunction_cache_impl<fixed_shape<N...>, is_shape_trivial>::is_trivial;
+        template <std::size_t... N, class is_shape_trivial>
+        constexpr bool xfunction_cache_impl<fixed_shape<N...>, is_shape_trivial>::is_trivial;
 
-            template <std::size_t... N, class is_shape_trivial>
-            constexpr bool xfunction_cache_impl<fixed_shape<N...>, is_shape_trivial>::is_initialized;
-        #endif
+        template <std::size_t... N, class is_shape_trivial>
+        constexpr bool xfunction_cache_impl<fixed_shape<N...>, is_shape_trivial>::is_initialized;
+#endif
 
         template <class... CT>
         struct xfunction_bool_load_type
@@ -109,8 +112,7 @@ namespace xt
         };
 
         template <class F, class... CT>
-        struct xfunction_base
-            : xfunction_base_impl<xexpression_tag_t<CT...>, F, CT...>
+        struct xfunction_base : xfunction_base_impl<xexpression_tag_t<CT...>, F, CT...>
         {
         };
 
@@ -118,8 +120,10 @@ namespace xt
         using xfunction_base_t = typename xfunction_base<F, CT...>::type;
     }
 
-    template<class promote>
-    struct xfunction_cache : detail::xfunction_cache_impl<typename promote::type, promote> {};
+    template <class promote>
+    struct xfunction_cache : detail::xfunction_cache_impl<typename promote::type, promote>
+    {
+    };
 
     template <class F, class... CT>
     class xfunction_iterator;
@@ -142,17 +146,19 @@ namespace xt
     struct xcontainer_inner_types<xfunction<F, CT...>>
     {
         // Added indirection for MSVC 2017 bug with the operator value_type()
-        using value_type = typename meta_identity<decltype(std::declval<F>()(std::declval<xvalue_type_t<std::decay_t<CT>>>()...))>::type;
-        using reference = value_type;
-        using const_reference = value_type;
+        using func_return_type = typename meta_identity<decltype(std::declval<F>(
+        )(std::declval<xvalue_type_t<std::decay_t<CT>>>()...))>::type;
+        using value_type = std::decay_t<func_return_type>;
+        using reference = func_return_type;
+        using const_reference = reference;
         using size_type = common_size_type_t<std::decay_t<CT>...>;
     };
 
     template <class T, class F, class... CT>
-    struct has_simd_interface<xfunction<F, CT...>, T>
-        : xtl::conjunction<has_simd_type<T>,
-                           has_simd_apply<F, xt_simd::simd_type<T>>,
-                           has_simd_interface<std::decay_t<CT>, T>...>
+    struct has_simd_interface<xfunction<F, CT...>, T> : xtl::conjunction<
+                                                            has_simd_type<T>,
+                                                            has_simd_apply<F, xt_simd::simd_type<T>>,
+                                                            has_simd_interface<std::decay_t<CT>, T>...>
     {
     };
 
@@ -197,7 +203,9 @@ namespace xt
         using difference_type = common_difference_type_t<std::decay_t<CT>...>;
 
         using simd_value_type = xt_simd::simd_type<value_type>;
-        using bool_load_type = detail::xfunction_bool_load_type_t<CT...>;// xtl::promote_type_t<typename std::decay_t<CT>::bool_load_type...>;
+
+        // xtl::promote_type_t<typename std::decay_t<CT>::bool_load_type...>;
+        using bool_load_type = detail::xfunction_bool_load_type_t<CT...>;
 
         template <class requested_type>
         using simd_return_type = xt_simd::simd_return_type<value_type, requested_type>;
@@ -230,10 +238,10 @@ namespace xt
         template <class S, layout_type L>
         using const_reverse_broadcast_iterator = typename iterable_base::template const_reverse_broadcast_iterator<S, L>;
 
-        using const_storage_iterator = xfunction_iterator<F, CT...>;
-        using storage_iterator = const_storage_iterator;
-        using const_reverse_storage_iterator = std::reverse_iterator<const_storage_iterator>;
-        using reverse_storage_iterator = std::reverse_iterator<storage_iterator>;
+        using const_linear_iterator = xfunction_iterator<F, CT...>;
+        using linear_iterator = const_linear_iterator;
+        using const_reverse_linear_iterator = std::reverse_iterator<const_linear_iterator>;
+        using reverse_linear_iterator = std::reverse_iterator<linear_iterator>;
 
         using iterator = typename iterable_base::iterator;
         using const_iterator = typename iterable_base::const_iterator;
@@ -243,7 +251,7 @@ namespace xt
         template <class Func, class... CTA, class U = std::enable_if_t<!std::is_base_of<std::decay_t<Func>, self_type>::value>>
         xfunction(Func&& f, CTA&&... e) noexcept;
 
-        template <class FA, class ... CTA>
+        template <class FA, class... CTA>
         xfunction(xfunction<FA, CTA...> xf) noexcept;
 
         ~xfunction() = default;
@@ -269,10 +277,10 @@ namespace xt
 
         using accessible_base::at;
         using accessible_base::operator[];
-        using accessible_base::periodic;
-        using accessible_base::in_bounds;
-        using accessible_base::front;
         using accessible_base::back;
+        using accessible_base::front;
+        using accessible_base::in_bounds;
+        using accessible_base::periodic;
 
         template <class It>
         const_reference element(It first, It last) const;
@@ -284,23 +292,23 @@ namespace xt
         bool has_linear_assign(const S& strides) const noexcept;
 
         using iterable_base::begin;
-        using iterable_base::end;
         using iterable_base::cbegin;
         using iterable_base::cend;
-        using iterable_base::rbegin;
-        using iterable_base::rend;
         using iterable_base::crbegin;
         using iterable_base::crend;
+        using iterable_base::end;
+        using iterable_base::rbegin;
+        using iterable_base::rend;
 
-        const_storage_iterator storage_begin() const noexcept;
-        const_storage_iterator storage_end() const noexcept;
-        const_storage_iterator storage_cbegin() const noexcept;
-        const_storage_iterator storage_cend() const noexcept;
+        const_linear_iterator linear_begin() const noexcept;
+        const_linear_iterator linear_end() const noexcept;
+        const_linear_iterator linear_cbegin() const noexcept;
+        const_linear_iterator linear_cend() const noexcept;
 
-        const_reverse_storage_iterator storage_rbegin() const noexcept;
-        const_reverse_storage_iterator storage_rend() const noexcept;
-        const_reverse_storage_iterator storage_crbegin() const noexcept;
-        const_reverse_storage_iterator storage_crend() const noexcept;
+        const_reverse_linear_iterator linear_rbegin() const noexcept;
+        const_reverse_linear_iterator linear_rend() const noexcept;
+        const_reverse_linear_iterator linear_crbegin() const noexcept;
+        const_reverse_linear_iterator linear_crend() const noexcept;
 
         template <class S>
         const_stepper stepper_begin(const S& shape) const noexcept;
@@ -314,8 +322,7 @@ namespace xt
         template <class UT = self_type, class = typename std::enable_if<UT::only_scalar::value>::type>
         operator value_type() const;
 
-        template <class align, class requested_type = value_type,
-                  std::size_t N = xt_simd::simd_traits<requested_type>::size>
+        template <class align, class requested_type = value_type, std::size_t N = xt_simd::simd_traits<requested_type>::size>
         simd_return_type<requested_type> load_simd(size_type i) const;
 
         const tuple_type& arguments() const noexcept;
@@ -367,11 +374,12 @@ namespace xt
      **********************/
 
     template <class F, class... CT>
-    class xfunction_iterator : public xtl::xrandom_access_iterator_base<xfunction_iterator<F, CT...>,
-                                                                        typename xfunction<F, CT...>::value_type,
-                                                                        typename xfunction<F, CT...>::difference_type,
-                                                                        typename xfunction<F, CT...>::pointer,
-                                                                        typename xfunction<F, CT...>::reference>
+    class xfunction_iterator : public xtl::xrandom_access_iterator_base<
+                                   xfunction_iterator<F, CT...>,
+                                   typename xfunction<F, CT...>::value_type,
+                                   typename xfunction<F, CT...>::difference_type,
+                                   typename xfunction<F, CT...>::pointer,
+                                   typename xfunction<F, CT...>::reference>
     {
     public:
 
@@ -403,27 +411,24 @@ namespace xt
 
     private:
 
-        using data_type = std::tuple<decltype(linear_begin(std::declval<const std::decay_t<CT>>()))...>;
+        using data_type = std::tuple<decltype(xt::linear_begin(std::declval<const std::decay_t<CT>>()))...>;
 
         template <std::size_t... I>
         reference deref_impl(std::index_sequence<I...>) const;
 
         template <std::size_t... I>
-        difference_type tuple_max_diff(std::index_sequence<I...>,
-                                       const data_type& lhs,
-                                       const data_type& rhs) const;
+        difference_type
+        tuple_max_diff(std::index_sequence<I...>, const data_type& lhs, const data_type& rhs) const;
 
         const xfunction_type* p_f;
         data_type m_it;
     };
 
     template <class F, class... CT>
-    bool operator==(const xfunction_iterator<F, CT...>& it1,
-                    const xfunction_iterator<F, CT...>& it2);
+    bool operator==(const xfunction_iterator<F, CT...>& it1, const xfunction_iterator<F, CT...>& it2);
 
     template <class F, class... CT>
-    bool operator<(const xfunction_iterator<F, CT...>& it1,
-                   const xfunction_iterator<F, CT...>& it2);
+    bool operator<(const xfunction_iterator<F, CT...>& it1, const xfunction_iterator<F, CT...>& it2);
 
     /*********************
      * xfunction_stepper *
@@ -439,7 +444,7 @@ namespace xt
         using xfunction_type = xfunction<F, CT...>;
 
         using value_type = typename xfunction_type::value_type;
-        using reference = typename xfunction_type::value_type;
+        using reference = typename xfunction_type::reference;
         using pointer = typename xfunction_type::const_pointer;
         using size_type = typename xfunction_type::size_type;
         using difference_type = typename xfunction_type::difference_type;
@@ -498,7 +503,10 @@ namespace xt
     template <class F, class... CT>
     template <class Func, class... CTA, class U>
     inline xfunction<F, CT...>::xfunction(Func&& f, CTA&&... e) noexcept
-        : m_e(std::forward<CTA>(e)...), m_f(std::forward<Func>(f)) {}
+        : m_e(std::forward<CTA>(e)...)
+        , m_f(std::forward<Func>(f))
+    {
+    }
 
     /**
      * Constructs an xfunction applying the specified function given by another
@@ -508,7 +516,11 @@ namespace xt
     template <class F, class... CT>
     template <class FA, class... CTA>
     inline xfunction<F, CT...>::xfunction(xfunction<FA, CTA...> xf) noexcept
-        : m_e(xf.arguments()), m_f(xf.functor()) {}
+        : m_e(xf.arguments())
+        , m_f(xf.functor())
+    {
+    }
+
     //@}
 
     /**
@@ -541,14 +553,16 @@ namespace xt
     template <class F, class... CT>
     inline auto xfunction<F, CT...>::shape() const -> const inner_shape_type&
     {
-        xtl::mpl::static_if<!detail::is_fixed<inner_shape_type>::value>([&](auto self)
-        {
-            if(!m_cache.is_initialized)
+        xtl::mpl::static_if<!detail::is_fixed<inner_shape_type>::value>(
+            [&](auto self)
             {
-                self(this)->compute_cached_shape();
-            }
-        },
-        [](auto /*self*/){});
+                if (!m_cache.is_initialized)
+                {
+                    self(this)->compute_cached_shape();
+                }
+            },
+            [](auto /*self*/) {}
+        );
         return m_cache.shape;
     }
 
@@ -564,7 +578,15 @@ namespace xt
     template <class F, class... CT>
     inline bool xfunction<F, CT...>::is_contiguous() const noexcept
     {
-        return layout() != layout_type::dynamic && accumulate([](bool r, const auto& exp) { return r && exp.is_contiguous(); }, true, m_e);
+        return layout() != layout_type::dynamic
+               && accumulate(
+                   [](bool r, const auto& exp)
+                   {
+                       return r && exp.is_contiguous();
+                   },
+                   true,
+                   m_e
+               );
     }
 
     //@}
@@ -572,6 +594,7 @@ namespace xt
     /**
      * @name Data
      */
+
     /**
      * Returns a constant reference to the element at the specified position in the function.
      * @param args a list of indices specifying the position in the function. Indices
@@ -590,6 +613,7 @@ namespace xt
     /**
      * @name Data
      */
+
     /**
      * Returns a constant reference to the element at the specified position of the underlying
      * contiguous storage of the function.
@@ -642,6 +666,7 @@ namespace xt
     {
         return element_access_impl(std::make_index_sequence<sizeof...(CT)>(), first, last);
     }
+
     //@}
 
     /**
@@ -658,7 +683,7 @@ namespace xt
     template <class S>
     inline bool xfunction<F, CT...>::broadcast_shape(S& shape, bool reuse_cache) const
     {
-        if(m_cache.is_initialized && reuse_cache)
+        if (m_cache.is_initialized && reuse_cache)
         {
             std::copy(m_cache.shape.cbegin(), m_cache.shape.cend(), shape.begin());
             return m_cache.is_trivial;
@@ -666,80 +691,96 @@ namespace xt
         else
         {
             // e.broadcast_shape must be evaluated even if b is false
-            auto func = [&shape](bool b, auto&& e) { return e.broadcast_shape(shape) && b; };
+            auto func = [&shape](bool b, auto&& e)
+            {
+                return e.broadcast_shape(shape) && b;
+            };
             return accumulate(func, true, m_e);
         }
     }
 
     /**
-    * Checks whether the xfunction can be linearly assigned to an expression
-    * with the specified strides.
-    * @return a boolean indicating whether a linear assign is possible
-    */
+     * Checks whether the xfunction can be linearly assigned to an expression
+     * with the specified strides.
+     * @return a boolean indicating whether a linear assign is possible
+     */
     template <class F, class... CT>
     template <class S>
     inline bool xfunction<F, CT...>::has_linear_assign(const S& strides) const noexcept
     {
-        auto func = [&strides](bool b, auto&& e) { return b && e.has_linear_assign(strides); };
+        auto func = [&strides](bool b, auto&& e)
+        {
+            return b && e.has_linear_assign(strides);
+        };
         return accumulate(func, true, m_e);
     }
+
     //@}
 
     template <class F, class... CT>
-    inline auto xfunction<F, CT...>::storage_begin() const noexcept -> const_storage_iterator
+    inline auto xfunction<F, CT...>::linear_begin() const noexcept -> const_linear_iterator
     {
-        return storage_cbegin();
+        return linear_cbegin();
     }
 
     template <class F, class... CT>
-    inline auto xfunction<F, CT...>::storage_end() const noexcept -> const_storage_iterator
+    inline auto xfunction<F, CT...>::linear_end() const noexcept -> const_linear_iterator
     {
-        return storage_cend();
+        return linear_cend();
     }
 
     template <class F, class... CT>
-    inline auto xfunction<F, CT...>::storage_cbegin() const noexcept -> const_storage_iterator
+    inline auto xfunction<F, CT...>::linear_cbegin() const noexcept -> const_linear_iterator
     {
-        auto f = [](const auto& e) noexcept { return linear_begin(e); };
+        auto f = [](const auto& e) noexcept
+        {
+            return xt::linear_begin(e);
+        };
         return build_iterator(f, std::make_index_sequence<sizeof...(CT)>());
     }
 
     template <class F, class... CT>
-    inline auto xfunction<F, CT...>::storage_cend() const noexcept -> const_storage_iterator
+    inline auto xfunction<F, CT...>::linear_cend() const noexcept -> const_linear_iterator
     {
-        auto f = [](const auto& e) noexcept { return linear_end(e); };
+        auto f = [](const auto& e) noexcept
+        {
+            return xt::linear_end(e);
+        };
         return build_iterator(f, std::make_index_sequence<sizeof...(CT)>());
     }
 
     template <class F, class... CT>
-    inline auto xfunction<F, CT...>::storage_rbegin() const noexcept -> const_reverse_storage_iterator
+    inline auto xfunction<F, CT...>::linear_rbegin() const noexcept -> const_reverse_linear_iterator
     {
-        return storage_crbegin();
+        return linear_crbegin();
     }
 
     template <class F, class... CT>
-    inline auto xfunction<F, CT...>::storage_rend() const noexcept -> const_reverse_storage_iterator
+    inline auto xfunction<F, CT...>::linear_rend() const noexcept -> const_reverse_linear_iterator
     {
-        return storage_crend();
+        return linear_crend();
     }
 
     template <class F, class... CT>
-    inline auto xfunction<F, CT...>::storage_crbegin() const noexcept -> const_reverse_storage_iterator
+    inline auto xfunction<F, CT...>::linear_crbegin() const noexcept -> const_reverse_linear_iterator
     {
-        return const_reverse_storage_iterator(storage_cend());
+        return const_reverse_linear_iterator(linear_cend());
     }
 
     template <class F, class... CT>
-    inline auto xfunction<F, CT...>::storage_crend() const noexcept -> const_reverse_storage_iterator
+    inline auto xfunction<F, CT...>::linear_crend() const noexcept -> const_reverse_linear_iterator
     {
-        return const_reverse_storage_iterator(storage_cbegin());
+        return const_reverse_linear_iterator(linear_cbegin());
     }
 
     template <class F, class... CT>
     template <class S>
     inline auto xfunction<F, CT...>::stepper_begin(const S& shape) const noexcept -> const_stepper
     {
-        auto f = [&shape](const auto& e) noexcept { return e.stepper_begin(shape); };
+        auto f = [&shape](const auto& e) noexcept
+        {
+            return e.stepper_begin(shape);
+        };
         return build_stepper(f, std::make_index_sequence<sizeof...(CT)>());
     }
 
@@ -747,7 +788,10 @@ namespace xt
     template <class S>
     inline auto xfunction<F, CT...>::stepper_end(const S& shape, layout_type l) const noexcept -> const_stepper
     {
-        auto f = [&shape, l](const auto& e) noexcept { return e.stepper_end(shape, l); };
+        auto f = [&shape, l](const auto& e) noexcept
+        {
+            return e.stepper_end(shape, l);
+        };
         return build_stepper(f, std::make_index_sequence<sizeof...(CT)>());
     }
 
@@ -766,8 +810,7 @@ namespace xt
 
     template <class F, class... CT>
     template <class align, class requested_type, std::size_t N>
-    inline auto xfunction<F, CT...>::load_simd(size_type i) const
-        -> simd_return_type<requested_type>
+    inline auto xfunction<F, CT...>::load_simd(size_type i) const -> simd_return_type<requested_type>
     {
         return load_simd_impl<align, requested_type, N>(std::make_index_sequence<sizeof...(CT)>(), i);
     }
@@ -793,7 +836,8 @@ namespace xt
 
     template <class F, class... CT>
     template <std::size_t... I, class... Args>
-    inline auto xfunction<F, CT...>::access_impl(std::index_sequence<I...>, Args... args) const -> const_reference
+    inline auto xfunction<F, CT...>::access_impl(std::index_sequence<I...>, Args... args) const
+        -> const_reference
     {
         XTENSOR_TRY(check_index(shape(), args...));
         XTENSOR_CHECK_DIMENSION(shape(), args...);
@@ -802,14 +846,16 @@ namespace xt
 
     template <class F, class... CT>
     template <std::size_t... I, class... Args>
-    inline auto xfunction<F, CT...>::unchecked_impl(std::index_sequence<I...>, Args... args) const -> const_reference
+    inline auto xfunction<F, CT...>::unchecked_impl(std::index_sequence<I...>, Args... args) const
+        -> const_reference
     {
         return m_f(std::get<I>(m_e).unchecked(args...)...);
     }
 
     template <class F, class... CT>
     template <std::size_t... I, class It>
-    inline auto xfunction<F, CT...>::element_access_impl(std::index_sequence<I...>, It first, It last) const -> const_reference
+    inline auto xfunction<F, CT...>::element_access_impl(std::index_sequence<I...>, It first, It last) const
+        -> const_reference
     {
         XTENSOR_TRY(check_element_index(shape(), first, last));
         return m_f((std::get<I>(m_e).element(first, last))...);
@@ -817,7 +863,8 @@ namespace xt
 
     template <class F, class... CT>
     template <std::size_t... I>
-    inline auto xfunction<F, CT...>::data_element_impl(std::index_sequence<I...>, size_type i) const -> const_reference
+    inline auto xfunction<F, CT...>::data_element_impl(std::index_sequence<I...>, size_type i) const
+        -> const_reference
     {
         return m_f((std::get<I>(m_e).data_element(i))...);
     }
@@ -826,13 +873,13 @@ namespace xt
     template <class align, class requested_type, std::size_t N, std::size_t... I>
     inline auto xfunction<F, CT...>::load_simd_impl(std::index_sequence<I...>, size_type i) const
     {
-        return m_f.simd_apply((std::get<I>(m_e)
-            .template load_simd<align, requested_type>(i))...);
+        return m_f.simd_apply((std::get<I>(m_e).template load_simd<align, requested_type>(i))...);
     }
 
     template <class F, class... CT>
     template <class Func, std::size_t... I>
-    inline auto xfunction<F, CT...>::build_stepper(Func&& f, std::index_sequence<I...>) const noexcept -> const_stepper
+    inline auto xfunction<F, CT...>::build_stepper(Func&& f, std::index_sequence<I...>) const noexcept
+        -> const_stepper
     {
         return const_stepper(this, f(std::get<I>(m_e))...);
     }
@@ -841,13 +888,16 @@ namespace xt
     template <class Func, std::size_t... I>
     inline auto xfunction<F, CT...>::build_iterator(Func&& f, std::index_sequence<I...>) const noexcept
     {
-        return const_storage_iterator(this, f(std::get<I>(m_e))...);
+        return const_linear_iterator(this, f(std::get<I>(m_e))...);
     }
 
     template <class F, class... CT>
     inline auto xfunction<F, CT...>::compute_dimension() const noexcept -> size_type
     {
-        auto func = [](size_type d, auto&& e) noexcept { return (std::max)(d, e.dimension()); };
+        auto func = [](size_type d, auto&& e) noexcept
+        {
+            return (std::max)(d, e.dimension());
+        };
         return accumulate(func, size_type(0), m_e);
     }
 
@@ -858,14 +908,18 @@ namespace xt
     template <class F, class... CT>
     template <class... It>
     inline xfunction_iterator<F, CT...>::xfunction_iterator(const xfunction_type* func, It&&... it) noexcept
-        : p_f(func), m_it(std::forward<It>(it)...)
+        : p_f(func)
+        , m_it(std::forward<It>(it)...)
     {
     }
 
     template <class F, class... CT>
     inline auto xfunction_iterator<F, CT...>::operator++() -> self_type&
     {
-        auto f = [](auto& it) { ++it; };
+        auto f = [](auto& it)
+        {
+            ++it;
+        };
         for_each(f, m_it);
         return *this;
     }
@@ -873,7 +927,10 @@ namespace xt
     template <class F, class... CT>
     inline auto xfunction_iterator<F, CT...>::operator--() -> self_type&
     {
-        auto f = [](auto& it) { return --it; };
+        auto f = [](auto& it)
+        {
+            return --it;
+        };
         for_each(f, m_it);
         return *this;
     }
@@ -881,7 +938,10 @@ namespace xt
     template <class F, class... CT>
     inline auto xfunction_iterator<F, CT...>::operator+=(difference_type n) -> self_type&
     {
-        auto f = [n](auto& it) { it += n; };
+        auto f = [n](auto& it)
+        {
+            it += n;
+        };
         for_each(f, m_it);
         return *this;
     }
@@ -889,7 +949,10 @@ namespace xt
     template <class F, class... CT>
     inline auto xfunction_iterator<F, CT...>::operator-=(difference_type n) -> self_type&
     {
-        auto f = [n](auto& it) { it -= n; };
+        auto f = [n](auto& it)
+        {
+            it -= n;
+        };
         for_each(f, m_it);
         return *this;
     }
@@ -935,25 +998,28 @@ namespace xt
 
     template <class F, class... CT>
     template <std::size_t... I>
-    inline auto xfunction_iterator<F, CT...>::tuple_max_diff(std::index_sequence<I...>,
-                                                                const data_type& lhs,
-                                                                const data_type& rhs) const -> difference_type
+    inline auto xfunction_iterator<F, CT...>::tuple_max_diff(
+        std::index_sequence<I...>,
+        const data_type& lhs,
+        const data_type& rhs
+    ) const -> difference_type
     {
         auto diff = std::make_tuple((std::get<I>(lhs) - std::get<I>(rhs))...);
-        auto func = [](difference_type n, auto&& v) { return (std::max)(n, v); };
+        auto func = [](difference_type n, auto&& v)
+        {
+            return (std::max)(n, v);
+        };
         return accumulate(func, difference_type(0), diff);
     }
 
     template <class F, class... CT>
-    inline bool operator==(const xfunction_iterator<F, CT...>& it1,
-                           const xfunction_iterator<F, CT...>& it2)
+    inline bool operator==(const xfunction_iterator<F, CT...>& it1, const xfunction_iterator<F, CT...>& it2)
     {
         return it1.equal(it2);
     }
 
     template <class F, class... CT>
-    inline bool operator<(const xfunction_iterator<F, CT...>& it1,
-                          const xfunction_iterator<F, CT...>& it2)
+    inline bool operator<(const xfunction_iterator<F, CT...>& it1, const xfunction_iterator<F, CT...>& it2)
     {
         return it1.less_than(it2);
     }
@@ -965,63 +1031,88 @@ namespace xt
     template <class F, class... CT>
     template <class... St>
     inline xfunction_stepper<F, CT...>::xfunction_stepper(const xfunction_type* func, St&&... st) noexcept
-        : p_f(func), m_st(std::forward<St>(st)...)
+        : p_f(func)
+        , m_st(std::forward<St>(st)...)
     {
     }
 
     template <class F, class... CT>
     inline void xfunction_stepper<F, CT...>::step(size_type dim)
     {
-        auto f = [dim](auto& st) { st.step(dim); };
+        auto f = [dim](auto& st)
+        {
+            st.step(dim);
+        };
         for_each(f, m_st);
     }
 
     template <class F, class... CT>
     inline void xfunction_stepper<F, CT...>::step_back(size_type dim)
     {
-        auto f = [dim](auto& st) { st.step_back(dim); };
+        auto f = [dim](auto& st)
+        {
+            st.step_back(dim);
+        };
         for_each(f, m_st);
     }
 
     template <class F, class... CT>
     inline void xfunction_stepper<F, CT...>::step(size_type dim, size_type n)
     {
-        auto f = [dim, n](auto& st) { st.step(dim, n); };
+        auto f = [dim, n](auto& st)
+        {
+            st.step(dim, n);
+        };
         for_each(f, m_st);
     }
 
     template <class F, class... CT>
     inline void xfunction_stepper<F, CT...>::step_back(size_type dim, size_type n)
     {
-        auto f = [dim, n](auto& st) { st.step_back(dim, n); };
+        auto f = [dim, n](auto& st)
+        {
+            st.step_back(dim, n);
+        };
         for_each(f, m_st);
     }
 
     template <class F, class... CT>
     inline void xfunction_stepper<F, CT...>::reset(size_type dim)
     {
-        auto f = [dim](auto& st) { st.reset(dim); };
+        auto f = [dim](auto& st)
+        {
+            st.reset(dim);
+        };
         for_each(f, m_st);
     }
 
     template <class F, class... CT>
     inline void xfunction_stepper<F, CT...>::reset_back(size_type dim)
     {
-        auto f = [dim](auto& st) { st.reset_back(dim); };
+        auto f = [dim](auto& st)
+        {
+            st.reset_back(dim);
+        };
         for_each(f, m_st);
     }
 
     template <class F, class... CT>
     inline void xfunction_stepper<F, CT...>::to_begin()
     {
-        auto f = [](auto& st) { st.to_begin(); };
+        auto f = [](auto& st)
+        {
+            st.to_begin();
+        };
         for_each(f, m_st);
     }
 
     template <class F, class... CT>
     inline void xfunction_stepper<F, CT...>::to_end(layout_type l)
     {
-        auto f = [l](auto& st) { st.to_end(l); };
+        auto f = [l](auto& st)
+        {
+            st.to_end(l);
+        };
         for_each(f, m_st);
     }
 
@@ -1042,7 +1133,7 @@ namespace xt
     template <class T, std::size_t... I>
     inline auto xfunction_stepper<F, CT...>::step_simd_impl(std::index_sequence<I...>) -> simd_return_type<T>
     {
-        return (p_f->m_f.simd_apply)(std::get<I>(m_st). template step_simd<T>()...);
+        return (p_f->m_f.simd_apply)(std::get<I>(m_st).template step_simd<T>()...);
     }
 
     template <class F, class... CT>
@@ -1055,7 +1146,10 @@ namespace xt
     template <class F, class... CT>
     inline void xfunction_stepper<F, CT...>::step_leading()
     {
-        auto step_leading_lambda = [](auto&& st) { st.step_leading(); };
+        auto step_leading_lambda = [](auto&& st)
+        {
+            st.step_leading();
+        };
         for_each(step_leading_lambda, m_st);
     }
 }

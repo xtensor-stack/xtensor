@@ -10,24 +10,17 @@ xaxis_iterator
 Defined in ``xtensor/xaxis_iterator.hpp``
 
 .. doxygenclass:: xt::xaxis_iterator
-   :project: xtensor
    :members:
 
 .. doxygenfunction:: operator==(const xaxis_iterator<CT>&, const xaxis_iterator<CT>&)
-   :project: xtensor
 
 
 .. doxygenfunction:: operator!=(const xaxis_iterator<CT>&, const xaxis_iterator<CT>&)
-   :project: xtensor
 
 .. doxygenfunction:: axis_begin(E&&)
-   :project: xtensor
 
 .. doxygenfunction:: axis_begin(E&&, typename std::decay_t<E>::size_type)
-   :project: xtensor
 
 .. doxygenfunction:: axis_end(E&&)
-   :project: xtensor
 
 .. doxygenfunction:: axis_end(E&&, typename std::decay_t<E>::size_type)
-   :project: xtensor

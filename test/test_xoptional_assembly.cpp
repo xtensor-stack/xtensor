@@ -1,26 +1,27 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
-
-#include "test_common_macros.hpp"
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #include "xtensor/xarray.hpp"
 #include "xtensor/xio.hpp"
 #include "xtensor/xoptional_assembly.hpp"
 
 #include "test_common.hpp"
+#include "test_common_macros.hpp"
 
 namespace xt
 {
     using array_type = xarray<int>;
     using flag_array_type = xarray<bool>;
     using opt_ass_type = xoptional_assembly<array_type, flag_array_type>;
-    using cm_opt_ass_type = xoptional_assembly<xarray<int, layout_type::column_major>, xarray<bool, layout_type::column_major>>;
+    using cm_opt_ass_type = xoptional_assembly<
+        xarray<int, layout_type::column_major>,
+        xarray<bool, layout_type::column_major>>;
     using dyn_opt_ass_type = xoptional_assembly<xarray<int, layout_type::dynamic>, xarray<bool, layout_type::dynamic>>;
 
     TEST(xoptional_assembly, shaped_constructor)
@@ -127,7 +128,7 @@ namespace xt
         EXPECT_EQ(a2(1, 0), opt(3, true));
         EXPECT_EQ(a2(1, 1), opt(4, true));
 
-        array_type value2 = { {1, 2}, {3, 4} };
+        array_type value2 = {{1, 2}, {3, 4}};
         opt_ass_type a3(std::move(value2));
         EXPECT_EQ(a3(0, 0), opt(1, true));
         EXPECT_EQ(a3(0, 1), opt(2, true));
@@ -229,7 +230,7 @@ namespace xt
     TEST(xoptional_assembly, unchecked)
     {
         using opt = xtl::xoptional<int>;
-        opt_ass_type a = { { opt(1), opt(2, false) },{ opt(3, false), opt(4) } };
+        opt_ass_type a = {{opt(1), opt(2, false)}, {opt(3, false), opt(4)}};
         EXPECT_EQ(a.unchecked(0, 0), opt(1, true));
         EXPECT_EQ(a.unchecked(0, 1), opt(2, false));
         EXPECT_EQ(a.unchecked(1, 0), opt(3, false));
@@ -305,7 +306,7 @@ namespace xt
 
         {
             shape_type s2 = {3, 1, 4, 2};
-        SUBCASE("different dimensions")
+            SUBCASE("different dimensions")
             vec.resize(s2);
             shape_type s3 = {5, 3, 1, 4, 2};
             shape_type s3r = s3;
@@ -328,7 +329,10 @@ namespace xt
             EXPECT_EQ(vec[1], rma(0, 1));
             EXPECT_EQ(vec[2], rma(1, 0));
             EXPECT_EQ(vec[3], rma(1, 1));
-            EXPECT_EQ(vec.size(), std::size_t(std::distance(rma.begin<layout_type::row_major>(), rma.end<layout_type::row_major>())));
+            EXPECT_EQ(
+                vec.size(),
+                std::size_t(std::distance(rma.begin<layout_type::row_major>(), rma.end<layout_type::row_major>()))
+            );
         }
 
         SUBCASE("column_major storage iterator")
@@ -339,7 +343,12 @@ namespace xt
             EXPECT_EQ(vec[1], cma(1, 0));
             EXPECT_EQ(vec[2], cma(0, 1));
             EXPECT_EQ(vec[3], cma(1, 1));
-            EXPECT_EQ(vec.size(), std::size_t(std::distance(cma.begin<layout_type::column_major>(), cma.end<layout_type::column_major>())));
+            EXPECT_EQ(
+                vec.size(),
+                std::size_t(
+                    std::distance(cma.begin<layout_type::column_major>(), cma.end<layout_type::column_major>())
+                )
+            );
         }
     }
 
@@ -493,12 +502,16 @@ namespace xt
 
     TEST(xoptional_assembly, mixed_semantic)
     {
-        using d_opt_ass_type = xoptional_assembly<xarray<double, layout_type::row_major>, xarray<bool, layout_type::row_major>>;
+        using d_opt_ass_type = xoptional_assembly<
+            xarray<double, layout_type::row_major>,
+            xarray<bool, layout_type::row_major>>;
         using opt = xtl::xoptional<double>;
-        d_opt_ass_type a = {{opt(1.), opt(2., false), opt(3., false), opt(4.)},
-                            {opt(5., false), opt(6.), opt(7.), opt(8., false)}};
-        xarray_optional<double> b = {{opt(1.), opt(2.), opt(3., false), opt(4., false)},
-                                     {opt(5., false), opt(6.), opt(7.), opt(8.)}};
+        d_opt_ass_type a = {
+            {opt(1.), opt(2., false), opt(3., false), opt(4.)},
+            {opt(5., false), opt(6.), opt(7.), opt(8., false)}};
+        xarray_optional<double> b = {
+            {opt(1.), opt(2.), opt(3., false), opt(4., false)},
+            {opt(5., false), opt(6.), opt(7.), opt(8.)}};
 
         d_opt_ass_type res = a + b;
         EXPECT_EQ(res(0, 0), opt(2.));
@@ -514,13 +527,15 @@ namespace xt
     TEST(xoptional_assembly, mixed_expression)
     {
         using opt = xtl::xoptional<int>;
-        dyn_opt_ass_type a = { { opt(1), opt(2, false), opt(3, false), opt(4) },
-                               { opt(5, false), opt(6), opt(7), opt(8, false) } };
-        xarray<int> b = { { 1, 2, 3, 4}, { 5, 6, 7, 8} };
+        dyn_opt_ass_type a = {
+            {opt(1), opt(2, false), opt(3, false), opt(4)},
+            {opt(5, false), opt(6), opt(7), opt(8, false)}};
+        xarray<int> b = {{1, 2, 3, 4}, {5, 6, 7, 8}};
 
         dyn_opt_ass_type c = a + b;
-        dyn_opt_ass_type res = { { opt(2), opt(4, false), opt(6, false), opt(8) },
-                                 { opt(10, false), opt(12), opt(14), opt(16, false) } };
+        dyn_opt_ass_type res = {
+            {opt(2), opt(4, false), opt(6, false), opt(8)},
+            {opt(10, false), opt(12), opt(14), opt(16, false)}};
         EXPECT_EQ(res, c);
 
         dyn_opt_ass_type d = 2 * a;

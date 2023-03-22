@@ -1,10 +1,10 @@
 /***************************************************************************
-* Copyright (c) 2016, Johan Mabille, Sylvain Corlay and Wolf Vollprecht    *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) 2016, Johan Mabille, Sylvain Corlay and Wolf Vollprecht    *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #include <benchmark/benchmark.h>
 
@@ -35,28 +35,28 @@ namespace xt
             }
         }
 
-        xarray<double> u = ones<double>({ 10, 100000 });
-        xarray<double> v = ones<double>({ 100000, 10 });
-        xarray<double> res2 = ones<double>({ 1 });
+        xarray<double> u = ones<double>({10, 100000});
+        xarray<double> v = ones<double>({100000, 10});
+        xarray<double> res2 = ones<double>({1});
 
-        std::vector<std::size_t> axis0 = { 0 };
-        std::vector<std::size_t> axis1 = { 1 };
-        std::vector<std::size_t> axis_both = { 0, 1 };
+        std::vector<std::size_t> axis0 = {0};
+        std::vector<std::size_t> axis1 = {1};
+        std::vector<std::size_t> axis_both = {0, 1};
 
-        static auto res0 = xarray<double>::from_shape({ 100000 });
-        static auto res1 = xarray<double>::from_shape({ 10 });
+        static auto res0 = xarray<double>::from_shape({100000});
+        static auto res1 = xarray<double>::from_shape({10});
 
-        BENCHMARK_CAPTURE(reducer_reducer, 10x100000/axis 0, u, res0, axis0);
-        BENCHMARK_CAPTURE(reducer_reducer, 10x100000/axis 1, u, res1, axis1);
-        BENCHMARK_CAPTURE(reducer_reducer, 100000x10/axis 1, v, res1, axis0);
-        BENCHMARK_CAPTURE(reducer_reducer, 100000x10/axis 0, v, res0, axis1);
-        BENCHMARK_CAPTURE(reducer_reducer, 100000x10/axis both, v, res2, axis_both);
+        BENCHMARK_CAPTURE(reducer_reducer, 10x100000 / axis 0, u, res0, axis0);
+        BENCHMARK_CAPTURE(reducer_reducer, 10x100000 / axis 1, u, res1, axis1);
+        BENCHMARK_CAPTURE(reducer_reducer, 100000x10 / axis 1, v, res1, axis0);
+        BENCHMARK_CAPTURE(reducer_reducer, 100000x10 / axis 0, v, res0, axis1);
+        BENCHMARK_CAPTURE(reducer_reducer, 100000x10 / axis both, v, res2, axis_both);
 
-        BENCHMARK_CAPTURE(reducer_immediate_reducer, 10x100000/axis 0, u, res0, axis0);
-        BENCHMARK_CAPTURE(reducer_immediate_reducer, 10x100000/axis 1, u, res1, axis1);
-        BENCHMARK_CAPTURE(reducer_immediate_reducer, 100000x10/axis 1, v, res1, axis0);
-        BENCHMARK_CAPTURE(reducer_immediate_reducer, 100000x10/axis 0, v, res0, axis1);
-        BENCHMARK_CAPTURE(reducer_immediate_reducer, 100000x10/axis both, v, res2, axis_both);
+        BENCHMARK_CAPTURE(reducer_immediate_reducer, 10x100000 / axis 0, u, res0, axis0);
+        BENCHMARK_CAPTURE(reducer_immediate_reducer, 10x100000 / axis 1, u, res1, axis1);
+        BENCHMARK_CAPTURE(reducer_immediate_reducer, 100000x10 / axis 1, v, res1, axis0);
+        BENCHMARK_CAPTURE(reducer_immediate_reducer, 100000x10 / axis 0, v, res0, axis1);
+        BENCHMARK_CAPTURE(reducer_immediate_reducer, 100000x10 / axis both, v, res2, axis_both);
 
         template <class E, class X>
         inline auto reducer_manual_strided_reducer(benchmark::State& state, const E& x, E& res, const X& axes)
@@ -92,9 +92,9 @@ namespace xt
             }
         }
 
-        BENCHMARK_CAPTURE(reducer_manual_strided_reducer, 10x100000/axis 0, u, res0, axis0);
-        BENCHMARK_CAPTURE(reducer_manual_strided_reducer, 10x100000/axis 1, u, res1, axis1);
-        BENCHMARK_CAPTURE(reducer_manual_strided_reducer, 100000x10/axis 1, v, res1, axis0);
-        BENCHMARK_CAPTURE(reducer_manual_strided_reducer, 100000x10/axis 0, v, res0, axis1);
+        BENCHMARK_CAPTURE(reducer_manual_strided_reducer, 10x100000 / axis 0, u, res0, axis0);
+        BENCHMARK_CAPTURE(reducer_manual_strided_reducer, 10x100000 / axis 1, u, res1, axis1);
+        BENCHMARK_CAPTURE(reducer_manual_strided_reducer, 100000x10 / axis 1, v, res1, axis0);
+        BENCHMARK_CAPTURE(reducer_manual_strided_reducer, 100000x10 / axis 0, v, res0, axis1);
     }
 }

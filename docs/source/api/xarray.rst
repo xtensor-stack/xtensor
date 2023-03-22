@@ -10,11 +10,8 @@ xarray
 Defined in ``xtensor/xarray.hpp``
 
 .. doxygenclass:: xt::xarray_container
-   :project: xtensor
    :members:
 
 .. doxygentypedef:: xt::xarray
-   :project: xtensor
 
 .. doxygentypedef:: xt::xarray_optional
-   :project: xtensor

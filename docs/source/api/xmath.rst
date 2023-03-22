@@ -34,7 +34,7 @@ Mathematical functions
    operators
 
 .. table::
-   :widths: 50 50
+   :widths: 30 70
 
    +-------------------------------+------------------------------------------+
    | :cpp:func:`xt::operator+`     | identity                                 |
@@ -109,7 +109,7 @@ Mathematical functions
    index_related
 
 .. table::
-   :widths: 50 50
+   :widths: 30 70
 
    +------------------------------+----------------------+
    | :cpp:func:`xt::where`        | indices selection    |
@@ -126,7 +126,7 @@ Mathematical functions
    basic_functions
 
 .. table::
-   :widths: 50 50
+   :widths: 30 70
 
    +---------------------------+----------------------------------------------------+
    | :cpp:func:`xt::abs`       | absolute value                                     |
@@ -159,7 +159,7 @@ Mathematical functions
    exponential_functions
 
 .. table::
-   :widths: 50 50
+   :widths: 30 70
 
    +-----------------------+-----------------------------------------+
    | :cpp:func:`xt::exp`   | natural exponential function            |
@@ -182,7 +182,7 @@ Mathematical functions
    power_functions
 
 .. table::
-   :widths: 50 50
+   :widths: 30 70
 
    +-----------------------+----------------------+
    | :cpp:func:`xt::pow`   | power function       |
@@ -199,7 +199,7 @@ Mathematical functions
    trigonometric_functions
 
 .. table::
-   :widths: 50 50
+   :widths: 30 70
 
    +-----------------------+---------------------------------------------+
    | :cpp:func:`xt::sin`   | sine function                               |
@@ -222,7 +222,7 @@ Mathematical functions
    hyperbolic_functions
 
 .. table::
-   :widths: 50 50
+   :widths: 30 70
 
    +-----------------------+-------------------------------------+
    | :cpp:func:`xt::sinh`  | hyperbolic sine function            |
@@ -243,7 +243,7 @@ Mathematical functions
    error_functions
 
 .. table::
-   :widths: 50 50
+   :widths: 30 70
 
    +------------------------+-----------------------------------------+
    | :cpp:func:`xt::erf`    | error function                          |
@@ -260,7 +260,7 @@ Mathematical functions
    nearint_operations
 
 .. table::
-   :widths: 50 50
+   :widths: 30 70
 
    +---------------------------+----------------------------------------------+
    | :cpp:func:`xt::ceil`      | nearest integers not less                    |
@@ -281,7 +281,7 @@ Mathematical functions
    classif_functions
 
 .. table::
-   :widths: 50 50
+   :widths: 30 70
 
    +--------------------------+----------------------------------+
    | :cpp:func:`xt::isfinite` | checks for finite values         |
@@ -300,7 +300,7 @@ Mathematical functions
    reducing_functions
 
 .. table::
-   :widths: 50 50
+   :widths: 30 70
 
    +-----------------------------------+---------------------------------------------------------------------+
    | :cpp:func:`xt::sum`               | sum of elements over given axes                                     |
@@ -347,12 +347,12 @@ Mathematical functions
    accumulating_functions
 
 .. table::
-   :widths: 50 50
+   :widths: 30 70
 
    +-------------------------+------------------------------------------------+
-   | :cpp:func:`xt::cumsum`  | cumulative sum of elements over a given axis   |
+   | :cpp:func:`xt::cumsum`  | Cumulative sum of elements over a given axis   |
    +-------------------------+------------------------------------------------+
-   | :cpp:func:`xt::cumprod` | cumulative product of elements over given axes |
+   | :cpp:func:`xt::cumprod` | Cumulative product of elements over given axes |
    +-------------------------+------------------------------------------------+
 
 .. toctree::
@@ -360,16 +360,26 @@ Mathematical functions
    nan_functions
 
 .. table::
-   :widths: 50 50
+   :widths: 30 70
 
-   +----------------------------+------------------------------------------------------------+
-   | :cpp:func:`xt::nan_to_num` | convert NaN and +/- inf to finite numbers                  |
-   +----------------------------+------------------------------------------------------------+
-   | :cpp:func:`xt::nansum`     | sum of elements over a given axis, replacing NaN with 0    |
-   +----------------------------+------------------------------------------------------------+
-   | :cpp:func:`xt::nanprod`    | product of elements over given axes, replacing NaN with 1  |
-   +----------------------------+------------------------------------------------------------+
-   | :cpp:func:`xt::nancumsum`  | cumsum of elements over a given axis, replacing NaN with 0 |
-   +----------------------------+------------------------------------------------------------+
-   | :cpp:func:`xt::nancumprod` | cumprod of elements over given axes, replacing NaN with 1  |
-   +----------------------------+------------------------------------------------------------+
+   +----------------------------+----------------------------------------------------------------------+
+   | :cpp:func:`xt::nan_to_num` | Convert NaN and +/- inf to finite numbers                            |
+   +----------------------------+----------------------------------------------------------------------+
+   | :cpp:func:`xt::nanmin`     | Min of elements over a given axis, ignoring NaNs                     |
+   +----------------------------+----------------------------------------------------------------------+
+   | :cpp:func:`xt::nanmax`     | Max of elements over a given axis, ignoring NaNs                     |
+   +----------------------------+----------------------------------------------------------------------+
+   | :cpp:func:`xt::nansum`     | Sum of elements over a given axis, replacing NaN with 0              |
+   +----------------------------+----------------------------------------------------------------------+
+   | :cpp:func:`xt::nanprod`    | Product of elements over given axes, replacing NaN with 1            |
+   +----------------------------+----------------------------------------------------------------------+
+   | :cpp:func:`xt::nancumsum`  | Cumulative sum of elements over a given axis, replacing NaN with 0   |
+   +----------------------------+----------------------------------------------------------------------+
+   | :cpp:func:`xt::nancumprod` | Cumulative product of elements over given axes, replacing NaN with 1 |
+   +----------------------------+----------------------------------------------------------------------+
+   | :cpp:func:`xt::nanmean`    | Mean of elements over given axes, ignoring NaNs                      |
+   +----------------------------+----------------------------------------------------------------------+
+   | :cpp:func:`xt::nanvar`     | Variance of elements over given axes, ignoring NaNs                  |
+   +----------------------------+----------------------------------------------------------------------+
+   | :cpp:func:`xt::nanstd`     | Standard deviation of elements over given axes, ignoring NaNs        |
+   +----------------------------+----------------------------------------------------------------------+

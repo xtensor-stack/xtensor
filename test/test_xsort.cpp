@@ -1,23 +1,25 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
-#include "test_common_macros.hpp"
 #include "xtensor/xadapt.hpp"
 #include "xtensor/xarray.hpp"
-#include "xtensor/xtensor.hpp"
 #include "xtensor/xfixed.hpp"
-#include "xtensor/xio.hpp"
 #include "xtensor/xinfo.hpp"
-#include "xtensor/xview.hpp"
+#include "xtensor/xio.hpp"
+#include "xtensor/xmath.hpp"
 #include "xtensor/xrandom.hpp"
 #include "xtensor/xslice.hpp"
 #include "xtensor/xsort.hpp"
+#include "xtensor/xtensor.hpp"
+#include "xtensor/xview.hpp"
+
+#include "test_common_macros.hpp"
 
 namespace xt
 {
@@ -26,10 +28,7 @@ namespace xt
         xarray<double> a1 = {2, 3, 1};
         xarray<double, xt::layout_type::column_major> a2_c = {{2, 3, 1}, {4, 6, 5}};
         xarray<double, xt::layout_type::row_major> a2_r = {{2, 3, 1}, {4, 6, 5}};
-        xarray<float> a3 = {{{1,3,2},
-                             {4,2,1}},
-                            {{5,1,3},
-                             {4,2,6}}};
+        xarray<float> a3 = {{{1, 3, 2}, {4, 2, 1}}, {{5, 1, 3}, {4, 2, 6}}};
 
         xarray<std::size_t> ex = {2, 0, 1};
         EXPECT_EQ(ex, argsort(a1, 0));
@@ -45,9 +44,9 @@ namespace xt
         EXPECT_EQ(ex2_1, argsort(a2_c, 1));
         EXPECT_EQ(ex2_1, argsort(a2_r, 1));
 
-        xarray<std::size_t> ex3_0 = {{{0,1,0},{0,0,0}},{{1,0,1},{1,1,1}}};
-        xarray<std::size_t> ex3_1 = {{{0,1,1},{1,0,0}},{{1,0,0},{0,1,1}}};
-        xarray<std::size_t> ex3_2 = {{{0,2,1},{2,1,0}},{{1,2,0},{1,0,2}}};
+        xarray<std::size_t> ex3_0 = {{{0, 1, 0}, {0, 0, 0}}, {{1, 0, 1}, {1, 1, 1}}};
+        xarray<std::size_t> ex3_1 = {{{0, 1, 1}, {1, 0, 0}}, {{1, 0, 0}, {0, 1, 1}}};
+        xarray<std::size_t> ex3_2 = {{{0, 2, 1}, {2, 1, 0}}, {{1, 2, 0}, {1, 0, 2}}};
 
         EXPECT_EQ(ex3_2, argsort(a3));
         EXPECT_EQ(ex3_0, argsort(a3, 0));
@@ -149,9 +148,9 @@ namespace xt
         EXPECT_EQ(ex_3, sort(a, 1));
 
 #ifndef XTENSOR_DISABLE_EXCEPTIONS
-	xt::xarray<double> xarr = xt::eval(xt::arange(0,16));
-	xarr.reshape({4,4});
-        auto view = xt::reshape_view(xt::transpose(xarr, {1,0}), {2,8});
+        xt::xarray<double> xarr = xt::eval(xt::arange(0, 16));
+        xarr.reshape({4, 4});
+        auto view = xt::reshape_view(xt::transpose(xarr, {1, 0}), {2, 8});
         EXPECT_NO_THROW(xt::sort(view, 0));
 #endif
     }
@@ -170,7 +169,7 @@ namespace xt
     TEST(xsort, argmin)
     {
         xarray<double> a = {{5, 3, 1}, {4, 4, 4}};
-        xarray<double> b = {1,3,4,-100};
+        xarray<double> b = {1, 3, 4, -100};
         xarray<double, layout_type(int(XTENSOR_DEFAULT_LAYOUT) & 0x03)> ar = {{5, 3, 1}, {4, 4, 4}};
 
         xarray<std::size_t> ex = 2ul;
@@ -186,7 +185,7 @@ namespace xt
         xarray<std::size_t> ex_3 = {2, 0};
         EXPECT_EQ(ex_3, argmin(a, 1));
 
-        xtensor<double, 2> xa = {{5,3,1}, {4,4,4}};
+        xtensor<double, 2> xa = {{5, 3, 1}, {4, 4, 4}};
         EXPECT_EQ(ex, argmin(xa));
         EXPECT_EQ(ex_2, argmin(xa, 0));
         EXPECT_EQ(ex_3, argmin(xa, 1));
@@ -204,12 +203,11 @@ namespace xt
         xarray<std::size_t> ex_3 = {0, 0};
         EXPECT_EQ(ex_3, argmax(a, 1));
 
-        xtensor<int, 2> b = {{ 1,2 }};
+        xtensor<int, 2> b = {{1, 2}};
         auto res = xt::eval(xt::argmax(b, 1));
         EXPECT_EQ(res(), 1u);
 
-        xtensor<int, 3> c = {{{1, 2, 3, 4}},
-                             {{4, 3, 2, 1}}};
+        xtensor<int, 3> c = {{{1, 2, 3, 4}}, {{4, 3, 2, 1}}};
         xtensor<std::size_t, 2> ex_4 = {{3}, {0}};
         EXPECT_EQ(ex_4, argmax(c, 2));
 
@@ -218,6 +216,12 @@ namespace xt
 
         xtensor<std::size_t, 2> ex_6 = {{0, 0, 0, 0}, {0, 0, 0, 0}};
         EXPECT_EQ(ex_6, argmax(c, 1));
+
+        // xtensor#2568
+        xarray<double> d = {0, 1, 0};
+        xtensor<size_t, 0> d_ex_1 = {1};
+        EXPECT_EQ(d_ex_1, argmax(d));
+        EXPECT_EQ(1, argmax(d)(0));
     }
 
     TEST(xsort, sort_large_prob)
@@ -282,23 +286,23 @@ namespace xt
 
     TEST(xsort, unique)
     {
-        xarray<double> a = {1,2,3, 5,3,2,1,2,2,2,2,2,2, 45};
+        xarray<double> a = {1, 2, 3, 5, 3, 2, 1, 2, 2, 2, 2, 2, 2, 45};
         xarray<double> ax = {1, 2, 3, 5, 45};
         EXPECT_EQ(unique(a), ax);
 
-        xarray<double> b = {{1,2,3}, {4,5,6}, {7,8,9}};
-        xarray<double> bx = {1,2,3,4,5,6,7,8,9};
+        xarray<double> b = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+        xarray<double> bx = {1, 2, 3, 4, 5, 6, 7, 8, 9};
         EXPECT_EQ(unique(b), bx);
 
-        xarray<double> bb = {{1,2,3}, {7,8,9}, {4,5,6}, {7,8,9}};
-        xarray<double> bbx = {1,2,3,4,5,6,7,8,9};
+        xarray<double> bb = {{1, 2, 3}, {7, 8, 9}, {4, 5, 6}, {7, 8, 9}};
+        xarray<double> bbx = {1, 2, 3, 4, 5, 6, 7, 8, 9};
         EXPECT_EQ(unique(bb), bbx);
 
         auto c = view(b, range(0, 3), range(0, 3));
         auto d = unique(c);
         EXPECT_EQ(d, bx);
 
-        auto e = xt::unique(xt::where(xt::greater(b,2), 1, 0));
+        auto e = xt::unique(xt::where(xt::greater(b, 2), 1, 0));
         xarray<double> ex = {0, 1};
         EXPECT_EQ(e, ex);
     }
@@ -306,16 +310,16 @@ namespace xt
     TEST(xsort, setdiff1d)
     {
         {
-            xarray<size_t> ar1 = {1,2,3,4,4,4,5};
-            xarray<size_t> ar2 = {4,5};
-            xarray<size_t> out = {1,2,3};
+            xarray<size_t> ar1 = {1, 2, 3, 4, 4, 4, 5};
+            xarray<size_t> ar2 = {4, 5};
+            xarray<size_t> out = {1, 2, 3};
             EXPECT_EQ(setdiff1d(ar1, ar2), out);
         }
 
         {
-            xarray<size_t> ar1 = {{5,6,7},{4,4,4},{1,2,3}};
-            xarray<size_t> ar2 = {4,1};
-            xarray<size_t> out = {2,3,5,6,7};
+            xarray<size_t> ar1 = {{5, 6, 7}, {4, 4, 4}, {1, 2, 3}};
+            xarray<size_t> ar2 = {4, 1};
+            xarray<size_t> out = {2, 3, 5, 6, 7};
             EXPECT_EQ(setdiff1d(ar1, ar2), out);
         }
     }
@@ -326,7 +330,7 @@ namespace xt
         bool res = true;
         for (std::size_t i = 0; i < pos; ++i)
         {
-            res = res && arr(i) < arr(pos);
+            res = res && arr(i) <= arr(pos);
         }
         for (std::size_t i = pos; i < arr.size(); ++i)
         {
@@ -337,16 +341,53 @@ namespace xt
 
     TEST(xsort, partition)
     {
-        xt::xarray<int> a = {3, 4, 2, 1};
-        auto r1 = xt::partition(a, 2);
-        EXPECT_TRUE(check_partition(r1, 2));
+        SUBCASE("simple")
+        {
+            xt::xarray<int> a = {3, 4, 2, 1};
+            auto part = xt::partition(a, 2);
+            EXPECT_TRUE(check_partition(part, 2));
+        }
 
+        SUBCASE("complex")
+        {
+            xt::xarray<double> a = {
+                927.,  932.,  935.,  943.,  944.,  944.,  945.,  948.,  952.,  962.,  968.,  968.,  969.,
+                969.,  974.,  981.,  993.,  994.,  994.,  1003., 1007., 1008., 1008., 1012., 1013., 1014.,
+                1014., 1017., 1019., 1020., 1023., 1026., 1026., 1028., 1030., 1032., 1039., 1047., 1071.,
+                1080., 1085., 1088., 1111., 1112., 1117., 1119., 1128., 1130., 1209., 1309., 1426.};
+            xt::xtensor_fixed<std::size_t, xt::xshape<4>> kth = {17, 32, 18, 33};
+
+            SUBCASE("1D")
+            {
+                auto part = xt::partition(a, kth);
+                for (std::size_t k : kth)
+                {
+                    CAPTURE(k);
+                    EXPECT_TRUE(check_partition(part, k));
+                }
+            }
+
+            SUBCASE("2D")
+            {
+                a.reshape({1, a.size()});
+                auto part = xt::partition(a, kth, 1);
+                for (std::size_t k : kth)
+                {
+                    CAPTURE(k);
+                    EXPECT_TRUE(check_partition(part, k));
+                }
+            }
+        }
+
+        SUBCASE("exception")
+        {
 #ifndef XTENSOR_DISABLE_EXCEPTIONS
-	xt::xarray<double> xarr = xt::eval(xt::arange(0,16));
-	xarr.reshape({4,4});
-        auto view = xt::transpose(xarr, {1,0});
-	EXPECT_NO_THROW(xt::partition(view, 1, 0));
+            xt::xarray<double> a = xt::eval(xt::arange(0, 16));
+            a.reshape({4, 4});
+            auto view = xt::transpose(a, {1, 0});
+            EXPECT_NO_THROW(xt::partition(view, 1, 0));
 #endif
+        }
     }
 
     template <class T, class U>
@@ -355,7 +396,7 @@ namespace xt
         bool res = true;
         for (std::size_t i = 0; i < pos; ++i)
         {
-            res = res && arr(idxs[i]) < arr(idxs[pos]);
+            res = res && arr(idxs[i]) <= arr(idxs[pos]);
         }
         for (std::size_t i = pos; i < arr.size(); ++i)
         {
@@ -366,25 +407,94 @@ namespace xt
 
     TEST(xsort, argpartition)
     {
-        xt::xarray<int> a = {3, 4, 2, 1};
-        auto r1 = xt::argpartition(a, 2);
-        EXPECT_TRUE(check_argpartition(a, r1, 2));
+        SUBCASE("simple")
+        {
+            xt::xarray<int> a = {3, 4, 2, 1};
+            auto r1 = xt::argpartition(a, 2);
+            EXPECT_TRUE(check_argpartition(a, r1, 2));
 
-        std::size_t s = a.size();
-        int* arr = a.data();
-        dynamic_shape<std::size_t> sh = { s };
-        auto b = xt::adapt(arr, s, xt::no_ownership(), sh);
-        auto r2 = xt::argpartition(b, 2);
-        EXPECT_TRUE(check_argpartition(b, r2, 2));
+            SUBCASE("adapt")
+            {
+                std::size_t s = a.size();
+                int* arr = a.data();
+                dynamic_shape<std::size_t> sh = {s};
+                auto b = xt::adapt(arr, s, xt::no_ownership(), sh);
+                auto r2 = xt::argpartition(b, 2);
+                EXPECT_TRUE(check_argpartition(b, r2, 2));
+            }
+        }
+
+        SUBCASE("complex")
+        {
+            const xt::xarray<double> data = {
+                1014., 1017., 1019., 1020., 1023., 1026., 1026., 1028., 1030., 1032., 1039., 1047., 1071.,
+                927.,  932.,  935.,  943.,  944.,  944.,  945.,  948.,  952.,  962.,  968.,  968.,  969.,
+                969.,  974.,  981.,  993.,  994.,  994.,  1003., 1007., 1008., 1008., 1012., 1013., 1014.,
+                1080., 1085., 1088., 1111., 1112., 1117., 1119., 1128., 1130., 1209., 1309., 1426.};
+            const xt::xtensor_fixed<std::size_t, xt::xshape<4>> kth = {17, 32, 18, 33};
+
+            SUBCASE("1D")
+            {
+                const auto& a = data;
+                const auto argpart = xt::argpartition(a, kth);
+                for (std::size_t k : kth)
+                {
+                    CAPTURE(k);
+                    EXPECT_TRUE(check_argpartition(a, argpart, k));
+                }
+            }
+
+            SUBCASE("2D")
+            {
+                auto a = data;
+                a.reshape({1, a.size()});
+                const auto argpart = xt::argpartition(a, kth, 1);
+                for (std::size_t k : kth)
+                {
+                    CAPTURE(k);
+                    EXPECT_TRUE(check_argpartition(a, argpart, k));
+                }
+            }
+        }
+    }
+
+    TEST(xsort, quantile)
+    {
+        const xt::xtensor_fixed<double, xt::xshape<4, 2, 2>> data = {
+            {{3., 4.}, {2., 1.}},
+            {{-1., 1.}, {3., 2.}},
+            {{-9., -0.}, {-9., -3.}},
+            {{12., 12.}, {12., 12.}},
+        };
+
+        {
+            auto q = xt::quantile(data, {.3, .0, 1.});
+            const xt::xtensor_fixed<double, xt::xshape<3>> expected = {0.5, -9., 12.};
+            EXPECT_TRUE(xt::equal(q, expected)(0));
+        }
+
+        const xt::xtensor_fixed<double, xt::xshape<3, 4, 2>> expected1 = {
+            {{2.3, 1.9}, {0.2, 1.3}, {-9., -2.1}, {12., 12.}},
+            {{2., 1.}, {-1., 1.}, {-9., -3.}, {12., 12.}},
+            {{3., 4.}, {3., 2.}, {-9., 0.}, {12., 12.}},
+        };
+        {
+            auto q1 = xt::quantile(data, {.3, .0, 1.}, 1);
+            EXPECT_TRUE(xt::equal(q1, expected1)(0));
+        }
+        {
+            auto q1 = xt::quantile(xt::xtensor<float, 3>(data), {.3, .0, 1.}, 1);
+            EXPECT_TRUE(xt::equal(q1, expected1)(0));
+        }
+        {
+            auto q1 = xt::quantile(xt::xarray<float>(data), {.3, .0, 1.}, 1);
+            EXPECT_TRUE(xt::equal(q1, expected1)(0));
+        }
     }
 
     TEST(xsort, median)
     {
-        xt::xtensor<float, 2> a = {{ 3, 4, 2, 1},
-                                   { 1, 1, 3, 2},
-                                   { 9, 9, 9, 9},
-                                   {12,12,12,12},
-                                   { 5, 5, 5, 5}};
+        xt::xtensor<float, 2> a = {{3, 4, 2, 1}, {1, 1, 3, 2}, {9, 9, 9, 9}, {12, 12, 12, 12}, {5, 5, 5, 5}};
         auto mall = median(a);
         auto ma0 = median(a, 0);
         auto ma1 = median(a, 1);

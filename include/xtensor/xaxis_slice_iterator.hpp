@@ -1,11 +1,11 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_AXIS_SLICE_ITERATOR_HPP
 #define XTENSOR_AXIS_SLICE_ITERATOR_HPP
@@ -69,12 +69,10 @@ namespace xt
         value_type m_sv;
 
         template <class T, class CTA>
-        std::enable_if_t<std::is_pointer<T>::value, T>
-            get_storage_init(CTA&& e) const;
+        std::enable_if_t<std::is_pointer<T>::value, T> get_storage_init(CTA&& e) const;
 
         template <class T, class CTA>
-        std::enable_if_t<!std::is_pointer<T>::value, T>
-            get_storage_init(CTA&& e) const;
+        std::enable_if_t<!std::is_pointer<T>::value, T> get_storage_init(CTA&& e) const;
     };
 
     template <class CT>
@@ -102,7 +100,7 @@ namespace xt
     template <class CT>
     template <class T, class CTA>
     inline std::enable_if_t<std::is_pointer<T>::value, T>
-        xaxis_slice_iterator<CT>::get_storage_init(CTA&& e) const
+    xaxis_slice_iterator<CT>::get_storage_init(CTA&& e) const
     {
         return &e;
     }
@@ -110,7 +108,7 @@ namespace xt
     template <class CT>
     template <class T, class CTA>
     inline std::enable_if_t<!std::is_pointer<T>::value, T>
-        xaxis_slice_iterator<CT>::get_storage_init(CTA&& e) const
+    xaxis_slice_iterator<CT>::get_storage_init(CTA&& e) const
     {
         return e;
     }
@@ -118,7 +116,7 @@ namespace xt
     /**
      * @name Constructors
      */
-     //@{
+    //@{
     /**
      * Constructs an xaxis_slice_iterator
      *
@@ -142,41 +140,62 @@ namespace xt
      */
     template <class CT>
     template <class CTA>
-    inline xaxis_slice_iterator<CT>::xaxis_slice_iterator(CTA&& e, size_type axis, size_type index, size_type offset) :
-        p_expression(get_storage_init<storing_type>(std::forward<CTA>(e))), m_index(index),
-        m_offset(offset), m_axis_stride(static_cast<size_type>(e.strides()[axis]) * (e.shape()[axis] - 1u)),
-        m_lower_shape(0), m_upper_shape(0), m_iter_size(0), m_is_target_axis(false),
-        m_sv(strided_view(std::forward<CT>(e), std::forward<shape_type>({ e.shape()[axis] }),
-            std::forward<strides_type>({ e.strides()[axis] }), offset, e.layout()))
+    inline xaxis_slice_iterator<CT>::xaxis_slice_iterator(CTA&& e, size_type axis, size_type index, size_type offset)
+        : p_expression(get_storage_init<storing_type>(std::forward<CTA>(e)))
+        , m_index(index)
+        , m_offset(offset)
+        , m_axis_stride(static_cast<size_type>(e.strides()[axis]) * (e.shape()[axis] - 1u))
+        , m_lower_shape(0)
+        , m_upper_shape(0)
+        , m_iter_size(0)
+        , m_is_target_axis(false)
+        , m_sv(strided_view(
+              std::forward<CT>(e),
+              std::forward<shape_type>({e.shape()[axis]}),
+              std::forward<strides_type>({e.strides()[axis]}),
+              offset,
+              e.layout()
+          ))
     {
         if (e.layout() == layout_type::row_major)
         {
             m_is_target_axis = axis == e.dimension() - 1;
-            m_lower_shape = std::accumulate(e.shape().begin() + axis + 1, e.shape().end(), size_t(1), std::multiplies<>());
+            m_lower_shape = std::accumulate(
+                e.shape().begin() + axis + 1,
+                e.shape().end(),
+                size_t(1),
+                std::multiplies<>()
+            );
             m_iter_size = std::accumulate(e.shape().begin() + 1, e.shape().end(), size_t(1), std::multiplies<>());
-
         }
         else
         {
             m_is_target_axis = axis == 0;
-            m_lower_shape = std::accumulate(e.shape().begin(), e.shape().begin() + axis, size_t(1), std::multiplies<>());
+            m_lower_shape = std::accumulate(
+                e.shape().begin(),
+                e.shape().begin() + axis,
+                size_t(1),
+                std::multiplies<>()
+            );
             m_iter_size = std::accumulate(e.shape().begin(), e.shape().end() - 1, size_t(1), std::multiplies<>());
         }
         m_upper_shape = m_lower_shape + m_axis_stride;
     }
+
     //@}
 
     /**
      * @name Increment
      */
-     //@{
+    //@{
     /**
      * Increments the iterator to the next position and returns it.
      */
     template <class CT>
     inline auto xaxis_slice_iterator<CT>::operator++() -> self_type&
     {
-        ++m_index; ++m_offset;
+        ++m_index;
+        ++m_offset;
         auto index_compare = (m_offset % m_iter_size);
         if (m_is_target_axis || (m_upper_shape >= index_compare && index_compare >= m_lower_shape))
         {
@@ -197,6 +216,7 @@ namespace xt
         ++(*this);
         return tmp;
     }
+
     //@}
 
     /**
@@ -224,6 +244,7 @@ namespace xt
     {
         return xtl::closure_pointer(operator*());
     }
+
     //@}
 
     /*
@@ -261,6 +282,7 @@ namespace xt
     {
         return !(lhs == rhs);
     }
+
     //@}
 
     /**
@@ -305,10 +327,12 @@ namespace xt
     inline auto axis_slice_end(E&& e)
     {
         using return_type = xaxis_slice_iterator<xtl::closure_type_t<E>>;
-        return return_type(std::forward<E>(e),
-                           0,
-                           std::accumulate(e.shape().begin() + 1, e.shape().end(), size_t(1), std::multiplies<>()),
-                           e.size());
+        return return_type(
+            std::forward<E>(e),
+            0,
+            std::accumulate(e.shape().begin() + 1, e.shape().end(), size_t(1), std::multiplies<>()),
+            e.size()
+        );
     }
 
     /**
@@ -323,12 +347,20 @@ namespace xt
     inline auto axis_slice_end(E&& e, typename std::decay_t<E>::size_type axis)
     {
         using return_type = xaxis_slice_iterator<xtl::closure_type_t<E>>;
-        auto index_sum = std::accumulate(e.shape().begin(), e.shape().begin() + axis, size_t(1), std::multiplies<>());
-        return return_type(std::forward<E>(e),
-                           axis,
-                           std::accumulate(e.shape().begin() + axis + 1, e.shape().end(), index_sum, std::multiplies<>()),
-                           e.size() + axis);
+        auto index_sum = std::accumulate(
+            e.shape().begin(),
+            e.shape().begin() + axis,
+            size_t(1),
+            std::multiplies<>()
+        );
+        return return_type(
+            std::forward<E>(e),
+            axis,
+            std::accumulate(e.shape().begin() + axis + 1, e.shape().end(), index_sum, std::multiplies<>()),
+            e.size() + axis
+        );
     }
+
     //@}
 }
 

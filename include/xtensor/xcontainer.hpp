@@ -1,11 +1,11 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_CONTAINER_HPP
 #define XTENSOR_CONTAINER_HPP
@@ -34,7 +34,6 @@ namespace xt
     struct xcontainer_iterable_types
     {
         using inner_shape_type = typename xcontainer_inner_types<D>::inner_shape_type;
-        using storage_type = typename xcontainer_inner_types<D>::storage_type;
         using stepper = xstepper<D>;
         using const_stepper = xstepper<const D>;
     };
@@ -108,10 +107,10 @@ namespace xt
         using data_alignment = xt_simd::container_alignment_t<storage_type>;
         using simd_type = xt_simd::simd_type<value_type>;
 
-        using storage_iterator = typename iterable_base::storage_iterator;
-        using const_storage_iterator = typename iterable_base::const_storage_iterator;
-        using reverse_storage_iterator = typename iterable_base::reverse_storage_iterator;
-        using const_reverse_storage_iterator = typename iterable_base::const_reverse_storage_iterator;
+        using linear_iterator = typename iterable_base::linear_iterator;
+        using const_linear_iterator = typename iterable_base::const_linear_iterator;
+        using reverse_linear_iterator = typename iterable_base::reverse_linear_iterator;
+        using const_reverse_linear_iterator = typename iterable_base::const_reverse_linear_iterator;
 
         static_assert(static_layout != layout_type::any, "Container layout can never be layout_type::any!");
 
@@ -138,13 +137,13 @@ namespace xt
         template <class... Args>
         const_reference unchecked(Args... args) const;
 
-        using accessible_base::shape;
         using accessible_base::at;
+        using accessible_base::shape;
         using accessible_base::operator[];
-        using accessible_base::periodic;
-        using accessible_base::in_bounds;
-        using accessible_base::front;
         using accessible_base::back;
+        using accessible_base::front;
+        using accessible_base::in_bounds;
+        using accessible_base::periodic;
 
         template <class It>
         reference element(It first, It last);
@@ -184,29 +183,28 @@ namespace xt
 
         template <class align, class simd>
         void store_simd(size_type i, const simd& e);
-        template <class align, class requested_type = value_type,
-                  std::size_t N = xt_simd::simd_traits<requested_type>::size>
+        template <class align, class requested_type = value_type, std::size_t N = xt_simd::simd_traits<requested_type>::size>
         container_simd_return_type_t<storage_type, value_type, requested_type>
         /*simd_return_type<requested_type>*/ load_simd(size_type i) const;
 
-        storage_iterator storage_begin() noexcept;
-        storage_iterator storage_end() noexcept;
+        linear_iterator linear_begin() noexcept;
+        linear_iterator linear_end() noexcept;
 
-        const_storage_iterator storage_begin() const noexcept;
-        const_storage_iterator storage_end() const noexcept;
-        const_storage_iterator storage_cbegin() const noexcept;
-        const_storage_iterator storage_cend() const noexcept;
+        const_linear_iterator linear_begin() const noexcept;
+        const_linear_iterator linear_end() const noexcept;
+        const_linear_iterator linear_cbegin() const noexcept;
+        const_linear_iterator linear_cend() const noexcept;
 
-        reverse_storage_iterator storage_rbegin() noexcept;
-        reverse_storage_iterator storage_rend() noexcept;
+        reverse_linear_iterator linear_rbegin() noexcept;
+        reverse_linear_iterator linear_rend() noexcept;
 
-        const_reverse_storage_iterator storage_rbegin() const noexcept;
-        const_reverse_storage_iterator storage_rend() const noexcept;
-        const_reverse_storage_iterator storage_crbegin() const noexcept;
-        const_reverse_storage_iterator storage_crend() const noexcept;
+        const_reverse_linear_iterator linear_rbegin() const noexcept;
+        const_reverse_linear_iterator linear_rend() const noexcept;
+        const_reverse_linear_iterator linear_crbegin() const noexcept;
+        const_reverse_linear_iterator linear_crend() const noexcept;
 
-        using container_iterator = storage_iterator;
-        using const_container_iterator = const_storage_iterator;
+        using container_iterator = linear_iterator;
+        using const_container_iterator = const_linear_iterator;
 
     protected:
 
@@ -227,7 +225,7 @@ namespace xt
     protected:
 
         derived_type& derived_cast() & noexcept;
-        const derived_type& derived_cast() const & noexcept;
+        const derived_type& derived_cast() const& noexcept;
         derived_type derived_cast() && noexcept;
 
     private:
@@ -408,6 +406,7 @@ namespace xt
     {
         return derived_cast().backstrides_impl();
     }
+
     //@}
 
     /**
@@ -423,7 +422,14 @@ namespace xt
     template <class T>
     inline void xcontainer<D>::fill(const T& value)
     {
-        std::fill(storage_begin(), storage_end(), value);
+        if (contiguous_layout)
+        {
+            std::fill(this->linear_begin(), this->linear_end(), value);
+        }
+        else
+        {
+            std::fill(this->begin(), this->end(), value);
+        }
     }
 
     /**
@@ -481,7 +487,10 @@ namespace xt
     template <class... Args>
     inline auto xcontainer<D>::unchecked(Args... args) -> reference
     {
-        size_type index = xt::unchecked_data_offset<size_type, static_layout>(strides(), static_cast<std::ptrdiff_t>(args)...);
+        size_type index = xt::unchecked_data_offset<size_type, static_layout>(
+            strides(),
+            static_cast<std::ptrdiff_t>(args)...
+        );
         return storage()[index];
     }
 
@@ -508,7 +517,10 @@ namespace xt
     template <class... Args>
     inline auto xcontainer<D>::unchecked(Args... args) const -> const_reference
     {
-        size_type index = xt::unchecked_data_offset<size_type, static_layout>(strides(), static_cast<std::ptrdiff_t>(args)...);
+        size_type index = xt::unchecked_data_offset<size_type, static_layout>(
+            strides(),
+            static_cast<std::ptrdiff_t>(args)...
+        );
         return storage()[index];
     }
 
@@ -573,10 +585,10 @@ namespace xt
     }
 
     /**
-    * Returns a constant pointer to the underlying array serving as element storage. The pointer
-    * is such that range [data(); data() + size()] is always a valid range, even if the
-    * container is empty (data() is not is not dereferenceable in that case)
-    */
+     * Returns a constant pointer to the underlying array serving as element storage. The pointer
+     * is such that range [data(); data() + size()] is always a valid range, even if the
+     * container is empty (data() is not is not dereferenceable in that case)
+     */
     template <class D>
     inline auto xcontainer<D>::data() const noexcept -> const_pointer
     {
@@ -591,6 +603,7 @@ namespace xt
     {
         return size_type(0);
     }
+
     //@}
 
     /**
@@ -619,13 +632,13 @@ namespace xt
     template <class S>
     inline bool xcontainer<D>::has_linear_assign(const S& str) const noexcept
     {
-        return str.size() == strides().size() &&
-            std::equal(str.cbegin(), str.cend(), strides().begin());
+        return str.size() == strides().size() && std::equal(str.cbegin(), str.cend(), strides().begin());
     }
+
     //@}
 
     template <class D>
-    inline auto xcontainer<D>::derived_cast() const & noexcept -> const derived_type&
+    inline auto xcontainer<D>::derived_cast() const& noexcept -> const derived_type&
     {
         return *static_cast<const derived_type*>(this);
     }
@@ -729,7 +742,8 @@ namespace xt
     }
 
     template <class D>
-    inline auto xcontainer<D>::data_xend(layout_type l, size_type offset) const noexcept -> const_container_iterator
+    inline auto xcontainer<D>::data_xend(layout_type l, size_type offset) const noexcept
+        -> const_container_iterator
     {
         return data_xend_impl(storage().cbegin(), l, offset);
     }
@@ -752,73 +766,73 @@ namespace xt
     }
 
     template <class D>
-    inline auto xcontainer<D>::storage_begin() noexcept -> storage_iterator
+    inline auto xcontainer<D>::linear_begin() noexcept -> linear_iterator
     {
         return storage().begin();
     }
 
     template <class D>
-    inline auto xcontainer<D>::storage_end() noexcept -> storage_iterator
+    inline auto xcontainer<D>::linear_end() noexcept -> linear_iterator
     {
         return storage().end();
     }
 
     template <class D>
-    inline auto xcontainer<D>::storage_begin() const noexcept -> const_storage_iterator
+    inline auto xcontainer<D>::linear_begin() const noexcept -> const_linear_iterator
     {
         return storage().begin();
     }
 
     template <class D>
-    inline auto xcontainer<D>::storage_end() const noexcept -> const_storage_iterator
+    inline auto xcontainer<D>::linear_end() const noexcept -> const_linear_iterator
     {
         return storage().cend();
     }
 
     template <class D>
-    inline auto xcontainer<D>::storage_cbegin() const noexcept -> const_storage_iterator
+    inline auto xcontainer<D>::linear_cbegin() const noexcept -> const_linear_iterator
     {
         return storage().cbegin();
     }
 
     template <class D>
-    inline auto xcontainer<D>::storage_cend() const noexcept -> const_storage_iterator
+    inline auto xcontainer<D>::linear_cend() const noexcept -> const_linear_iterator
     {
         return storage().cend();
     }
 
     template <class D>
-    inline auto xcontainer<D>::storage_rbegin() noexcept -> reverse_storage_iterator
+    inline auto xcontainer<D>::linear_rbegin() noexcept -> reverse_linear_iterator
     {
         return storage().rbegin();
     }
 
     template <class D>
-    inline auto xcontainer<D>::storage_rend() noexcept -> reverse_storage_iterator
+    inline auto xcontainer<D>::linear_rend() noexcept -> reverse_linear_iterator
     {
         return storage().rend();
     }
 
     template <class D>
-    inline auto xcontainer<D>::storage_rbegin() const noexcept -> const_reverse_storage_iterator
+    inline auto xcontainer<D>::linear_rbegin() const noexcept -> const_reverse_linear_iterator
     {
         return storage().rbegin();
     }
 
     template <class D>
-    inline auto xcontainer<D>::storage_rend() const noexcept -> const_reverse_storage_iterator
+    inline auto xcontainer<D>::linear_rend() const noexcept -> const_reverse_linear_iterator
     {
         return storage().rend();
     }
 
     template <class D>
-    inline auto xcontainer<D>::storage_crbegin() const noexcept -> const_reverse_storage_iterator
+    inline auto xcontainer<D>::linear_crbegin() const noexcept -> const_reverse_linear_iterator
     {
         return storage().crbegin();
     }
 
     template <class D>
-    inline auto xcontainer<D>::storage_crend() const noexcept -> const_reverse_storage_iterator
+    inline auto xcontainer<D>::linear_crend() const noexcept -> const_reverse_linear_iterator
     {
         return storage().crend();
     }
@@ -844,15 +858,26 @@ namespace xt
 
     template <class D>
     inline xstrided_container<D>::xstrided_container(inner_shape_type&& shape, inner_strides_type&& strides) noexcept
-        : base_type(), m_shape(std::move(shape)), m_strides(std::move(strides))
+        : base_type()
+        , m_shape(std::move(shape))
+        , m_strides(std::move(strides))
     {
         m_backstrides = xtl::make_sequence<inner_backstrides_type>(m_shape.size(), 0);
         adapt_strides(m_shape, m_strides, m_backstrides);
     }
 
     template <class D>
-    inline xstrided_container<D>::xstrided_container(inner_shape_type&& shape, inner_strides_type&& strides, inner_backstrides_type&& backstrides, layout_type&& layout) noexcept
-        : base_type(), m_shape(std::move(shape)), m_strides(std::move(strides)), m_backstrides(std::move(backstrides)), m_layout(std::move(layout))
+    inline xstrided_container<D>::xstrided_container(
+        inner_shape_type&& shape,
+        inner_strides_type&& strides,
+        inner_backstrides_type&& backstrides,
+        layout_type&& layout
+    ) noexcept
+        : base_type()
+        , m_shape(std::move(shape))
+        , m_strides(std::move(strides))
+        , m_backstrides(std::move(backstrides))
+        , m_layout(std::move(layout))
     {
     }
 
@@ -906,11 +931,32 @@ namespace xt
     inline bool xstrided_container<D>::is_contiguous() const noexcept
     {
         using str_type = typename inner_strides_type::value_type;
-        return is_contiguous_container<storage_type>::value &&
-               ( m_strides.empty()
-                 || (m_layout == layout_type::row_major && m_strides.back() == str_type(1))
-                 || (m_layout == layout_type::column_major && m_strides.front() == str_type(1)));
-
+        auto is_zero = [](auto i)
+        {
+            return i == 0;
+        };
+        if (!is_contiguous_container<storage_type>::value)
+        {
+            return false;
+        }
+        // We need to make sure the inner-most non-zero stride is one.
+        // Trailing zero strides are ignored because they indicate bradcasted dimensions.
+        if (m_layout == layout_type::row_major)
+        {
+            auto it = std::find_if_not(m_strides.rbegin(), m_strides.rend(), is_zero);
+            // If the array has strides of zero, it is a constant, and therefore contiguous.
+            return it == m_strides.rend() || *it == str_type(1);
+        }
+        else if (m_layout == layout_type::column_major)
+        {
+            auto it = std::find_if_not(m_strides.begin(), m_strides.end(), is_zero);
+            // If the array has strides of zero, it is a constant, and therefore contiguous.
+            return it == m_strides.end() || *it == str_type(1);
+        }
+        else
+        {
+            return m_strides.empty();
+        }
     }
 
     namespace detail
@@ -953,10 +999,13 @@ namespace xt
     template <class S>
     inline void xstrided_container<D>::resize(S&& shape, bool force)
     {
-        XTENSOR_ASSERT_MSG(detail::check_resize_dimension(m_shape, shape),
-                           "cannot change the number of dimensions of xtensor")
+        XTENSOR_ASSERT_MSG(
+            detail::check_resize_dimension(m_shape, shape),
+            "cannot change the number of dimensions of xtensor"
+        )
         std::size_t dim = shape.size();
-        if (m_shape.size() != dim || !std::equal(std::begin(shape), std::end(shape), std::begin(m_shape)) || force)
+        if (m_shape.size() != dim || !std::equal(std::begin(shape), std::end(shape), std::begin(m_shape))
+            || force)
         {
             if (D::static_layout == layout_type::dynamic && m_layout == layout_type::dynamic)
             {
@@ -982,11 +1031,16 @@ namespace xt
     template <class S>
     inline void xstrided_container<D>::resize(S&& shape, layout_type l)
     {
-        XTENSOR_ASSERT_MSG(detail::check_resize_dimension(m_shape, shape),
-                           "cannot change the number of dimensions of xtensor")
+        XTENSOR_ASSERT_MSG(
+            detail::check_resize_dimension(m_shape, shape),
+            "cannot change the number of dimensions of xtensor"
+        )
         if (base_type::static_layout != layout_type::dynamic && l != base_type::static_layout)
         {
-            XTENSOR_THROW(std::runtime_error, "Cannot change layout_type if template parameter not layout_type::dynamic.");
+            XTENSOR_THROW(
+                std::runtime_error,
+                "Cannot change layout_type if template parameter not layout_type::dynamic."
+            );
         }
         m_layout = l;
         resize(std::forward<S>(shape), true);
@@ -1003,12 +1057,16 @@ namespace xt
     template <class S>
     inline void xstrided_container<D>::resize(S&& shape, const strides_type& strides)
     {
-        XTENSOR_ASSERT_MSG(detail::check_resize_dimension(m_shape, shape),
-                           "cannot change the number of dimensions of xtensor")
+        XTENSOR_ASSERT_MSG(
+            detail::check_resize_dimension(m_shape, shape),
+            "cannot change the number of dimensions of xtensor"
+        )
         if (base_type::static_layout != layout_type::dynamic)
         {
-            XTENSOR_THROW(std::runtime_error,
-                          "Cannot resize with custom strides when layout() is != layout_type::dynamic.");
+            XTENSOR_THROW(
+                std::runtime_error,
+                "Cannot resize with custom strides when layout() is != layout_type::dynamic."
+            );
         }
         m_shape = xtl::forward_sequence<shape_type, S>(shape);
         m_strides = strides;
@@ -1035,7 +1093,11 @@ namespace xt
     template <class S>
     inline auto& xstrided_container<D>::reshape(S&& shape, layout_type layout) &
     {
-        reshape_impl(std::forward<S>(shape), xtl::is_signed<std::decay_t<typename std::decay_t<S>::value_type>>(), std::forward<layout_type>(layout));
+        reshape_impl(
+            std::forward<S>(shape),
+            xtl::is_signed<std::decay_t<typename std::decay_t<S>::value_type>>(),
+            std::forward<layout_type>(layout)
+        );
         return this->derived_cast();
     }
 
@@ -1052,11 +1114,15 @@ namespace xt
 
     template <class D>
     template <class S>
-    inline void xstrided_container<D>::reshape_impl(S&& shape, std::false_type /* is unsigned */, layout_type layout)
+    inline void
+    xstrided_container<D>::reshape_impl(S&& shape, std::false_type /* is unsigned */, layout_type layout)
     {
         if (compute_size(shape) != this->size())
         {
-            XTENSOR_THROW(std::runtime_error, "Cannot reshape with incorrect number of elements. Do you mean to resize?");
+            XTENSOR_THROW(
+                std::runtime_error,
+                "Cannot reshape with incorrect number of elements. Do you mean to resize?"
+            );
         }
         if (D::static_layout == layout_type::dynamic && layout == layout_type::dynamic)
         {
@@ -1075,7 +1141,8 @@ namespace xt
 
     template <class D>
     template <class S>
-    inline void xstrided_container<D>::reshape_impl(S&& _shape, std::true_type /* is signed */, layout_type layout)
+    inline void
+    xstrided_container<D>::reshape_impl(S&& _shape, std::true_type /* is signed */, layout_type layout)
     {
         using tmp_value_type = typename std::decay_t<S>::value_type;
         auto new_size = compute_size(_shape);
@@ -1087,23 +1154,26 @@ namespace xt
         tmp_value_type accumulator = 1;
         std::size_t neg_idx = 0;
         std::size_t i = 0;
-        for(auto it = shape.begin(); it != shape.end(); ++it, i++)
+        for (auto it = shape.begin(); it != shape.end(); ++it, i++)
         {
             auto&& dim = *it;
-            if(dim < 0)
+            if (dim < 0)
             {
                 XTENSOR_ASSERT(dim == -1 && !neg_idx);
                 neg_idx = i;
             }
             accumulator *= dim;
         }
-        if(accumulator < 0)
+        if (accumulator < 0)
         {
             shape[neg_idx] = static_cast<tmp_value_type>(this->size()) / std::abs(accumulator);
         }
-        else if(this->size() != new_size)
+        else if (this->size() != new_size)
         {
-            XTENSOR_THROW(std::runtime_error, "Cannot reshape with incorrect number of elements. Do you mean to resize?");
+            XTENSOR_THROW(
+                std::runtime_error,
+                "Cannot reshape with incorrect number of elements. Do you mean to resize?"
+            );
         }
         m_layout = layout;
         m_shape = xtl::forward_sequence<shape_type, S>(shape);

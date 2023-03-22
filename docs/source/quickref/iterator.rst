@@ -52,14 +52,14 @@ Broacasting iteration
     xt::xarray<int> a = {{1, 2, 3}, {4, 5, 6}};
     using shape_type = xt::dynamic_shape<std::size_t>;
     shape_type s = {2, 2, 3};
-    
+
     std::copy(a.begin(s), a.end(s), std::ostream_iterator<int>(std::cout, ", "));
-    // Prints 1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6, 
+    // Prints 1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6,
 
     std::copy(a.begin<layout_type::row_major>(s),
               a.end<layout_type::row_major>(s),
               std::ostream_iterator<int>(std::cout, ", "));
-    // Prints 1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6, 
+    // Prints 1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6,
 
     std::copy(a.begin<layout_type::column_major>(s),
               a.end<layout_type>::column_major>(s),
@@ -126,7 +126,7 @@ Iterating over axis 1:
         std::cout << *iter++ << std::endl;
     }
     // Prints:
-    // { 1, 5, 9 } 
+    // { 1, 5, 9 }
     // { 2, 6, 10 }
     // { 3, 7, 11 }
     // { 4, 8, 12 }

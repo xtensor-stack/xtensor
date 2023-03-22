@@ -1,19 +1,74 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
-#include "test_common_macros.hpp"
 #include "xtensor/xadapt.hpp"
 #include "xtensor/xstrides.hpp"
+
+#include "test_common_macros.hpp"
 
 namespace xt
 {
     using vec_type = std::vector<int>;
+
+    TEST(xarray_adaptor, xarray_pointer)
+    {
+        std::vector<int> data(4, 0);
+        xt::svector<std::size_t> shape = {2, 2};
+        xt::xarray_pointer<int> a = xt::adapt(data.data(), data.size(), xt::no_ownership(), shape);
+
+        a(0, 0) = 0;
+        a(0, 1) = 1;
+        a(1, 0) = 2;
+        a(1, 1) = 3;
+
+        if (XTENSOR_DEFAULT_LAYOUT == xt::layout_type::row_major)
+        {
+            EXPECT_EQ(0, data[0]);
+            EXPECT_EQ(1, data[1]);
+            EXPECT_EQ(2, data[2]);
+            EXPECT_EQ(3, data[3]);
+        }
+        else
+        {
+            EXPECT_EQ(0, data[0]);
+            EXPECT_EQ(2, data[1]);
+            EXPECT_EQ(1, data[2]);
+            EXPECT_EQ(3, data[3]);
+        }
+    }
+
+    TEST(xtensor_adaptor, xtensor_pointer)
+    {
+        std::vector<int> data(4, 0);
+        std::array<std::size_t, 2> shape = {2, 2};
+        xt::xtensor_pointer<int, 2> a = xt::adapt(data.data(), data.size(), xt::no_ownership(), shape);
+
+        a(0, 0) = 0;
+        a(0, 1) = 1;
+        a(1, 0) = 2;
+        a(1, 1) = 3;
+
+        if (XTENSOR_DEFAULT_LAYOUT == xt::layout_type::row_major)
+        {
+            EXPECT_EQ(0, data[0]);
+            EXPECT_EQ(1, data[1]);
+            EXPECT_EQ(2, data[2]);
+            EXPECT_EQ(3, data[3]);
+        }
+        else
+        {
+            EXPECT_EQ(0, data[0]);
+            EXPECT_EQ(2, data[1]);
+            EXPECT_EQ(1, data[2]);
+            EXPECT_EQ(3, data[3]);
+        }
+    }
 
     TEST(xarray_adaptor, adapt)
     {
@@ -61,11 +116,30 @@ namespace xt
         delete[] data;
     }
 
+    TEST(xarray_adaptor, pointer_no_ownership_replace)
+    {
+        size_t size = 4;
+        int* data = new int[3 * size];
+        using shape_type = std::vector<vec_type::size_type>;
+        shape_type s({2, 2});
+
+        auto a1 = adapt(data, size, no_ownership(), s);
+        size_t st = static_cast<size_t>(a1.strides()[0]);
+
+        for (size_t i = 0; i < 3; ++i)
+        {
+            a1.reset_buffer(&data[i * size], size);
+            a1(1, 0) = static_cast<int>(i);
+            EXPECT_EQ(i, data[i * size + st]);
+        }
+    }
+
     TEST(xarray_adaptor, pointer_acquire_ownership)
     {
         size_t size = 4;
         int* data = std::allocator<int>{}.allocate(size);
-        int* data2 =  std::allocator<int>{}.allocate(size);;
+        int* data2 = std::allocator<int>{}.allocate(size);
+        ;
         using shape_type = std::vector<vec_type::size_type>;
         shape_type s({2, 2});
 
@@ -81,13 +155,13 @@ namespace xt
 
     TEST(xarray_adaptor, c_stack_array)
     {
-        double data[4] = { 1., 2., 3., 4. };
+        double data[4] = {1., 2., 3., 4.};
         using shape_type = std::vector<vec_type::size_type>;
         shape_type s({2, 2});
         auto a = adapt(data, s);
 
         EXPECT_EQ(a.size(), 4u);
-        if(XTENSOR_DEFAULT_LAYOUT == xt::layout_type::row_major)
+        if (XTENSOR_DEFAULT_LAYOUT == xt::layout_type::row_major)
         {
             EXPECT_EQ(a(0, 1), 2.);
             EXPECT_EQ(a(1, 0), 3.);
@@ -111,7 +185,7 @@ namespace xt
         int data2 = 1;
         int data3;
         using shape_type = std::vector<vec_type::size_type>;
-        shape_type s({ 1 });
+        shape_type s({1});
 
         auto a1 = adapt(&data1, size, no_ownership(), s);
         auto a2 = adapt(&data2, size, no_ownership(), s);
@@ -129,7 +203,7 @@ namespace xt
         data2[0] = 1;
         int* data3 = nullptr;
         using shape_type = std::vector<vec_type::size_type>;
-        shape_type s({ 1 });
+        shape_type s({1});
 
         auto a1 = adapt(data1, size, acquire_ownership(), s);
         auto a2 = adapt(data2, size, acquire_ownership(), s);
@@ -144,7 +218,7 @@ namespace xt
         int* data = new int[size];
 
         using shape_type = std::vector<vec_type::size_type>;
-        shape_type s = { size };
+        shape_type s = {size};
 
         auto a0 = adapt<layout_type::dynamic>(data, size, no_ownership(), s, layout_type::row_major);
         a0(3) = 3;
@@ -209,6 +283,23 @@ namespace xt
         EXPECT_EQ(1, data[2]);
 
         delete[] data;
+    }
+
+    TEST(xtensor_adaptor, pointer_no_ownership_replace)
+    {
+        size_t size = 4;
+        int* data = new int[3 * size];
+        std::array<size_t, 2> shape = {2, 2};
+
+        auto a1 = adapt(data, size, no_ownership(), shape);
+        size_t st = static_cast<size_t>(a1.strides()[0]);
+
+        for (size_t i = 0; i < 3; ++i)
+        {
+            a1.reset_buffer(&data[i * size], size);
+            a1(1, 0) = static_cast<int>(i);
+            EXPECT_EQ(i, data[i * size + st]);
+        }
     }
 
     TEST(xtensor_adaptor, pointer_const_no_ownership)
@@ -278,13 +369,13 @@ namespace xt
 
     TEST(xtensor_adaptor, c_stack_array)
     {
-        double data[4] = { 1., 2., 3., 4. };
+        double data[4] = {1., 2., 3., 4.};
         using shape_type = std::array<vec_type::size_type, 2>;
         shape_type s = {2, 2};
         auto a = adapt(data, s);
 
         EXPECT_EQ(a.size(), 4u);
-        if(XTENSOR_DEFAULT_LAYOUT == xt::layout_type::row_major)
+        if (XTENSOR_DEFAULT_LAYOUT == xt::layout_type::row_major)
         {
             EXPECT_EQ(a(0, 1), 2.);
             EXPECT_EQ(a(1, 0), 3.);
@@ -309,7 +400,7 @@ namespace xt
         int data2 = 1;
         int data3;
         using shape_type = std::array<vec_type::size_type, 1>;
-        shape_type s = { 1 };
+        shape_type s = {1};
 
         auto a1 = adapt(&data1, size, no_ownership(), s);
         auto a2 = adapt(&data2, size, no_ownership(), s);
@@ -329,7 +420,7 @@ namespace xt
         int* p_data3 = &data3;
 
         using shape_type = std::array<vec_type::size_type, 1>;
-        shape_type s = { 1 };
+        shape_type s = {1};
 
         auto a1 = adapt(p_data1, size, no_ownership(), s);
         auto a2 = adapt(p_data2, size, no_ownership(), s);
@@ -349,7 +440,7 @@ namespace xt
         data2[0] = 1;
         int* data3 = nullptr;
         using shape_type = std::array<vec_type::size_type, 1>;
-        shape_type s = { 1 };
+        shape_type s = {1};
 
         auto a1 = adapt(data1, size, acquire_ownership(), s);
         auto a2 = adapt(data2, size, acquire_ownership(), s);
@@ -364,7 +455,7 @@ namespace xt
         int* data = new int[size];
 
         using shape_type = std::array<vec_type::size_type, 1>;
-        shape_type s = { size };
+        shape_type s = {size};
 
         auto a0 = adapt<layout_type::dynamic>(data, size, no_ownership(), s, layout_type::column_major);
         a0(3) = 3;
@@ -375,7 +466,7 @@ namespace xt
 
     TEST(xarray_adaptor, short_syntax)
     {
-        std::vector<int> a({1,2,3,4,5,6,7,8});
+        std::vector<int> a({1, 2, 3, 4, 5, 6, 7, 8});
         auto xa = adapt(&a[1], std::vector<std::size_t>({3}));
         xa(1) = 123;
 
@@ -385,7 +476,7 @@ namespace xt
 
     TEST(xtensor_adaptor, nice_syntax)
     {
-        std::vector<int> a({1,2,3,4,5,6,7,8});
+        std::vector<int> a({1, 2, 3, 4, 5, 6, 7, 8});
 
         auto xa = adapt(&a[0], {2, 4});
         bool truthy = std::is_same<decltype(xa)::shape_type, std::array<std::size_t, 2>>::value;
@@ -399,7 +490,7 @@ namespace xt
 
     TEST(xtensor_fixed_adaptor, adapt)
     {
-        std::vector<int> a({1,2,3,4,5,6,7,8});
+        std::vector<int> a({1, 2, 3, 4, 5, 6, 7, 8});
         auto xa = adapt(&a[0], xshape<2, 4>());
         xa(0, 0) = 100;
         xa(1, 3) = 1000;
@@ -407,7 +498,7 @@ namespace xt
         EXPECT_EQ(a[7], 1000);
         bool truthy = std::is_same<decltype(xa)::shape_type, xshape<2, 4>>::value;
         EXPECT_TRUE(truthy);
-        const std::vector<int> b({5,5,19,5});
+        const std::vector<int> b({5, 5, 19, 5});
         auto xb = adapt(&b[0], xshape<2, 2>());
         if (XTENSOR_DEFAULT_LAYOUT == layout_type::row_major)
         {
@@ -421,15 +512,20 @@ namespace xt
 
     namespace xadapt_test
     {
-        struct Buffer {
+        struct Buffer
+        {
             std::vector<double> buf;
-            Buffer(std::vector<double>& ibuf) : buf(ibuf) {}
+
+            Buffer(std::vector<double>& ibuf)
+                : buf(ibuf)
+            {
+            }
         };
     }
 
     TEST(xarray_adaptor, smart_ptr)
     {
-        auto data = std::vector<double>{1,2,3,4,5,6,7,8};
+        auto data = std::vector<double>{1, 2, 3, 4, 5, 6, 7, 8};
         auto shared_buf = std::make_shared<xadapt_test::Buffer>(data);
         auto unique_buf = std::make_unique<xadapt_test::Buffer>(data);
         std::vector<size_t> shape = {4, 2};
@@ -463,9 +559,26 @@ namespace xt
         }
     }
 
+    TEST(xtensor_adaptor, pointer_strided_fill)
+    {
+        auto data = std::vector<double>{1, 2, 3, 4, 5, 6, 7, 8};
+        auto adapter = xt::adapt(
+            data.data(),
+            4,
+            xt::no_ownership(),
+            std::vector<size_t>{4, 1},
+            std::vector<size_t>{2, 1}
+        );
+        adapter.fill(0);
+        EXPECT_EQ(data[0], 0);
+        EXPECT_EQ(data[3], 4);
+        EXPECT_EQ(data[4], 0);
+        EXPECT_EQ(data[5], 6);
+    }
+
     TEST(xtensor_adaptor, smart_ptr)
     {
-        auto data = std::vector<double>{1,2,3,4,5,6,7,8};
+        auto data = std::vector<double>{1, 2, 3, 4, 5, 6, 7, 8};
         auto shared_buf = std::make_shared<xadapt_test::Buffer>(data);
         auto unique_buf = std::make_unique<xadapt_test::Buffer>(data);
 

@@ -28,12 +28,14 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU"
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
     endif()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -Wunused-parameter -Wextra -Wreorder")
-    CHECK_CXX_COMPILER_FLAG("-std=c++14" HAS_CPP14_FLAG)
 
-    if (HAS_CPP14_FLAG)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
-    else()
-        message(FATAL_ERROR "Unsupported compiler -- xtensor requires C++14 support!")
+    if(NOT "${CMAKE_CXX_SIMULATE_ID}" STREQUAL "MSVC")
+        CHECK_CXX_COMPILER_FLAG("-std=c++14" HAS_CPP14_FLAG)
+        if (HAS_CPP14_FLAG)
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+        else()
+            message(FATAL_ERROR "Unsupported compiler -- xtensor requires C++14 support!")
+        endif()
     endif()
 
     # Enable link time optimization and set the default symbol
@@ -133,7 +135,16 @@ set(XTENSOR_BENCHMARK
 
 set(XTENSOR_BENCHMARK_TARGET benchmark_xtensor)
 add_executable(${XTENSOR_BENCHMARK_TARGET} EXCLUDE_FROM_ALL ${XTENSOR_BENCHMARK} ${XTENSOR_HEADERS})
-target_link_libraries(${XTENSOR_BENCHMARK_TARGET} xtensor ${GBENCHMARK_LIBRARIES})
+target_link_libraries(${XTENSOR_BENCHMARK_TARGET} PUBLIC xtensor ${GBENCHMARK_LIBRARIES})
+
+if(XTENSOR_USE_TBB)
+    target_compile_definitions(${XTENSOR_BENCHMARK_TARGET} PUBLIC XTENSOR_USE_TBB)
+    target_include_directories(${XTENSOR_BENCHMARK_TARGET} PUBLIC ${TBB_INCLUDE_DIRS})
+    target_link_libraries(${XTENSOR_BENCHMARK_TARGET} PUBLIC ${TBB_LIBRARIES})
+endif()
+if(XTENSOR_USE_OPENMP)
+    target_compile_definitions(${XTENSOR_BENCHMARK_TARGET} PUBLIC XTENSOR_USE_OPENMP)
+endif()
 
 add_custom_target(xbenchmark
     COMMAND benchmark_xtensor

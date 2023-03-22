@@ -1,19 +1,19 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_PAD_HPP
 #define XTENSOR_PAD_HPP
 
 #include "xarray.hpp"
+#include "xstrided_view.hpp"
 #include "xtensor.hpp"
 #include "xview.hpp"
-#include "xstrided_view.hpp"
 
 using namespace xt::placeholders;  // to enable _ syntax
 
@@ -69,13 +69,12 @@ namespace xt
      * (used in `xt::pad_mode::constant`).
      * @return The padded array.
      */
-    template <class E,
-              class S = typename std::decay_t<E>::size_type,
-              class V = typename std::decay_t<E>::value_type>
-    inline auto pad(E&& e,
-                    const std::vector<std::vector<S>>& pad_width,
-                    pad_mode mode = pad_mode::constant,
-                    V constant_value = 0)
+    template <class E, class S = typename std::decay_t<E>::size_type, class V = typename std::decay_t<E>::value_type>
+    inline auto
+    pad(E&& e,
+        const std::vector<std::vector<S>>& pad_width,
+        pad_mode mode = pad_mode::constant,
+        V constant_value = 0)
     {
         XTENSOR_ASSERT(detail::check_pad_width(pad_width, e.shape()));
 
@@ -123,17 +122,17 @@ namespace xt
                 if (mode == pad_mode::wrap || mode == pad_mode::periodic)
                 {
                     XTENSOR_ASSERT(nb <= e.shape(axis));
-                    svs[axis] = xt::range(e.shape(axis), nb+e.shape(axis));
+                    svs[axis] = xt::range(e.shape(axis), nb + e.shape(axis));
                 }
                 else if (mode == pad_mode::symmetric)
                 {
                     XTENSOR_ASSERT(nb <= e.shape(axis));
-                    svs[axis] = xt::range(2*nb-1, nb-1, -1);
+                    svs[axis] = xt::range(2 * nb - 1, nb - 1, -1);
                 }
                 else if (mode == pad_mode::reflect)
                 {
                     XTENSOR_ASSERT(nb <= e.shape(axis) - 1);
-                    svs[axis] = xt::range(2*nb, nb, -1);
+                    svs[axis] = xt::range(2 * nb, nb, -1);
                 }
 
                 xt::strided_view(out, svt) = xt::strided_view(out, svs);
@@ -141,23 +140,23 @@ namespace xt
 
             if (ne > static_cast<size_type>(0))
             {
-                svt[axis] = xt::range(out.shape(axis)-ne, out.shape(axis));
+                svt[axis] = xt::range(out.shape(axis) - ne, out.shape(axis));
 
                 if (mode == pad_mode::wrap || mode == pad_mode::periodic)
                 {
                     XTENSOR_ASSERT(ne <= e.shape(axis));
-                    svs[axis] = xt::range(nb, nb+ne);
+                    svs[axis] = xt::range(nb, nb + ne);
                 }
                 else if (mode == pad_mode::symmetric)
                 {
                     XTENSOR_ASSERT(ne <= e.shape(axis));
                     if (ne == nb + e.shape(axis))
                     {
-                        svs[axis] = xt::range(nb+e.shape(axis)-1, _, -1);
+                        svs[axis] = xt::range(nb + e.shape(axis) - 1, _, -1);
                     }
                     else
                     {
-                        svs[axis] = xt::range(nb+e.shape(axis)-1, nb+e.shape(axis)-ne-1, -1);
+                        svs[axis] = xt::range(nb + e.shape(axis) - 1, nb + e.shape(axis) - ne - 1, -1);
                     }
                 }
                 else if (mode == pad_mode::reflect)
@@ -165,11 +164,11 @@ namespace xt
                     XTENSOR_ASSERT(ne <= e.shape(axis) - 1);
                     if (ne == nb + e.shape(axis) - 1)
                     {
-                        svs[axis] = xt::range(nb+e.shape(axis)-2, _, -1);
+                        svs[axis] = xt::range(nb + e.shape(axis) - 2, _, -1);
                     }
                     else
                     {
-                        svs[axis] = xt::range(nb+e.shape(axis)-2, nb+e.shape(axis)-ne-2, -1);
+                        svs[axis] = xt::range(nb + e.shape(axis) - 2, nb + e.shape(axis) - ne - 2, -1);
                     }
                 }
 
@@ -194,13 +193,9 @@ namespace xt
      * (used in `xt::pad_mode::constant`).
      * @return The padded array.
      */
-    template <class E,
-              class S = typename std::decay_t<E>::size_type,
-              class V = typename std::decay_t<E>::value_type>
-    inline auto pad(E&& e,
-                    const std::vector<S>& pad_width,
-                    pad_mode mode = pad_mode::constant,
-                    V constant_value = 0)
+    template <class E, class S = typename std::decay_t<E>::size_type, class V = typename std::decay_t<E>::value_type>
+    inline auto
+    pad(E&& e, const std::vector<S>& pad_width, pad_mode mode = pad_mode::constant, V constant_value = 0)
     {
         std::vector<std::vector<S>> pw(e.shape().size(), pad_width);
 
@@ -217,20 +212,16 @@ namespace xt
      * (used in `xt::pad_mode::constant`).
      * @return The padded array.
      */
-    template <class E,
-              class S = typename std::decay_t<E>::size_type,
-              class V = typename std::decay_t<E>::value_type>
-    inline auto pad(E&& e,
-                    S pad_width,
-                    pad_mode mode = pad_mode::constant,
-                    V constant_value = 0)
+    template <class E, class S = typename std::decay_t<E>::size_type, class V = typename std::decay_t<E>::value_type>
+    inline auto pad(E&& e, S pad_width, pad_mode mode = pad_mode::constant, V constant_value = 0)
     {
         std::vector<std::vector<S>> pw(e.shape().size(), {pad_width, pad_width});
 
         return pad(e, pw, mode, constant_value);
     }
 
-    namespace detail {
+    namespace detail
+    {
 
         template <class E, class S>
         inline auto tile(E&& e, const S& reps)
@@ -285,13 +276,13 @@ namespace xt
     template <class E, class S = typename std::decay_t<E>::size_type>
     inline auto tile(E&& e, std::initializer_list<S> reps)
     {
-      return detail::tile(std::forward<E>(e), std::vector<S>{reps});
+        return detail::tile(std::forward<E>(e), std::vector<S>{reps});
     }
 
     template <class E, class C, XTL_REQUIRES(xtl::negation<xtl::is_integral<C>>)>
     inline auto tile(E&& e, const C& reps)
     {
-      return detail::tile(std::forward<E>(e), reps);
+        return detail::tile(std::forward<E>(e), reps);
     }
 
     /**
@@ -304,9 +295,9 @@ namespace xt
     template <class E, class S = typename std::decay_t<E>::size_type, XTL_REQUIRES(xtl::is_integral<S>)>
     inline auto tile(E&& e, S reps)
     {
-      std::vector<S> tw(e.shape().size(), static_cast<S>(1));
-      tw[0] = reps;
-      return detail::tile(std::forward<E>(e), tw);
+        std::vector<S> tw(e.shape().size(), static_cast<S>(1));
+        tw[0] = reps;
+        return detail::tile(std::forward<E>(e), tw);
     }
 }
 

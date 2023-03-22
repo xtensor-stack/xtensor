@@ -1,20 +1,20 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
-#include "test_common_macros.hpp"
+#include "xtensor/xarray.hpp"
 #include "xtensor/xbroadcast.hpp"
-#include "xtensor/xarray.hpp"
-#include "xtensor/xstrides.hpp"
-#include "xtensor/xarray.hpp"
-#include "xtensor/xtensor.hpp"
 #include "xtensor/xfixed.hpp"
 #include "xtensor/xshape.hpp"
+#include "xtensor/xstrides.hpp"
+#include "xtensor/xtensor.hpp"
+
+#include "test_common_macros.hpp"
 
 namespace xt
 {
@@ -32,7 +32,9 @@ namespace xt
     {
         auto s0 = shape<std::vector<size_t>>(3);
         auto s1 = shape<std::vector<size_t>>(std::initializer_list<size_t>{1, 2});
-        auto s2 = shape<std::vector<size_t>>(std::initializer_list<std::initializer_list<size_t>>{{1, 2, 4}, {1, 3, 5}});
+        auto s2 = shape<std::vector<size_t>>(
+            std::initializer_list<std::initializer_list<size_t>>{{1, 2, 4}, {1, 3, 5}}
+        );
 
         std::vector<size_t> e0 = {};
         std::vector<size_t> e1 = {2};
@@ -47,13 +49,11 @@ namespace xt
     {
         bool expect_v = std::is_same<
             dynamic_shape<size_t>,
-            promote_shape_t<dynamic_shape<size_t>, std::array<size_t, 3>, std::array<size_t, 2>>
-        >::value;
+            promote_shape_t<dynamic_shape<size_t>, std::array<size_t, 3>, std::array<size_t, 2>>>::value;
 
         bool expect_a = std::is_same<
             std::array<size_t, 3>,
-            promote_shape_t<std::array<size_t, 2>, std::array<size_t, 3>, std::array<size_t, 2>>
-        >::value;
+            promote_shape_t<std::array<size_t, 2>, std::array<size_t, 3>, std::array<size_t, 2>>>::value;
 
         ASSERT_TRUE(expect_v);
         ASSERT_TRUE(expect_a);

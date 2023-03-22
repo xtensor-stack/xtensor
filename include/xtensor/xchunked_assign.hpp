@@ -1,11 +1,11 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_CHUNKED_ASSIGN_HPP
 #define XTENSOR_CHUNKED_ASSIGN_HPP
@@ -34,7 +34,7 @@ namespace xt
     /*********************************
      * xchunked_semantic declaration *
      *********************************/
-    
+
     template <class D>
     class xchunked_semantic : public xsemantic_base<D>
     {
@@ -105,7 +105,9 @@ namespace xt
         {
         };
 
-        struct invalid_chunk_iterator {};
+        struct invalid_chunk_iterator
+        {
+        };
 
         template <class A>
         struct xchunk_iterator_array
@@ -122,22 +124,23 @@ namespace xt
         template <class V>
         struct xchunk_iterator_view
         {
-            using reference = decltype(xt::strided_view(std::declval<V>().expression(), std::declval<xstrided_slice_vector>()));
-            
+            using reference = decltype(xt::strided_view(
+                std::declval<V>().expression(),
+                std::declval<xstrided_slice_vector>()
+            ));
+
             inline auto get_chunk(V& view, typename V::size_type, const xstrided_slice_vector& sv) const
             {
                 return xt::strided_view(view.expression(), sv);
             }
         };
 
-
         template <class T>
         struct xchunk_iterator_base
-            : std::conditional_t<is_xchunked_array<std::decay_t<T>>::value,
-                                 xchunk_iterator_array<T>,
-                                 std::conditional_t<is_xchunked_view<std::decay_t<T>>::value,
-                                                    xchunk_iterator_view<T>,
-                                                    invalid_chunk_iterator>>
+            : std::conditional_t<
+                  is_xchunked_array<std::decay_t<T>>::value,
+                  xchunk_iterator_array<T>,
+                  std::conditional_t<is_xchunked_view<std::decay_t<T>>::value, xchunk_iterator_view<T>, invalid_chunk_iterator>>
         {
         };
     }
@@ -161,10 +164,8 @@ namespace xt
 
 
         xchunk_iterator() = default;
-        xchunk_iterator(E& chunked_expression,
-                        shape_type&& chunk_index,
-                        size_type chunk_linear_index);
-        
+        xchunk_iterator(E& chunked_expression, shape_type&& chunk_index, size_type chunk_linear_index);
+
         self_type& operator++();
         self_type operator++(int);
         decltype(auto) operator*() const;
@@ -228,8 +229,7 @@ namespace xt
     inline auto xchunked_semantic<D>::computed_assign(const xexpression<E>& e) -> derived_type&
     {
         D& d = this->derived_cast();
-        if (e.derived_cast().dimension() > d.dimension()
-            || e.derived_cast().shape() > d.shape())
+        if (e.derived_cast().dimension() > d.dimension() || e.derived_cast().shape() > d.shape())
         {
             return operator=(e);
         }
@@ -243,7 +243,7 @@ namespace xt
     template <class E, class F>
     inline auto xchunked_semantic<D>::scalar_computed_assign(const E& e, F&& f) -> derived_type&
     {
-        for (auto& c: this->derived_cast().chunks())
+        for (auto& c : this->derived_cast().chunks())
         {
             c.scalar_computed_assign(e, f);
         }
@@ -336,13 +336,13 @@ namespace xt
     }
 
     template <class E>
-    inline auto xchunk_iterator<E>::get_slice_vector() const -> const slice_vector& 
+    inline auto xchunk_iterator<E>::get_slice_vector() const -> const slice_vector&
     {
         return m_slice_vector;
     }
-    
+
     template <class E>
-    auto xchunk_iterator<E>::chunk_index() const -> const shape_type& 
+    auto xchunk_iterator<E>::chunk_index() const -> const shape_type&
     {
         return m_chunk_index;
     }
@@ -354,8 +354,10 @@ namespace xt
         for (size_type i = 0; i < m_chunk_index.size(); ++i)
         {
             size_type chunk_shape = p_chunked_expression->chunk_shape()[i];
-            size_type end = std::min(chunk_shape,
-                                     p_chunked_expression->shape()[i] - m_chunk_index[i] * chunk_shape);
+            size_type end = std::min(
+                chunk_shape,
+                p_chunked_expression->shape()[i] - m_chunk_index[i] * chunk_shape
+            );
             slices[i] = range(0u, end);
         }
         return slices;
@@ -365,11 +367,12 @@ namespace xt
     inline void xchunk_iterator<E>::fill_slice_vector(size_type i)
     {
         size_type range_start = m_chunk_index[i] * p_chunked_expression->chunk_shape()[i];
-        size_type range_end = std::min((m_chunk_index[i] + 1) * p_chunked_expression->chunk_shape()[i],
-                                        p_chunked_expression->shape()[i]);
+        size_type range_end = std::min(
+            (m_chunk_index[i] + 1) * p_chunked_expression->chunk_shape()[i],
+            p_chunked_expression->shape()[i]
+        );
         m_slice_vector[i] = range(range_start, range_end);
     }
 }
 
 #endif
-

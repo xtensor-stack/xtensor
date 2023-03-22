@@ -1,11 +1,11 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_ACCUMULATOR_HPP
 #define XTENSOR_ACCUMULATOR_HPP
@@ -28,18 +28,18 @@ namespace xt
     namespace detail
     {
         template <class V = void>
-        struct accumulator_identity: xtl::identity
+        struct accumulator_identity : xtl::identity
         {
             using value_type = V;
         };
     }
+
     /**************
      * accumulate *
      **************/
 
     template <class ACCUMULATE_FUNC, class INIT_FUNC = detail::accumulator_identity<void>>
-    struct xaccumulator_functor
-        : public std::tuple<ACCUMULATE_FUNC, INIT_FUNC>
+    struct xaccumulator_functor : public std::tuple<ACCUMULATE_FUNC, INIT_FUNC>
     {
         using self_type = xaccumulator_functor<ACCUMULATE_FUNC, INIT_FUNC>;
         using base_type = std::tuple<ACCUMULATE_FUNC, INIT_FUNC>;
@@ -84,13 +84,19 @@ namespace xt
         template <class F, class E, class EVS>
         xarray<typename std::decay_t<E>::value_type> accumulator_impl(F&&, E&&, std::size_t, EVS)
         {
-            static_assert(!std::is_same<evaluation_strategy::lazy_type, EVS>::value, "Lazy accumulators not yet implemented.");
+            static_assert(
+                !std::is_same<evaluation_strategy::lazy_type, EVS>::value,
+                "Lazy accumulators not yet implemented."
+            );
         }
 
         template <class F, class E, class EVS>
         xarray<typename std::decay_t<E>::value_type> accumulator_impl(F&&, E&&, EVS)
         {
-            static_assert(!std::is_same<evaluation_strategy::lazy_type, EVS>::value, "Lazy accumulators not yet implemented.");
+            static_assert(
+                !std::is_same<evaluation_strategy::lazy_type, EVS>::value,
+                "Lazy accumulators not yet implemented."
+            );
         }
 
         template <class T, class R>
@@ -160,17 +166,29 @@ namespace xt
             std::size_t outer_loop_size, inner_loop_size, pos = 0;
             std::size_t outer_stride, inner_stride;
 
-            auto set_loop_sizes = [&outer_loop_size, &inner_loop_size](auto first, auto last, std::ptrdiff_t ax) {
-                outer_loop_size = std::accumulate(first, first + ax,
-                                                  std::size_t(1), std::multiplies<std::size_t>());
-                inner_loop_size = std::accumulate(first + ax + 1, last,
-                                                  std::size_t(1), std::multiplies<std::size_t>());
+            auto set_loop_sizes = [&outer_loop_size, &inner_loop_size](auto first, auto last, std::ptrdiff_t ax)
+            {
+                outer_loop_size = std::accumulate(
+                    first,
+                    first + ax,
+                    std::size_t(1),
+                    std::multiplies<std::size_t>()
+                );
+                inner_loop_size = std::accumulate(
+                    first + ax + 1,
+                    last,
+                    std::size_t(1),
+                    std::multiplies<std::size_t>()
+                );
             };
 
             // Note: add check that strides > 0
-            auto set_loop_strides = [&outer_stride, &inner_stride](auto first, auto last, std::ptrdiff_t ax) {
+            auto set_loop_strides = [&outer_stride, &inner_stride](auto first, auto last, std::ptrdiff_t ax)
+            {
                 outer_stride = static_cast<std::size_t>(ax == 0 ? 1 : *std::min_element(first, first + ax));
-                inner_stride = static_cast<std::size_t>((ax == std::distance(first, last) - 1) ? 1 : *std::min_element(first + ax + 1, last));
+                inner_stride = static_cast<std::size_t>(
+                    (ax == std::distance(first, last) - 1) ? 1 : *std::min_element(first + ax + 1, last)
+                );
             };
 
             set_loop_sizes(e.shape().begin(), e.shape().end(), static_cast<std::ptrdiff_t>(axis));
@@ -200,10 +218,12 @@ namespace xt
             using init_type = typename F::init_value_type;
             using accumulate_functor_type = typename F::accumulate_functor_type;
             using expr_value_type = typename std::decay_t<E>::value_type;
-            //using return_type = std::conditional_t<std::is_same<init_type, void>::value, typename std::decay_t<E>::value_type, init_type>;
+            // using return_type = std::conditional_t<std::is_same<init_type, void>::value, typename
+            // std::decay_t<E>::value_type, init_type>;
 
-            using return_type = std::decay_t<decltype(std::declval<accumulate_functor_type>()(std::declval<init_type>(),
-                                                                                              std::declval<expr_value_type>()))>;
+            using return_type = std::decay_t<decltype(std::declval<accumulate_functor_type>(
+            )(std::declval<init_type>(), std::declval<expr_value_type>()))>;
+
             using result_type = xaccumulator_return_type_t<std::decay_t<E>, return_type>;
 
             if (axis >= e.dimension())
@@ -211,33 +231,36 @@ namespace xt
                 XTENSOR_THROW(std::runtime_error, "Axis larger than expression dimension in accumulator.");
             }
 
-            result_type result = e;  // assign + make a copy, we need it anyways
+            result_type res = e;  // assign + make a copy, we need it anyways
 
-            if(result.shape(axis) != std::size_t(0))
+            if (res.shape(axis) != std::size_t(0))
             {
-                std::size_t inner_stride = static_cast<std::size_t>(result.strides()[axis]);
-                std::size_t outer_stride = 1;  // this is either going row- or column-wise (strides.back / strides.front)
+                std::size_t inner_stride = static_cast<std::size_t>(res.strides()[axis]);
+                std::size_t outer_stride = 1;  // either row- or column-wise (strides.back / strides.front)
                 std::size_t outer_loop_size = 0;
                 std::size_t inner_loop_size = 0;
                 std::size_t init_size = e.shape()[axis] != std::size_t(1) ? std::size_t(1) : std::size_t(0);
 
-                auto set_loop_sizes = [&outer_loop_size, &inner_loop_size, init_size](auto first, auto last, std::ptrdiff_t ax) {
-                    outer_loop_size = std::accumulate(first,
-                                                      first + ax,
-                                                      init_size, std::multiplies<std::size_t>());
+                auto set_loop_sizes =
+                    [&outer_loop_size, &inner_loop_size, init_size](auto first, auto last, std::ptrdiff_t ax)
+                {
+                    outer_loop_size = std::accumulate(first, first + ax, init_size, std::multiplies<std::size_t>());
 
-                    inner_loop_size = std::accumulate(first + ax,
-                                                      last,
-                                                      std::size_t(1), std::multiplies<std::size_t>());
+                    inner_loop_size = std::accumulate(
+                        first + ax,
+                        last,
+                        std::size_t(1),
+                        std::multiplies<std::size_t>()
+                    );
                 };
 
                 if (result_type::static_layout == layout_type::row_major)
                 {
-                    set_loop_sizes(result.shape().cbegin(), result.shape().cend(), static_cast<std::ptrdiff_t>(axis));
+                    set_loop_sizes(res.shape().cbegin(), res.shape().cend(), static_cast<std::ptrdiff_t>(axis));
                 }
                 else
                 {
-                    set_loop_sizes(result.shape().cbegin(), result.shape().cend(), static_cast<std::ptrdiff_t>(axis + 1));
+                    set_loop_sizes(res.shape().cbegin(), res.shape().cend(), static_cast<std::ptrdiff_t>(axis + 1));
                     std::swap(inner_loop_size, outer_loop_size);
                 }
 
@@ -246,10 +269,11 @@ namespace xt
                 inner_loop_size = inner_loop_size - inner_stride;
 
                 // activate the init loop if we have an init function other than identity
-                if (!std::is_same<std::decay_t<typename F::init_functor_type>,
-                                  typename detail::accumulator_identity<init_type>>::value)
+                if (!std::is_same<
+                        std::decay_t<typename F::init_functor_type>,
+                        typename detail::accumulator_identity<init_type>>::value)
                 {
-                    accumulator_init_with_f(xt::get<1>(f), result, axis);
+                    accumulator_init_with_f(xt::get<1>(f), res, axis);
                 }
 
                 pos = 0;
@@ -257,14 +281,15 @@ namespace xt
                 {
                     for (std::size_t j = 0; j < inner_loop_size; ++j)
                     {
-                        result.storage()[pos + inner_stride] = xt::get<0>(f)(result.storage()[pos],
-                                                                             result.storage()[pos + inner_stride]);
+                        res.storage()[pos + inner_stride] = xt::get<0>(f
+                        )(res.storage()[pos], res.storage()[pos + inner_stride]);
+
                         pos += outer_stride;
                     }
                     pos += inner_stride;
                 }
             }
-            return result;
+            return res;
         }
 
         template <class F, class E>
@@ -273,15 +298,17 @@ namespace xt
             using init_type = typename F::init_value_type;
             using expr_value_type = typename std::decay_t<E>::value_type;
             using accumulate_functor_type = typename F::accumulate_functor_type;
-            using return_type = std::decay_t<decltype(std::declval<accumulate_functor_type>()(std::declval<init_type>(),
-                                                                                              std::declval<expr_value_type>()))>;
-            //using return_type = std::conditional_t<std::is_same<init_type, void>::value, typename std::decay_t<E>::value_type, init_type>;
+            using return_type = std::decay_t<decltype(std::declval<accumulate_functor_type>(
+            )(std::declval<init_type>(), std::declval<expr_value_type>()))>;
+            // using return_type = std::conditional_t<std::is_same<init_type, void>::value, typename
+            // std::decay_t<E>::value_type, init_type>;
+
             using result_type = xaccumulator_return_type_t<std::decay_t<E>, return_type>;
 
             std::size_t sz = e.size();
             auto result = result_type::from_shape({sz});
 
-            if(sz != std::size_t(0))
+            if (sz != std::size_t(0))
             {
                 auto it = e.template begin<XTENSOR_DEFAULT_TRAVERSAL>();
                 result.storage()[0] = xt::get<1>(f)(*it);
@@ -307,12 +334,11 @@ namespace xt
      *
      * @return returns xarray<T> filled with accumulated values
      */
-    template <class F, class E, class EVS = DEFAULT_STRATEGY_ACCUMULATORS,
-              XTL_REQUIRES(is_evaluation_strategy<EVS>)>
+    template <class F, class E, class EVS = DEFAULT_STRATEGY_ACCUMULATORS, XTL_REQUIRES(is_evaluation_strategy<EVS>)>
     inline auto accumulate(F&& f, E&& e, EVS evaluation_strategy = EVS())
     {
-        // Note we need to check is_integral above in order to prohibit EVS = int, and not taking the std::size_t
-        // overload below!
+        // Note we need to check is_integral above in order to prohibit EVS = int, and not taking the
+        // std::size_t overload below!
         return detail::accumulator_impl(std::forward<F>(f), std::forward<E>(e), evaluation_strategy);
     }
 

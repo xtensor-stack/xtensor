@@ -1,11 +1,11 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_UTILS_HPP
 #define XTENSOR_UTILS_HPP
@@ -24,16 +24,16 @@
 #include <vector>
 
 #include <xtl/xfunctional.hpp>
-#include <xtl/xsequence.hpp>
 #include <xtl/xmeta_utils.hpp>
+#include <xtl/xsequence.hpp>
 #include <xtl/xtype_traits.hpp>
 
 #include "xtensor_config.hpp"
 
 #if (_MSC_VER >= 1910)
-    #define NOEXCEPT(T)
+#define NOEXCEPT(T)
 #else
-    #define NOEXCEPT(T) noexcept(T)
+#define NOEXCEPT(T) noexcept(T)
 #endif
 
 namespace xt
@@ -156,9 +156,8 @@ namespace xt
         }
 
         template <std::size_t I, class F, class... T>
-        inline typename std::enable_if<I < sizeof...(T), void>::type
-        for_each_impl(F&& f, std::tuple<T...>& t)
-            noexcept(noexcept(f(std::get<I>(t))))
+            inline typename std::enable_if < I<sizeof...(T), void>::type
+            for_each_impl(F&& f, std::tuple<T...>& t) noexcept(noexcept(f(std::get<I>(t))))
         {
             f(std::get<I>(t));
             for_each_impl<I + 1, F, T...>(std::forward<F>(f), t);
@@ -166,8 +165,9 @@ namespace xt
     }
 
     template <class F, class... T>
-    inline void for_each(F&& f, std::tuple<T...>& t)
-        noexcept(noexcept(detail::for_each_impl<0, F, T...>(std::forward<F>(f), t)))
+    inline void for_each(F&& f, std::tuple<T...>& t) noexcept(
+        noexcept(detail::for_each_impl<0, F, T...>(std::forward<F>(f), t))
+    )
     {
         detail::for_each_impl<0, F, T...>(std::forward<F>(f), t);
     }
@@ -181,9 +181,8 @@ namespace xt
         }
 
         template <std::size_t I, class F, class... T>
-        inline typename std::enable_if<I < sizeof...(T), void>::type
-        for_each_impl(F&& f, const std::tuple<T...>& t)
-            noexcept(noexcept(f(std::get<I>(t))))
+            inline typename std::enable_if < I<sizeof...(T), void>::type
+            for_each_impl(F&& f, const std::tuple<T...>& t) noexcept(noexcept(f(std::get<I>(t))))
         {
             f(std::get<I>(t));
             for_each_impl<I + 1, F, T...>(std::forward<F>(f), t);
@@ -191,8 +190,9 @@ namespace xt
     }
 
     template <class F, class... T>
-    inline void for_each(F&& f, const std::tuple<T...>& t)
-        noexcept(noexcept(detail::for_each_impl<0, F, T...>(std::forward<F>(f), t)))
+    inline void for_each(F&& f, const std::tuple<T...>& t) noexcept(
+        noexcept(detail::for_each_impl<0, F, T...>(std::forward<F>(f), t))
+    )
     {
         detail::for_each_impl<0, F, T...>(std::forward<F>(f), t);
     }
@@ -213,9 +213,8 @@ namespace xt
         }
 
         template <std::size_t I, class F, class R, class... T>
-        inline std::enable_if_t<I < sizeof...(T), R>
-        accumulate_impl(F&& f, R init, const std::tuple<T...>& t)
-            noexcept(noexcept(f(init, std::get<I>(t))))
+            inline std::enable_if_t < I<sizeof...(T), R>
+            accumulate_impl(F&& f, R init, const std::tuple<T...>& t) noexcept(noexcept(f(init, std::get<I>(t))))
         {
             R res = f(init, std::get<I>(t));
             return accumulate_impl<I + 1, F, R, T...>(std::forward<F>(f), res, t);
@@ -223,8 +222,9 @@ namespace xt
     }
 
     template <class F, class R, class... T>
-    inline R accumulate(F&& f, R init, const std::tuple<T...>& t)
-        noexcept(noexcept(detail::accumulate_impl<0, F, R, T...>(std::forward<F>(f), init, t)))
+    inline R accumulate(F&& f, R init, const std::tuple<T...>& t) noexcept(
+        noexcept(detail::accumulate_impl<0, F, R, T...>(std::forward<F>(f), init, t))
+    )
     {
         return detail::accumulate_impl<0, F, R, T...>(std::forward<F>(f), init, t);
     }
@@ -288,7 +288,8 @@ namespace xt
     }
 
     template <class R, class F, class... S>
-    inline R apply(std::size_t index, F&& func, const std::tuple<S...>& s) NOEXCEPT(noexcept(func(std::get<0>(s))))
+    inline R apply(std::size_t index, F&& func, const std::tuple<S...>& s)
+        NOEXCEPT(noexcept(func(std::get<0>(s))))
     {
         return detail::apply<R>(index, std::forward<F>(func), std::make_index_sequence<sizeof...(S)>(), s);
     }
@@ -360,13 +361,14 @@ namespace xt
     // scalar normalize axis
     inline std::size_t normalize_axis(std::size_t dim, std::ptrdiff_t axis)
     {
-        return axis < 0 ? static_cast<std::size_t>(static_cast<std::ptrdiff_t>(dim) + axis) : static_cast<std::size_t>(axis);
+        return axis < 0 ? static_cast<std::size_t>(static_cast<std::ptrdiff_t>(dim) + axis)
+                        : static_cast<std::size_t>(axis);
     }
 
     template <class E, class C>
-    inline std::enable_if_t<!xtl::is_integral<std::decay_t<C>>::value &&
-                     xtl::is_signed<typename std::decay_t<C>::value_type>::value,
-                     rebind_container_t<std::size_t, std::decay_t<C>>>
+    inline std::enable_if_t<
+        !xtl::is_integral<std::decay_t<C>>::value && xtl::is_signed<typename std::decay_t<C>::value_type>::value,
+        rebind_container_t<std::size_t, std::decay_t<C>>>
     normalize_axis(E& expr, C&& axes)
     {
         rebind_container_t<std::size_t, std::decay_t<C>> res;
@@ -377,17 +379,33 @@ namespace xt
             res[i] = normalize_axis(expr.dimension(), axes[i]);
         }
 
-        XTENSOR_ASSERT(std::all_of(res.begin(), res.end(), [&expr](auto ax_el) { return ax_el < expr.dimension(); }));
+        XTENSOR_ASSERT(std::all_of(
+            res.begin(),
+            res.end(),
+            [&expr](auto ax_el)
+            {
+                return ax_el < expr.dimension();
+            }
+        ));
 
         return res;
     }
 
     template <class C, class E>
-    inline std::enable_if_t<!xtl::is_integral<std::decay_t<C>>::value && std::is_unsigned<typename std::decay_t<C>::value_type>::value, C&&>
+    inline std::enable_if_t<
+        !xtl::is_integral<std::decay_t<C>>::value && std::is_unsigned<typename std::decay_t<C>::value_type>::value,
+        C&&>
     normalize_axis(E& expr, C&& axes)
     {
         static_cast<void>(expr);
-        XTENSOR_ASSERT(std::all_of(axes.begin(), axes.end(), [&expr](auto ax_el) { return ax_el < expr.dimension(); }));
+        XTENSOR_ASSERT(std::all_of(
+            axes.begin(),
+            axes.end(),
+            [&expr](auto ax_el)
+            {
+                return ax_el < expr.dimension();
+            }
+        ));
         return std::forward<C>(axes);
     }
 
@@ -398,34 +416,63 @@ namespace xt
         R res;
         xt::resize_container(res, xtl::sequence_size(axes));
         auto dim = expr.dimension();
-        std::transform(std::begin(axes), std::end(axes), std::begin(res), [&dim](auto ax_el) {
-            return normalize_axis(dim, ax_el);
-        });
+        std::transform(
+            std::begin(axes),
+            std::end(axes),
+            std::begin(res),
+            [&dim](auto ax_el)
+            {
+                return normalize_axis(dim, ax_el);
+            }
+        );
 
-        XTENSOR_ASSERT(std::all_of(res.begin(), res.end(), [&expr](auto ax_el) { return ax_el < expr.dimension(); }));
+        XTENSOR_ASSERT(std::all_of(
+            res.begin(),
+            res.end(),
+            [&expr](auto ax_el)
+            {
+                return ax_el < expr.dimension();
+            }
+        ));
 
         return res;
     }
 
     template <class R, class E, class C>
-    inline auto forward_normalize(E& expr, C&& axes)
-        -> std::enable_if_t<!xtl::is_signed<std::decay_t<decltype(*std::begin(axes))>>::value && !std::is_same<R, std::decay_t<C>>::value, R>
+    inline auto forward_normalize(E& expr, C&& axes) -> std::enable_if_t<
+        !xtl::is_signed<std::decay_t<decltype(*std::begin(axes))>>::value && !std::is_same<R, std::decay_t<C>>::value,
+        R>
     {
         static_cast<void>(expr);
 
         R res;
         xt::resize_container(res, xtl::sequence_size(axes));
         std::copy(std::begin(axes), std::end(axes), std::begin(res));
-        XTENSOR_ASSERT(std::all_of(res.begin(), res.end(), [&expr](auto ax_el) { return ax_el < expr.dimension(); }));
+        XTENSOR_ASSERT(std::all_of(
+            res.begin(),
+            res.end(),
+            [&expr](auto ax_el)
+            {
+                return ax_el < expr.dimension();
+            }
+        ));
         return res;
     }
 
     template <class R, class E, class C>
-    inline auto forward_normalize(E& expr, C&& axes)
-        -> std::enable_if_t<!xtl::is_signed<std::decay_t<decltype(*std::begin(axes))>>::value && std::is_same<R, std::decay_t<C>>::value, R&&>
+    inline auto forward_normalize(E& expr, C&& axes) -> std::enable_if_t<
+        !xtl::is_signed<std::decay_t<decltype(*std::begin(axes))>>::value && std::is_same<R, std::decay_t<C>>::value,
+        R&&>
     {
         static_cast<void>(expr);
-        XTENSOR_ASSERT(std::all_of(std::begin(axes), std::end(axes), [&expr](auto ax_el) { return ax_el < expr.dimension(); }));
+        XTENSOR_ASSERT(std::all_of(
+            std::begin(axes),
+            std::end(axes),
+            [&expr](auto ax_el)
+            {
+                return ax_el < expr.dimension();
+            }
+        ));
         return std::move(axes);
     }
 
@@ -454,22 +501,22 @@ namespace xt
 
     // When subclassing from std::tuple not all compilers are able to correctly instantiate get
     // See here: https://stackoverflow.com/a/37188019/2528668
-    template <std::size_t I, template <typename... Args> class T, typename ...Args>
+    template <std::size_t I, template <typename... Args> class T, typename... Args>
     decltype(auto) get(T<Args...>&& v)
     {
-      return std::get<I>(static_cast<std::tuple<Args...>&&>(v));
+        return std::get<I>(static_cast<std::tuple<Args...>&&>(v));
     }
 
-    template <std::size_t I, template <typename... Args> class T, typename ...Args>
+    template <std::size_t I, template <typename... Args> class T, typename... Args>
     decltype(auto) get(T<Args...>& v)
     {
-      return std::get<I>(static_cast<std::tuple<Args...>&>(v));
+        return std::get<I>(static_cast<std::tuple<Args...>&>(v));
     }
 
-    template <std::size_t I, template <typename... Args> class T, typename ...Args>
-    decltype(auto) get(const T<Args...> & v)
+    template <std::size_t I, template <typename... Args> class T, typename... Args>
+    decltype(auto) get(const T<Args...>& v)
     {
-      return std::get<I>(static_cast<const std::tuple<Args...> &>(v));
+        return std::get<I>(static_cast<const std::tuple<Args...>&>(v));
     }
 
     /***************************
@@ -478,8 +525,11 @@ namespace xt
 
     namespace detail
     {
-        template <class T, class U, bool = std::is_const<std::remove_reference_t<T>>::value,
-                  bool = std::is_volatile<std::remove_reference_t<T>>::value>
+        template <
+            class T,
+            class U,
+            bool = std::is_const<std::remove_reference_t<T>>::value,
+            bool = std::is_volatile<std::remove_reference_t<T>>::value>
         struct apply_cv_impl
         {
             using type = U;
@@ -537,10 +587,9 @@ namespace xt
     template <class T, class U>
     using apply_cv_t = typename apply_cv<T, U>::type;
 
-
     /**************************
-    * to_array implementation *
-    ***************************/
+     * to_array implementation *
+     ***************************/
 
     namespace detail
     {
@@ -575,6 +624,25 @@ namespace xt
         return N;
     }
 
+    /***********************************
+     * has_storage_type implementation *
+     ***********************************/
+
+    template <class T, class = void>
+    struct has_storage_type : std::false_type
+    {
+    };
+
+    template <class T>
+    struct xcontainer_inner_types;
+
+    template <class T>
+    struct has_storage_type<T, void_t<typename xcontainer_inner_types<T>::storage_type>>
+        : xtl::negation<
+              std::is_same<typename std::remove_cv<typename xcontainer_inner_types<T>::storage_type>::type, invalid_type>>
+    {
+    };
+
     /*************************************
      * has_data_interface implementation *
      *************************************/
@@ -585,8 +653,7 @@ namespace xt
     };
 
     template <class E>
-    struct has_data_interface<E, void_t<decltype(std::declval<E>().data())>>
-        : std::true_type
+    struct has_data_interface<E, void_t<decltype(std::declval<E>().data())>> : std::true_type
     {
     };
 
@@ -596,8 +663,7 @@ namespace xt
     };
 
     template <class E>
-    struct has_strides<E, void_t<decltype(std::declval<E>().strides())>>
-        : std::true_type
+    struct has_strides<E, void_t<decltype(std::declval<E>().strides())>> : std::true_type
     {
     };
 
@@ -607,8 +673,7 @@ namespace xt
     };
 
     template <class E>
-    struct has_iterator_interface<E, void_t<decltype(std::declval<E>().begin())>>
-        : std::true_type
+    struct has_iterator_interface<E, void_t<decltype(std::declval<E>().begin())>> : std::true_type
     {
     };
 
@@ -622,13 +687,10 @@ namespace xt
     };
 
     template <class E>
-    struct is_iterator<E, void_t<decltype(
-        *std::declval<const E>(),
-        std::declval<const E>() == std::declval<const E>(),
-        std::declval<const E>() != std::declval<const E>(),
-        ++ (*std::declval<E*>()),
-        (*std::declval<E*>()) ++,
-        std::true_type())>>
+    struct is_iterator<
+        E,
+        void_t<
+            decltype(*std::declval<const E>(), std::declval<const E>() == std::declval<const E>(), std::declval<const E>() != std::declval<const E>(), ++(*std::declval<E*>()), (*std::declval<E*>())++, std::true_type())>>
         : std::true_type
     {
     };
@@ -727,8 +789,7 @@ namespace xt
     }
 
     template <class T, class A, alloc_tracking::policy P>
-    struct tracking_allocator
-        : private A
+    struct tracking_allocator : private A
     {
         using base_type = A;
         using value_type = typename A::value_type;
@@ -751,16 +812,17 @@ namespace xt
                 }
                 else if (P == alloc_tracking::assert)
                 {
-                    XTENSOR_THROW(std::runtime_error,
-                                  "xtensor allocation of " + std::to_string(n) +
-                                  " elements detected");
+                    XTENSOR_THROW(
+                        std::runtime_error,
+                        "xtensor allocation of " + std::to_string(n) + " elements detected"
+                    );
                 }
             }
             return base_type::allocate(n);
         }
 
-        using base_type::deallocate;
         using base_type::construct;
+        using base_type::deallocate;
         using base_type::destroy;
 
         template <class U>
@@ -774,13 +836,13 @@ namespace xt
     template <class T, class AT, alloc_tracking::policy PT, class U, class AU, alloc_tracking::policy PU>
     inline bool operator==(const tracking_allocator<T, AT, PT>&, const tracking_allocator<U, AU, PU>&)
     {
-      return std::is_same<AT, AU>::value;
+        return std::is_same<AT, AU>::value;
     }
 
     template <class T, class AT, alloc_tracking::policy PT, class U, class AU, alloc_tracking::policy PU>
     inline bool operator!=(const tracking_allocator<T, AT, PT>& a, const tracking_allocator<U, AU, PU>& b)
     {
-      return !(a == b);
+        return !(a == b);
     }
 
     /*****************
@@ -843,6 +905,21 @@ namespace xt
         using type = std::array<std::ptrdiff_t, sizeof...(I)>;
     };
 
+    template <class CP, class O, class A>
+    class xbuffer_adaptor;
+
+    template <class CP, class O, class A>
+    struct get_strides_type<xbuffer_adaptor<CP, O, A>>
+    {
+        // In bindings this mapping is called by reshape_view with an inner shape of type
+        // xbuffer_adaptor.
+        // Since we cannot create a buffer adaptor holding data, we map it to an std::vector.
+        using type = std::vector<
+            typename xbuffer_adaptor<CP, O, A>::value_type,
+            typename xbuffer_adaptor<CP, O, A>::allocator_type>;
+    };
+
+
     template <class C>
     using get_strides_t = typename get_strides_type<C>::type;
 
@@ -854,9 +931,10 @@ namespace xt
     struct inner_reference
     {
         using storage_type = std::decay_t<ST>;
-        using type = std::conditional_t<std::is_const<std::remove_reference_t<ST>>::value,
-                                        typename storage_type::const_reference,
-                                        typename storage_type::reference>;
+        using type = std::conditional_t<
+            std::is_const<std::remove_reference_t<ST>>::value,
+            typename storage_type::const_reference,
+            typename storage_type::reference>;
     };
 
     template <class ST>
@@ -869,13 +947,13 @@ namespace xt
     template <class E, typename = void>
     struct get_rank
     {
-        constexpr static std::size_t value = SIZE_MAX;
+        static constexpr std::size_t value = SIZE_MAX;
     };
 
     template <class E>
-    struct get_rank<E, decltype((void)E::rank, void())>
+    struct get_rank<E, decltype((void) E::rank, void())>
     {
-        constexpr static std::size_t value= E::rank;
+        static constexpr std::size_t value = E::rank;
     };
 
     /******************

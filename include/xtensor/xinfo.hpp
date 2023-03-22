@@ -1,45 +1,47 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_INFO_HPP
 #define XTENSOR_INFO_HPP
 
 #include <string>
 
+#include "xlayout.hpp"
+
 #ifndef _MSC_VER
-#  if __cplusplus < 201103
-#    define CONSTEXPR11_TN
-#    define CONSTEXPR14_TN
-#    define NOEXCEPT_TN
-#  elif __cplusplus < 201402
-#    define CONSTEXPR11_TN constexpr
-#    define CONSTEXPR14_TN
-#    define NOEXCEPT_TN noexcept
-#  else
-#    define CONSTEXPR11_TN constexpr
-#    define CONSTEXPR14_TN constexpr
-#    define NOEXCEPT_TN noexcept
-#  endif
+#if __cplusplus < 201103
+#define CONSTEXPR11_TN
+#define CONSTEXPR14_TN
+#define NOEXCEPT_TN
+#elif __cplusplus < 201402
+#define CONSTEXPR11_TN constexpr
+#define CONSTEXPR14_TN
+#define NOEXCEPT_TN noexcept
+#else
+#define CONSTEXPR11_TN constexpr
+#define CONSTEXPR14_TN constexpr
+#define NOEXCEPT_TN noexcept
+#endif
 #else  // _MSC_VER
-#  if _MSC_VER < 1900
-#    define CONSTEXPR11_TN
-#    define CONSTEXPR14_TN
-#    define NOEXCEPT_TN
-#  elif _MSC_VER < 2000
-#    define CONSTEXPR11_TN constexpr
-#    define CONSTEXPR14_TN
-#    define NOEXCEPT_TN noexcept
-#  else
-#    define CONSTEXPR11_TN constexpr
-#    define CONSTEXPR14_TN constexpr
-#    define NOEXCEPT_TN noexcept
-#  endif
+#if _MSC_VER < 1900
+#define CONSTEXPR11_TN
+#define CONSTEXPR14_TN
+#define NOEXCEPT_TN
+#elif _MSC_VER < 2000
+#define CONSTEXPR11_TN constexpr
+#define CONSTEXPR14_TN
+#define NOEXCEPT_TN noexcept
+#else
+#define CONSTEXPR11_TN constexpr
+#define CONSTEXPR14_TN constexpr
+#define NOEXCEPT_TN noexcept
+#endif
 #endif
 
 namespace xt
@@ -48,13 +50,13 @@ namespace xt
     struct static_string
     {
         template <std::size_t N>
-        explicit CONSTEXPR11_TN static_string(const char (&a)[N]) NOEXCEPT_TN
-            : data(a), size(N - 1)
+        explicit CONSTEXPR11_TN static_string(const char (&a)[N]) NOEXCEPT_TN : data(a),
+                                                                                size(N - 1)
         {
         }
 
-        CONSTEXPR11_TN static_string(const char* a, const std::size_t sz) NOEXCEPT_TN
-            : data(a), size(sz)
+        CONSTEXPR11_TN static_string(const char* a, const std::size_t sz) NOEXCEPT_TN : data(a),
+                                                                                        size(sz)
         {
         }
 

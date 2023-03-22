@@ -108,7 +108,7 @@ amount in a given dimension, dereferencing the stepper, and moving it to the beg
 .. code::
 
     reference operator*() const;
-    
+
     void step(size_type dim, size_type n = 1);
     void step_back(size_type dim, size_type n = 1);
     void reset(size_type dim);
@@ -234,4 +234,3 @@ from ``{0, 3}`` to ``{1, 0}``: first the stepper is reset to ``{0, 0}``, then ``
 
 ``xiterator`` implements a random access iterator, providing ``operator--`` and ``operator[]`` methods. The implementation of these methods
 is similar to the one of ``operator++``.
-

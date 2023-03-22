@@ -55,7 +55,7 @@ This is not consistent with the behavior of the copy constructor from a scalar:
     // prints 1.2 (a is a 0-D array)
 
 A way to fix this is to disable copy construction from scalar, and provide a constructor taking a shape and
-a scalar: 
+a scalar:
 
 .. code::
 
@@ -129,4 +129,3 @@ This simple example shows that without consistency between scalars and 0-D expre
 of some 0-D computation actually *silently* changes the shape of the expressions that this result is assigned to.
 
 The only way to avoid that behavior and the bugs it leads to is to handle scalars as if they were 0-dimensional expressions.
-

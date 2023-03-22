@@ -1,21 +1,18 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright Leon Merten Lohse
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright Leon Merten Lohse
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_NPY_HPP
 #define XTENSOR_NPY_HPP
 
 // Derived from https://github.com/llohse/libnpy by Leon Merten Lohse,
 // relicensed from MIT License with permission
-
-#include <xtl/xsequence.hpp>
-#include <xtl/xplatform.hpp>
 
 #include <algorithm>
 #include <complex>
@@ -31,10 +28,14 @@
 #include <typeinfo>
 #include <vector>
 
+#include <xtl/xplatform.hpp>
+#include <xtl/xsequence.hpp>
+
 #include "xtensor/xadapt.hpp"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xeval.hpp"
 #include "xtensor/xstrides.hpp"
+
 #include "xtensor_config.hpp"
 
 namespace xt
@@ -47,20 +48,15 @@ namespace xt
         const char magic_string[] = "\x93NUMPY";
         const std::size_t magic_string_length = sizeof(magic_string) - 1;
 
-
         template <class O>
-        inline void write_magic(O& ostream,
-                                unsigned char v_major = 1,
-                                unsigned char v_minor = 0)
+        inline void write_magic(O& ostream, unsigned char v_major = 1, unsigned char v_minor = 0)
         {
             ostream.write(magic_string, magic_string_length);
             ostream.put(char(v_major));
             ostream.put(char(v_minor));
         }
 
-        inline void read_magic(std::istream& istream,
-                               unsigned char* v_major,
-                               unsigned char* v_minor)
+        inline void read_magic(std::istream& istream, unsigned char* v_major, unsigned char* v_minor)
         {
             std::unique_ptr<char[]> buf(new char[magic_string_length + 2]);
             istream.read(buf.get(), magic_string_length + 2);
@@ -85,28 +81,82 @@ namespace xt
         template <class T>
         inline char map_type()
         {
-            if (std::is_same<T, float>::value) return 'f';
-            if (std::is_same<T, double>::value) return 'f';
-            if (std::is_same<T, long double>::value) return 'f';
+            if (std::is_same<T, float>::value)
+            {
+                return 'f';
+            }
+            if (std::is_same<T, double>::value)
+            {
+                return 'f';
+            }
+            if (std::is_same<T, long double>::value)
+            {
+                return 'f';
+            }
 
-            if (std::is_same<T, char>::value) return 'i';
-            if (std::is_same<T, signed char>::value) return 'i';
-            if (std::is_same<T, short>::value) return 'i';
-            if (std::is_same<T, int>::value) return 'i';
-            if (std::is_same<T, long>::value) return 'i';
-            if (std::is_same<T, long long>::value) return 'i';
+            if (std::is_same<T, char>::value)
+            {
+                return 'i';
+            }
+            if (std::is_same<T, signed char>::value)
+            {
+                return 'i';
+            }
+            if (std::is_same<T, short>::value)
+            {
+                return 'i';
+            }
+            if (std::is_same<T, int>::value)
+            {
+                return 'i';
+            }
+            if (std::is_same<T, long>::value)
+            {
+                return 'i';
+            }
+            if (std::is_same<T, long long>::value)
+            {
+                return 'i';
+            }
 
-            if (std::is_same<T, unsigned char>::value) return 'u';
-            if (std::is_same<T, unsigned short>::value) return 'u';
-            if (std::is_same<T, unsigned int>::value) return 'u';
-            if (std::is_same<T, unsigned long>::value) return 'u';
-            if (std::is_same<T, unsigned long long>::value) return 'u';
+            if (std::is_same<T, unsigned char>::value)
+            {
+                return 'u';
+            }
+            if (std::is_same<T, unsigned short>::value)
+            {
+                return 'u';
+            }
+            if (std::is_same<T, unsigned int>::value)
+            {
+                return 'u';
+            }
+            if (std::is_same<T, unsigned long>::value)
+            {
+                return 'u';
+            }
+            if (std::is_same<T, unsigned long long>::value)
+            {
+                return 'u';
+            }
 
-            if (std::is_same<T, bool>::value) return 'b';
+            if (std::is_same<T, bool>::value)
+            {
+                return 'b';
+            }
 
-            if (std::is_same<T, std::complex<float>>::value) return 'c';
-            if (std::is_same<T, std::complex<double>>::value) return 'c';
-            if (std::is_same<T, std::complex<long double>>::value) return 'c';
+            if (std::is_same<T, std::complex<float>>::value)
+            {
+                return 'c';
+            }
+            if (std::is_same<T, std::complex<double>>::value)
+            {
+                return 'c';
+            }
+            if (std::is_same<T, std::complex<long double>>::value)
+            {
+                return 'c';
+            }
 
             XTENSOR_THROW(std::runtime_error, "Type not known.");
         }
@@ -118,19 +168,19 @@ namespace xt
             constexpr char big_endian_char = '>';
             constexpr char no_endian_char = '|';
 
-            if(sizeof(T) <= sizeof(char))
+            if (sizeof(T) <= sizeof(char))
             {
                 return no_endian_char;
             }
 
-            switch(xtl::endianness())
+            switch (xtl::endianness())
             {
-            case xtl::endian::little_endian:
-                return little_endian_char;
-            case xtl::endian::big_endian:
-                return big_endian_char;
-            default:
-                return no_endian_char;
+                case xtl::endian::little_endian:
+                    return little_endian_char;
+                case xtl::endian::big_endian:
+                    return big_endian_char;
+                default:
+                    return no_endian_char;
             }
         }
 
@@ -187,9 +237,8 @@ namespace xt
             }
         }
 
-        inline void parse_header(std::string header, std::string& descr,
-                                 bool* fortran_order,
-                                 std::vector<std::size_t>& shape)
+        inline void
+        parse_header(std::string header, std::string& descr, bool* fortran_order, std::vector<std::size_t>& shape)
         {
             // The first 6 bytes are a magic string: exactly "x93NUMPY".
             //
@@ -349,8 +398,7 @@ namespace xt
         }
 
         template <class O, class S>
-        inline void write_header(O& out, const std::string& descr,
-                                 bool fortran_order, const S& shape)
+        inline void write_header(O& out, const std::string& descr, bool fortran_order, const S& shape)
         {
             std::ostringstream ss_header;
             std::string s_fortran_order;
@@ -381,8 +429,7 @@ namespace xt
             }
             s_shape += ")";
 
-            ss_header << "{'descr': '" << descr
-                      << "', 'fortran_order': " << s_fortran_order
+            ss_header << "{'descr': '" << descr << "', 'fortran_order': " << s_fortran_order
                       << ", 'shape': " << s_shape << ", }";
 
             std::size_t header_len_pre = ss_header.str().length() + 1;
@@ -456,8 +503,8 @@ namespace xt
             char header_len_le32[4];
             istream.read(header_len_le32, 4);
 
-            uint32_t header_length = uint32_t(header_len_le32[0] << 0) | uint32_t(header_len_le32[1] << 8) |
-                uint32_t(header_len_le32[2] << 16) | uint32_t(header_len_le32[3] << 24);
+            uint32_t header_length = uint32_t(header_len_le32[0] << 0) | uint32_t(header_len_le32[1] << 8)
+                                     | uint32_t(header_len_le32[2] << 16) | uint32_t(header_len_le32[3] << 24);
 
             if ((magic_string_length + 2 + 4 + header_length) % 16 != 0)
             {
@@ -475,9 +522,10 @@ namespace xt
         {
             npy_file() = default;
 
-            npy_file(std::vector<std::size_t>& shape, bool fortran_order,
-                     std::string typestring)
-                : m_shape(shape), m_fortran_order(fortran_order), m_typestring(typestring)
+            npy_file(std::vector<std::size_t>& shape, bool fortran_order, std::string typestring)
+                : m_shape(shape)
+                , m_fortran_order(fortran_order)
+                , m_typestring(typestring)
             {
                 // Allocate memory
                 m_word_size = std::size_t(atoi(&typestring[2]));
@@ -495,16 +543,16 @@ namespace xt
 
             // delete copy constructor
             npy_file(const npy_file&) = delete;
-            npy_file& operator=(npy_file) = delete;
+            npy_file& operator=(const npy_file&) = delete;
 
             // implement move constructor and assignment
             npy_file(npy_file&& rhs)
-                : m_shape(std::move(rhs.m_shape)),
-                  m_fortran_order(std::move(rhs.m_fortran_order)),
-                  m_word_size(std::move(rhs.m_word_size)),
-                  m_n_bytes(std::move(rhs.m_n_bytes)),
-                  m_typestring(std::move(rhs.m_typestring)),
-                  m_buffer(rhs.m_buffer)
+                : m_shape(std::move(rhs.m_shape))
+                , m_fortran_order(std::move(rhs.m_fortran_order))
+                , m_word_size(std::move(rhs.m_word_size))
+                , m_n_bytes(std::move(rhs.m_n_bytes))
+                , m_typestring(std::move(rhs.m_typestring))
+                , m_buffer(rhs.m_buffer)
             {
                 rhs.m_buffer = nullptr;
             }
@@ -538,20 +586,27 @@ namespace xt
                 // check if the typestring matches the given one
                 if (check_type && m_typestring != detail::build_typestring<T>())
                 {
-                    XTENSOR_THROW(std::runtime_error,
-                                  "Cast error: formats not matching "s + m_typestring +
-                                  " vs "s + detail::build_typestring<T>());
+                    XTENSOR_THROW(
+                        std::runtime_error,
+                        "Cast error: formats not matching "s + m_typestring + " vs "s
+                            + detail::build_typestring<T>()
+                    );
                 }
 
-                if ((L == layout_type::column_major && !m_fortran_order) ||
-                    (L == layout_type::row_major && m_fortran_order))
+                if ((L == layout_type::column_major && !m_fortran_order)
+                    || (L == layout_type::row_major && m_fortran_order))
                 {
-                    XTENSOR_THROW(std::runtime_error, "Cast error: layout mismatch between npy file and requested layout.");
+                    XTENSOR_THROW(
+                        std::runtime_error,
+                        "Cast error: layout mismatch between npy file and requested layout."
+                    );
                 }
 
-                compute_strides(m_shape,
-                                m_fortran_order ? layout_type::column_major : layout_type::row_major,
-                                strides);
+                compute_strides(
+                    m_shape,
+                    m_fortran_order ? layout_type::column_major : layout_type::row_major,
+                    strides
+                );
                 std::vector<std::size_t> shape(m_shape);
 
                 return std::make_tuple(ptr, sz, std::move(shape), std::move(strides));
@@ -562,24 +617,39 @@ namespace xt
             {
                 auto cast_elems = cast_impl<T, L>(check_type);
                 m_buffer = nullptr;
-                return adapt(std::move(std::get<0>(cast_elems)), std::get<1>(cast_elems),
-                             acquire_ownership(), std::get<2>(cast_elems), std::get<3>(cast_elems));
+                return adapt(
+                    std::move(std::get<0>(cast_elems)),
+                    std::get<1>(cast_elems),
+                    acquire_ownership(),
+                    std::get<2>(cast_elems),
+                    std::get<3>(cast_elems)
+                );
             }
 
             template <class T, layout_type L = layout_type::dynamic>
-            auto cast(bool check_type = true) const &
+            auto cast(bool check_type = true) const&
             {
                 auto cast_elems = cast_impl<T, L>(check_type);
-                return adapt(std::get<0>(cast_elems), std::get<1>(cast_elems),
-                             no_ownership(), std::get<2>(cast_elems), std::get<3>(cast_elems));
+                return adapt(
+                    std::get<0>(cast_elems),
+                    std::get<1>(cast_elems),
+                    no_ownership(),
+                    std::get<2>(cast_elems),
+                    std::get<3>(cast_elems)
+                );
             }
 
             template <class T, layout_type L = layout_type::dynamic>
             auto cast(bool check_type = true) &
             {
                 auto cast_elems = cast_impl<T, L>(check_type);
-                return adapt(std::get<0>(cast_elems), std::get<1>(cast_elems),
-                             no_ownership(), std::get<2>(cast_elems), std::get<3>(cast_elems));
+                return adapt(
+                    std::get<0>(cast_elems),
+                    std::get<1>(cast_elems),
+                    no_ownership(),
+                    std::get<2>(cast_elems),
+                    std::get<3>(cast_elems)
+                );
             }
 
             char* ptr()
@@ -652,11 +722,12 @@ namespace xt
             detail::write_header(stream, typestring, fortran_order, shape);
 
             std::size_t size = compute_size(shape);
-            stream.write(reinterpret_cast<const char*>(eval_ex.data()),
-                         std::streamsize((sizeof(value_type) * size)));
+            stream.write(
+                reinterpret_cast<const char*>(eval_ex.data()),
+                std::streamsize((sizeof(value_type) * size))
+            );
         }
     }  // namespace detail
-
 
     /**
      * Save xexpression to NumPy npy format
@@ -730,4 +801,3 @@ namespace xt
 }  // namespace xt
 
 #endif
-

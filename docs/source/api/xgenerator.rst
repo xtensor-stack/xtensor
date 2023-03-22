@@ -10,6 +10,4 @@ xgenerator
 Defined in ``xtensor/xgenerator.hpp``
 
 .. doxygenclass:: xt::xgenerator
-   :project: xtensor
    :members:
-

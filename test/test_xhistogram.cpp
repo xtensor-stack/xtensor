@@ -1,19 +1,22 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #include <complex>
 #include <limits>
 
-#include "test_common_macros.hpp"
+// For some obscure reason xtensor.hpp need to be included first for Windows' Clangcl
 #include "xtensor/xtensor.hpp"
+//
 #include "xtensor/xhistogram.hpp"
 #include "xtensor/xrandom.hpp"
+
+#include "test_common_macros.hpp"
 
 namespace xt
 {
@@ -24,13 +27,14 @@ namespace xt
         {
             xt::xtensor<double, 1> count = xt::histogram(data, std::size_t(2));
 
-            EXPECT_EQ(count.size(), std::size_t(2) );
+            EXPECT_EQ(count.size(), std::size_t(2));
             EXPECT_EQ(count(0), 2.);
             EXPECT_EQ(count(1), 2.);
         }
 
         {
-            xt::xtensor<double, 1> count = xt::histogram(data,
+            xt::xtensor<double, 1> count = xt::histogram(
+                data,
                 xt::histogram_bin_edges(data, std::size_t(2), xt::histogram_algorithm::uniform)
             );
 
@@ -49,8 +53,7 @@ namespace xt
 
         {
             // test specifying return type as well
-            auto count = xt::histogram<float>(
-                    data, size_t(2), xt::xtensor<double, 1>({1., 2., 1., 1.}), 0.5, 1.5);
+            auto count = xt::histogram<float>(data, size_t(2), xt::xtensor<double, 1>({1., 2., 1., 1.}), 0.5, 1.5);
 
             EXPECT_EQ(count.size(), std::size_t(2));
             EXPECT_EQ(count(0), 0.f);
@@ -64,7 +67,7 @@ namespace xt
             xt::xarray<double> arr = {1., 1., 2., 2.};
             xt::xtensor<double, 1> count = xt::histogram(arr, std::size_t(2));
 
-            EXPECT_EQ(count.size(), std::size_t(2) );
+            EXPECT_EQ(count.size(), std::size_t(2));
             EXPECT_EQ(count(0), 2.);
             EXPECT_EQ(count(1), 2.);
         }
@@ -96,7 +99,6 @@ namespace xt
         EXPECT_EQ(xt::digitize(data, bin_edges, false), res_left);
         EXPECT_EQ(xt::digitize(data, bin_edges, true), res_right);
     }
-
 
     TEST(xhistogram, bin_items_1)
     {

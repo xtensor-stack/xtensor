@@ -4,13 +4,13 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-xshape
-======
+xstrides
+========
 
-Defined in ``xtensor/xstride.hpp``
+Defined in ``xtensor/xstrides.hpp``
 
-.. doxygenfunction:: auto strides(const E& e, xt::stride_type type)
-   :project: xtensor
+.. cpp:namespace-push:: xt
 
-.. doxygenfunction:: auto strides(const E& e, S axis, xt::stride_type type)
-   :project: xtensor
+.. doxygengroup:: xt_xstrides
+
+.. cpp:namespace-pop::

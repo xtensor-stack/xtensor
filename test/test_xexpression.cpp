@@ -1,32 +1,33 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
-#include "test_common_macros.hpp"
 #include <sstream>
 
 #include "xtensor/xarray.hpp"
 #include "xtensor/xexpression.hpp"
-#include "xtensor/xmath.hpp"
 #include "xtensor/xio.hpp"
+#include "xtensor/xmath.hpp"
+
+#include "test_common_macros.hpp"
 
 namespace xt
 {
     auto fun()
     {
-        auto sa = make_xshared(xarray<double>({{1,2,3,4}, {5,6,7,8}}));
+        auto sa = make_xshared(xarray<double>({{1, 2, 3, 4}, {5, 6, 7, 8}}));
         return sa + sa * sa - sa;
     }
 
     TEST(xexpression, shared_basic)
     {
-        xarray<double> a = {{1,2,3,4}, {5,6,7,8}};
-        xarray<double> ca = {{1,2,3,4}, {5,6,7,8}};
+        xarray<double> a = {{1, 2, 3, 4}, {5, 6, 7, 8}};
+        xarray<double> ca = {{1, 2, 3, 4}, {5, 6, 7, 8}};
 
         auto sa = make_xshared(std::move(a));
 
@@ -45,7 +46,7 @@ namespace xt
         EXPECT_EQ(sa.use_count(), 2);
         auto cpysa = sa;
         EXPECT_EQ(sa.use_count(), 3);
-        
+
         std::stringstream buffer;
         buffer << sa;
         EXPECT_EQ(buffer.str(), "{{ 1.,  2.,  3.,  4.},\n { 5.,  6.,  7.,  8.}}");
@@ -53,8 +54,8 @@ namespace xt
 
     TEST(xexpression, shared_iterator)
     {
-        xarray<double> a = {{1,2,3,4}, {5,6,7,8}};
-        xarray<double> ca = {{1,2,3,4}, {5,6,7,8}};
+        xarray<double> a = {{1, 2, 3, 4}, {5, 6, 7, 8}};
+        xarray<double> ca = {{1, 2, 3, 4}, {5, 6, 7, 8}};
 
         auto sa = make_xshared(std::move(a));
 
@@ -82,8 +83,8 @@ namespace xt
 
     TEST(xexpression, shared_xfunctions)
     {
-        xarray<double> a = {{1,2,3,4}, {5,6,7,8}};
-        xarray<double> ca = {{1,2,3,4}, {5,6,7,8}};
+        xarray<double> a = {{1, 2, 3, 4}, {5, 6, 7, 8}};
+        xarray<double> ca = {{1, 2, 3, 4}, {5, 6, 7, 8}};
         xarray<double> acopy(a);
 
         auto sa = make_xshared(std::move(a));
@@ -111,7 +112,7 @@ namespace xt
     TEST(xexpression, shared_expr_return)
     {
         auto expr = fun();
-        xarray<double> a = {{1,2,3,4}, {5,6,7,8}};
+        xarray<double> a = {{1, 2, 3, 4}, {5, 6, 7, 8}};
         EXPECT_EQ(expr, a * a);
     }
 
@@ -122,7 +123,7 @@ namespace xt
         using dyn_exp = xt::xarray<int>;
         constexpr bool dyn_res = std::is_same<dyn_tmp, dyn_exp>::value;
         EXPECT_TRUE(dyn_res);
-        
+
         using sta_shape = std::array<std::size_t, 4>;
         using sta_tmp = xt::detail::xtype_for_shape<sta_shape>::type<int, XTENSOR_DEFAULT_LAYOUT>;
         using sta_exp = xt::xtensor<int, 4>;

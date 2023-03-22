@@ -24,7 +24,7 @@ Sum
     int r2 = xt::sum(a)();
     std::cout << r2 << std::endl;
     // Outputs 21
-    
+
     auto r3 = xt::sum(a, {1});
     std::cout << r3 << std::endl;
     // Outputs {6, 15}, but r3 is an unevaluated expression

@@ -233,7 +233,7 @@ Reverse iterators are also available:
     std::copy(a.crbegin(), a.crend(), b.begin());
     std::cout << b << std::endl;
     // Outputs {{6., 5., 4.}, {3., 2., 1.}}
- 
+
 Data buffer
 -----------
 

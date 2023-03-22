@@ -1,15 +1,16 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
-#include "test_common_macros.hpp"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xaxis_iterator.hpp"
+
+#include "test_common_macros.hpp"
 
 namespace xt
 {
@@ -17,12 +18,9 @@ namespace xt
 
     xarray<int> get_test_array()
     {
-        xarray<int> res = {{{1, 2, 3, 4},
-                            {5, 6, 7, 8},
-                            {9, 10, 11, 12}},
-                           {{13, 14, 15, 16},
-                            {17, 18, 19, 20},
-                            {21, 22, 23, 24}}};
+        xarray<int> res = {
+            {{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}},
+            {{13, 14, 15, 16}, {17, 18, 19, 20}, {21, 22, 23, 24}}};
         return res;
     }
 
@@ -68,13 +66,17 @@ namespace xt
         xarray<int, layout_type::column_major> a = get_test_array();
         auto iter_begin = axis_begin(a);
         auto iter_end = axis_end(a);
-        ++iter_begin; ++iter_begin;
+        ++iter_begin;
+        ++iter_begin;
         EXPECT_EQ(iter_begin, iter_end);
 
         xarray<int> b = get_test_array();
         auto iter_begin_row = axis_begin(b, 2u);
         auto iter_end_row = axis_end(b, 2u);
-        ++iter_begin_row; ++iter_begin_row; ++iter_begin_row; ++iter_begin_row;
+        ++iter_begin_row;
+        ++iter_begin_row;
+        ++iter_begin_row;
+        ++iter_begin_row;
         EXPECT_EQ(iter_begin_row, iter_end_row);
     }
 

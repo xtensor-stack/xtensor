@@ -198,7 +198,7 @@ HStack
 
     xt::xarray<double> a1 = {1, 2, 3};
     xt::xarray<double> b1 = {2, 3 ,4};
-    auto c1 = xt::hastack(xt::xtuple(a1, b1));
+    auto c1 = xt::hstack(xt::xtuple(a1, b1));
     std::cout << c1 << std::endl;
     // Outputs {1, 2, 3, 2, 3, 4}
 
@@ -244,6 +244,3 @@ Returns the elements on the diagonal of the expression
     auto d = xt::diagonal(a);
     std::cout << d << std::endl;
     // Outputs {1, 5, 9}
-
-
-

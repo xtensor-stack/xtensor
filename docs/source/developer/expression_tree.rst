@@ -191,4 +191,3 @@ The last requirement is to specialize the ``select_xfunction_expression`` metafu
 In this example, ``xmapped_function`` may provide the same API as ``xfunction`` and define some additional methods unrelated to the
 assignment mechanics. However it is possible to define a function class with an API totally different from the one of ``xfunction``.
 In that case, the assignment mechanics need to be customized too, this is detailed in :ref:`xtensor-assign-label`.
-

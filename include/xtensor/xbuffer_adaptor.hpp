@@ -1,11 +1,11 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_BUFFER_ADAPTOR_HPP
 #define XTENSOR_BUFFER_ADAPTOR_HPP
@@ -18,8 +18,8 @@
 
 #include <xtl/xclosure.hpp>
 
-#include "xtensor_config.hpp"
 #include "xstorage.hpp"
+#include "xtensor_config.hpp"
 
 namespace xt
 {
@@ -53,13 +53,15 @@ namespace xt
             using destructor_type = allocator_type;
             using allocator_traits = std::allocator_traits<allocator_type>;
             using value_type = typename allocator_traits::value_type;
-            using reference = std::conditional_t<std::is_const<std::remove_pointer_t<std::remove_reference_t<CP>>>::value,
-                                  const value_type&,
-                                  value_type&>;
+            using reference = std::conditional_t<
+                std::is_const<std::remove_pointer_t<std::remove_reference_t<CP>>>::value,
+                const value_type&,
+                value_type&>;
             using const_reference = const value_type&;
-            using pointer = std::conditional_t<std::is_const<std::remove_pointer_t<std::remove_reference_t<CP>>>::value,
-                                  typename allocator_traits::const_pointer,
-                                  typename allocator_traits::pointer>;
+            using pointer = std::conditional_t<
+                std::is_const<std::remove_pointer_t<std::remove_reference_t<CP>>>::value,
+                typename allocator_traits::const_pointer,
+                typename allocator_traits::pointer>;
             using const_pointer = typename allocator_traits::const_pointer;
             using size_type = typename allocator_traits::size_type;
             using difference_type = typename allocator_traits::difference_type;
@@ -77,6 +79,9 @@ namespace xt
 
             void swap(self_type& rhs) noexcept;
 
+            template <class P>
+            void reset_data(P&& data, size_type size) noexcept;
+
         private:
 
             pointer p_data;
@@ -93,13 +98,15 @@ namespace xt
             using value_type = std::remove_const_t<std::remove_pointer_t<std::remove_reference_t<CP>>>;
             using allocator_type = std::allocator<value_type>;
             using allocator_traits = std::allocator_traits<allocator_type>;
-            using reference = std::conditional_t<std::is_const<std::remove_pointer_t<std::remove_reference_t<CP>>>::value,
-                                  const value_type&,
-                                  value_type&>;
+            using reference = std::conditional_t<
+                std::is_const<std::remove_pointer_t<std::remove_reference_t<CP>>>::value,
+                const value_type&,
+                value_type&>;
             using const_reference = const value_type&;
-            using pointer = std::conditional_t<std::is_const<std::remove_pointer_t<std::remove_reference_t<CP>>>::value,
-                                  typename allocator_traits::const_pointer,
-                                  typename allocator_traits::pointer>;
+            using pointer = std::conditional_t<
+                std::is_const<std::remove_pointer_t<std::remove_reference_t<CP>>>::value,
+                typename allocator_traits::const_pointer,
+                typename allocator_traits::pointer>;
             using const_pointer = typename allocator_traits::const_pointer;
             using size_type = typename allocator_traits::size_type;
             using difference_type = typename allocator_traits::difference_type;
@@ -116,6 +123,9 @@ namespace xt
             const_pointer data() const noexcept;
 
             void swap(self_type& rhs) noexcept;
+
+            template <class P, class DT>
+            void reset_data(P&& data, size_type size, DT&& destruct) noexcept;
 
         private:
 
@@ -134,13 +144,15 @@ namespace xt
             using destructor_type = allocator_type;
             using allocator_traits = std::allocator_traits<allocator_type>;
             using value_type = typename allocator_traits::value_type;
-            using reference = std::conditional_t<std::is_const<std::remove_pointer_t<std::remove_reference_t<CP>>>::value,
-                                  const value_type&,
-                                  value_type&>;
+            using reference = std::conditional_t<
+                std::is_const<std::remove_pointer_t<std::remove_reference_t<CP>>>::value,
+                const value_type&,
+                value_type&>;
             using const_reference = const value_type&;
-            using pointer = std::conditional_t<std::is_const<std::remove_pointer_t<std::remove_reference_t<CP>>>::value,
-                                  typename allocator_traits::const_pointer,
-                                  typename allocator_traits::pointer>;
+            using pointer = std::conditional_t<
+                std::is_const<std::remove_pointer_t<std::remove_reference_t<CP>>>::value,
+                typename allocator_traits::const_pointer,
+                typename allocator_traits::pointer>;
             using const_pointer = typename allocator_traits::const_pointer;
             using size_type = typename allocator_traits::size_type;
             using difference_type = typename allocator_traits::difference_type;
@@ -168,6 +180,9 @@ namespace xt
 
             void swap(self_type& rhs) noexcept;
 
+            template <class P>
+            void reset_data(P&& data, size_type size, const allocator_type& alloc = allocator_type()) noexcept;
+
         private:
 
             xtl::xclosure_wrapper<CP> m_data;
@@ -177,7 +192,7 @@ namespace xt
         };
 
         // Workaround for MSVC2015: using void_t results in some
-        // template instantiation caching that leads to wrong 
+        // template instantiation caching that leads to wrong
         // type deduction later in xfunction.
         template <class T>
         struct msvc2015_void
@@ -195,8 +210,7 @@ namespace xt
 
         // check if operator() is available
         template <class E>
-        struct is_lambda_type<E, msvc2015_void_t<decltype(&E::operator())>>
-            : std::true_type
+        struct is_lambda_type<E, msvc2015_void_t<decltype(&E::operator())>> : std::true_type
         {
         };
 
@@ -205,12 +219,14 @@ namespace xt
         {
             using type = T;
         };
+
         template <class CP, class A, class O>
         struct get_buffer_storage
         {
-            using type = xtl::mpl::eval_if_t<is_lambda_type<A>,
-                                             self_type<xbuffer_smart_pointer<CP, A>>,
-                                             self_type<xbuffer_storage<CP, A>>>;
+            using type = xtl::mpl::eval_if_t<
+                is_lambda_type<A>,
+                self_type<xbuffer_smart_pointer<CP, A>>,
+                self_type<xbuffer_storage<CP, A>>>;
         };
 
         template <class CP, class A>
@@ -306,28 +322,22 @@ namespace xt
     };
 
     template <class D>
-    bool operator==(const xbuffer_adaptor_base<D>& lhs,
-                    const xbuffer_adaptor_base<D>& rhs);
+    bool operator==(const xbuffer_adaptor_base<D>& lhs, const xbuffer_adaptor_base<D>& rhs);
 
     template <class D>
-    bool operator!=(const xbuffer_adaptor_base<D>& lhs,
-                    const xbuffer_adaptor_base<D>& rhs);
+    bool operator!=(const xbuffer_adaptor_base<D>& lhs, const xbuffer_adaptor_base<D>& rhs);
 
     template <class D>
-    bool operator<(const xbuffer_adaptor_base<D>& lhs,
-                   const xbuffer_adaptor_base<D>& rhs);
+    bool operator<(const xbuffer_adaptor_base<D>& lhs, const xbuffer_adaptor_base<D>& rhs);
 
     template <class D>
-    bool operator<=(const xbuffer_adaptor_base<D>& lhs,
-                    const xbuffer_adaptor_base<D>& rhs);
+    bool operator<=(const xbuffer_adaptor_base<D>& lhs, const xbuffer_adaptor_base<D>& rhs);
 
     template <class D>
-    bool operator>(const xbuffer_adaptor_base<D>& lhs,
-                   const xbuffer_adaptor_base<D>& rhs);
+    bool operator>(const xbuffer_adaptor_base<D>& lhs, const xbuffer_adaptor_base<D>& rhs);
 
     template <class D>
-    bool operator>=(const xbuffer_adaptor_base<D>& lhs,
-                    const xbuffer_adaptor_base<D>& rhs);
+    bool operator>=(const xbuffer_adaptor_base<D>& lhs, const xbuffer_adaptor_base<D>& rhs);
 
     /*******************
      * xbuffer_adaptor *
@@ -389,15 +399,15 @@ namespace xt
 
         self_type& operator=(temporary_type&&);
 
-        using base_type::size;
-        using base_type::resize;
         using base_type::data;
+        using base_type::reset_data;
+        using base_type::resize;
+        using base_type::size;
         using base_type::swap;
     };
 
     template <class CP, class O, class A>
-    void swap(xbuffer_adaptor<CP, O, A>& lhs,
-              xbuffer_adaptor<CP, O, A>& rhs) noexcept;
+    void swap(xbuffer_adaptor<CP, O, A>& lhs, xbuffer_adaptor<CP, O, A>& rhs) noexcept;
 
     /*********************
      * xiterator_adaptor *
@@ -412,16 +422,14 @@ namespace xt
         using traits = std::iterator_traits<I>;
         using const_traits = std::iterator_traits<CI>;
 
-        using value_type = std::common_type_t<typename traits::value_type,
-                                              typename const_traits::value_type>;
+        using value_type = std::common_type_t<typename traits::value_type, typename const_traits::value_type>;
         using reference = typename traits::reference;
         using const_reference = typename const_traits::reference;
         using pointer = typename traits::pointer;
         using const_pointer = typename const_traits::pointer;
-        using difference_type = std::common_type_t<typename traits::difference_type,
-                                                   typename const_traits::difference_type>;
+        using difference_type = std::common_type_t<typename traits::difference_type, typename const_traits::difference_type>;
         using size_type = std::make_unsigned_t<difference_type>;
-        
+
         using iterator = I;
         using const_iterator = CI;
         using reverse_iterator = std::reverse_iterator<iterator>;
@@ -440,7 +448,7 @@ namespace xt
         using allocator_type = std::allocator<value_type>;
         using size_type = typename base_type::size_type;
         using iterator = typename base_type::iterator;
-        using const_iterator = typename base_type::const_iterator; 
+        using const_iterator = typename base_type::const_iterator;
         using temporary_type = uvector<value_type, allocator_type>;
 
         xiterator_adaptor() = default;
@@ -459,12 +467,12 @@ namespace xt
 
         size_type size() const noexcept;
         void resize(size_type size);
-        
+
         iterator data() noexcept;
         const_iterator data() const noexcept;
 
         void swap(self_type& rhs) noexcept;
-    
+
     private:
 
         I m_it;
@@ -473,12 +481,10 @@ namespace xt
     };
 
     template <class I, class CI>
-    void swap(xiterator_adaptor<I, CI>& lhs,
-              xiterator_adaptor<I, CI>& rhs) noexcept;
+    void swap(xiterator_adaptor<I, CI>& lhs, xiterator_adaptor<I, CI>& rhs) noexcept;
 
     template <class I, class CI>
-    struct is_contiguous_container<xiterator_adaptor<I, CI>>
-        : is_contiguous_container<I>
+    struct is_contiguous_container<xiterator_adaptor<I, CI>> : is_contiguous_container<I>
     {
     };
 
@@ -500,14 +506,12 @@ namespace xt
         using traits = std::iterator_traits<iterator>;
         using const_traits = std::iterator_traits<const_iterator>;
 
-        using value_type = std::common_type_t<typename traits::value_type,
-                                              typename const_traits::value_type>;
+        using value_type = std::common_type_t<typename traits::value_type, typename const_traits::value_type>;
         using reference = typename traits::reference;
         using const_reference = typename const_traits::reference;
         using pointer = typename traits::pointer;
         using const_pointer = typename const_traits::pointer;
-        using difference_type = std::common_type_t<typename traits::difference_type,
-                                                   typename const_traits::difference_type>;
+        using difference_type = std::common_type_t<typename traits::difference_type, typename const_traits::difference_type>;
         using size_type = std::make_unsigned_t<difference_type>;
         using index_type = difference_type;
     };
@@ -523,7 +527,7 @@ namespace xt
         using allocator_type = std::allocator<value_type>;
         using size_type = typename base_type::size_type;
         using iterator = typename base_type::iterator;
-        using const_iterator = typename base_type::const_iterator; 
+        using const_iterator = typename base_type::const_iterator;
         using temporary_type = uvector<value_type, allocator_type>;
 
         xiterator_owner_adaptor(C&& c);
@@ -541,7 +545,7 @@ namespace xt
 
         size_type size() const noexcept;
         void resize(size_type size);
-        
+
         iterator data() noexcept;
         const_iterator data() const noexcept;
 
@@ -558,8 +562,7 @@ namespace xt
     };
 
     template <class C, class IG>
-    void swap(xiterator_owner_adaptor<C, IG>& lhs,
-              xiterator_owner_adaptor<C, IG>& rhs) noexcept;
+    void swap(xiterator_owner_adaptor<C, IG>& lhs, xiterator_owner_adaptor<C, IG>& rhs) noexcept;
 
     template <class C, class IG>
     struct is_contiguous_container<xiterator_owner_adaptor<C, IG>>
@@ -613,14 +616,16 @@ namespace xt
     {
         template <class CP, class A>
         inline xbuffer_storage<CP, A>::xbuffer_storage()
-            : p_data(nullptr), m_size(0)
+            : p_data(nullptr)
+            , m_size(0)
         {
         }
 
         template <class CP, class A>
         template <class P>
         inline xbuffer_storage<CP, A>::xbuffer_storage(P&& data, size_type size, const allocator_type&)
-            : p_data(std::forward<P>(data)), m_size(size)
+            : p_data(std::forward<P>(data))
+            , m_size(size)
         {
         }
 
@@ -658,6 +663,14 @@ namespace xt
             swap(p_data, rhs.p_data);
             swap(m_size, rhs.m_size);
         }
+
+        template <class CP, class A>
+        template <class P>
+        inline void xbuffer_storage<CP, A>::reset_data(P&& data, size_type size) noexcept
+        {
+            p_data = std::forward<P>(data);
+            m_size = size;
+        }
     }
 
     /****************************************
@@ -669,7 +682,10 @@ namespace xt
         template <class CP, class A>
         template <class P>
         inline xbuffer_owner_storage<CP, A>::xbuffer_owner_storage(P&& data, size_type size, const allocator_type& alloc)
-            : m_data(std::forward<P>(data)), m_size(size), m_moved_from(false), m_allocator(alloc)
+            : m_data(std::forward<P>(data))
+            , m_size(size)
+            , m_moved_from(false)
+            , m_allocator(alloc)
         {
         }
 
@@ -689,7 +705,9 @@ namespace xt
             using std::swap;
             if (this != &rhs)
             {
-                allocator_type al = std::allocator_traits<allocator_type>::select_on_container_copy_construction(rhs.get_allocator());
+                allocator_type al = std::allocator_traits<allocator_type>::select_on_container_copy_construction(
+                    rhs.get_allocator()
+                );
                 pointer tmp = safe_init_allocate(al, rhs.m_size);
                 if (xtrivially_default_constructible<value_type>::value)
                 {
@@ -709,7 +727,10 @@ namespace xt
 
         template <class CP, class A>
         inline xbuffer_owner_storage<CP, A>::xbuffer_owner_storage(self_type&& rhs)
-            : m_data(std::move(rhs.m_data)), m_size(std::move(rhs.m_size)), m_moved_from(std::move(rhs.m_moved_from)), m_allocator(std::move(rhs.m_allocator))
+            : m_data(std::move(rhs.m_data))
+            , m_size(std::move(rhs.m_size))
+            , m_moved_from(std::move(rhs.m_moved_from))
+            , m_allocator(std::move(rhs.m_allocator))
         {
             rhs.m_moved_from = true;
             rhs.m_size = 0;
@@ -767,6 +788,15 @@ namespace xt
             swap(m_size, rhs.m_size);
             swap(m_allocator, rhs.m_allocator);
         }
+
+        template <class CP, class A>
+        template <class P>
+        inline void
+        xbuffer_owner_storage<CP, A>::reset_data(P&& data, size_type size, const allocator_type& alloc) noexcept
+        {
+            xbuffer_owner_storage<CP, A> tmp(std::forward<P>(data), size, alloc);
+            this->swap(tmp);
+        }
     }
 
     /****************************************
@@ -778,7 +808,9 @@ namespace xt
         template <class CP, class D>
         template <class P, class DT>
         xbuffer_smart_pointer<CP, D>::xbuffer_smart_pointer(P&& data_ptr, size_type size, DT&& destruct)
-            : p_data(data_ptr), m_size(size), m_destruct(std::forward<DT>(destruct))
+            : p_data(data_ptr)
+            , m_size(size)
+            , m_destruct(std::forward<DT>(destruct))
         {
         }
 
@@ -793,7 +825,7 @@ namespace xt
         {
             if (m_size != size)
             {
-                XTENSOR_THROW(std::runtime_error, "xbuffer_storage not resizable");
+                XTENSOR_THROW(std::runtime_error, "xbuffer_storage not resizeable");
             }
         }
 
@@ -802,6 +834,7 @@ namespace xt
         {
             return p_data;
         }
+
         template <class CP, class D>
         auto xbuffer_smart_pointer<CP, D>::data() const noexcept -> const_pointer
         {
@@ -815,6 +848,15 @@ namespace xt
             swap(p_data, rhs.p_data);
             swap(m_size, rhs.m_size);
             swap(m_destruct, rhs.m_destruct);
+        }
+
+        template <class CP, class D>
+        template <class P, class DT>
+        void xbuffer_smart_pointer<CP, D>::reset_data(P&& data, size_type size, DT&& destruct) noexcept
+        {
+            p_data = std::forward<P>(data);
+            m_size = size;
+            m_destruct = destruct;
         }
     }
 
@@ -871,7 +913,7 @@ namespace xt
     }
 
     template <class D>
-    inline auto xbuffer_adaptor_base<D>::end() noexcept-> iterator
+    inline auto xbuffer_adaptor_base<D>::end() noexcept -> iterator
     {
         return derived_cast().data() + static_cast<index_type>(derived_cast().size());
     }
@@ -901,7 +943,7 @@ namespace xt
     }
 
     template <class D>
-    inline auto xbuffer_adaptor_base<D>::rbegin() noexcept-> reverse_iterator
+    inline auto xbuffer_adaptor_base<D>::rbegin() noexcept -> reverse_iterator
     {
         return reverse_iterator(end());
     }
@@ -949,53 +991,64 @@ namespace xt
     }
 
     template <class D>
-    inline bool operator==(const xbuffer_adaptor_base<D>& lhs,
-                           const xbuffer_adaptor_base<D>& rhs)
+    inline bool operator==(const xbuffer_adaptor_base<D>& lhs, const xbuffer_adaptor_base<D>& rhs)
     {
-        return lhs.derived_cast().size() == rhs.derived_cast().size() && std::equal(lhs.begin(), lhs.end(), rhs.begin());
+        return lhs.derived_cast().size() == rhs.derived_cast().size()
+               && std::equal(lhs.begin(), lhs.end(), rhs.begin());
     }
 
     template <class D>
-    inline bool operator!=(const xbuffer_adaptor_base<D>& lhs,
-                           const xbuffer_adaptor_base<D>& rhs)
+    inline bool operator!=(const xbuffer_adaptor_base<D>& lhs, const xbuffer_adaptor_base<D>& rhs)
     {
         return !(lhs == rhs);
     }
 
     template <class D>
-    inline bool operator<(const xbuffer_adaptor_base<D>& lhs,
-                          const xbuffer_adaptor_base<D>& rhs)
+    inline bool operator<(const xbuffer_adaptor_base<D>& lhs, const xbuffer_adaptor_base<D>& rhs)
     {
-        return std::lexicographical_compare(lhs.begin(), lhs.end(),
-                                            rhs.begin(), rhs.end(),
-                                            std::less<typename D::value_type>());
+        return std::lexicographical_compare(
+            lhs.begin(),
+            lhs.end(),
+            rhs.begin(),
+            rhs.end(),
+            std::less<typename D::value_type>()
+        );
     }
 
     template <class D>
-    inline bool operator<=(const xbuffer_adaptor_base<D>& lhs,
-                           const xbuffer_adaptor_base<D>& rhs)
+    inline bool operator<=(const xbuffer_adaptor_base<D>& lhs, const xbuffer_adaptor_base<D>& rhs)
     {
-        return std::lexicographical_compare(lhs.begin(), lhs.end(),
-                                            rhs.begin(), rhs.end(),
-                                            std::less_equal<typename D::value_type>());
+        return std::lexicographical_compare(
+            lhs.begin(),
+            lhs.end(),
+            rhs.begin(),
+            rhs.end(),
+            std::less_equal<typename D::value_type>()
+        );
     }
 
     template <class D>
-    inline bool operator>(const xbuffer_adaptor_base<D>& lhs,
-                          const xbuffer_adaptor_base<D>& rhs)
+    inline bool operator>(const xbuffer_adaptor_base<D>& lhs, const xbuffer_adaptor_base<D>& rhs)
     {
-        return std::lexicographical_compare(lhs.begin(), lhs.end(),
-                                            rhs.begin(), rhs.end(),
-                                            std::greater<typename D::value_type>());
+        return std::lexicographical_compare(
+            lhs.begin(),
+            lhs.end(),
+            rhs.begin(),
+            rhs.end(),
+            std::greater<typename D::value_type>()
+        );
     }
 
     template <class D>
-    inline bool operator>=(const xbuffer_adaptor_base<D>& lhs,
-                           const xbuffer_adaptor_base<D>& rhs)
+    inline bool operator>=(const xbuffer_adaptor_base<D>& lhs, const xbuffer_adaptor_base<D>& rhs)
     {
-        return std::lexicographical_compare(lhs.begin(), lhs.end(),
-                                            rhs.begin(), rhs.end(),
-                                            std::greater_equal<typename D::value_type>());
+        return std::lexicographical_compare(
+            lhs.begin(),
+            lhs.end(),
+            rhs.begin(),
+            rhs.end(),
+            std::greater_equal<typename D::value_type>()
+        );
     }
 
     /**********************************
@@ -1011,8 +1064,7 @@ namespace xt
     }
 
     template <class CP, class O, class A>
-    inline void swap(xbuffer_adaptor<CP, O, A>& lhs,
-                     xbuffer_adaptor<CP, O, A>& rhs) noexcept
+    inline void swap(xbuffer_adaptor<CP, O, A>& lhs, xbuffer_adaptor<CP, O, A>& rhs) noexcept
     {
         lhs.swap(rhs);
     }
@@ -1020,10 +1072,12 @@ namespace xt
     /************************************
      * xiterator_adaptor implementation *
      ************************************/
-    
+
     template <class I, class CI>
     inline xiterator_adaptor<I, CI>::xiterator_adaptor(I it, CI cit, size_type size)
-        : m_it(it), m_cit(cit), m_size(size)
+        : m_it(it)
+        , m_cit(cit)
+        , m_size(size)
     {
     }
 
@@ -1040,7 +1094,7 @@ namespace xt
     {
         return (*this = rhs);
     }
-    
+
     template <class I, class CI>
     inline auto xiterator_adaptor<I, CI>::size() const noexcept -> size_type
     {
@@ -1052,7 +1106,7 @@ namespace xt
     {
         if (m_size != size)
         {
-            XTENSOR_THROW(std::runtime_error, "xiterator_adaptor not resizable");
+            XTENSOR_THROW(std::runtime_error, "xiterator_adaptor not resizeable");
         }
     }
 
@@ -1076,10 +1130,9 @@ namespace xt
         swap(m_cit, rhs.m_cit);
         swap(m_size, rhs.m_size);
     }
-    
+
     template <class I, class CI>
-    inline void swap(xiterator_adaptor<I, CI>& lhs,
-                     xiterator_adaptor<I, CI>& rhs) noexcept
+    inline void swap(xiterator_adaptor<I, CI>& lhs, xiterator_adaptor<I, CI>& rhs) noexcept
     {
         lhs.swap(rhs);
     }
@@ -1087,7 +1140,7 @@ namespace xt
     /******************************************
      * xiterator_owner_adaptor implementation *
      ******************************************/
-    
+
     template <class C, class IG>
     inline xiterator_owner_adaptor<C, IG>::xiterator_owner_adaptor(C&& c)
         : m_container(std::move(c))
@@ -1148,18 +1201,18 @@ namespace xt
     {
         if (m_size != size)
         {
-            XTENSOR_THROW(std::runtime_error, "xiterator_owner_adaptor not resizable");
+            XTENSOR_THROW(std::runtime_error, "xiterator_owner_adaptor not resizeable");
         }
     }
-        
+
     template <class C, class IG>
-    inline auto xiterator_owner_adaptor<C, IG>:: data() noexcept -> iterator
+    inline auto xiterator_owner_adaptor<C, IG>::data() noexcept -> iterator
     {
         return m_it;
     }
 
     template <class C, class IG>
-    inline auto xiterator_owner_adaptor<C, IG>:: data() const noexcept -> const_iterator
+    inline auto xiterator_owner_adaptor<C, IG>::data() const noexcept -> const_iterator
     {
         return m_cit;
     }
@@ -1182,8 +1235,7 @@ namespace xt
     }
 
     template <class C, class IG>
-    inline void swap(xiterator_owner_adaptor<C, IG>& lhs,
-                     xiterator_owner_adaptor<C, IG>& rhs) noexcept
+    inline void swap(xiterator_owner_adaptor<C, IG>& lhs, xiterator_owner_adaptor<C, IG>& rhs) noexcept
     {
         lhs.swap(rhs);
     }

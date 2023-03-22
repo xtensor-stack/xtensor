@@ -12,23 +12,15 @@ Exponential functions
 Defined in ``xtensor/xmath.hpp``
 
 .. doxygenfunction:: exp(E&&)
-   :project: xtensor
 
 .. doxygenfunction:: exp2(E&&)
-   :project: xtensor
 
 .. doxygenfunction:: expm1(E&&)
-   :project: xtensor
 
 .. doxygenfunction:: log(E&&)
-   :project: xtensor
 
 .. doxygenfunction:: log2(E&&)
-   :project: xtensor
 
 .. doxygenfunction:: log10(E&&)
-   :project: xtensor
 
 .. doxygenfunction:: log1p(E&&)
-   :project: xtensor
-

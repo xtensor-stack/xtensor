@@ -1,16 +1,16 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
-
-#include "test_common_macros.hpp"
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #include "xtensor/xarray.hpp"
 #include "xtensor/xvectorize.hpp"
+
+#include "test_common_macros.hpp"
 
 namespace xt
 {
@@ -33,7 +33,10 @@ namespace xt
 
     TEST(xvectorize, lambda)
     {
-        auto lambda = [](double d1, double d2) { return d1 + d2; };
+        auto lambda = [](double d1, double d2)
+        {
+            return d1 + d2;
+        };
         auto vec_lambda = vectorize(lambda);
         shape_type shape = {3, 2};
         xarray<double> a(shape, 1.5);
@@ -63,7 +66,12 @@ namespace xt
 
     TEST(xvectorize, noargument)
     {
-        auto vecfunc = vectorize([] { return double(1.); });
+        auto vecfunc = vectorize(
+            []
+            {
+                return double(1.);
+            }
+        );
         shape_type shape = {3, 2};
         xarray<double> a(shape, 1.5);
         a = vecfunc();

@@ -1,0 +1,47 @@
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.4.0
+  hooks:
+  - id: check-added-large-files
+  - id: check-case-conflict
+  - id: end-of-file-fixer
+  - id: trailing-whitespace
+  - id: mixed-line-ending
+    args: [--fix=lf]
+    exclude: \.bat$
+  - id: check-json
+  - id: pretty-format-json
+    args: [--autofix, --top-keys=version]
+  - id: check-yaml
+    types: [file]
+    files: \.(yaml|yml|clang-format)
+  - id: detect-private-key
+  - id: check-merge-conflict
+- repo: https://github.com/Lucas-C/pre-commit-hooks
+  rev: v1.4.2
+  hooks:
+  - id: forbid-tabs
+  - id: remove-tabs
+    args: [--whitespaces-count, '4']
+- repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
+  rev: v2.7.0
+  hooks:
+  - id: pretty-format-yaml
+    args: [--autofix, --indent, '2']
+    types: [file]
+    files: \.(yaml|yml|clang-format)
+- repo: https://github.com/tdegeus/cpp_comment_format
+  rev: v0.2.0
+  hooks:
+  - id: cpp_comment_format
+- repo: https://github.com/tdegeus/conda_envfile
+  rev: v0.4.2
+  hooks:
+  - id: conda_envfile_parse
+    files: environment.yaml
+# Externally provided executables (so we can use them with editors as well).
+- repo: https://github.com/pre-commit/mirrors-clang-format
+  rev: v15.0.7
+  hooks:
+  - id: clang-format
+    files: .*\.[hc]pp$

@@ -1,28 +1,40 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_MANIPULATION_HPP
 #define XTENSOR_MANIPULATION_HPP
 
+#include <algorithm>
+#include <utility>
+
+#include <xtl/xcompare.hpp>
+#include <xtl/xsequence.hpp>
+
 #include "xbuilder.hpp"
-#include "xstrided_view.hpp"
-#include "xutils.hpp"
-#include "xtensor_config.hpp"
+#include "xexception.hpp"
 #include "xrepeat.hpp"
+#include "xstrided_view.hpp"
+#include "xtensor_config.hpp"
+#include "xutils.hpp"
 
 namespace xt
 {
+    /**
+     * @defgroup xt_xmanipulation
+     */
+
     namespace check_policy
     {
         struct none
         {
         };
+
         struct full
         {
         };
@@ -33,6 +45,9 @@ namespace xt
 
     template <class E, class S, class Tag = check_policy::none>
     auto transpose(E&& e, S&& permutation, Tag check_policy = Tag());
+
+    template <class E>
+    auto swapaxes(E&& e, std::ptrdiff_t axis1, std::ptrdiff_t axis2);
 
     template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E>
     auto ravel(E&& e);
@@ -85,19 +100,19 @@ namespace xt
     template <std::ptrdiff_t N = 1, class E>
     auto rot90(E&& e, const std::array<std::ptrdiff_t, 2>& axes = {0, 1});
 
-    template<class E>
+    template <class E>
     auto roll(E&& e, std::ptrdiff_t shift);
 
-    template<class E>
+    template <class E>
     auto roll(E&& e, std::ptrdiff_t shift, std::ptrdiff_t axis);
 
-    template<class E>
+    template <class E>
     auto repeat(E&& e, std::size_t repeats, std::size_t axis);
 
-    template<class E>
+    template <class E>
     auto repeat(E&& e, const std::vector<std::size_t>& repeats, std::size_t axis);
 
-    template<class E>
+    template <class E>
     auto repeat(E&& e, std::vector<std::size_t>&& repeats, std::size_t axis);
 
     /****************************
@@ -169,7 +184,13 @@ namespace xt
                 new_layout = transpose_layout_noexcept(e.layout());
             }
 
-            return strided_view(std::forward<E>(e), std::move(temp_shape), std::move(temp_strides), get_offset<XTENSOR_DEFAULT_LAYOUT>(e), new_layout);
+            return strided_view(
+                std::forward<E>(e),
+                std::move(temp_shape),
+                std::move(temp_strides),
+                get_offset<XTENSOR_DEFAULT_LAYOUT>(e),
+                new_layout
+            );
         }
 
         template <class E, class S>
@@ -208,6 +229,8 @@ namespace xt
 
     /**
      * Returns a transpose view by reversing the dimensions of xexpression e
+     *
+     * @ingroup xt_xmanipulation
      * @param e the input expression
      */
     template <class E>
@@ -224,11 +247,19 @@ namespace xt
 
         layout_type new_layout = detail::transpose_layout_noexcept(e.layout());
 
-        return strided_view(std::forward<E>(e), std::move(shape), std::move(strides), detail::get_offset<XTENSOR_DEFAULT_TRAVERSAL>(e), new_layout);
+        return strided_view(
+            std::forward<E>(e),
+            std::move(shape),
+            std::move(strides),
+            detail::get_offset<XTENSOR_DEFAULT_TRAVERSAL>(e),
+            new_layout
+        );
     }
 
     /**
      * Returns a transpose view by permuting the xexpression e with @p permutation.
+     *
+     * @ingroup xt_xmanipulation
      * @param e the input expression
      * @param permutation the sequence containing permutation
      * @param check_policy the check level (check_policy::full() or check_policy::none())
@@ -242,11 +273,107 @@ namespace xt
 
     /// @cond DOXYGEN_INCLUDE_SFINAE
     template <class E, class I, std::size_t N, class Tag = check_policy::none>
-    inline auto transpose(E&& e, const I(&permutation)[N], Tag check_policy = Tag())
+    inline auto transpose(E&& e, const I (&permutation)[N], Tag check_policy = Tag())
     {
         return detail::transpose_impl(std::forward<E>(e), permutation, check_policy);
     }
+
     /// @endcond
+
+    /*****************************
+     *  swapaxes implementation  *
+     *****************************/
+
+    namespace detail
+    {
+        template <class S>
+        inline S swapaxes_perm(std::size_t dim, std::ptrdiff_t axis1, std::ptrdiff_t axis2)
+        {
+            const std::size_t ax1 = normalize_axis(dim, axis1);
+            const std::size_t ax2 = normalize_axis(dim, axis2);
+            auto perm = xtl::make_sequence<S>(dim, 0);
+            using id_t = typename S::value_type;
+            std::iota(perm.begin(), perm.end(), id_t(0));
+            perm[ax1] = ax2;
+            perm[ax2] = ax1;
+            return perm;
+        }
+    }
+
+    /**
+     * Return a new expression with two axes interchanged.
+     *
+     * The two axis parameter @p axis and @p axis2 are interchangable.
+     *
+     * @ingroup xt_xmanipulation
+     * @param e The input expression
+     * @param axis1 First axis to swap
+     * @param axis2 Second axis to swap
+     */
+    template <class E>
+    inline auto swapaxes(E&& e, std::ptrdiff_t axis1, std::ptrdiff_t axis2)
+    {
+        const auto dim = e.dimension();
+        check_axis_in_dim(axis1, dim, "Parameter axis1");
+        check_axis_in_dim(axis2, dim, "Parameter axis2");
+
+        using strides_t = get_strides_t<typename std::decay_t<E>::shape_type>;
+        return transpose(std::forward<E>(e), detail::swapaxes_perm<strides_t>(dim, axis1, axis2));
+    }
+
+    /*****************************
+     *  moveaxis implementation  *
+     *****************************/
+
+    namespace detail
+    {
+        template <class S>
+        inline S moveaxis_perm(std::size_t dim, std::ptrdiff_t src, std::ptrdiff_t dest)
+        {
+            using id_t = typename S::value_type;
+
+            const std::size_t src_norm = normalize_axis(dim, src);
+            const std::size_t dest_norm = normalize_axis(dim, dest);
+
+            // Initializing to src_norm handles case where `dest == -1` and the loop
+            // does not go check `perm_idx == dest_norm` a `dim+1`th time.
+            auto perm = xtl::make_sequence<S>(dim, src_norm);
+            id_t perm_idx = 0;
+            for (id_t i = 0; xtl::cmp_less(i, dim); ++i)
+            {
+                if (xtl::cmp_equal(perm_idx, dest_norm))
+                {
+                    perm[perm_idx] = src_norm;
+                    ++perm_idx;
+                }
+                if (xtl::cmp_not_equal(i, src_norm))
+                {
+                    perm[perm_idx] = i;
+                    ++perm_idx;
+                }
+            }
+            return perm;
+        }
+    }
+
+    /**
+     * Return a new expression with an axis move to a new position.
+     *
+     * @ingroup xt_xmanipulation
+     * @param e The input expression
+     * @param src Original position of the axis to move
+     * @param dest Destination position for the original axis.
+     */
+    template <class E>
+    inline auto moveaxis(E&& e, std::ptrdiff_t src, std::ptrdiff_t dest)
+    {
+        const auto dim = e.dimension();
+        check_axis_in_dim(src, dim, "Parameter src");
+        check_axis_in_dim(dest, dim, "Parameter dest");
+
+        using strides_t = get_strides_t<typename std::decay_t<E>::shape_type>;
+        return xt::transpose(std::forward<E>(e), detail::moveaxis_perm<strides_t>(e.dimension(), src, dest));
+    }
 
     /************************************
      * ravel and flatten implementation *
@@ -278,10 +405,12 @@ namespace xt
     }
 
     /**
-     * Returns a flatten view of the given expression. No copy is made.
+     * Return a flatten view of the given expression. No copy is made.
+     *
+     * @ingroup xt_xmanipulation
      * @param e the input expression
-     * @tparam L the layout used to read the elements of e. If no parameter
-     * is specified, XTENSOR_DEFAULT_TRAVERSAL is used.
+     * @tparam L the layout used to read the elements of e.
+     *     If no parameter is specified, XTENSOR_DEFAULT_TRAVERSAL is used.
      * @tparam E the type of the expression
      */
     template <layout_type L, class E>
@@ -293,16 +422,19 @@ namespace xt
         auto adaptor = make_xiterator_adaptor(std::forward<E>(e), iterator_getter());
         constexpr layout_type layout = std::is_pointer<iterator>::value ? L : layout_type::dynamic;
         using type = xtensor_view<decltype(adaptor), 1, layout, extension::get_expression_tag_t<E>>;
-        return type(std::move(adaptor), { size });
+        return type(std::move(adaptor), {size});
     }
 
     /**
-     * Returns a flatten view of the given expression. No copy is made. This
-     * method is equivalent to ravel and is provided for API sameness with
-     * Numpy.
+     * Return a flatten view of the given expression.
+     *
+     * No copy is made.
+     * This method is equivalent to ravel and is provided for API sameness with Numpy.
+     *
+     * @ingroup xt_xmanipulation
      * @param e the input expression
-     * @tparam L the layout used to read the elements of e. If no parameter
-     * is specified, XTENSOR_DEFAULT_TRAVERSAL is used.
+     * @tparam L the layout used to read the elements of e.
+     *     If no parameter is specified, XTENSOR_DEFAULT_TRAVERSAL is used.
      * @tparam E the type of the expression
      * @sa ravel
      */
@@ -313,8 +445,9 @@ namespace xt
     }
 
     /**
-     * @brief return indices that are non-zero in the flattened version of arr,
-     * equivalent to nonzero(ravel<layout_type>(arr))[0];
+     * Return indices that are non-zero in the flattened version of arr.
+     *
+     * Equivalent to ``nonzero(ravel<layout_type>(arr))[0];``
      *
      * @param arr input array
      * @return indices that are non-zero in the flattened version of arr
@@ -332,6 +465,7 @@ namespace xt
     /**
      * Trim zeros at beginning, end or both of 1D sequence.
      *
+     * @ingroup xt_xmanipulation
      * @param e input xexpression
      * @param direction string of either 'f' for trim from beginning, 'b' for trim from end
      *                  or 'fb' (default) for both.
@@ -344,7 +478,8 @@ namespace xt
 
         std::ptrdiff_t begin = 0, end = static_cast<std::ptrdiff_t>(e.size());
 
-        auto find_fun = [](const auto& i) {
+        auto find_fun = [](const auto& i)
+        {
             return i != 0;
         };
 
@@ -358,7 +493,7 @@ namespace xt
             end -= std::find_if(e.crbegin(), e.crend(), find_fun) - e.crbegin();
         }
 
-        return strided_view(std::forward<E>(e), { range(begin, end) });
+        return strided_view(std::forward<E>(e), {range(begin, end)});
     }
 
     /**************************
@@ -366,9 +501,11 @@ namespace xt
      **************************/
 
     /**
-     * Returns a squeeze view of the given expression. No copy is made.
-     * Squeezing an expression removes dimensions of extent 1.
+     * Returns a squeeze view of the given expression.
      *
+     * No copy is made. Squeezing an expression removes dimensions of extent 1.
+     *
+     * @ingroup xt_xmanipulation
      * @param e the input expression
      * @tparam E the type of the expression
      */
@@ -377,11 +514,25 @@ namespace xt
     {
         dynamic_shape<std::size_t> new_shape;
         dynamic_shape<std::ptrdiff_t> new_strides;
-        std::copy_if(e.shape().cbegin(), e.shape().cend(), std::back_inserter(new_shape),
-                     [](std::size_t i) { return i != 1; });
+        std::copy_if(
+            e.shape().cbegin(),
+            e.shape().cend(),
+            std::back_inserter(new_shape),
+            [](std::size_t i)
+            {
+                return i != 1;
+            }
+        );
         decltype(auto) old_strides = detail::get_strides<XTENSOR_DEFAULT_LAYOUT>(e);
-        std::copy_if(old_strides.cbegin(), old_strides.cend(), std::back_inserter(new_strides),
-                     [](std::ptrdiff_t i) { return i != 0; });
+        std::copy_if(
+            old_strides.cbegin(),
+            old_strides.cend(),
+            std::back_inserter(new_strides),
+            [](std::ptrdiff_t i)
+            {
+                return i != 0;
+            }
+        );
 
         return strided_view(std::forward<E>(e), std::move(new_shape), std::move(new_strides), 0, e.layout());
     }
@@ -428,8 +579,9 @@ namespace xt
     }
 
     /**
-     * @brief Remove single-dimensional entries from the shape of an xexpression
+     * Remove single-dimensional entries from the shape of an xexpression
      *
+     * @ingroup xt_xmanipulation
      * @param e input xexpression
      * @param axis integer or container of integers, select a subset of single-dimensional
      *        entries of the shape.
@@ -444,17 +596,22 @@ namespace xt
 
     /// @cond DOXYGEN_INCLUDE_SFINAE
     template <class E, class I, std::size_t N, class Tag = check_policy::none>
-    inline auto squeeze(E&& e, const I(&axis)[N], Tag check_policy = Tag())
+    inline auto squeeze(E&& e, const I (&axis)[N], Tag check_policy = Tag())
     {
         using arr_t = std::array<I, N>;
-        return detail::squeeze_impl(std::forward<E>(e), xtl::forward_sequence<arr_t, decltype(axis)>(axis), check_policy);
+        return detail::squeeze_impl(
+            std::forward<E>(e),
+            xtl::forward_sequence<arr_t, decltype(axis)>(axis),
+            check_policy
+        );
     }
 
     template <class E, class Tag = check_policy::none>
     inline auto squeeze(E&& e, std::size_t axis, Tag check_policy = Tag())
     {
-        return squeeze(std::forward<E>(e), std::array<std::size_t, 1>{ axis }, check_policy);
+        return squeeze(std::forward<E>(e), std::array<std::size_t, 1>{axis}, check_policy);
     }
+
     /// @endcond
 
     /******************************
@@ -462,11 +619,12 @@ namespace xt
      ******************************/
 
     /**
-     * @brief Expand the shape of an xexpression.
+     * Expand the shape of an xexpression.
      *
      * Insert a new axis that will appear at the axis position in the expanded array shape.
      * This will return a ``strided_view`` with a ``xt::newaxis()`` at the indicated axis.
      *
+     * @ingroup xt_xmanipulation
      * @param e input xexpression
      * @param axis axis to expand
      * @return returns a ``strided_view`` with expanded dimension
@@ -491,6 +649,7 @@ namespace xt
      * Note: dimensions are added equally at the beginning and the end.
      * For example, a 1-D array of shape (N,) becomes a view of shape (1, N, 1).
      *
+     * @ingroup xt_xmanipulation
      * @param e input xexpression
      * @tparam N the number of requested dimensions
      * @return ``strided_view`` with expanded dimensions
@@ -518,6 +677,8 @@ namespace xt
 
     /**
      * Expand to at least 1D
+     *
+     * @ingroup xt_xmanipulation
      * @sa atleast_Nd
      */
     template <class E>
@@ -528,6 +689,8 @@ namespace xt
 
     /**
      * Expand to at least 2D
+     *
+     * @ingroup xt_xmanipulation
      * @sa atleast_Nd
      */
     template <class E>
@@ -538,6 +701,8 @@ namespace xt
 
     /**
      * Expand to at least 3D
+     *
+     * @ingroup xt_xmanipulation
      * @sa atleast_Nd
      */
     template <class E>
@@ -551,13 +716,14 @@ namespace xt
      ************************/
 
     /**
-     * @brief Split xexpression along axis into subexpressions
+     * Split xexpression along axis into subexpressions
      *
      * This splits an xexpression along the axis in `n` equal parts and
      * returns a vector of ``strided_view``.
      * Calling split with axis > dimension of e or a `n` that does not result in
      * an equal division of the xexpression will throw a runtime_error.
      *
+     * @ingroup xt_xmanipulation
      * @param e input xexpression
      * @param n number of elements to return
      * @param axis axis along which to split the expression
@@ -590,10 +756,11 @@ namespace xt
     }
 
     /**
-     * @brief Split an xexpression into subexpressions horizontally (column-wise)
+     * Split an xexpression into subexpressions horizontally (column-wise)
      *
      * This method is equivalent to ``split(e, n, 1)``.
      *
+     * @ingroup xt_xmanipulation
      * @param e input xexpression
      * @param n number of elements to return
      */
@@ -604,10 +771,11 @@ namespace xt
     }
 
     /**
-     * @brief Split an xexpression into subexpressions vertically (row-wise)
+     * Split an xexpression into subexpressions vertically (row-wise)
      *
      * This method is equivalent to ``split(e, n, 0)``.
      *
+     * @ingroup xt_xmanipulation
      * @param e input xexpression
      * @param n number of elements to return
      */
@@ -622,10 +790,10 @@ namespace xt
      ***********************/
 
     /**
-     * @brief Reverse the order of elements in an xexpression along every axis.
+     * Reverse the order of elements in an xexpression along every axis.
      *
+     * @ingroup xt_xmanipulation
      * @param e the input xexpression
-     *
      * @return returns a view with the result of the flip.
      */
     template <class E>
@@ -633,20 +801,22 @@ namespace xt
     {
         using size_type = typename std::decay_t<E>::size_type;
         auto r = flip(e, 0);
-        for (size_type d = 1; d < e.dimension(); ++d) {
+        for (size_type d = 1; d < e.dimension(); ++d)
+        {
             r = flip(r, d);
         }
         return r;
     }
 
     /**
-     * @brief Reverse the order of elements in an xexpression along the given axis.
+     * Reverse the order of elements in an xexpression along the given axis.
+     *
      * Note: A NumPy/Matlab style `flipud(arr)` is equivalent to `xt::flip(arr, 0)`,
      * `fliplr(arr)` to `xt::flip(arr, 1)`.
      *
+     * @ingroup xt_xmanipulation
      * @param e the input xexpression
      * @param axis the axis along which elements should be reversed
-     *
      * @return returns a view with the result of the flip
      */
     template <class E>
@@ -664,7 +834,10 @@ namespace xt
         std::copy(old_strides.cbegin(), old_strides.cend(), strides.begin());
 
         strides[axis] *= -1;
-        std::size_t offset = static_cast<std::size_t>(static_cast<std::ptrdiff_t>(e.data_offset()) + old_strides[axis] * (static_cast<std::ptrdiff_t>(e.shape()[axis]) - 1));
+        std::size_t offset = static_cast<std::size_t>(
+            static_cast<std::ptrdiff_t>(e.data_offset())
+            + old_strides[axis] * (static_cast<std::ptrdiff_t>(e.shape()[axis]) - 1)
+        );
 
         return strided_view(std::forward<E>(e), std::move(shape), std::move(strides), offset);
     }
@@ -673,69 +846,73 @@ namespace xt
      * rot90 implementation *
      ************************/
 
-    template <std::ptrdiff_t N>
-    struct rot90_impl;
-
-    template <>
-    struct rot90_impl<0>
+    namespace detail
     {
-        template <class E>
-        inline auto operator()(E&& e, const std::array<std::size_t, 2>& /*axes*/)
+        template <std::ptrdiff_t N>
+        struct rot90_impl;
+
+        template <>
+        struct rot90_impl<0>
         {
-            return std::forward<E>(e);
-        }
-    };
+            template <class E>
+            inline auto operator()(E&& e, const std::array<std::size_t, 2>& /*axes*/)
+            {
+                return std::forward<E>(e);
+            }
+        };
 
-    template <>
-    struct rot90_impl<1>
-    {
-        template <class E>
-        inline auto operator()(E&& e, const std::array<std::size_t, 2>& axes)
+        template <>
+        struct rot90_impl<1>
         {
-            using std::swap;
+            template <class E>
+            inline auto operator()(E&& e, const std::array<std::size_t, 2>& axes)
+            {
+                using std::swap;
 
-            dynamic_shape<std::ptrdiff_t> axes_list(e.shape().size());
-            std::iota(axes_list.begin(), axes_list.end(), 0);
-            swap(axes_list[axes[0]], axes_list[axes[1]]);
+                dynamic_shape<std::ptrdiff_t> axes_list(e.shape().size());
+                std::iota(axes_list.begin(), axes_list.end(), 0);
+                swap(axes_list[axes[0]], axes_list[axes[1]]);
 
-            return transpose(flip(std::forward<E>(e), axes[1]), std::move(axes_list));
-        }
-    };
+                return transpose(flip(std::forward<E>(e), axes[1]), std::move(axes_list));
+            }
+        };
 
-    template <>
-    struct rot90_impl<2>
-    {
-        template <class E>
-        inline auto operator()(E&& e, const std::array<std::size_t, 2>& axes)
+        template <>
+        struct rot90_impl<2>
         {
-            return flip(flip(std::forward<E>(e), axes[0]), axes[1]);
-        }
-    };
+            template <class E>
+            inline auto operator()(E&& e, const std::array<std::size_t, 2>& axes)
+            {
+                return flip(flip(std::forward<E>(e), axes[0]), axes[1]);
+            }
+        };
 
-    template <>
-    struct rot90_impl<3>
-    {
-        template <class E>
-        inline auto operator()(E&& e, const std::array<std::size_t, 2>& axes)
+        template <>
+        struct rot90_impl<3>
         {
-            using std::swap;
+            template <class E>
+            inline auto operator()(E&& e, const std::array<std::size_t, 2>& axes)
+            {
+                using std::swap;
 
-            dynamic_shape<std::ptrdiff_t> axes_list(e.shape().size());
-            std::iota(axes_list.begin(), axes_list.end(), 0);
-            swap(axes_list[axes[0]], axes_list[axes[1]]);
+                dynamic_shape<std::ptrdiff_t> axes_list(e.shape().size());
+                std::iota(axes_list.begin(), axes_list.end(), 0);
+                swap(axes_list[axes[0]], axes_list[axes[1]]);
 
-            return flip(transpose(std::forward<E>(e), std::move(axes_list)), axes[1]);
-        }
-    };
+                return flip(transpose(std::forward<E>(e), std::move(axes_list)), axes[1]);
+            }
+        };
+    }
 
     /**
-     * @brief Rotate an array by 90 degrees in the plane specified by axes.
+     * Rotate an array by 90 degrees in the plane specified by axes.
+     *
      * Rotation direction is from the first towards the second axis.
      *
+     * @ingroup xt_xmanipulation
      * @param e the input xexpression
      * @param axes the array is rotated in the plane defined by the axes. Axes must be different.
      * @tparam N number of times the array is rotated by 90 degrees. Default is 1.
-     *
      * @return returns a view with the result of the rotation
      */
     template <std::ptrdiff_t N, class E>
@@ -751,7 +928,7 @@ namespace xt
         auto norm_axes = forward_normalize<std::array<std::size_t, 2>>(e, axes);
         constexpr std::ptrdiff_t n = (4 + (N % 4)) % 4;
 
-        return rot90_impl<n>()(std::forward<E>(e), norm_axes);
+        return detail::rot90_impl<n>()(std::forward<E>(e), norm_axes);
     }
 
     /***********************
@@ -759,30 +936,35 @@ namespace xt
      ***********************/
 
     /**
-     * @brief Roll an expression.
+     * Roll an expression.
+     *
      * The expression is flatten before shifting, after which the original
      * shape is restore. Elements that roll beyond the last position are
      * re-introduced at the first. This function does not change the input
      * expression.
      *
+     * @ingroup xt_xmanipulation
      * @param e the input xexpression
      * @param shift the number of places by which elements are shifted
-     *
      * @return a roll of the input expression
      */
-    template<class E>
+    template <class E>
     inline auto roll(E&& e, std::ptrdiff_t shift)
     {
         auto cpy = empty_like(e);
-        auto flat_size = std::accumulate(cpy.shape().begin(), cpy.shape().end(), 1L, std::multiplies<std::size_t>());
-        while(shift < 0)
+        auto flat_size = std::accumulate(
+            cpy.shape().begin(),
+            cpy.shape().end(),
+            1L,
+            std::multiplies<std::size_t>()
+        );
+        while (shift < 0)
         {
             shift += flat_size;
         }
 
         shift %= flat_size;
-        std::copy(e.begin(), e.end() - shift,
-                  std::copy(e.end() - shift, e.end(), cpy.begin()));
+        std::copy(e.begin(), e.end() - shift, std::copy(e.end() - shift, e.end(), cpy.begin()));
 
         return cpy;
     }
@@ -793,28 +975,33 @@ namespace xt
          * Algorithm adapted from pythran/pythonic/numpy/roll.hpp
          */
 
-        template < class To, class From, class S>
-        To roll(To to, From from, std::ptrdiff_t shift, std::size_t axis, S const& shape, std::size_t M)
+        template <class To, class From, class S>
+        To roll(To to, From from, std::ptrdiff_t shift, std::size_t axis, const S& shape, std::size_t M)
         {
             std::ptrdiff_t dim = std::ptrdiff_t(shape[M]);
-            std::ptrdiff_t offset = std::accumulate(shape.begin() + M + 1, shape.end(), std::ptrdiff_t(1), std::multiplies<std::ptrdiff_t>());
-            if(shape.size() == M + 1)
+            std::ptrdiff_t offset = std::accumulate(
+                shape.begin() + M + 1,
+                shape.end(),
+                std::ptrdiff_t(1),
+                std::multiplies<std::ptrdiff_t>()
+            );
+            if (shape.size() == M + 1)
             {
                 if (axis == M)
                 {
                     const auto split = from + (dim - shift) * offset;
-                    for(auto iter = split, end = from + dim * offset; iter != end; iter += offset, ++to)
+                    for (auto iter = split, end = from + dim * offset; iter != end; iter += offset, ++to)
                     {
                         *to = *iter;
                     }
-                    for(auto iter = from, end = split; iter != end; iter += offset, ++to)
+                    for (auto iter = from, end = split; iter != end; iter += offset, ++to)
                     {
                         *to = *iter;
                     }
                 }
                 else
                 {
-                    for(auto iter = from, end = from + dim * offset; iter != end; iter += offset, ++to)
+                    for (auto iter = from, end = from + dim * offset; iter != end; iter += offset, ++to)
                     {
                         *to = *iter;
                     }
@@ -825,11 +1012,11 @@ namespace xt
                 if (axis == M)
                 {
                     const auto split = from + (dim - shift) * offset;
-                    for(auto iter = split, end = from + dim * offset; iter != end; iter += offset)
+                    for (auto iter = split, end = from + dim * offset; iter != end; iter += offset)
                     {
                         to = roll(to, iter, shift, axis, shape, M + 1);
                     }
-                    for(auto iter = from, end = split; iter != end; iter += offset)
+                    for (auto iter = from, end = split; iter != end; iter += offset)
                     {
                         to = roll(to, iter, shift, axis, shape, M + 1);
                     }
@@ -847,34 +1034,35 @@ namespace xt
     }
 
     /**
-     * @brief Roll an expression along a given axis.
+     * Roll an expression along a given axis.
+     *
      * Elements that roll beyond the last position are re-introduced at the first.
      * This function does not change the input expression.
      *
+     * @ingroup xt_xmanipulation
      * @param e the input xexpression
      * @param shift the number of places by which elements are shifted
      * @param axis the axis along which elements are shifted.
-     *
      * @return a roll of the input expression
      */
-    template<class E>
+    template <class E>
     inline auto roll(E&& e, std::ptrdiff_t shift, std::ptrdiff_t axis)
     {
         auto cpy = empty_like(e);
-        auto const& shape = cpy.shape();
+        const auto& shape = cpy.shape();
         std::size_t saxis = static_cast<std::size_t>(axis);
-        if(axis < 0)
+        if (axis < 0)
         {
             axis += std::ptrdiff_t(cpy.dimension());
         }
 
-        if(saxis >= cpy.dimension() || axis < 0)
+        if (saxis >= cpy.dimension() || axis < 0)
         {
             XTENSOR_THROW(std::runtime_error, "axis is no within shape dimension.");
         }
 
         const auto axis_dim = static_cast<std::ptrdiff_t>(shape[saxis]);
-        while(shift < 0)
+        while (shift < 0)
         {
             shift += axis_dim;
         }
@@ -886,9 +1074,10 @@ namespace xt
     /****************************
      * repeat implementation    *
      ****************************/
+
     namespace detail
     {
-        template<class E, class R>
+        template <class E, class R>
         inline auto make_xrepeat(E&& e, R&& r, typename std::decay_t<E>::size_type axis)
         {
             const auto casted_axis = static_cast<typename std::decay_t<E>::size_type>(axis);
@@ -901,13 +1090,13 @@ namespace xt
     }
 
     /**
-     * @brief Repeats elements of an expression along a given axis.
+     * Repeat elements of an expression along a given axis.
      *
+     * @ingroup xt_xmanipulation
      * @param e the input xexpression
-     * @param repeats The number of repetition of each elements. \ref repeats is broadcasted to
-     * fit the shape of the given \ref axis.
+     * @param repeats The number of repetition of each elements.
+     *     @p repeats is broadcasted to fit the shape of the given @p axis.
      * @param axis the axis along which to repeat the value
-     *
      * @return an expression which as the same shape as \ref e, except along the given \ref axis
      */
     template <class E>
@@ -920,11 +1109,12 @@ namespace xt
     }
 
     /**
-     * @brief Repeats elements of an expression along a given axis.
+     * Repeat elements of an expression along a given axis.
      *
+     * @ingroup xt_xmanipulation
      * @param e the input xexpression
-     * @param repeats The number of repetition of each elements. The size of \ref repeats
-     * must match the shape of the given \ref axis.
+     * @param repeats The number of repetition of each elements.
+     *     The size of @p repeats must match the shape of the given @p axis.
      * @param axis the axis along which to repeat the value
      *
      * @return an expression which as the same shape as \ref e, except along the given \ref axis
@@ -936,13 +1126,13 @@ namespace xt
     }
 
     /**
-     * @brief Repeats elements of an expression along a given axis.
+     * Repeat elements of an expression along a given axis.
      *
+     * @ingroup xt_xmanipulation
      * @param e the input xexpression
-     * @param repeats The number of repetition of each elements. The size of \ref repeats
-     * must match the shape of the given \ref axis.
+     * @param repeats The number of repetition of each elements.
+     *     The size of @p repeats must match the shape of the given @p axis.
      * @param axis the axis along which to repeat the value
-     *
      * @return an expression which as the same shape as \ref e, except along the given \ref axis
      */
     template <class E>

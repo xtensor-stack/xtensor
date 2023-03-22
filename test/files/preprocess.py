@@ -47,68 +47,68 @@ def get_cpp_initlist(arr, name):
 
 
 def translate_file(contents, f):
-	current_vars = {}
+    current_vars = {}
 
-	matches = re.findall(r"\/\*py.*?\*\/", contents, re.MULTILINE | re.DOTALL)
+    matches = re.findall(r"\/\*py.*?\*\/", contents, re.MULTILINE | re.DOTALL)
 
-	def exec_comment(txt, upper_level=False):
-		lines = txt.split('\n')
-		if upper_level:
-			txt = '\n'.join(["import numpy as np"] + [x.strip() for x in lines[1:-1]])
-		locals_before = list(locals().keys())
-		exec(txt, globals(), current_vars)
-		current_vars.update(
-			{x: val for x, val in locals().items() if x not in locals_before}
-		)
+    def exec_comment(txt, upper_level=False):
+        lines = txt.split('\n')
+        if upper_level:
+            txt = '\n'.join(["import numpy as np"] + [x.strip() for x in lines[1:-1]])
+        locals_before = list(locals().keys())
+        exec(txt, globals(), current_vars)
+        current_vars.update(
+            {x: val for x, val in locals().items() if x not in locals_before}
+        )
 
-	result_file = ""
+    result_file = ""
 
-	idx = 0
-	lidx = 0
-	for line in contents.split('\n'):
-		if lidx == 8:
-			f = os.path.split(f)[1]
-			result_file += "// This file is generated from test/files/cppy_source/{} by preprocess.py!\n".format(f)
-			result_file += "// Warning: This file should not be modified directly! " \
-						   "Instead, modify the `*.cppy` file.\n\n"
+    idx = 0
+    lidx = 0
+    for line in contents.split('\n'):
+        if lidx == 8:
+            f = os.path.split(f)[1]
+            result_file += "// This file is generated from test/files/cppy_source/{} by preprocess.py!\n".format(f)
+            result_file += "// Warning: This file should not be modified directly! " \
+                           "Instead, modify the `*.cppy` file.\n\n"
 
-		lstrip = line.lstrip()
-		if lstrip.startswith("/*py"):
-			exec_comment(matches[idx], True)
-			idx += 1
-		if lstrip.startswith("// py_"):
-			indent_n = len(line) - len(lstrip)
-			if '=' in lstrip:
-				exec_comment(lstrip[6:])
-				var = line.strip()[6:lstrip.index('=')].strip()
-			else:
-				var = line.strip()[6:]
-			indent = line[:indent_n]
-			init_list = get_cpp_initlist(current_vars[var], 'py_' + var)
-			init_list = '\n'.join([indent + x for x in init_list.split('\n')])
-			result_file += line + '\n'
-			result_file += init_list + '\n'
-		else:
-			result_file += line + '\n'
-		lidx += 1
-	return result_file
+        lstrip = line.lstrip()
+        if lstrip.startswith("/*py"):
+            exec_comment(matches[idx], True)
+            idx += 1
+        if lstrip.startswith("// py_"):
+            indent_n = len(line) - len(lstrip)
+            if '=' in lstrip:
+                exec_comment(lstrip[6:])
+                var = line.strip()[6:lstrip.index('=')].strip()
+            else:
+                var = line.strip()[6:]
+            indent = line[:indent_n]
+            init_list = get_cpp_initlist(current_vars[var], 'py_' + var)
+            init_list = '\n'.join([indent + x for x in init_list.split('\n')])
+            result_file += line + '\n'
+            result_file += init_list + '\n'
+        else:
+            result_file += line + '\n'
+        lidx += 1
+    return result_file
 
 print("::: PREPROCESSING :::\n")
 
 for f in cppy_files:
-	print(" - PROCESSING {}".format(f))
+    print(" - PROCESSING {}".format(f))
 
-	global current_vars
-	current_vars = {}  # reset
+    global current_vars
+    current_vars = {}  # reset
 
-	with open(f) as fi:
-		contents = fi.read()
+    with open(f) as fi:
+        contents = fi.read()
 
-	# reset global seed
-	np.random.seed(42)
-	result = translate_file(contents, f)
-	f_result = os.path.split(f)[1]
-	with open(my_path + "/../" + f_result[:-1], 'w+') as fo:
-		fo.write(result)
-	print("::: DONE :::")
-	# print(result)
+    # reset global seed
+    np.random.seed(42)
+    result = translate_file(contents, f)
+    f_result = os.path.split(f)[1]
+    with open(my_path + "/../" + f_result[:-1], 'w+') as fo:
+        fo.write(result)
+    print("::: DONE :::")
+    # print(result)

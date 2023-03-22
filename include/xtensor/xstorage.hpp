@@ -1,11 +1,11 @@
 /***************************************************************************
-* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef XTENSOR_STORAGE_HPP
 #define XTENSOR_STORAGE_HPP
@@ -29,8 +29,8 @@ namespace xt
     namespace detail
     {
         template <class It>
-        using require_input_iter = typename std::enable_if<std::is_convertible<typename std::iterator_traits<It>::iterator_category,
-                                                                               std::input_iterator_tag>::value>::type;
+        using require_input_iter = typename std::enable_if<
+            std::is_convertible<typename std::iterator_traits<It>::iterator_category, std::input_iterator_tag>::value>::type;
     }
 
     template <class C>
@@ -186,8 +186,11 @@ namespace xt
         }
 
         template <class A>
-        inline void safe_destroy_deallocate(A& alloc, typename std::allocator_traits<A>::pointer ptr,
-                                            typename std::allocator_traits<A>::size_type size)
+        inline void safe_destroy_deallocate(
+            A& alloc,
+            typename std::allocator_traits<A>::pointer ptr,
+            typename std::allocator_traits<A>::size_type size
+        )
         {
             using traits = std::allocator_traits<A>;
             using pointer = typename traits::pointer;
@@ -240,13 +243,17 @@ namespace xt
 
     template <class T, class A>
     inline uvector<T, A>::uvector(const allocator_type& alloc) noexcept
-        : m_allocator(alloc), p_begin(nullptr), p_end(nullptr)
+        : m_allocator(alloc)
+        , p_begin(nullptr)
+        , p_end(nullptr)
     {
     }
 
     template <class T, class A>
     inline uvector<T, A>::uvector(size_type count, const allocator_type& alloc)
-        : m_allocator(alloc), p_begin(nullptr), p_end(nullptr)
+        : m_allocator(alloc)
+        , p_begin(nullptr)
+        , p_end(nullptr)
     {
         if (count != 0)
         {
@@ -257,7 +264,9 @@ namespace xt
 
     template <class T, class A>
     inline uvector<T, A>::uvector(size_type count, const_reference value, const allocator_type& alloc)
-        : m_allocator(alloc), p_begin(nullptr), p_end(nullptr)
+        : m_allocator(alloc)
+        , p_begin(nullptr)
+        , p_end(nullptr)
     {
         if (count != 0)
         {
@@ -270,14 +279,18 @@ namespace xt
     template <class T, class A>
     template <class InputIt, class>
     inline uvector<T, A>::uvector(InputIt first, InputIt last, const allocator_type& alloc)
-        : m_allocator(alloc), p_begin(nullptr), p_end(nullptr)
+        : m_allocator(alloc)
+        , p_begin(nullptr)
+        , p_end(nullptr)
     {
         init_data(first, last);
     }
 
     template <class T, class A>
     inline uvector<T, A>::uvector(std::initializer_list<T> init, const allocator_type& alloc)
-        : m_allocator(alloc), p_begin(nullptr), p_end(nullptr)
+        : m_allocator(alloc)
+        , p_begin(nullptr)
+        , p_end(nullptr)
     {
         init_data(init.begin(), init.end());
     }
@@ -292,15 +305,20 @@ namespace xt
 
     template <class T, class A>
     inline uvector<T, A>::uvector(const uvector& rhs)
-        : m_allocator(std::allocator_traits<allocator_type>::select_on_container_copy_construction(rhs.get_allocator())),
-          p_begin(nullptr), p_end(nullptr)
+        : m_allocator(
+            std::allocator_traits<allocator_type>::select_on_container_copy_construction(rhs.get_allocator())
+        )
+        , p_begin(nullptr)
+        , p_end(nullptr)
     {
         init_data(rhs.p_begin, rhs.p_end);
     }
 
     template <class T, class A>
     inline uvector<T, A>::uvector(const uvector& rhs, const allocator_type& alloc)
-        : m_allocator(alloc), p_begin(nullptr), p_end(nullptr)
+        : m_allocator(alloc)
+        , p_begin(nullptr)
+        , p_end(nullptr)
     {
         init_data(rhs.p_begin, rhs.p_end);
     }
@@ -311,7 +329,9 @@ namespace xt
         // No copy and swap idiom here due to performance issues
         if (this != &rhs)
         {
-            m_allocator = std::allocator_traits<allocator_type>::select_on_container_copy_construction(rhs.get_allocator());
+            m_allocator = std::allocator_traits<allocator_type>::select_on_container_copy_construction(
+                rhs.get_allocator()
+            );
             resize_impl(rhs.size());
             if (xtrivially_default_constructible<value_type>::value)
             {
@@ -327,7 +347,9 @@ namespace xt
 
     template <class T, class A>
     inline uvector<T, A>::uvector(uvector&& rhs) noexcept
-        : m_allocator(std::move(rhs.m_allocator)), p_begin(rhs.p_begin), p_end(rhs.p_end)
+        : m_allocator(std::move(rhs.m_allocator))
+        , p_begin(rhs.p_begin)
+        , p_end(rhs.p_end)
     {
         rhs.p_begin = nullptr;
         rhs.p_end = nullptr;
@@ -335,7 +357,9 @@ namespace xt
 
     template <class T, class A>
     inline uvector<T, A>::uvector(uvector&& rhs, const allocator_type& alloc) noexcept
-        : m_allocator(alloc), p_begin(rhs.p_begin), p_end(rhs.p_end)
+        : m_allocator(alloc)
+        , p_begin(rhs.p_begin)
+        , p_end(rhs.p_end)
     {
         rhs.p_begin = nullptr;
         rhs.p_end = nullptr;
@@ -418,16 +442,20 @@ namespace xt
     template <class T, class A>
     inline auto uvector<T, A>::at(size_type i) -> reference
     {
-        if(i >= size())
+        if (i >= size())
+        {
             XTENSOR_THROW(std::out_of_range, "Out of range in uvector access");
+        }
         return this->operator[](i);
     }
 
     template <class T, class A>
     inline auto uvector<T, A>::at(size_type i) const -> const_reference
     {
-        if(i >= size())
+        if (i >= size())
+        {
             XTENSOR_THROW(std::out_of_range, "Out of range in uvector access");
+        }
         return this->operator[](i);
     }
 
@@ -563,8 +591,7 @@ namespace xt
     template <class T, class A>
     inline bool operator<(const uvector<T, A>& lhs, const uvector<T, A>& rhs)
     {
-        return std::lexicographical_compare(lhs.begin(), lhs.end(),
-                                            rhs.begin(), rhs.end());
+        return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
     }
 
     template <class T, class A>
@@ -600,13 +627,13 @@ namespace xt
         template <class T>
         struct allocator_alignment
         {
-            constexpr static std::size_t value = 0;
+            static constexpr std::size_t value = 0;
         };
 
         template <class T, std::size_t A>
         struct allocator_alignment<xt_simd::aligned_allocator<T, A>>
         {
-            constexpr static std::size_t value = A;
+            static constexpr std::size_t value = A;
         };
     }
 
@@ -630,12 +657,13 @@ namespace xt
         using reverse_iterator = std::reverse_iterator<iterator>;
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-    #if defined(_MSC_VER) && _MSC_VER < 1910
-        constexpr static std::size_t alignment = detail::allocator_alignment<A>::value;
-    #else
-        constexpr static std::size_t alignment = detail::allocator_alignment<A>::value != 0 ?
-                                                    detail::allocator_alignment<A>::value : alignof(T);
-    #endif
+#if defined(_MSC_VER) && _MSC_VER < 1910
+        static constexpr std::size_t alignment = detail::allocator_alignment<A>::value;
+#else
+        static constexpr std::size_t alignment = detail::allocator_alignment<A>::value != 0
+                                                     ? detail::allocator_alignment<A>::value
+                                                     : alignof(T);
+#endif
 
         svector() noexcept;
         ~svector();
@@ -824,8 +852,8 @@ namespace xt
     }
 
     template <class T, std::size_t N, class A, bool Init>
-    inline svector<T, N, A, Init>& svector<T, N, A, Init>::operator=(svector&& rhs) noexcept(std::is_nothrow_move_assignable<
-                                                                                             value_type>::value)
+    inline svector<T, N, A, Init>& svector<T, N, A, Init>::operator=(svector&& rhs
+    ) noexcept(std::is_nothrow_move_assignable<value_type>::value)
     {
         assign(rhs.begin(), rhs.end());
         return *this;
@@ -834,7 +862,9 @@ namespace xt
     template <class T, std::size_t N, class A, bool Init>
     inline svector<T, N, A, Init>& svector<T, N, A, Init>::operator=(const std::vector<T>& rhs)
     {
-        m_allocator = std::allocator_traits<allocator_type>::select_on_container_copy_construction(rhs.get_allocator());
+        m_allocator = std::allocator_traits<allocator_type>::select_on_container_copy_construction(
+            rhs.get_allocator()
+        );
         assign(rhs.begin(), rhs.end());
         return *this;
     }
@@ -849,20 +879,25 @@ namespace xt
     template <std::size_t N2, bool I2, class>
     inline svector<T, N, A, Init>& svector<T, N, A, Init>::operator=(const svector<T, N2, A, I2>& rhs)
     {
-        m_allocator = std::allocator_traits<allocator_type>::select_on_container_copy_construction(rhs.get_allocator());
+        m_allocator = std::allocator_traits<allocator_type>::select_on_container_copy_construction(
+            rhs.get_allocator()
+        );
         assign(rhs.begin(), rhs.end());
         return *this;
     }
 
     template <class T, std::size_t N, class A, bool Init>
     inline svector<T, N, A, Init>::svector(const svector& rhs)
-        : m_allocator(std::allocator_traits<allocator_type>::select_on_container_copy_construction(rhs.get_allocator()))
+        : m_allocator(
+            std::allocator_traits<allocator_type>::select_on_container_copy_construction(rhs.get_allocator())
+        )
     {
         assign(rhs.begin(), rhs.end());
     }
 
     template <class T, std::size_t N, class A, bool Init>
-    inline svector<T, N, A, Init>::svector(svector&& rhs) noexcept(std::is_nothrow_move_constructible<value_type>::value)
+    inline svector<T, N, A, Init>::svector(svector&& rhs
+    ) noexcept(std::is_nothrow_move_constructible<value_type>::value)
     {
         this->swap(rhs);
     }
@@ -913,16 +948,20 @@ namespace xt
     template <class T, std::size_t N, class A, bool Init>
     inline auto svector<T, N, A, Init>::at(size_type idx) -> reference
     {
-        if(idx >= size())
+        if (idx >= size())
+        {
             XTENSOR_THROW(std::out_of_range, "Out of range in svector access");
+        }
         return this->operator[](idx);
     }
 
     template <class T, std::size_t N, class A, bool Init>
     inline auto svector<T, N, A, Init>::at(size_type idx) const -> const_reference
     {
-        if(idx >= size())
+        if (idx >= size())
+        {
             XTENSOR_THROW(std::out_of_range, "Out of range in svector access");
+        }
         return this->operator[](idx);
     }
 
@@ -968,7 +1007,7 @@ namespace xt
     template <class T, std::size_t N, class A, bool Init>
     inline void svector<T, N, A, Init>::reserve(size_type n)
     {
-        if(n > N && n > capacity())
+        if (n > N && n > capacity())
         {
             grow(n);
         }
@@ -1345,8 +1384,7 @@ namespace xt
     template <class T, std::size_t N, class A, bool Init>
     inline bool operator<(const svector<T, N, A, Init>& lhs, const svector<T, N, A, Init>& rhs)
     {
-        return std::lexicographical_compare(lhs.begin(), lhs.end(),
-                                            rhs.begin(), rhs.end());
+        return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
     }
 
     template <class T, std::size_t N, class A, bool Init>
@@ -1382,7 +1420,8 @@ namespace xt
     };
 
     /**
-     * This array class is modeled after ``std::array`` but adds optional alignment through a template parameter.
+     * This array class is modeled after ``std::array`` but adds optional alignment through a template
+     * parameter.
      *
      * To be moved to xtl, along with the rest of xstorage.hpp
      */
@@ -1390,21 +1429,20 @@ namespace xt
     class alignas(Align) aligned_array : public std::array<T, N>
     {
     public:
+
         // Note: this is for alignment detection. The allocator serves no other purpose than
         //       that of a trait here.
-        using allocator_type = std::conditional_t<Align != 0,
-                                                  xt_simd::aligned_allocator<T, Align>,
-                                                  std::allocator<T>>;
+        using allocator_type = std::conditional_t<Align != 0, xt_simd::aligned_allocator<T, Align>, std::allocator<T>>;
     };
 
 #if defined(_MSC_VER)
-    #define XTENSOR_CONST
+#define XTENSOR_CONST
 #else
-    #define XTENSOR_CONST const
+#define XTENSOR_CONST const
 #endif
 
 #if defined(__GNUC__) && __GNUC__ < 5 && !defined(__clang__)
-    #define GCC4_FALLBACK
+#define GCC4_FALLBACK
 
     namespace const_array_detail
     {
@@ -1427,7 +1465,9 @@ namespace xt
         template <class T>
         struct array_traits<T, 0>
         {
-            struct empty {};
+            struct empty
+            {
+            };
 
             using storage_type = empty;
 
@@ -1466,11 +1506,11 @@ namespace xt
 
         constexpr const_reference operator[](std::size_t idx) const
         {
-        #ifdef GCC4_FALLBACK
+#ifdef GCC4_FALLBACK
             return const_array_detail::array_traits<T, N>::ref(m_data, idx);
-        #else
+#else
             return m_data[idx];
-        #endif
+#endif
         }
 
         constexpr const_iterator begin() const noexcept
@@ -1516,30 +1556,30 @@ namespace xt
 
         constexpr const_pointer data() const noexcept
         {
-        #ifdef GCC4_FALLBACK
+#ifdef GCC4_FALLBACK
             return const_array_detail::array_traits<T, N>::ptr(m_data);
-        #else
+#else
             return m_data;
-        #endif
+#endif
         }
 
         constexpr const_reference front() const noexcept
         {
-        #ifdef GCC4_FALLBACK
+#ifdef GCC4_FALLBACK
             return const_array_detail::array_traits<T, N>::ref(m_data, 0);
-        #else
+#else
             return m_data[0];
-        #endif
+#endif
         }
 
         constexpr const_reference back() const noexcept
         {
-        #ifdef GCC4_FALLBACK
-            return N ? const_array_detail::array_traits<T, N>::ref(m_data, N - 1) :
-                       const_array_detail::array_traits<T, N>::ref(m_data, 0);
-        #else
+#ifdef GCC4_FALLBACK
+            return N ? const_array_detail::array_traits<T, N>::ref(m_data, N - 1)
+                     : const_array_detail::array_traits<T, N>::ref(m_data, 0);
+#else
             return m_data[size() - 1];
-        #endif
+#endif
         }
 
         constexpr bool empty() const noexcept
@@ -1552,15 +1592,14 @@ namespace xt
             return N;
         }
 
-    #ifdef GCC4_FALLBACK
+#ifdef GCC4_FALLBACK
         XTENSOR_CONST typename const_array_detail::array_traits<T, N>::storage_type m_data;
-    #else
+#else
         XTENSOR_CONST T m_data[N > 0 ? N : 1];
-    #endif
+#endif
     };
 
 #undef GCC4_FALLBACK
-
 
     template <class T, std::size_t N>
     inline bool operator==(const const_array<T, N>& lhs, const const_array<T, N>& rhs)
@@ -1577,8 +1616,7 @@ namespace xt
     template <class T, std::size_t N>
     inline bool operator<(const const_array<T, N>& lhs, const const_array<T, N>& rhs)
     {
-        return std::lexicographical_compare(lhs.begin(), lhs.end(),
-                                            rhs.begin(), rhs.end());
+        return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
     }
 
     template <class T, std::size_t N>
@@ -1626,22 +1664,22 @@ namespace xt
 
 #if defined(_MSC_VER)
         using cast_type = std::array<std::size_t, sizeof...(X)>;
-        #define XTENSOR_FIXED_SHAPE_CONSTEXPR inline
+#define XTENSOR_FIXED_SHAPE_CONSTEXPR inline
 #else
         using cast_type = const_array<std::size_t, sizeof...(X)>;
-        #define XTENSOR_FIXED_SHAPE_CONSTEXPR constexpr
+#define XTENSOR_FIXED_SHAPE_CONSTEXPR constexpr
 #endif
         using value_type = std::size_t;
         using size_type = std::size_t;
         using const_iterator = typename cast_type::const_iterator;
 
-        constexpr static std::size_t size()
+        static constexpr std::size_t size()
         {
             return sizeof...(X);
         }
 
         template <std::size_t idx>
-        constexpr static auto get()
+        static constexpr auto get()
         {
             using tmp_cast_type = std::array<std::size_t, sizeof...(X)>;
             return std::get<idx>(tmp_cast_type{X...});
@@ -1694,7 +1732,7 @@ namespace xt
 
     private:
 
-         XTENSOR_CONSTEXPR_ENHANCED_STATIC cast_type m_array = cast_type({X...});
+        XTENSOR_CONSTEXPR_ENHANCED_STATIC cast_type m_array = cast_type({X...});
     };
 
 #ifdef XTENSOR_HAS_CONSTEXPR_ENHANCED
@@ -1803,7 +1841,7 @@ namespace xt
     }
 
     template <class E, std::ptrdiff_t Start, std::ptrdiff_t End>
-    auto  sequence_view<E, Start, End>::end() const -> const_iterator
+    auto sequence_view<E, Start, End>::end() const -> const_iterator
     {
         if (End != -1)
         {
@@ -1816,19 +1854,19 @@ namespace xt
     }
 
     template <class E, std::ptrdiff_t Start, std::ptrdiff_t End>
-    auto  sequence_view<E, Start, End>::begin() const -> const_iterator
+    auto sequence_view<E, Start, End>::begin() const -> const_iterator
     {
         return m_sequence.begin() + Start;
     }
 
     template <class E, std::ptrdiff_t Start, std::ptrdiff_t End>
-    auto  sequence_view<E, Start, End>::cend() const -> const_iterator
+    auto sequence_view<E, Start, End>::cend() const -> const_iterator
     {
         return end();
     }
 
     template <class E, std::ptrdiff_t Start, std::ptrdiff_t End>
-    auto  sequence_view<E, Start, End>::cbegin() const -> const_iterator
+    auto sequence_view<E, Start, End>::cbegin() const -> const_iterator
     {
         return begin();
     }
@@ -1882,7 +1920,6 @@ namespace xt
         return m_sequence;
     }
 
-
     template <class T, std::ptrdiff_t TB, std::ptrdiff_t TE>
     inline bool operator==(const sequence_view<T, TB, TE>& lhs, const sequence_view<T, TB, TE>& rhs)
     {
@@ -1904,28 +1941,29 @@ namespace xt
 // G++ 8 C++ library does define it as a struct hence we get
 // clang warnings here
 
+// Do not remove space between "#" and "pragma". This is required for CRAN checks.
+// clang-format off
 #if defined(__clang__)
-    # pragma clang diagnostic push
-    # pragma clang diagnostic ignored "-Wmismatched-tags"
+ # pragma clang diagnostic push
+ # pragma clang diagnostic ignored "-Wmismatched-tags"
 #endif
+// clang-format on
 
 namespace std
 {
     template <class T, std::size_t N>
-    class tuple_size<xt::const_array<T, N>> :
-        public integral_constant<std::size_t, N>
+    class tuple_size<xt::const_array<T, N>> : public integral_constant<std::size_t, N>
     {
     };
 
     template <std::size_t... N>
-    class tuple_size<xt::fixed_shape<N...>> :
-        public integral_constant<std::size_t, sizeof...(N)>
+    class tuple_size<xt::fixed_shape<N...>> : public integral_constant<std::size_t, sizeof...(N)>
     {
     };
 
     template <class T, std::ptrdiff_t Start, std::ptrdiff_t End>
-    class tuple_size<xt::sequence_view<T, Start, End>> :
-        public integral_constant<std::size_t, std::size_t(End - Start)>
+    class tuple_size<xt::sequence_view<T, Start, End>>
+        : public integral_constant<std::size_t, std::size_t(End - Start)>
     {
     };
 
@@ -1934,9 +1972,12 @@ namespace std
     class tuple_size<xt::sequence_view<T, Start, -1>>;
 }
 
+// Do not remove space between "#" and "pragma". This is required for CRAN checks.
+// clang-format off
 #if defined(__clang__)
-    # pragma clang diagnostic pop
+ # pragma clang diagnostic pop
 #endif
+// clang-format on
 
 #undef XTENSOR_CONST
 

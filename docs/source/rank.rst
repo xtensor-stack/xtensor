@@ -104,10 +104,13 @@ Consider the following example:
         xt::xtensor<double, 2> B = xt::zeros<double>({2, 2});
         xt::xarray<double> C = xt::zeros<double>({2, 2});
 
-        std::cout << Foo<decltype(A)>::value() << std::endl;
-        std::cout << Foo<decltype(B)>::value() << std::endl;
-        std::cout << Foo<decltype(C)>::value() << std::endl;
+        assert(Foo<decltype(A)>::value() == 1);
+        assert(Foo<decltype(B)>::value() == 2);
+        assert(Foo<decltype(C)>::value() == SIZE_MAX);
 
         return 0;
     }
 
+``xt::get_rank`` 'returns' the rank of the *xtensor* object if its rank is fixed.
+In all other cases it 'returns' ``SIZE_MAX``.
+Indeed ``xt::get_rank<xt::array<double>>::value`` is equal to ``SIZE_MAX``, but equally so is ``xt::get_rank<double>::value``.
