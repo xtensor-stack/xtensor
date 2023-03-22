@@ -18,4 +18,3 @@ Defined in ``xtensor/xfft.hpp``
 
 .. doxygentypedef:: xt::ifft
    :project: xtensor
-
