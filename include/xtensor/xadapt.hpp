@@ -407,12 +407,18 @@ namespace xt
     /**
      * @copydoc adapt(P&&, typename A::size_type, O, const SC&, layout_type, const A&)
      */
-    template <layout_type L = XTENSOR_DEFAULT_LAYOUT, class P, class O, std::size_t N, class A = detail::default_allocator_for_ptr_t<P>>
+    template <
+        layout_type L = XTENSOR_DEFAULT_LAYOUT,
+        class P,
+        class O,
+        class ST,
+        std::size_t N,
+        class A = detail::default_allocator_for_ptr_t<P>>
     inline xtensor_adaptor<xbuffer_adaptor<xtl::closure_type_t<P>, O, A>, N, L> adapt(
         P&& pointer,
         typename A::size_type size,
         O ownership,
-        const typename A::size_type (&shape)[N],
+        const ST (&shape)[N],
         layout_type l = L,
         const A& alloc = A()
     )
