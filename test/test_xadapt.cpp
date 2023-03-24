@@ -70,6 +70,32 @@ namespace xt
         }
     }
 
+    TEST(xtensor_adaptor, xtensor_pointer_braces)
+    {
+        std::vector<int> data(4, 0);
+        xt::xtensor_pointer<int, 2> a = xt::adapt(data.data(), data.size(), xt::no_ownership(), {2, 2});
+
+        a(0, 0) = 0;
+        a(0, 1) = 1;
+        a(1, 0) = 2;
+        a(1, 1) = 3;
+
+        if (XTENSOR_DEFAULT_LAYOUT == xt::layout_type::row_major)
+        {
+            EXPECT_EQ(0, data[0]);
+            EXPECT_EQ(1, data[1]);
+            EXPECT_EQ(2, data[2]);
+            EXPECT_EQ(3, data[3]);
+        }
+        else
+        {
+            EXPECT_EQ(0, data[0]);
+            EXPECT_EQ(2, data[1]);
+            EXPECT_EQ(1, data[2]);
+            EXPECT_EQ(3, data[3]);
+        }
+    }
+
     TEST(xarray_adaptor, adapt)
     {
         vec_type v(4, 0);

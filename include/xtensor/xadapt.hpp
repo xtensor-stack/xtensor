@@ -405,6 +405,28 @@ namespace xt
     }
 
     /**
+     * @copydoc adapt(P&&, typename A::size_type, O, const SC&, layout_type, const A&)
+     */
+    template <layout_type L = XTENSOR_DEFAULT_LAYOUT, class P, class O, std::size_t N, class A = detail::default_allocator_for_ptr_t<P>>
+    inline xtensor_adaptor<xbuffer_adaptor<xtl::closure_type_t<P>, O, A>, N, L> adapt(
+        P&& pointer,
+        typename A::size_type size,
+        O ownership,
+        const typename A::size_type (&shape)[N],
+        layout_type l = L,
+        const A& alloc = A()
+    )
+    {
+        (void) ownership;
+        using buffer_type = xbuffer_adaptor<xtl::closure_type_t<P>, O, A>;
+        using return_type = xtensor_adaptor<buffer_type, N, L>;
+        buffer_type buf(std::forward<P>(pointer), size, alloc);
+        std::array<typename A::size_type, N> shape_;
+        std::copy(std::begin(shape), std::end(shape), std::begin(shape_));
+        return return_type(std::move(buf), shape_, l);
+    }
+
+    /**
      * Constructs an xtensor_adaptor of the given dynamically allocated C array,
      * with the specified shape and strides.
      *
