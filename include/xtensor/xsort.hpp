@@ -293,12 +293,12 @@ namespace xt
     {
         template <class ConstRandomIt, class RandomIt, class Compare, class Method>
         inline void argsort_iter(
-                ConstRandomIt data_begin,
-                ConstRandomIt data_end,
-                RandomIt idx_begin,
-                RandomIt idx_end,
-                Compare comp,
-                Method method
+            ConstRandomIt data_begin,
+            ConstRandomIt data_end,
+            RandomIt idx_begin,
+            RandomIt idx_end,
+            Compare comp,
+            Method method
         )
         {
             XTENSOR_ASSERT(std::distance(data_begin, data_end) >= 0);
@@ -444,7 +444,7 @@ namespace xt
      * @param method sorting algorithm to use
      *
      * @return argsorted index array
-     * 
+     *
      * @see xt::sorting_method
      */
     template <class E>
