@@ -9,12 +9,23 @@ on:
 
 jobs:
 
-  unix:
+  standard:
 
     strategy:
       fail-fast: false
       matrix:
-        runs-on: [ubuntu-latest, macos-latest]
+        runs-on: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+        - runs-on: ubuntu-latest
+          config: -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON
+        - runs-on: macos-latest
+          config: -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON
+        - runs-on: windows-latest
+          config: -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON -G Ninja
+
+    defaults:
+      run:
+        shell: bash -l {0}
 
     name: ${{ matrix.runs-on }} • x64 ${{ matrix.args }}
     runs-on: ${{ matrix.runs-on }}
@@ -31,67 +42,19 @@ jobs:
         environment-file: environment-dev.yml
         cache-env: true
         extra-specs: |
-          ninja
+          sel(win): ninja
 
     - name: Configure using CMake
-      shell: bash -l {0}
-      run: cmake -Bbuild -G "Ninja" -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON
+      run: cmake ${{ matrix.config }}
 
     - name: Install
-      shell: bash -l {0}
       working-directory: build
       run: cmake --install .
 
-    - name: Build xtensor-python
-      shell: bash -l {0}
+    - name: Build
       working-directory: build
       run: cmake --build .
 
-    - name: Test xtensor-python
-      shell: bash -l {0}
-      working-directory: build/test
-      run: ./test_xtensor_lib
-
-  windows:
-
-    strategy:
-      fail-fast: false
-      matrix:
-        runs-on: [windows-latest]
-
-    name: ${{ matrix.runs-on }} • x64 ${{ matrix.args }}
-    runs-on: ${{ matrix.runs-on }}
-
-    steps:
-
-    - name: Basic GitHub action setup
-      uses: actions/checkout@v2
-
-    - name: Set conda environment
-      uses: mamba-org/provision-with-micromamba@main
-      with:
-        environment-name: myenv
-        environment-file: environment-dev.yml
-        cache-env: true
-        extra-specs: |
-          ninja
-
-    - name: Configure using CMake
-      shell: cmd /C call {0}
-      run: cmake -Bbuild -G "Ninja" -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON
-
-    - name: Install
-      shell: cmd /C call {0}
+    - name: Run tests
       working-directory: build
-      run: cmake --install .
-
-    - name: Build xtensor-python
-      shell: cmd /C call {0}
-      working-directory: build
-      run: cmake --build .
-
-    - name: Test xtensor-python
-      shell: cmd /C call {0}
-      working-directory: build/test
-      run: ./test_xtensor_lib
-
+      run: ctest --output-on-failure
