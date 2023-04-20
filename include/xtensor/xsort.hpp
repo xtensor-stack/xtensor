@@ -279,11 +279,13 @@ namespace xt
      */
     enum class sorting_method
     {
-        /** Faster method but with no guarantee on preservation of order of equal elements
+        /** 
+         *  Faster method but with no guarantee on preservation of order of equal elements
          *  https://en.cppreference.com/w/cpp/algorithm/sort.
          */
         quick,
-        /** Slower method but with guarantee on preservation of order of equal elements
+        /** 
+         *  Slower method but with guarantee on preservation of order of equal elements
          *  https://en.cppreference.com/w/cpp/algorithm/stable_sort.
          */
         stable,
