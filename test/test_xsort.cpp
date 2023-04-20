@@ -2,24 +2,24 @@
  * Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
  * Copyright (c) QuantStack                                                 *
  *                                                                          *
- * Distributed under the terms of the BSD 3-Clause License                 *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
  *                                                                          *
- * The full license is in the file LICENSE, distributed with this software *
+ * The full license is in the file LICENSE, distributed with this software. *
  ****************************************************************************/
 
-#include "xtensor/xadapthpp"
-#include "xtensor/xarrayhpp"
-#include "xtensor/xfixedhpp"
-#include "xtensor/xinfohpp"
-#include "xtensor/xiohpp"
-#include "xtensor/xmathhpp"
-#include "xtensor/xrandomhpp"
-#include "xtensor/xslicehpp"
-#include "xtensor/xsorthpp"
-#include "xtensor/xtensorhpp"
-#include "xtensor/xviewhpp"
+#include "xtensor/xadapt.hpp"
+#include "xtensor/xarray.hpp"
+#include "xtensor/xfixed.hpp"
+#include "xtensor/xinfo.hpp"
+#include "xtensor/xio.hpp"
+#include "xtensor/xmath.hpp"
+#include "xtensor/xrandom.hpp"
+#include "xtensor/xslice.hpp"
+#include "xtensor/xsort.hpp"
+#include "xtensor/xtensor.hpp"
+#include "xtensor/xview.hpp"
 
-#include "test_common_macroshpp"
+#include "test_common_macros.hpp"
 
 namespace xt
 {
@@ -73,7 +73,7 @@ namespace xt
     TEST(xsort, argsort_zero_stride)
     {
         {
-            xt::xtensor<double, 2> A = {{14, 13, 12, 11}};
+            xt::xtensor<double, 2> A = {{1.4, 1.3, 1.2, 1.1}};
             xt::xtensor<size_t, 2> bsort = {{0, 0, 0, 0}};
             xt::xtensor<size_t, 2> fsort = {{3, 2, 1, 0}};
             EXPECT_EQ(bsort, xt::argsort(A, 0));
@@ -81,7 +81,7 @@ namespace xt
             EXPECT_EQ(fsort, xt::argsort(A));
         }
         {
-            xt::xtensor<double, 3> A = {{{14, 13, 12, 11}}};
+            xt::xtensor<double, 3> A = {{{1.4, 1.3, 1.2, 1.1}}};
             xt::xtensor<size_t, 3> bsort = {{{0, 0, 0, 0}}};
             xt::xtensor<size_t, 3> fsort = {{{3, 2, 1, 0}}};
             EXPECT_EQ(bsort, xt::argsort(A, 0));
@@ -94,7 +94,7 @@ namespace xt
     TEST(xsort, argsort_zero_stride_column_major)
     {
         {
-            xt::xtensor<double, 2, xt::layout_type::column_major> A = {{14, 13, 12, 11}};
+            xt::xtensor<double, 2, xt::layout_type::column_major> A = {{1.4, 1.3, 1.2, 1.1}};
             xt::xtensor<size_t, 2, xt::layout_type::column_major> bsort = {{0, 0, 0, 0}};
             xt::xtensor<size_t, 2, xt::layout_type::column_major> fsort = {{3, 2, 1, 0}};
             EXPECT_EQ(bsort, xt::argsort(A, 0));
@@ -102,7 +102,7 @@ namespace xt
             EXPECT_EQ(fsort, xt::argsort(A));
         }
         {
-            xt::xtensor<double, 3, xt::layout_type::column_major> A = {{{14, 13, 12, 11}}};
+            xt::xtensor<double, 3, xt::layout_type::column_major> A = {{{1.4, 1.3, 1.2, 1.1}}};
             xt::xtensor<size_t, 3, xt::layout_type::column_major> bsort = {{{0, 0, 0, 0}}};
             xt::xtensor<size_t, 3, xt::layout_type::column_major> fsort = {{{3, 2, 1, 0}}};
             EXPECT_EQ(bsort, xt::argsort(A, 0));
@@ -131,30 +131,30 @@ namespace xt
     TEST(xsort, argsort_stable)
     {
         xt::xarray<int> a = {
-            2247, 2044, 2037, 1825, 1699,  1600, 1501, 1432, 1440, 1388, 1299, 1259, 1211,
-            1177, 1124, 1121, 1399, 1179,  1102, 1055, 1017, 1001, 979,  953,  925,  927,
-            1899, 4782, 2601, 3050, 1998,  3478, 5762, 8745, 7777, 4086, 2968, 2456, 2138,
-            3199, 7187, 7165, 3942, 11588, 4643, 3618, 3184, 6052, 3723, 3356, 2645, 2330,
-            2103, 1928, 1890, 3624, 3647,  5821, 2949, 4161, 3855, 5200, 3162, 3896, 19818,
-            5228, 3711, 4874, 4868, 4267,  2978, 2748, 2500, 2276, 2107, 1969, 1815, 1714,
-            1649, 1561, 1491, 1428, 1347,  1288, 1245, 1207, 1163, 1189, 1558, 1313, 1186,
-            1147, 1143, 1099, 1036, 1008,  982,  953,  924,  899,  880,  858,  836,  818,
-            791,  762,  742,  720,  701,   685,  674,  658,  643,  625,  609,  602,  594,
-            594,  625,  616,  707,  759,   929,  755,  684,  737,  804,  680,  639,  620,
-            706,  2474, 1406, 2686, 2037,  1410, 1130, 992,  901,  847,  798,  766,  750,
-            2793, 1574, 1087, 960,  883,   823,  782,  755,  730,  705,  677,  744,  932,
-            770,  794,  804,  728,  721,   765,  826,  795,  784,  875,  711,  795,  2295,
-            1265, 1115, 936,  817,  742,   713,  680,  647,  647,  671,  651,  692,  605,
-            576,  612,  564,  536,  526,   516,  506,  494,  473,  459,  451,  450,  441,
-            428,  430,  453,  467,  444,   413,  390,  376,  373,  368,  360,  359,  351,
-            348,  345,  343,  340,  337,   341,  529,  476,  448,  397,  367,  354,  342,
-            332,  320,  324,  327,  332,   340,  359,  331,  382,  371,  356,  333,  318,
-            316,  318,  312,  308,  300,   298,  399,  448,  669,  534,  402,  384,  361,
-            347,  337,  342,  349,  339,   333,  325,  324,  326,  324,  322,  320,  318,
-            322,  327,  327,  333,  329,   333,  353,  436,  516,  412,  402,  398,  551,
-            449,  416,  484,  801,  537,   457,  483,  534,  477,  483,  582,  575,  557,
-            504,  477,  515,  643,  627,   627,  546,  515,  497,  577,  1439, 1198, 1591,
-            1815, 1448, 1117, 960,  847,   809,  788,  749,  896,  870,  801,  752};
+            2247., 2044., 2037., 1825., 1699.,  1600., 1501., 1432., 1440., 1388., 1299., 1259., 1211.,
+            1177., 1124., 1121., 1399., 1179.,  1102., 1055., 1017., 1001., 979.,  953.,  925.,  927.,
+            1899., 4782., 2601., 3050., 1998.,  3478., 5762., 8745., 7777., 4086., 2968., 2456., 2138.,
+            3199., 7187., 7165., 3942., 11588., 4643., 3618., 3184., 6052., 3723., 3356., 2645., 2330.,
+            2103., 1928., 1890., 3624., 3647.,  5821., 2949., 4161., 3855., 5200., 3162., 3896., 19818.,
+            5228., 3711., 4874., 4868., 4267.,  2978., 2748., 2500., 2276., 2107., 1969., 1815., 1714.,
+            1649., 1561., 1491., 1428., 1347.,  1288., 1245., 1207., 1163., 1189., 1558., 1313., 1186.,
+            1147., 1143., 1099., 1036., 1008.,  982.,  953.,  924.,  899.,  880.,  858.,  836.,  818.,
+            791.,  762.,  742.,  720.,  701.,   685.,  674.,  658.,  643.,  625.,  609.,  602.,  594.,
+            594.,  625.,  616.,  707.,  759.,   929.,  755.,  684.,  737.,  804.,  680.,  639.,  620.,
+            706.,  2474., 1406., 2686., 2037.,  1410., 1130., 992.,  901.,  847.,  798.,  766.,  750.,
+            2793., 1574., 1087., 960.,  883.,   823.,  782.,  755.,  730.,  705.,  677.,  744.,  932.,
+            770.,  794.,  804.,  728.,  721.,   765.,  826.,  795.,  784.,  875.,  711.,  795.,  2295.,
+            1265., 1115., 936.,  817.,  742.,   713.,  680.,  647.,  647.,  671.,  651.,  692.,  605.,
+            576.,  612.,  564.,  536.,  526.,   516.,  506.,  494.,  473.,  459.,  451.,  450.,  441.,
+            428.,  430.,  453.,  467.,  444.,   413.,  390.,  376.,  373.,  368.,  360.,  359.,  351.,
+            348.,  345.,  343.,  340.,  337.,   341.,  529.,  476.,  448.,  397.,  367.,  354.,  342.,
+            332.,  320.,  324.,  327.,  332.,   340.,  359.,  331.,  382.,  371.,  356.,  333.,  318.,
+            316.,  318.,  312.,  308.,  300.,   298.,  399.,  448.,  669.,  534.,  402.,  384.,  361.,
+            347.,  337.,  342.,  349.,  339.,   333.,  325.,  324.,  326.,  324.,  322.,  320.,  318.,
+            322.,  327.,  327.,  333.,  329.,   333.,  353.,  436.,  516.,  412.,  402.,  398.,  551.,
+            449.,  416.,  484.,  801.,  537.,   457.,  483.,  534.,  477.,  483.,  582.,  575.,  557.,
+            504.,  477.,  515.,  643.,  627.,   627.,  546.,  515.,  497.,  577.,  1439., 1198., 1591.,
+            1815., 1448., 1117., 960.,  847.,   809.,  788.,  749.,  896.,  870.,  801.,  752.};
 
         xt::xarray<std::size_t> ex = {
             239, 238, 237, 236, 234, 233, 235, 259, 222, 258, 257, 260, 223, 254, 256, 253, 255, 224, 261,
@@ -199,7 +199,7 @@ namespace xt
 
 #ifndef XTENSOR_DISABLE_EXCEPTIONS
         xt::xarray<double> xarr = xt::eval(xt::arange(0, 16));
-        xarrreshape({4, 4});
+        xarr.reshape({4, 4});
         auto view = xt::reshape_view(xt::transpose(xarr, {1, 0}), {2, 8});
         EXPECT_NO_THROW(xt::sort(view, 0));
 #endif
@@ -282,19 +282,19 @@ namespace xt
 
             auto a_s0 = sort(a, 0);
             auto va_s0 = view(a_s0, xt::all(), 3, 45, 3);
-            EXPECT_TRUE(std::is_sorted(va_s0begin(), va_s0end()));
+            EXPECT_TRUE(std::is_sorted(va_s0.begin(), va_s0.end()));
 
             auto a_s1 = sort(a, 1);
             auto va_s1 = view(a_s1, 0, xt::all(), 0, 0);
-            EXPECT_TRUE(std::is_sorted(va_s1begin(), va_s1end()));
+            EXPECT_TRUE(std::is_sorted(va_s1.begin(), va_s1.end()));
 
             auto a_s2 = sort(a, 2);
             auto va_s2 = view(a_s2, 3, 1, xt::all(), 3);
-            EXPECT_TRUE(std::is_sorted(va_s2begin(), va_s2end()));
+            EXPECT_TRUE(std::is_sorted(va_s2.begin(), va_s2.end()));
 
             auto a_s3 = sort(a, 3);
             auto va_s3 = view(a_s3, 4, 3, 45, xt::all());
-            EXPECT_TRUE(std::is_sorted(va_s3begin(), va_s3end()));
+            EXPECT_TRUE(std::is_sorted(va_s3.begin(), va_s3.end()));
         }
     }
 
@@ -307,29 +307,29 @@ namespace xt
             auto a_s0 = argmin<XTENSOR_DEFAULT_LAYOUT>(a, 0);
             auto va_s0 = view(a, xt::all(), 3, 2, 3);
             auto m0_idx = a_s0(3, 2, 3);
-            auto it0 = std::min_element(va_s0begin(), va_s0end());
-            auto c0_idx = std::distance(va_s0begin(), it0);
+            auto it0 = std::min_element(va_s0.begin(), va_s0.end());
+            auto c0_idx = std::distance(va_s0.begin(), it0);
             EXPECT_EQ(static_cast<size_t>(c0_idx), m0_idx);
 
             auto a_s1 = argmin<XTENSOR_DEFAULT_LAYOUT>(a, 1);
             auto va_s1 = view(a, 3, xt::all(), 2, 3);
             auto m1_idx = a_s1(3, 2, 3);
-            auto it1 = std::min_element(va_s1begin(), va_s1end());
-            auto c1_idx = std::distance(va_s1begin(), it1);
+            auto it1 = std::min_element(va_s1.begin(), va_s1.end());
+            auto c1_idx = std::distance(va_s1.begin(), it1);
             EXPECT_EQ(static_cast<size_t>(c1_idx), m1_idx);
 
             auto a_s2 = argmin<XTENSOR_DEFAULT_LAYOUT>(a, 2);
             auto va_s2 = view(a, 3, 2, xt::all(), 3);
             auto m2_idx = a_s2(3, 2, 3);
-            auto it2 = std::min_element(va_s2begin(), va_s2end());
-            auto c2_idx = std::distance(va_s2begin(), it2);
+            auto it2 = std::min_element(va_s2.begin(), va_s2.end());
+            auto c2_idx = std::distance(va_s2.begin(), it2);
             EXPECT_EQ(static_cast<size_t>(c2_idx), m2_idx);
 
             auto a_s3 = argmin<XTENSOR_DEFAULT_LAYOUT>(a, 3);
             auto va_s3 = view(a, 3, 2, 3, xt::all());
             auto m3_idx = a_s3(3, 2, 3);
-            auto it3 = std::min_element(va_s3begin(), va_s3end());
-            auto c3_idx = std::distance(va_s3begin(), it3);
+            auto it3 = std::min_element(va_s3.begin(), va_s3.end());
+            auto c3_idx = std::distance(va_s3.begin(), it3);
             EXPECT_EQ(static_cast<size_t>(c3_idx), m3_idx);
         }
     }
@@ -382,7 +382,7 @@ namespace xt
         {
             res = res && arr(i) <= arr(pos);
         }
-        for (std::size_t i = pos; i < arrsize(); ++i)
+        for (std::size_t i = pos; i < arr.size(); ++i)
         {
             res = res && arr(i) >= arr(pos);
         }
@@ -401,10 +401,10 @@ namespace xt
         SUBCASE("complex")
         {
             xt::xarray<double> a = {
-                927,  932,  935,  943,  944,  944,  945,  948,  952,  962,  968,  968,  969,
-                969,  974,  981,  993,  994,  994,  1003, 1007, 1008, 1008, 1012, 1013, 1014,
-                1014, 1017, 1019, 1020, 1023, 1026, 1026, 1028, 1030, 1032, 1039, 1047, 1071,
-                1080, 1085, 1088, 1111, 1112, 1117, 1119, 1128, 1130, 1209, 1309, 1426};
+                927.,  932.,  935.,  943.,  944.,  944.,  945.,  948.,  952.,  962.,  968.,  968.,  969.,
+                969.,  974.,  981.,  993.,  994.,  994.,  1003., 1007., 1008., 1008., 1012., 1013., 1014.,
+                1014., 1017., 1019., 1020., 1023., 1026., 1026., 1028., 1030., 1032., 1039., 1047., 1071.,
+                1080., 1085., 1088., 1111., 1112., 1117., 1119., 1128., 1130., 1209., 1309., 1426.};
             xt::xtensor_fixed<std::size_t, xt::xshape<4>> kth = {17, 32, 18, 33};
 
             SUBCASE("1D")
@@ -419,7 +419,7 @@ namespace xt
 
             SUBCASE("2D")
             {
-                areshape({1, asize()});
+                a.reshape({1, a.size()});
                 auto part = xt::partition(a, kth, 1);
                 for (std::size_t k : kth)
                 {
@@ -433,7 +433,7 @@ namespace xt
         {
 #ifndef XTENSOR_DISABLE_EXCEPTIONS
             xt::xarray<double> a = xt::eval(xt::arange(0, 16));
-            areshape({4, 4});
+            a.reshape({4, 4});
             auto view = xt::transpose(a, {1, 0});
             EXPECT_NO_THROW(xt::partition(view, 1, 0));
 #endif
@@ -448,7 +448,7 @@ namespace xt
         {
             res = res && arr(idxs[i]) <= arr(idxs[pos]);
         }
-        for (std::size_t i = pos; i < arrsize(); ++i)
+        for (std::size_t i = pos; i < arr.size(); ++i)
         {
             res = res && arr(idxs[i]) >= arr(idxs[pos]);
         }
@@ -465,8 +465,8 @@ namespace xt
 
             SUBCASE("adapt")
             {
-                std::size_t s = asize();
-                int* arr = adata();
+                std::size_t s = a.size();
+                int* arr = a.data();
                 dynamic_shape<std::size_t> sh = {s};
                 auto b = xt::adapt(arr, s, xt::no_ownership(), sh);
                 auto r2 = xt::argpartition(b, 2);
@@ -477,10 +477,10 @@ namespace xt
         SUBCASE("complex")
         {
             const xt::xarray<double> data = {
-                1014, 1017, 1019, 1020, 1023, 1026, 1026, 1028, 1030, 1032, 1039, 1047, 1071,
-                927,  932,  935,  943,  944,  944,  945,  948,  952,  962,  968,  968,  969,
-                969,  974,  981,  993,  994,  994,  1003, 1007, 1008, 1008, 1012, 1013, 1014,
-                1080, 1085, 1088, 1111, 1112, 1117, 1119, 1128, 1130, 1209, 1309, 1426};
+                1014., 1017., 1019., 1020., 1023., 1026., 1026., 1028., 1030., 1032., 1039., 1047., 1071.,
+                927.,  932.,  935.,  943.,  944.,  944.,  945.,  948.,  952.,  962.,  968.,  968.,  969.,
+                969.,  974.,  981.,  993.,  994.,  994.,  1003., 1007., 1008., 1008., 1012., 1013., 1014.,
+                1080., 1085., 1088., 1111., 1112., 1117., 1119., 1128., 1130., 1209., 1309., 1426.};
             const xt::xtensor_fixed<std::size_t, xt::xshape<4>> kth = {17, 32, 18, 33};
 
             SUBCASE("1D")
@@ -497,7 +497,7 @@ namespace xt
             SUBCASE("2D")
             {
                 auto a = data;
-                areshape({1, asize()});
+                a.reshape({1, a.size()});
                 const auto argpart = xt::argpartition(a, kth, 1);
                 for (std::size_t k : kth)
                 {
@@ -511,33 +511,33 @@ namespace xt
     TEST(xsort, quantile)
     {
         const xt::xtensor_fixed<double, xt::xshape<4, 2, 2>> data = {
-            {{3, 4}, {2, 1}},
-            {{-1, 1}, {3, 2}},
-            {{-9, -0}, {-9, -3}},
-            {{12, 12}, {12, 12}},
+            {{3., 4.}, {2., 1.}},
+            {{-1., 1.}, {3., 2.}},
+            {{-9., -0.}, {-9., -3.}},
+            {{12., 12.}, {12., 12.}},
         };
 
         {
-            auto q = xt::quantile(data, {3, 0, 1});
-            const xt::xtensor_fixed<double, xt::xshape<3>> expected = {05, -9, 12};
+            auto q = xt::quantile(data, {.3, .0, 1.});
+            const xt::xtensor_fixed<double, xt::xshape<3>> expected = {0.5, -9., 12.};
             EXPECT_TRUE(xt::equal(q, expected)(0));
         }
 
         const xt::xtensor_fixed<double, xt::xshape<3, 4, 2>> expected1 = {
-            {{23, 19}, {02, 13}, {-9, -21}, {12, 12}},
-            {{2, 1}, {-1, 1}, {-9, -3}, {12, 12}},
-            {{3, 4}, {3, 2}, {-9, 0}, {12, 12}},
+            {{2.3, 1.9}, {0.2, 1.3}, {-9., -2.1}, {12., 12.}},
+            {{2., 1.}, {-1., 1.}, {-9., -3.}, {12., 12.}},
+            {{3., 4.}, {3., 2.}, {-9., 0.}, {12., 12.}},
         };
         {
-            auto q1 = xt::quantile(data, {3, 0, 1}, 1);
+            auto q1 = xt::quantile(data, {.3, .0, 1.}, 1);
             EXPECT_TRUE(xt::equal(q1, expected1)(0));
         }
         {
-            auto q1 = xt::quantile(xt::xtensor<float, 3>(data), {3, 0, 1}, 1);
+            auto q1 = xt::quantile(xt::xtensor<float, 3>(data), {.3, .0, 1.}, 1);
             EXPECT_TRUE(xt::equal(q1, expected1)(0));
         }
         {
-            auto q1 = xt::quantile(xt::xarray<float>(data), {3, 0, 1}, 1);
+            auto q1 = xt::quantile(xt::xarray<float>(data), {.3, .0, 1.}, 1);
             EXPECT_TRUE(xt::equal(q1, expected1)(0));
         }
     }
@@ -549,10 +549,10 @@ namespace xt
         auto ma0 = median(a, 0);
         auto ma1 = median(a, 1);
 
-        EXPECT_EQ(mall, 5f);
+        EXPECT_EQ(mall, 5.f);
 
         xt::xtensor<float, 1> ma0_exp = {5, 5, 5, 5};
-        xt::xtensor<float, 1> ma1_exp = {25, 15, 9, 12, 5};
+        xt::xtensor<float, 1> ma1_exp = {2.5, 1.5, 9., 12., 5.};
         EXPECT_EQ(ma0, ma0_exp);
         EXPECT_EQ(ma1, ma1_exp);
     }
