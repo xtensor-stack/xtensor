@@ -1,4 +1,4 @@
-name: Close inactive issues
+name: Close inactive issues and PRs
 on:
   schedule:
   - cron: 30 1 * * *
@@ -10,9 +10,9 @@ jobs:
       issues: write
       pull-requests: write
     steps:
-    - uses: actions/stale@v5
+    - uses: actions/stale@v8
       with:
-        any-of-issue-labels: [Needs clarification, Answered]
+        any-of-issue-labels: Needs clarification, Answered
         days-before-issue-stale: 30
         days-before-issue-close: 14
         stale-issue-label: Stale
@@ -21,7 +21,7 @@ jobs:
           It will be automatically closed in 14 days.
         close-issue-message: |
           This issue was closed because it has been inactive for 14 days since being marked as stale.
-        any-of-pr-labels: [Needs clarification, Answered, Needs revision]
+        any-of-pr-labels: Needs clarification, Answered, Needs revision
         days-before-pr-stale: 60
         days-before-pr-close: 14
         stale-pr-label: Stale
