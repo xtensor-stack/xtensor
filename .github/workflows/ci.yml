@@ -49,6 +49,7 @@ jobs:
         cache-env: true
         extra-specs: |
           sel(win): ninja
+
     - name: Configure using CMake
       env:
         CXX: ${{ matrix.compiler }}
