@@ -1,0 +1,65 @@
+name: CI
+
+on: push
+
+jobs:
+
+  standard:
+
+    strategy:
+      fail-fast: false
+      matrix:
+        xsimd: [-DXTENSOR_USE_XSIMD=ON, -DXTENSOR_USE_XSIMD=OFF]
+        compiler: [g++, clang++, cl]
+        runs-on: [ubuntu-latest, macos-latest, windows-latest]
+        exclude:
+        - runs-on: macos-latest
+          compiler: cl
+        - runs-on: ubuntu-latest
+          compiler: cl
+        include:
+        - runs-on: ubuntu-latest
+          config: -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON
+        - runs-on: macos-latest
+          config: -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON
+        - runs-on: windows-latest
+          config: -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON -G Ninja
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    name: ${{ matrix.runs-on }} • x64 ${{ matrix.args }}
+    runs-on: ${{ matrix.runs-on }}
+    steps:
+    - name: Initialize MSVC
+      if: runner.os == 'Windows'
+      uses: ilammy/msvc-dev-cmd@v1
+
+    - name: Basic GitHub action setup
+      uses: actions/checkout@v2
+
+    - name: Set conda environment
+      uses: mamba-org/provision-with-micromamba@main
+      with:
+        environment-name: myenv
+        environment-file: environment-dev.yml
+        cache-env: true
+        extra-specs: |
+          sel(win): ninja
+    - name: Configure using CMake
+      env:
+        CXX: ${{ matrix.compiler }}
+      run: cmake ${{ matrix.config }} ${{ matrix.xsimd }}
+
+    - name: Install
+      working-directory: build
+      run: cmake --install .
+
+    - name: Build
+      working-directory: build
+      run: cmake --build .
+
+    - name: Run tests
+      working-directory: build
+      run: ctest --output-on-failure
