@@ -4,24 +4,101 @@ on: push
 
 jobs:
 
-  standard:
+  linux:
 
     strategy:
       fail-fast: false
       matrix:
-        xsimd: [-DXTENSOR_USE_XSIMD=ON, -DXTENSOR_USE_XSIMD=OFF]
-        compiler: [g++, clang++, cl]
-        runs-on: [ubuntu-latest, macos-latest, windows-latest]
-        exclude:
-        - runs-on: macos-latest
-          compiler: cl
-        - runs-on: macos-latest
-          compiler: g++
-        - runs-on: ubuntu-latest
-          compiler: cl
+        runs-on: [ubuntu-latest]
+        sys:
+        - {compiler: gcc, version: '9', name: tbb, flags: -DXTENSOR_USE_TBB=ON -DTBB_INCLUDE_DIR=$CONDA_PREFIX/include -DTBB_LIBRARY=$CONDA_PREFIX/lib}
+        - {compiler: gcc, version: '10', name: openmp, flags: -DXTENSOR_USE_OPENMP=ON}
+        - {compiler: gcc, version: '11', name: noexcept, flags: -DXTENSOR_DISABLE_EXCEPTION=ON}
+        - {compiler: gcc, version: '11', name: xsimd, flags: -DXTENSOR_USE_XSIMD=ON}
+        - {compiler: gcc, version: '11', name: c++17, flags: -DCPP17=ON}
+        - {compiler: clang, version: '15', name: assert, flags: -DXTENSOR_ENABLE_ASSERT=ON}
+        - {compiler: clang, version: '16', name: column-major, flags: -DDEFAULT_COLUMN_MAJOR=ON}
         include:
-        - runs-on: ubuntu-latest
-          config: -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON
+        - config: -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    name: ${{ matrix.runs-on }} • ${{ matrix.sys.compiler }} ${{ matrix.sys.version }} - ${{ matrix.sys.name }}
+    runs-on: ${{ matrix.runs-on }}
+    steps:
+
+    - name: Setup GCC
+      if: ${{ matrix.sys.compiler == 'gcc' }}
+      run: |
+        GCC_VERSION=${{ matrix.sys.version }}
+        CC=gcc-$GCC_VERSION
+        echo "CC=$CC" >> $GITHUB_ENV
+        CXX=g++-$GCC_VERSION
+        echo "CXX=$CXX" >> $GITHUB_ENV
+
+    - name: Setup clang
+      if: ${{ matrix.sys.compiler == 'clang' }}
+      run: |
+        LLVM_VERSION=${{ matrix.sys.version }}
+        #sudo add-apt-repository ppa:ubuntu-toolchain-r/test || exit 1
+        wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add - || exit 1
+        if [[ $LLVM_VERSION -ge 13 ]]; then
+          sudo add-apt-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-$LLVM_VERSION main" || exit 1
+        else
+          sudo add-apt-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal main" || exit 1
+        fi || exit 1
+        sudo apt-get update || exit 1
+        sudo apt-get --no-install-suggests --no-install-recommends install clang-$LLVM_VERSION || exit 1
+        sudo apt-get --no-install-suggests --no-install-recommends install g++-9 g++-9-multilib || exit 1
+        sudo ln -s /usr/include/asm-generic /usr/include/asm
+        CC=clang-$LLVM_VERSION
+        echo "CC=$CC" >> $GITHUB_ENV
+        CXX=clang++-$LLVM_VERSION
+        echo "CXX=$CXX" >> $GITHUB_ENV
+
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set conda environment
+      if: ${{ matrix.sys.name != 'tbb' }}
+      uses: mamba-org/provision-with-micromamba@main
+      with:
+        environment-name: myenv
+        environment-file: environment-dev.yml
+
+    - name: Set conda environment
+      if: ${{ matrix.sys.name == 'tbb' }}
+      uses: mamba-org/provision-with-micromamba@main
+      with:
+        environment-name: myenv
+        environment-file: environment-dev.yml
+        extra-specs: |
+          tbb-devel
+
+    - name: Configure using CMake
+      run: cmake ${{ matrix.config }} ${{ matrix.sys.flags }}
+
+    - name: Install
+      working-directory: build
+      run: cmake --install .
+
+    - name: Build
+      working-directory: build
+      run: cmake --build .
+
+    - name: Run tests
+      working-directory: build
+      run: ctest --output-on-failure
+
+  other:
+
+    strategy:
+      fail-fast: false
+      matrix:
+        runs-on: [macos-latest, windows-latest]
+        include:
         - runs-on: macos-latest
           config: -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON
         - runs-on: windows-latest
@@ -31,14 +108,15 @@ jobs:
       run:
         shell: bash -l {0}
 
-    name: ${{ matrix.runs-on }} • x64 ${{ matrix.args }}
+    name: ${{ matrix.runs-on }} - default
     runs-on: ${{ matrix.runs-on }}
     steps:
-    - name: Initialize MSVC
+
+    - name: Setup MSVC
       if: runner.os == 'Windows'
       uses: ilammy/msvc-dev-cmd@v1
 
-    - name: Basic GitHub action setup
+    - name: Checkout code
       uses: actions/checkout@v3
 
     - name: Set conda environment
@@ -46,14 +124,11 @@ jobs:
       with:
         environment-name: myenv
         environment-file: environment-dev.yml
-        cache-env: true
         extra-specs: |
           sel(win): ninja
 
     - name: Configure using CMake
-      env:
-        CXX: ${{ matrix.compiler }}
-      run: cmake ${{ matrix.config }} ${{ matrix.xsimd }}
+      run: cmake ${{ matrix.config }} ${{ matrix.sys.flags }}
 
     - name: Install
       working-directory: build
