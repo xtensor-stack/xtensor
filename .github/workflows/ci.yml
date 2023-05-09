@@ -32,11 +32,8 @@ jobs:
     - name: Setup GCC
       if: ${{ matrix.sys.compiler == 'gcc' }}
       run: |
-        GCC_VERSION=${{ matrix.sys.version }}
-        CC=gcc-$GCC_VERSION
-        echo "CC=$CC" >> $GITHUB_ENV
-        CXX=g++-$GCC_VERSION
-        echo "CXX=$CXX" >> $GITHUB_ENV
+        echo "CC=gcc-${{ matrix.sys.version }}" >> $GITHUB_ENV
+        echo "CXX=g++-${{ matrix.sys.version }}" >> $GITHUB_ENV
 
     - name: Setup clang
       if: ${{ matrix.sys.compiler == 'clang' }}
