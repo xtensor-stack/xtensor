@@ -42,7 +42,6 @@ jobs:
       if: ${{ matrix.sys.compiler == 'clang' }}
       run: |
         LLVM_VERSION=${{ matrix.sys.version }}
-        #sudo add-apt-repository ppa:ubuntu-toolchain-r/test || exit 1
         wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add - || exit 1
         if [[ $LLVM_VERSION -ge 13 ]]; then
           sudo add-apt-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-$LLVM_VERSION main" || exit 1
