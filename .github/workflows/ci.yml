@@ -95,7 +95,7 @@ jobs:
   other:
 
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         runs-on: [macos-latest, windows-latest]
         compiler: [cl, clang++]
