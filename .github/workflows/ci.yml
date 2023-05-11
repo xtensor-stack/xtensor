@@ -11,7 +11,7 @@ jobs:
   linux:
 
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         runs-on: [ubuntu-latest]
         sys:
