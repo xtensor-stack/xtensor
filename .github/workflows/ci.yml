@@ -11,7 +11,7 @@ jobs:
   linux:
 
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         runs-on: [ubuntu-latest]
         sys:
@@ -95,20 +95,23 @@ jobs:
   other:
 
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         runs-on: [macos-latest, windows-latest]
+        compiler: [cl, clang++]
         include:
         - runs-on: macos-latest
           config: -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON
         - runs-on: windows-latest
           config: -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON -G Ninja
-
+        exclude:
+        - runs-on: macos-latest
+          compiler: cl
     defaults:
       run:
         shell: bash -l {0}
 
-    name: ${{ matrix.runs-on }} - default
+    name: ${{ matrix.runs-on }} - ${{ matrix.compiler }}
     runs-on: ${{ matrix.runs-on }}
     steps:
 
@@ -128,6 +131,8 @@ jobs:
           sel(win): ninja
 
     - name: Configure using CMake
+      env:
+        CXX: ${{ matrix.compiler }}
       run: cmake ${{ matrix.config }} ${{ matrix.sys.flags }}
 
     - name: Install
