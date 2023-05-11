@@ -87,7 +87,7 @@ jobs:
       run:
         shell: bash -l {0}
 
-    name: ${{ matrix.runs-on }} - default
+    name: ${{ matrix.runs-on }} • default - default
     runs-on: ${{ matrix.runs-on }}
     steps:
 
