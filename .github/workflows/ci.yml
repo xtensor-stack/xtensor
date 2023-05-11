@@ -92,26 +92,23 @@ jobs:
       working-directory: build
       run: ctest --output-on-failure
 
-  other:
+  default:
 
     strategy:
       fail-fast: false
       matrix:
         runs-on: [macos-latest, windows-latest]
-        compiler: [cl, clang++]
         include:
         - runs-on: macos-latest
           config: -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON
         - runs-on: windows-latest
           config: -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON -G Ninja
-        exclude:
-        - runs-on: macos-latest
-          compiler: cl
+
     defaults:
       run:
         shell: bash -l {0}
 
-    name: ${{ matrix.runs-on }} - ${{ matrix.compiler }}
+    name: ${{ matrix.runs-on }} - default
     runs-on: ${{ matrix.runs-on }}
     steps:
 
@@ -131,8 +128,55 @@ jobs:
           sel(win): ninja
 
     - name: Configure using CMake
-      env:
-        CXX: ${{ matrix.compiler }}
+      run: cmake ${{ matrix.config }} ${{ matrix.sys.flags }}
+
+    - name: Install
+      working-directory: build
+      run: cmake --install .
+
+    - name: Build
+      working-directory: build
+      run: cmake --build .
+
+    - name: Run tests
+      working-directory: build
+      run: ctest --output-on-failure
+
+  clang:
+
+    strategy:
+      fail-fast: false
+      matrix:
+        runs-on: [windows-latest]
+        include:
+        - runs-on: windows-latest
+          config: -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON -G Ninja
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    name: ${{ matrix.runs-on }} - clang
+    runs-on: ${{ matrix.runs-on }}
+    steps:
+
+    - name: Setup clang
+      run: |
+        echo "CC=clang" >> $GITHUB_ENV
+        echo "CXX=clang++" >> $GITHUB_ENV
+
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set conda environment
+      uses: mamba-org/provision-with-micromamba@main
+      with:
+        environment-name: myenv
+        environment-file: environment-dev.yml
+        extra-specs: |
+          sel(win): ninja
+
+    - name: Configure using CMake
       run: cmake ${{ matrix.config }} ${{ matrix.sys.flags }}
 
     - name: Install
