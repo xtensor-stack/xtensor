@@ -15,15 +15,9 @@ jobs:
       matrix:
         runs-on: [ubuntu-latest]
         sys:
-        - {compiler: gcc, version: '9', name: tbb, flags: -DXTENSOR_USE_TBB=ON -DTBB_INCLUDE_DIR=$CONDA_PREFIX/include -DTBB_LIBRARY=$CONDA_PREFIX/lib}
-        - {compiler: gcc, version: '10', name: openmp, flags: -DXTENSOR_USE_OPENMP=ON}
-        - {compiler: gcc, version: '11', name: noexcept, flags: -DXTENSOR_DISABLE_EXCEPTION=ON}
-        - {compiler: gcc, version: '11', name: xsimd, flags: -DXTENSOR_USE_XSIMD=ON}
         - {compiler: gcc, version: '11', name: c++17, flags: -DCPP17=ON}
         - {compiler: clang, version: '15', name: assert, flags: -DXTENSOR_ENABLE_ASSERT=ON}
         - {compiler: clang, version: '16', name: column-major, flags: -DDEFAULT_COLUMN_MAJOR=ON}
-        include:
-        - config: -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON
 
     defaults:
       run:
@@ -62,23 +56,13 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Set conda environment
-      if: ${{ matrix.sys.name != 'tbb' }}
       uses: mamba-org/provision-with-micromamba@main
       with:
         environment-name: myenv
         environment-file: environment-dev.yml
-
-    - name: Set conda environment
-      if: ${{ matrix.sys.name == 'tbb' }}
-      uses: mamba-org/provision-with-micromamba@main
-      with:
-        environment-name: myenv
-        environment-file: environment-dev.yml
-        extra-specs: |
-          tbb-devel
 
     - name: Configure using CMake
-      run: cmake ${{ matrix.config }} ${{ matrix.sys.flags }}
+      run: cmake -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON ${{ matrix.sys.flags }}
 
     - name: Install
       working-directory: build
@@ -98,11 +82,6 @@ jobs:
       fail-fast: false
       matrix:
         runs-on: [macos-latest, windows-latest]
-        include:
-        - runs-on: macos-latest
-          config: -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON
-        - runs-on: windows-latest
-          config: -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON -G Ninja
 
     defaults:
       run:
@@ -128,56 +107,12 @@ jobs:
           sel(win): ninja
 
     - name: Configure using CMake
-      run: cmake ${{ matrix.config }} ${{ matrix.sys.flags }}
-
-    - name: Install
-      working-directory: build
-      run: cmake --install .
-
-    - name: Build
-      working-directory: build
-      run: cmake --build .
-
-    - name: Run tests
-      working-directory: build
-      run: ctest --output-on-failure
-
-  clang:
-
-    strategy:
-      fail-fast: false
-      matrix:
-        runs-on: [windows-latest]
-        include:
-        - runs-on: windows-latest
-          config: -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON -G Ninja
-
-    defaults:
-      run:
-        shell: bash -l {0}
-
-    name: ${{ matrix.runs-on }} - clang
-    runs-on: ${{ matrix.runs-on }}
-    steps:
-
-    - name: Setup clang
-      run: |
-        echo "CC=clang" >> $GITHUB_ENV
-        echo "CXX=clang++" >> $GITHUB_ENV
-
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Set conda environment
-      uses: mamba-org/provision-with-micromamba@main
-      with:
-        environment-name: myenv
-        environment-file: environment-dev.yml
-        extra-specs: |
-          sel(win): ninja
+      if: runner.os != 'Windows'
+      run: cmake -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON
 
     - name: Configure using CMake
-      run: cmake ${{ matrix.config }} ${{ matrix.sys.flags }}
+      if: runner.os == 'Windows'
+      run: cmake -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON -G Ninja
 
     - name: Install
       working-directory: build

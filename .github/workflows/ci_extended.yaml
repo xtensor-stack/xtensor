@@ -1,0 +1,108 @@
+name: Extra CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+
+jobs:
+
+  linux:
+
+    strategy:
+      fail-fast: false
+      matrix:
+        runs-on: [ubuntu-latest]
+        sys:
+        - {name: tbb, flags: -DXTENSOR_USE_TBB=ON -DTBB_INCLUDE_DIR=$CONDA_PREFIX/include -DTBB_LIBRARY=$CONDA_PREFIX/lib}
+        - {name: openmp, flags: -DXTENSOR_USE_OPENMP=ON}
+        - {name: noexcept, flags: -DXTENSOR_DISABLE_EXCEPTIONS=ON}
+        - {name: xsimd, flags: -DXTENSOR_USE_XSIMD=ON}
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    name: ${{ matrix.runs-on }} • default - ${{ matrix.sys.name }}
+    runs-on: ${{ matrix.runs-on }}
+    steps:
+
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set conda environment
+      if: ${{ matrix.sys.name != 'tbb' }}
+      uses: mamba-org/provision-with-micromamba@main
+      with:
+        environment-name: myenv
+        environment-file: environment-dev.yml
+
+    - name: Set conda environment
+      if: ${{ matrix.sys.name == 'tbb' }}
+      uses: mamba-org/provision-with-micromamba@main
+      with:
+        environment-name: myenv
+        environment-file: environment-dev.yml
+        extra-specs: |
+          tbb-devel
+
+    - name: Configure using CMake
+      run: cmake -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON ${{ matrix.sys.flags }}
+
+    - name: Install
+      working-directory: build
+      run: cmake --install .
+
+    - name: Build
+      working-directory: build
+      run: cmake --build .
+
+    - name: Run tests
+      working-directory: build
+      run: ctest --output-on-failure
+
+  clang:
+
+    strategy:
+      fail-fast: false
+      matrix:
+        runs-on: [windows-latest]
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    name: ${{ matrix.runs-on }} • clang - default
+    runs-on: ${{ matrix.runs-on }}
+    steps:
+
+    - name: Setup clang
+      run: |
+        echo "CC=clang" >> $GITHUB_ENV
+        echo "CXX=clang++" >> $GITHUB_ENV
+
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set conda environment
+      uses: mamba-org/provision-with-micromamba@main
+      with:
+        environment-name: myenv
+        environment-file: environment-dev.yml
+        extra-specs: |
+          sel(win): ninja
+
+    - name: Configure using CMake
+      run: cmake -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON -G Ninja ${{ matrix.sys.flags }}
+
+    - name: Install
+      working-directory: build
+      run: cmake --install .
+
+    - name: Build
+      working-directory: build
+      run: cmake --build .
+
+    - name: Run tests
+      working-directory: build
+      run: ctest --output-on-failure
