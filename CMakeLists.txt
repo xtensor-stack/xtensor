@@ -232,6 +232,8 @@ if(MSVC AND DISABLE_MSVC_ITERATOR_CHECK)
 endif()
 
 if(BUILD_TESTS)
+    set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_CURRENT_SOURCE_DIR}/cotire/")
+    include(cotire)
     enable_testing()
     add_subdirectory(test)
 endif()

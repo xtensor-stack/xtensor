@@ -18,7 +18,7 @@ if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     set(XTENSOR_INCLUDE_DIR ${xtensor_INCLUDE_DIRS})
 endif ()
 
-find_package(doctest            REQUIRED)
+find_package(doctest REQUIRED)
 find_package(Threads)
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -59,7 +59,7 @@ elseif(CPP20)
 else()
   set_compiler_flag(
     _cxx_std_flag CXX REQUIRED
-    "-std=c++14"  # this should work with GNU, Intel, PGI
+    "-std=gnu++14"  # this should work with GNU, Intel, PGI
     "/std:c++14"  # this should work with MSVC
   )
   message(STATUS "Building with C++14")
@@ -96,7 +96,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
   endif()
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  if(NOT WIN32)
+if (CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "GNU")
     CHECK_CXX_COMPILER_FLAG(-march=native arch_native_supported)
     if(arch_native_supported AND NOT CMAKE_CXX_FLAGS MATCHES "-march")
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
@@ -109,7 +109,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     if (XTENSOR_ENABLE_WERROR)
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -DSKIP_ON_WERROR")
     endif()
-  else() # We are using clang-cl
+  elseif (CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_cxx_std_flag} /bigobj")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /MANIFEST:NO")
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
@@ -257,6 +257,7 @@ add_custom_target(
 foreach(filename IN LISTS COMMON_BASE XTENSOR_TESTS)
     string(REPLACE ".cpp" "" targetname ${filename})
     add_executable(${targetname} main.cpp ${filename} ${TEST_HEADERS} ${XTENSOR_HEADERS})
+    cotire(${targetname})
     if(XTENSOR_USE_XSIMD)
         target_compile_definitions(${targetname}
                                    PRIVATE
@@ -282,6 +283,7 @@ foreach(filename IN LISTS COMMON_BASE XTENSOR_TESTS)
 endforeach()
 
 add_executable(test_xtensor_lib  main.cpp ${COMMON_BASE} ${XTENSOR_TESTS} ${TEST_HEADERS} ${XTENSOR_HEADERS})
+cotire(test_xtensor_lib)
 if(XTENSOR_USE_XSIMD)
     target_compile_definitions(test_xtensor_lib
                                PRIVATE
