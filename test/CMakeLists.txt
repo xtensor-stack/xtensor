@@ -311,4 +311,5 @@ add_library(test_xtensor_core_lib STATIC ${COMMON_BASE} ${TEST_HEADERS} ${XTENSO
 target_include_directories(test_xtensor_core_lib PRIVATE ${XTENSOR_INCLUDE_DIR})
 
 target_link_libraries(test_xtensor_core_lib PRIVATE xtensor doctest::doctest ${CMAKE_THREAD_LIBS_INIT})
+target_precompile_headers(test_xtensor_core_lib PRIVATE ${XTENSOR_HEADERS})
 add_custom_target(coverity COMMAND coverity_scan DEPENDS test_xtensor_core_lib)
