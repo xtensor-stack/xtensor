@@ -70,7 +70,7 @@ jobs:
 
     - name: Build
       working-directory: build
-      run: cmake --build . --parallel 8
+      run: cmake --build . --parallel 8 --target test_xtensor_lib
 
     - name: Run tests
       working-directory: build
@@ -120,7 +120,7 @@ jobs:
 
     - name: Build
       working-directory: build
-      run: cmake --build . --parallel 8
+      run: cmake --build . --parallel 8 --target test_xtensor_lib
 
     - name: Run tests
       working-directory: build
