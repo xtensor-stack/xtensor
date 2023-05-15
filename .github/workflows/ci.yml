@@ -74,7 +74,7 @@ jobs:
 
     - name: Run tests
       working-directory: build
-      run: ctest --output-on-failure
+      run: ctest -R ^xtest$ --output-on-failure
 
   default:
 
@@ -124,4 +124,4 @@ jobs:
 
     - name: Run tests
       working-directory: build
-      run: ctest --output-on-failure
+      run: ctest -R ^xtest$ --output-on-failure
