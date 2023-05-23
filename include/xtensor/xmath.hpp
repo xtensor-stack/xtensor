@@ -338,6 +338,7 @@ namespace xt
         XTENSOR_UNARY_MATH_FUNCTOR(isfinite);
         XTENSOR_UNARY_MATH_FUNCTOR(isinf);
         XTENSOR_UNARY_MATH_FUNCTOR(isnan);
+        XTENSOR_UNARY_MATH_FUNCTOR(conj);
     }
 
 #undef XTENSOR_UNARY_MATH_FUNCTOR

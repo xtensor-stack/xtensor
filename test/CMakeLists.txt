@@ -167,6 +167,7 @@ set(COMMON_BASE
     test_xview_semantic.cpp
     test_xutils.cpp
     test_xsimd8.cpp
+    test_xfft.cpp
 )
 
 set(XTENSOR_TESTS

@@ -129,6 +129,7 @@ set(XTENSOR_BENCHMARK
     benchmark_view_access.cpp
     benchmark_view_assignment.cpp
     benchmark_view_adapt.cpp
+    benchmark_xfft.cpp
     main.cpp
 )
 
