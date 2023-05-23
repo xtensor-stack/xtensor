@@ -1,8 +1,7 @@
 # ![xtensor](docs/source/xtensor.svg)
 
-[![Appveyor](https://ci.appveyor.com/api/projects/status/dljjg79povwgncuf?svg=true)](https://ci.appveyor.com/project/xtensor-stack/xtensor)
-[![Azure](https://dev.azure.com/xtensor-stack/xtensor-stack/_apis/build/status/xtensor-stack.xtensor?branchName=master)](https://dev.azure.com/xtensor-stack/xtensor-stack/_build/latest?definitionId=4&branchName=master)
-[![Coverity](https://scan.coverity.com/projects/18335/badge.svg)](https://scan.coverity.com/projects/xtensor)
+[![GithubActions](https://github.com/xtensor-stack/xtensor/actions/workflows/ci.yml/badge.svg)](https://github.com/xtensor-stack/xtensor/actions/workflows/ci.yml)
+[![GithubActions](https://github.com/xtensor-stack/xtensor/actions/workflows/ci_extended.yaml/badge.svg)](https://github.com/xtensor-stack/xtensor/actions/workflows/ci_extended.yaml)
 [![Documentation](http://readthedocs.org/projects/xtensor/badge/?version=latest)](https://xtensor.readthedocs.io/en/latest/?badge=latest)
 [![Doxygen -> gh-pages](https://github.com/xtensor-stack/xtensor/workflows/gh-pages/badge.svg)](https://xtensor-stack.github.io/xtensor)
 [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/xtensor-stack/xtensor/stable?filepath=notebooks%2Fxtensor.ipynb)
