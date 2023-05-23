@@ -1,0 +1,127 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches: [master]
+
+jobs:
+
+  linux:
+
+    strategy:
+      fail-fast: false
+      matrix:
+        runs-on: [ubuntu-latest]
+        sys:
+        - {compiler: gcc, version: '11', name: c++17, flags: -DCPP17=ON}
+        - {compiler: clang, version: '15', name: assert, flags: -DXTENSOR_ENABLE_ASSERT=ON}
+        - {compiler: clang, version: '16', name: column-major, flags: -DDEFAULT_COLUMN_MAJOR=ON}
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    name: ${{ matrix.runs-on }} • ${{ matrix.sys.compiler }} ${{ matrix.sys.version }} - ${{ matrix.sys.name }}
+    runs-on: ${{ matrix.runs-on }}
+    steps:
+
+    - name: Setup GCC
+      if: ${{ matrix.sys.compiler == 'gcc' }}
+      run: |
+        echo "CC=gcc-${{ matrix.sys.version }}" >> $GITHUB_ENV
+        echo "CXX=g++-${{ matrix.sys.version }}" >> $GITHUB_ENV
+
+    - name: Setup clang
+      if: ${{ matrix.sys.compiler == 'clang' }}
+      run: |
+        LLVM_VERSION=${{ matrix.sys.version }}
+        wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add - || exit 1
+        if [[ $LLVM_VERSION -ge 13 ]]; then
+          sudo add-apt-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-$LLVM_VERSION main" || exit 1
+        else
+          sudo add-apt-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal main" || exit 1
+        fi || exit 1
+        sudo apt-get update || exit 1
+        sudo apt-get --no-install-suggests --no-install-recommends install clang-$LLVM_VERSION || exit 1
+        sudo apt-get --no-install-suggests --no-install-recommends install g++-9 g++-9-multilib || exit 1
+        sudo ln -s /usr/include/asm-generic /usr/include/asm
+        CC=clang-$LLVM_VERSION
+        echo "CC=$CC" >> $GITHUB_ENV
+        CXX=clang++-$LLVM_VERSION
+        echo "CXX=$CXX" >> $GITHUB_ENV
+
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set conda environment
+      uses: mamba-org/provision-with-micromamba@main
+      with:
+        environment-name: myenv
+        environment-file: environment-dev.yml
+
+    - name: Configure using CMake
+      run: cmake -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON ${{ matrix.sys.flags }}
+
+    - name: Install
+      working-directory: build
+      run: cmake --install .
+
+    - name: Build
+      working-directory: build
+      run: cmake --build . --target test_xtensor_lib --parallel 8
+
+    - name: Run tests
+      working-directory: build
+      run: ctest -R ^xtest$ --output-on-failure
+
+  default:
+
+    strategy:
+      fail-fast: false
+      matrix:
+        runs-on: [macos-latest, windows-latest]
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    name: ${{ matrix.runs-on }} • default - default
+    runs-on: ${{ matrix.runs-on }}
+    steps:
+
+    - name: Setup MSVC
+      if: runner.os == 'Windows'
+      uses: ilammy/msvc-dev-cmd@v1
+
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set conda environment
+      uses: mamba-org/provision-with-micromamba@main
+      with:
+        environment-name: myenv
+        environment-file: environment-dev.yml
+        extra-specs: |
+          sel(win): ninja
+
+    - name: Configure using CMake
+      if: runner.os != 'Windows'
+      run: cmake -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON
+
+    - name: Configure using CMake
+      if: runner.os == 'Windows'
+      run: cmake -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON -G Ninja
+
+    - name: Install
+      working-directory: build
+      run: cmake --install .
+
+    - name: Build
+      working-directory: build
+      run: cmake --build . --target test_xtensor_lib --parallel 8
+
+    - name: Run tests
+      working-directory: build
+      run: ctest -R ^xtest$ --output-on-failure
