@@ -81,6 +81,45 @@ namespace xt
         }                                                              \
     }
 
+// This functor avoids implicit conversions of small integral types to 'int'
+// by returning the same type instead of 'auto'.
+#define UNARY_BITWISE_OPERATOR_FUNCTOR(NAME, OP)                   \
+    struct NAME                                                    \
+    {                                                              \
+        template <class A1>                                        \
+        constexpr std::decay_t<A1> operator()(const A1& arg) const \
+        {                                                          \
+            return OP arg;                                         \
+        }                                                          \
+        template <class B>                                         \
+        constexpr auto simd_apply(const B& arg) const              \
+        {                                                          \
+            return OP arg;                                         \
+        }                                                          \
+    }
+
+// This functor avoids implicit conversions of small integral types to 'int'
+// by returning the largest type instead of 'auto'.
+#define BINARY_BITWISE_OPERATOR_FUNCTOR(NAME, OP) \
+    struct NAME                                                                   \
+    {                                                                             \
+        template <class T1, class T2>                                             \
+        constexpr                                                                 \
+        std::conditional_t<(sizeof(std::decay_t<T1>) > sizeof(std::decay_t<T2>)), \
+                           std::decay_t<T1>, std::decay_t<T2>>                    \
+        operator()(T1&& arg1, T2&& arg2) const                                    \
+        {                                                                         \
+            using xt::detail::operator OP;                                        \
+            return (std::forward<T1>(arg1) OP std::forward<T2>(arg2));            \
+        }                                                                         \
+        template <class B>                                                        \
+        constexpr auto simd_apply(const B& arg1, const B& arg2) const             \
+        {                                                                         \
+            return (arg1 OP arg2);                                                \
+        }                                                                         \
+    }
+
+
     namespace detail
     {
         DEFINE_COMPLEX_OVERLOAD(+);
@@ -112,10 +151,10 @@ namespace xt
         BINARY_OPERATOR_FUNCTOR(logical_or, ||);
         BINARY_OPERATOR_FUNCTOR(logical_and, &&);
         UNARY_OPERATOR_FUNCTOR(logical_not, !);
-        BINARY_OPERATOR_FUNCTOR(bitwise_or, |);
-        BINARY_OPERATOR_FUNCTOR(bitwise_and, &);
-        BINARY_OPERATOR_FUNCTOR(bitwise_xor, ^);
-        UNARY_OPERATOR_FUNCTOR(bitwise_not, ~);
+        BINARY_BITWISE_OPERATOR_FUNCTOR(bitwise_or, |);
+        BINARY_BITWISE_OPERATOR_FUNCTOR(bitwise_and, &);
+        BINARY_BITWISE_OPERATOR_FUNCTOR(bitwise_xor, ^);
+        UNARY_BITWISE_OPERATOR_FUNCTOR(bitwise_not, ~);
         BINARY_OPERATOR_FUNCTOR(left_shift, <<);
         BINARY_OPERATOR_FUNCTOR(right_shift, >>);
         BINARY_OPERATOR_FUNCTOR(less, <);
