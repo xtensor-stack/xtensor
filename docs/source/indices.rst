@@ -90,8 +90,8 @@ are turned on, and the number of indices is assumed to match the dimension of th
     post-pad zeros if you specify less indices than the rank of the array.
     Example: ``a.unchecked(1) == a(1, 0)``.
 
-:cpp:func:`periodic(args...) <xt::xcaontainer::periodic>`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+:cpp:func:`periodic(args...) <xt::xcontainer::periodic>`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 *   Example: ``a.periodic(-1, -2) == 7``.
 *   See also: :cpp:func:`xt::xcontainer::periodic`.
