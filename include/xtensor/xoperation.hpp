@@ -100,25 +100,23 @@ namespace xt
 
 // This functor avoids implicit conversions of small integral types to 'int'
 // by returning the largest type instead of 'auto'.
-#define BINARY_BITWISE_OPERATOR_FUNCTOR(NAME, OP) \
-    struct NAME                                                                   \
-    {                                                                             \
-        template <class T1, class T2>                                             \
-        constexpr                                                                 \
-        std::conditional_t<(sizeof(std::decay_t<T1>) > sizeof(std::decay_t<T2>)), \
-                           std::decay_t<T1>, std::decay_t<T2>>                    \
-        operator()(T1&& arg1, T2&& arg2) const                                    \
-        {                                                                         \
-            using xt::detail::operator OP;                                        \
-            return (std::forward<T1>(arg1) OP std::forward<T2>(arg2));            \
-        }                                                                         \
-        template <class B>                                                        \
-        constexpr auto simd_apply(const B& arg1, const B& arg2) const             \
-        {                                                                         \
-            return (arg1 OP arg2);                                                \
-        }                                                                         \
+#define BINARY_BITWISE_OPERATOR_FUNCTOR(NAME, OP)                                                                    \
+    struct NAME                                                                                                      \
+    {                                                                                                                \
+        template <class T1, class T2>                                                                                \
+        constexpr std::                                                                                              \
+            conditional_t<(sizeof(std::decay_t<T1>) > sizeof(std::decay_t<T2>)), std::decay_t<T1>, std::decay_t<T2>> \
+            operator()(T1&& arg1, T2&& arg2) const                                                                   \
+        {                                                                                                            \
+            using xt::detail::operator OP;                                                                           \
+            return (std::forward<T1>(arg1) OP std::forward<T2>(arg2));                                               \
+        }                                                                                                            \
+        template <class B>                                                                                           \
+        constexpr auto simd_apply(const B& arg1, const B& arg2) const                                                \
+        {                                                                                                            \
+            return (arg1 OP arg2);                                                                                   \
+        }                                                                                                            \
     }
-
 
     namespace detail
     {
