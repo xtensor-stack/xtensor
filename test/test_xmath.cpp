@@ -923,4 +923,48 @@ namespace xt
 
         EXPECT_EQ(result, expected);
     }
+
+    TEST(xmath, unwrap)
+    {
+        {
+            // {0, pi / 4, pi / 2, -pi / 4, 0}
+            xt::xarray<double> expected = {0., 0.78539816, 1.57079633, -0.78539816, 0};
+            auto pi = xt::numeric_constants<double>::PI;
+            xt::xarray<double> phase = xt::linspace<double>(0, pi, 5);
+            xt::view(phase, xt::range(3, xt::xnone())) += pi;
+            auto unwrapped = xt::unwrap(phase);
+            EXPECT_TRUE(xt::allclose(expected, unwrapped));
+        }
+        {
+            xt::xarray<double> expected = {
+                -180.,
+                -140.,
+                -100.,
+                -60.,
+                -20.,
+                20.,
+                60.,
+                100.,
+                140.,
+                180.,
+                220.,
+                260.,
+                300.,
+                340.,
+                380.,
+                420.,
+                460.,
+                500.,
+                540.};
+            xt::xarray<double> phase_deg = xt::fmod(xt::linspace<double>(0, 720, 19), 360) - 180;
+            auto unwrapped = xt::unwrap(phase_deg, xnone(), -1, 360.0);
+            EXPECT_TRUE(xt::allclose(expected, unwrapped));
+        }
+        {
+            xt::xarray<int> expected = {2, 3, 4, 5, 6, 7, 8, 9};
+            xt::xarray<int> phase = {2, 3, 4, 5, 2, 3, 4, 5};
+            auto unwrapped = xt::unwrap(phase, xnone(), -1, 4);
+            EXPECT_TRUE(xt::allclose(expected, unwrapped));
+        }
+    }
 }
