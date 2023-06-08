@@ -102,8 +102,8 @@ jobs:
 
     - name: Build
       working-directory: build
-      run: cmake --build .
+      run: cmake --build . --target test_xtensor_lib --parallel 8
 
     - name: Run tests
       working-directory: build
-      run: ctest --output-on-failure
+      run: ctest -R ^xtest$ --output-on-failure
