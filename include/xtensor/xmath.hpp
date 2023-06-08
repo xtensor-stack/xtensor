@@ -3123,6 +3123,7 @@ namespace xt
     }
 
     /**
+     * @ingroup basic_functions
      * @brief Unwrap by taking the complement of large deltas with respect to the period
      * @details https://numpy.org/doc/stable/reference/generated/numpy.unwrap.html
      * @param p Input array.
