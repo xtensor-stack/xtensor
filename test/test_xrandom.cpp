@@ -9,7 +9,6 @@
 
 #include <type_traits>
 
-#include "test_common_macros.hpp"
 #if (defined(__GNUC__) && !defined(__clang__))
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
@@ -21,6 +20,8 @@
 #include "xtensor/xarray.hpp"
 #include "xtensor/xset_operation.hpp"
 #include "xtensor/xview.hpp"
+
+#include "test_common_macros.hpp"
 
 namespace xt
 {
