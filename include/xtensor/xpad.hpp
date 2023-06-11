@@ -41,7 +41,8 @@ namespace xt
         symmetric,
         reflect,
         wrap,
-        periodic
+        periodic,
+        edge
     };
 
     namespace detail
@@ -123,19 +124,28 @@ namespace xt
                 {
                     XTENSOR_ASSERT(nb <= e.shape(axis));
                     svs[axis] = xt::range(e.shape(axis), nb + e.shape(axis));
+                    xt::strided_view(out, svt) = xt::strided_view(out, svs);
                 }
                 else if (mode == pad_mode::symmetric)
                 {
                     XTENSOR_ASSERT(nb <= e.shape(axis));
                     svs[axis] = xt::range(2 * nb - 1, nb - 1, -1);
+                    xt::strided_view(out, svt) = xt::strided_view(out, svs);
                 }
                 else if (mode == pad_mode::reflect)
                 {
                     XTENSOR_ASSERT(nb <= e.shape(axis) - 1);
                     svs[axis] = xt::range(2 * nb, nb, -1);
+                    xt::strided_view(out, svt) = xt::strided_view(out, svs);
                 }
-
-                xt::strided_view(out, svt) = xt::strided_view(out, svs);
+                else if (mode == pad_mode::edge)
+                {
+                    svs[axis] = xt::range(nb, nb + 1);
+                    xt::strided_view(out, svt) = xt::broadcast(
+                        xt::strided_view(out, svs),
+                        xt::strided_view(out, svt).shape()
+                    );
+                }
             }
 
             if (ne > static_cast<size_type>(0))
@@ -146,6 +156,7 @@ namespace xt
                 {
                     XTENSOR_ASSERT(ne <= e.shape(axis));
                     svs[axis] = xt::range(nb, nb + ne);
+                    xt::strided_view(out, svt) = xt::strided_view(out, svs);
                 }
                 else if (mode == pad_mode::symmetric)
                 {
@@ -158,6 +169,7 @@ namespace xt
                     {
                         svs[axis] = xt::range(nb + e.shape(axis) - 1, nb + e.shape(axis) - ne - 1, -1);
                     }
+                    xt::strided_view(out, svt) = xt::strided_view(out, svs);
                 }
                 else if (mode == pad_mode::reflect)
                 {
@@ -170,9 +182,16 @@ namespace xt
                     {
                         svs[axis] = xt::range(nb + e.shape(axis) - 2, nb + e.shape(axis) - ne - 2, -1);
                     }
+                    xt::strided_view(out, svt) = xt::strided_view(out, svs);
                 }
-
-                xt::strided_view(out, svt) = xt::strided_view(out, svs);
+                else if (mode == pad_mode::edge)
+                {
+                    svs[axis] = xt::range(out.shape(axis) - ne - 1, out.shape(axis) - ne);
+                    xt::strided_view(out, svt) = xt::broadcast(
+                        xt::strided_view(out, svs),
+                        xt::strided_view(out, svt).shape()
+                    );
+                }
             }
 
             svs[axis] = xt::all();
