@@ -67,6 +67,56 @@ namespace xt
         EXPECT_EQ(b, c);
     }
 
+    TEST(xpad, edge_a)
+    {
+        xt::xtensor<size_t, 2> a = {{0, 1, 2}, {3, 4, 5}};
+
+        xt::xtensor<size_t, 2> b = {
+            {0, 0, 0, 0, 1, 2, 2, 2, 2},
+            {0, 0, 0, 0, 1, 2, 2, 2, 2},
+            {0, 0, 0, 0, 1, 2, 2, 2, 2},
+            {3, 3, 3, 3, 4, 5, 5, 5, 5},
+            {3, 3, 3, 3, 4, 5, 5, 5, 5},
+            {3, 3, 3, 3, 4, 5, 5, 5, 5}};
+
+        xt::xtensor<size_t, 2> c = xt::pad(a, {{2, 2}, {3, 3}}, xt::pad_mode::edge);
+
+        EXPECT_EQ(b, c);
+    }
+
+    TEST(xpad, edge_b)
+    {
+        xt::xtensor<size_t, 2> a = {{0, 1, 2}, {3, 4, 5}};
+
+        xt::xtensor<size_t, 2> b = {{0, 1, 2}, {3, 4, 5}};
+
+        xt::xtensor<size_t, 2> c = xt::pad(a, 0, xt::pad_mode::edge);
+
+        EXPECT_EQ(b, c);
+    }
+
+    TEST(xpad, edge_c)
+    {
+        xt::xtensor<size_t, 2> a = {{0, 1, 2}, {3, 4, 5}};
+
+        xt::xtensor<size_t, 2> b = {{0, 1, 2, 2, 2}, {3, 4, 5, 5, 5}, {3, 4, 5, 5, 5}};
+
+        xt::xtensor<size_t, 2> c = xt::pad(a, {{0, 1}, {0, 2}}, xt::pad_mode::edge);
+
+        EXPECT_EQ(b, c);
+    }
+
+    TEST(xpad, edge_d)
+    {
+        xt::xtensor<size_t, 2> a = {{0, 1, 2}, {3, 4, 5}};
+
+        xt::xtensor<size_t, 2> b = {{0, 0, 0, 1, 2}, {0, 0, 0, 1, 2}, {3, 3, 3, 4, 5}};
+
+        xt::xtensor<size_t, 2> c = xt::pad(a, {{1, 0}, {2, 0}}, xt::pad_mode::edge);
+
+        EXPECT_EQ(b, c);
+    }
+
     TEST(xpad, wrap_a)
     {
         xt::xtensor<size_t, 2> a = {{0, 1, 2}, {3, 4, 5}};
