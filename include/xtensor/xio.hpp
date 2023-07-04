@@ -254,7 +254,7 @@ namespace xt
         }
 
         template <class F, class E>
-        static void recurser_run(F& fn, const E& e, xstrided_slice_vector& slices, std::size_t lim = 0)
+        void recurser_run(F& fn, const E& e, xstrided_slice_vector& slices, std::size_t lim = 0)
         {
             using size_type = typename E::size_type;
             const auto view = strided_view(e, slices);
