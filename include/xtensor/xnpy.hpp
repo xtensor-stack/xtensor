@@ -561,6 +561,10 @@ namespace xt
             {
                 if (this != &rhs)
                 {
+                    if (m_buffer != nullptr)
+                    {
+                        std::allocator<char>{}.deallocate(m_buffer, m_n_bytes);
+                    }
                     m_shape = std::move(rhs.m_shape);
                     m_fortran_order = std::move(rhs.m_fortran_order);
                     m_word_size = std::move(rhs.m_word_size);
