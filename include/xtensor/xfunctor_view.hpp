@@ -1163,8 +1163,8 @@ namespace xt
     template <layout_type L>
     inline auto xfunctor_applier_base<D>::crbegin() const noexcept
     {
-        return xfunctor_iterator<const functor_type, decltype(m_e.template rbegin<L>())>(
-            m_e.template rbegin<L>(),
+        return xfunctor_iterator<const functor_type, decltype(m_e.template crbegin<L>())>(
+            m_e.template crbegin<L>(),
             &m_functor
         );
     }
@@ -1178,8 +1178,8 @@ namespace xt
     template <layout_type L>
     inline auto xfunctor_applier_base<D>::crend() const noexcept
     {
-        return xfunctor_iterator<const functor_type, decltype(m_e.template rend<L>())>(
-            m_e.template rend<L>(),
+        return xfunctor_iterator<const functor_type, decltype(m_e.template crend<L>())>(
+            m_e.template crend<L>(),
             &m_functor
         );
     }
