@@ -531,8 +531,9 @@ namespace xt
             XTENSOR_THROW(std::runtime_error, "Data argument for bincount can only contain positive integers!");
         }
 
-        xt::xtensor<result_value_type, 1> res = xt::zeros<result_value_type>({(std::max
-        )(minlength, std::size_t(left_right[1] + 1))});
+        xt::xtensor<result_value_type, 1> res = xt::zeros<result_value_type>(
+            {(std::max)(minlength, std::size_t(left_right[1] + 1))}
+        );
 
         for (size_type i = 0; i < data.size(); ++i)
         {
