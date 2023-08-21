@@ -221,8 +221,10 @@ namespace xt
             // using return_type = std::conditional_t<std::is_same<init_type, void>::value, typename
             // std::decay_t<E>::value_type, init_type>;
 
-            using return_type = std::decay_t<decltype(std::declval<accumulate_functor_type>(
-            )(std::declval<init_type>(), std::declval<expr_value_type>()))>;
+            using return_type = std::decay_t<decltype(std::declval<accumulate_functor_type>()(
+                std::declval<init_type>(),
+                std::declval<expr_value_type>()
+            ))>;
 
             using result_type = xaccumulator_return_type_t<std::decay_t<E>, return_type>;
 
@@ -281,8 +283,10 @@ namespace xt
                 {
                     for (std::size_t j = 0; j < inner_loop_size; ++j)
                     {
-                        res.storage()[pos + inner_stride] = xt::get<0>(f
-                        )(res.storage()[pos], res.storage()[pos + inner_stride]);
+                        res.storage()[pos + inner_stride] = xt::get<0>(f)(
+                            res.storage()[pos],
+                            res.storage()[pos + inner_stride]
+                        );
 
                         pos += outer_stride;
                     }
@@ -298,8 +302,10 @@ namespace xt
             using init_type = typename F::init_value_type;
             using expr_value_type = typename std::decay_t<E>::value_type;
             using accumulate_functor_type = typename F::accumulate_functor_type;
-            using return_type = std::decay_t<decltype(std::declval<accumulate_functor_type>(
-            )(std::declval<init_type>(), std::declval<expr_value_type>()))>;
+            using return_type = std::decay_t<decltype(std::declval<accumulate_functor_type>()(
+                std::declval<init_type>(),
+                std::declval<expr_value_type>()
+            ))>;
             // using return_type = std::conditional_t<std::is_same<init_type, void>::value, typename
             // std::decay_t<E>::value_type, init_type>;
 

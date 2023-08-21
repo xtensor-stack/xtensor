@@ -1757,8 +1757,8 @@ namespace xt
                 auto d = math::abs(internal_type(a) - internal_type(b));
                 return d <= m_atol
                        || d <= m_rtol
-                                   * double((std::max
-                                   )(math::abs(internal_type(a)), math::abs(internal_type(b))));
+                                   * double((std::max)(math::abs(internal_type(a)), math::abs(internal_type(b)))
+                                   );
             }
 
         private:

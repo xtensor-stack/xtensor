@@ -301,8 +301,10 @@ namespace xt
         using reduce_functor_type = typename std::decay_t<F>::reduce_functor_type;
         using init_functor_type = typename std::decay_t<F>::init_functor_type;
         using expr_value_type = typename std::decay_t<E>::value_type;
-        using result_type = std::decay_t<decltype(std::declval<reduce_functor_type>(
-        )(std::declval<init_functor_type>()(), std::declval<expr_value_type>()))>;
+        using result_type = std::decay_t<decltype(std::declval<reduce_functor_type>()(
+            std::declval<init_functor_type>()(),
+            std::declval<expr_value_type>()
+        ))>;
 
         using options_t = reducer_options<result_type, std::decay_t<O>>;
         options_t options(raw_options);
@@ -767,8 +769,10 @@ namespace xt
         using init_functor_type = typename std::decay_t<F>::init_functor_type;
         using merge_functor_type = typename std::decay_t<F>::merge_functor_type;
         using substepper_type = typename xexpression_type::const_stepper;
-        using raw_value_type = std::decay_t<decltype(std::declval<reduce_functor_type>(
-        )(std::declval<init_functor_type>()(), *std::declval<substepper_type>()))>;
+        using raw_value_type = std::decay_t<decltype(std::declval<reduce_functor_type>()(
+            std::declval<init_functor_type>()(),
+            *std::declval<substepper_type>()
+        ))>;
         using value_type = typename detail::evaluated_value_type_t<raw_value_type, is_xexpression<raw_value_type>::value>;
 
         using reference = value_type;
@@ -926,8 +930,10 @@ namespace xt
 
             using reduce_functor_type = typename std::decay_t<F>::reduce_functor_type;
             using init_functor_type = typename std::decay_t<F>::init_functor_type;
-            using value_type = std::decay_t<decltype(std::declval<reduce_functor_type>(
-            )(std::declval<init_functor_type>()(), *std::declval<typename std::decay_t<E>::const_stepper>()))>;
+            using value_type = std::decay_t<decltype(std::declval<reduce_functor_type>()(
+                std::declval<init_functor_type>()(),
+                *std::declval<typename std::decay_t<E>::const_stepper>()
+            ))>;
             using evaluated_value_type = evaluated_value_type_t<value_type, is_xexpression<value_type>::value>;
 
             using reducer_type = xreducer<
