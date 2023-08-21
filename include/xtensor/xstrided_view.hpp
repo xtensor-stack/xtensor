@@ -155,6 +155,8 @@ namespace xt
         using storage_type = typename base_type::storage_type;
         using linear_iterator = typename storage_type::iterator;
         using const_linear_iterator = typename storage_type::const_iterator;
+        using reverse_linear_iterator = std::reverse_iterator<linear_iterator>;
+        using const_reverse_linear_iterator = std::reverse_iterator<const_linear_iterator>;
 
         using iterable_base = select_iterable_base_t<L, xexpression_type::static_layout, self_type>;
         using inner_shape_type = typename base_type::inner_shape_type;
@@ -217,8 +219,17 @@ namespace xt
 
         linear_iterator linear_begin();
         linear_iterator linear_end();
+        const_linear_iterator linear_begin() const;
+        const_linear_iterator linear_end() const;
         const_linear_iterator linear_cbegin() const;
         const_linear_iterator linear_cend() const;
+
+        reverse_linear_iterator linear_rbegin();
+        reverse_linear_iterator linear_rend();
+        const_reverse_linear_iterator linear_rbegin() const;
+        const_reverse_linear_iterator linear_rend() const;
+        const_reverse_linear_iterator linear_crbegin() const;
+        const_reverse_linear_iterator linear_crend() const;
 
         template <class ST, class STEP = stepper>
         disable_indexed_stepper_t<STEP> stepper_begin(const ST& shape);
@@ -486,6 +497,18 @@ namespace xt
     }
 
     template <class CT, class S, layout_type L, class FST>
+    inline auto xstrided_view<CT, S, L, FST>::linear_begin() const -> const_linear_iterator
+    {
+        return this->linear_cbegin();
+    }
+
+    template <class CT, class S, layout_type L, class FST>
+    inline auto xstrided_view<CT, S, L, FST>::linear_end() const -> const_linear_iterator
+    {
+        return this->linear_cend();
+    }
+
+    template <class CT, class S, layout_type L, class FST>
     inline auto xstrided_view<CT, S, L, FST>::linear_cbegin() const -> const_linear_iterator
     {
         return this->storage().cbegin() + static_cast<std::ptrdiff_t>(data_offset());
@@ -495,6 +518,42 @@ namespace xt
     inline auto xstrided_view<CT, S, L, FST>::linear_cend() const -> const_linear_iterator
     {
         return this->storage().cbegin() + static_cast<std::ptrdiff_t>(data_offset() + size());
+    }
+
+    template <class CT, class S, layout_type L, class FST>
+    inline auto xstrided_view<CT, S, L, FST>::linear_rbegin() -> reverse_linear_iterator
+    {
+        return reverse_linear_iterator(this->linear_begin());
+    }
+
+    template <class CT, class S, layout_type L, class FST>
+    inline auto xstrided_view<CT, S, L, FST>::linear_rend() -> reverse_linear_iterator
+    {
+        return reverse_linear_iterator(this->linear_end());
+    }
+
+    template <class CT, class S, layout_type L, class FST>
+    inline auto xstrided_view<CT, S, L, FST>::linear_rbegin() const -> const_reverse_linear_iterator
+    {
+        return this->linear_crbegin();
+    }
+
+    template <class CT, class S, layout_type L, class FST>
+    inline auto xstrided_view<CT, S, L, FST>::linear_rend() const -> const_reverse_linear_iterator
+    {
+        return this->linear_crend();
+    }
+
+    template <class CT, class S, layout_type L, class FST>
+    inline auto xstrided_view<CT, S, L, FST>::linear_crbegin() const -> const_reverse_linear_iterator
+    {
+        return const_reverse_linear_iterator(this->linear_cbegin());
+    }
+
+    template <class CT, class S, layout_type L, class FST>
+    inline auto xstrided_view<CT, S, L, FST>::linear_crend() const -> const_reverse_linear_iterator
+    {
+        return const_reverse_linear_iterator(this->linear_cend());
     }
 
     /***************
