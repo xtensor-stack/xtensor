@@ -273,7 +273,6 @@ namespace xt
     /**
      * Sorting method.
      * Predefined methods for performing indirect sorting.
-     *
      * @see argsort(const xexpression<E>&, std::ptrdiff_t, sorting_method)
      */
     enum class sorting_method
