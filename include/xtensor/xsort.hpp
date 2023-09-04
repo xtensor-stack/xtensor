@@ -266,30 +266,76 @@ namespace xt
         );
     }
 
+    /*****************************
+     * Implementation of argsort *
+     *****************************/
+
+    /**
+     * Sorting method.
+     * Predefined methods for performing indirect sorting.
+     * @see argsort(const xexpression<E>&, std::ptrdiff_t, sorting_method)
+     */
+    enum class sorting_method
+    {
+        /**
+         *  Faster method but with no guarantee on preservation of order of equal elements
+         *  https://en.cppreference.com/w/cpp/algorithm/sort.
+         */
+        quick,
+        /**
+         *  Slower method but with guarantee on preservation of order of equal elements
+         *  https://en.cppreference.com/w/cpp/algorithm/stable_sort.
+         */
+        stable,
+    };
+
     namespace detail
     {
-        template <class ConstRandomIt, class RandomIt, class Compare>
-        inline void
-        argsort_iter(ConstRandomIt data_begin, ConstRandomIt data_end, RandomIt idx_begin, RandomIt idx_end, Compare comp)
+        template <class ConstRandomIt, class RandomIt, class Compare, class Method>
+        inline void argsort_iter(
+            ConstRandomIt data_begin,
+            ConstRandomIt data_end,
+            RandomIt idx_begin,
+            RandomIt idx_end,
+            Compare comp,
+            Method method
+        )
         {
             XTENSOR_ASSERT(std::distance(data_begin, data_end) >= 0);
             XTENSOR_ASSERT(std::distance(idx_begin, idx_end) == std::distance(data_begin, data_end));
             (void) idx_end;  // TODO(C++17) [[maybe_unused]] only used in assertion.
 
             std::iota(idx_begin, idx_end, 0);
-            std::sort(
-                idx_begin,
-                idx_end,
-                [&](const auto i, const auto j)
+            switch (method)
+            {
+                case (sorting_method::quick):
                 {
-                    return comp(*(data_begin + i), *(data_begin + j));
+                    std::sort(
+                        idx_begin,
+                        idx_end,
+                        [&](const auto i, const auto j)
+                        {
+                            return comp(*(data_begin + i), *(data_begin + j));
+                        }
+                    );
                 }
-            );
+                case (sorting_method::stable):
+                {
+                    std::stable_sort(
+                        idx_begin,
+                        idx_end,
+                        [&](const auto i, const auto j)
+                        {
+                            return comp(*(data_begin + i), *(data_begin + j));
+                        }
+                    );
+                }
+            }
         }
 
-        template <class ConstRandomIt, class RandomIt>
+        template <class ConstRandomIt, class RandomIt, class Method>
         inline void
-        argsort_iter(ConstRandomIt data_begin, ConstRandomIt data_end, RandomIt idx_begin, RandomIt idx_end)
+        argsort_iter(ConstRandomIt data_begin, ConstRandomIt data_end, RandomIt idx_begin, RandomIt idx_end, Method method)
         {
             return argsort_iter(
                 std::move(data_begin),
@@ -299,7 +345,8 @@ namespace xt
                 [](const auto& x, const auto& y) -> bool
                 {
                     return x < y;
-                }
+                },
+                method
             );
         }
 
@@ -359,8 +406,8 @@ namespace xt
                 typename T::temporary_type>::type;
         };
 
-        template <class E, class R = typename detail::linear_argsort_result_type<E>::type>
-        inline auto flatten_argsort_impl(const xexpression<E>& e)
+        template <class E, class R = typename detail::linear_argsort_result_type<E>::type, class Method>
+        inline auto flatten_argsort_impl(const xexpression<E>& e, Method method)
         {
             const auto& de = e.derived_cast();
 
@@ -372,16 +419,17 @@ namespace xt
             result_type result;
             result.resize({de.size()});
 
-            detail::argsort_iter(de.cbegin(), de.cend(), result.begin(), result.end());
+            detail::argsort_iter(de.cbegin(), de.cend(), result.begin(), result.end(), method);
 
             return result;
         }
     }
 
     template <class E>
-    inline auto argsort(const xexpression<E>& e, placeholders::xtuph /*t*/)
+    inline auto
+    argsort(const xexpression<E>& e, placeholders::xtuph /*t*/, sorting_method method = sorting_method::quick)
     {
-        return detail::flatten_argsort_impl(e);
+        return detail::flatten_argsort_impl(e, method);
     }
 
     /**
@@ -393,11 +441,15 @@ namespace xt
      * @ingroup xt_xsort
      * @param e xexpression to argsort
      * @param axis axis along which argsort is performed
+     * @param method sorting algorithm to use
      *
      * @return argsorted index array
+     *
+     * @see xt::sorting_method
      */
     template <class E>
-    inline auto argsort(const xexpression<E>& e, std::ptrdiff_t axis = -1)
+    inline auto
+    argsort(const xexpression<E>& e, std::ptrdiff_t axis = -1, sorting_method method = sorting_method::quick)
     {
         using eval_type = typename detail::sort_eval_type<E>::type;
         using result_type = typename detail::argsort_result_type<eval_type>::type;
@@ -408,12 +460,12 @@ namespace xt
 
         if (de.dimension() == 1)
         {
-            return detail::flatten_argsort_impl<E, result_type>(e);
+            return detail::flatten_argsort_impl<E, result_type>(e, method);
         }
 
-        const auto argsort = [](auto res_begin, auto res_end, auto ev_begin, auto ev_end)
+        const auto argsort = [&method](auto res_begin, auto res_end, auto ev_begin, auto ev_end)
         {
-            detail::argsort_iter(ev_begin, ev_end, res_begin, res_end);
+            detail::argsort_iter(ev_begin, ev_end, res_begin, res_end, method);
         };
 
         if (ax == detail::leading_axis(de))
