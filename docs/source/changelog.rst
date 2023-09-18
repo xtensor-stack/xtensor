@@ -7,6 +7,28 @@
 Changelog
 =========
 
+0.24.7
+------
+
+- Adjust version of required xsimd in README
+  `# 2670 https://github.com/xtensor-stack/xtensor/pull/2670`
+- Add CI through github actions.
+  `# 2692 https://github.com/xtensor-stack/xtensor/pull/2692`
+- Added unwrap
+  `# 2710 https://github.com/xtensor-stack/xtensor/pull/2710`
+- Removed repeated work from ci-extra build
+  `# 2711 https://github.com/xtensor-stack/xtensor/pull/2711`
+- Removed bad macro definitions
+  `# 2712 https://github.com/xtensor-stack/xtensor/pull/2712`
+- Fixing some iterator issues
+  `# 2564 https://github.com/xtensor-stack/xtensor/pull/2564`
+- Fixed static analysis build
+  `# 2720 https://github.com/xtensor-stack/xtensor/pull/2720`
+- Support external linkage for "recurser_run"
+  `# 2714 https://github.com/xtensor-stack/xtensor/pull/2714`
+- add possibility to use std::stable_sort with xt::argsort
+  `# 2681 https://github.com/xtensor-stack/xtensor/pull/2681`
+
 0.24.6
 ------
 
