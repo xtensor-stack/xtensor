@@ -1,8 +1,8 @@
 name: xtensor-docs
 
 channels:
-  - conda-forge
+- conda-forge
 
 dependencies:
-  - breathe
-  - sphinx_rtd_theme
+- breathe
+- sphinx_rtd_theme
