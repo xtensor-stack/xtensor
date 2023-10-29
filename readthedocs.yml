@@ -1,2 +1,9 @@
+version: 2
+
+build:
+  os: "ubuntu-22.04"
+  tools:
+    python: "mambaforge-22.9"
+
 conda:
-  file: docs/rtd_environment.yml
+  environment: docs/rtd_environment.yml
