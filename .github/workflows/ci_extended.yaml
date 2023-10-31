@@ -41,7 +41,7 @@ jobs:
         environment-file: environment-dev.yml
 
     - name: Set conda environment
-      if: ${{ matrix.sys.name == 'tbb' }}
+      if: ${{ matrix.sys.name == 'tbb' }} || ${{ matrix.sys.name == 'xsimd-tbb' }}
       uses: mamba-org/provision-with-micromamba@main
       with:
         environment-name: myenv
