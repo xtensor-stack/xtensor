@@ -19,6 +19,8 @@ jobs:
         - {name: openmp, flags: -DXTENSOR_USE_OPENMP=ON}
         - {name: noexcept, flags: -DXTENSOR_DISABLE_EXCEPTIONS=ON}
         - {name: xsimd, flags: -DXTENSOR_USE_XSIMD=ON}
+        - {name: xsimd-tbb, flags: -DXTENSOR_USE_XSIMD=ON -DXTENSOR_USE_TBB=ON}
+
 
     defaults:
       run:
