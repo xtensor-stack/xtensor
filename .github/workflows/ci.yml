@@ -109,11 +109,11 @@ jobs:
 
     - name: Configure using CMake
       if: runner.os != 'Windows'
-      run: cmake -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON -DTENSOR_ENABLE_XSIMD=ON -DXTENSOR_ENABLE_TBB=ON
+      run: cmake -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON
 
     - name: Configure using CMake
       if: runner.os == 'Windows'
-      run: cmake -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON -G Ninja
+      run: cmake -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON -DBUILD_TESTS=ON -DTENSOR_ENABLE_XSIMD=ON -DXTENSOR_ENABLE_TBB=ON -G Ninja
 
     - name: Install
       working-directory: build
