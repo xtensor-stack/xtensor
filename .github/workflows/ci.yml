@@ -105,10 +105,11 @@ jobs:
         environment-file: environment-dev.yml
         extra-specs: |
           sel(win): ninja
+          sel(win): tbb-devel
 
     - name: Configure using CMake
       if: runner.os != 'Windows'
-      run: cmake -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON
+      run: cmake -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON -DTENSOR_ENABLE_XSIMD=ON -DXTENSOR_ENABLE_TBB=ON
 
     - name: Configure using CMake
       if: runner.os == 'Windows'
