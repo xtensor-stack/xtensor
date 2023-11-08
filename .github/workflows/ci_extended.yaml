@@ -89,7 +89,7 @@ jobs:
         init-shell: bash
         cache-downloads: true
         create-args: |
-          ${{ runner.os == 'Windows' && 'ninja-64' || '' }}
+          ${{ runner.os == 'Windows' && 'ninja' || '' }}
 
     - name: Configure using CMake
       run: cmake -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON -G Ninja ${{ matrix.sys.flags }}

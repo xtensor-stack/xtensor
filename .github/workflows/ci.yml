@@ -108,7 +108,7 @@ jobs:
         init-shell: bash
         cache-downloads: true
         create-args: |
-          ${{ runner.os == 'Windows' && 'ninja-64' || '' }}
+          ${{ runner.os == 'Windows' && 'ninja' || '' }}
           ${{ runner.os == 'Windows' && 'tbb-devel' || '' }}
 
     - name: Configure using CMake
