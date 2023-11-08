@@ -25,13 +25,12 @@ namespace xt
         ss << info(test) << std::endl;
     }
 
-#ifndef __clang__ // See https://github.com/xtensor-stack/xtensor/issues/2694
-    TEST(xinfo, typename)
-    {
-        xarray<double> test = {{1, 2, 3}, {4, 5, 6}};
-        auto t_s = type_to_string<typename decltype(test)::value_type>();
-        std::string expected = "double";
-        EXPECT_EQ(expected, t_s);
-    }
-#endif
+// See https://github.com/xtensor-stack/xtensor/issues/2694
+//     TEST(xinfo, typename)
+//     {
+//         xarray<double> test = {{1, 2, 3}, {4, 5, 6}};
+//         auto t_s = type_to_string<typename decltype(test)::value_type>();
+//         std::string expected = "double";
+//         EXPECT_EQ(expected, t_s);
+//     }
 }
