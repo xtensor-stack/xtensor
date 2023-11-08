@@ -21,7 +21,7 @@ jobs:
 
     defaults:
       run:
-        shell: bash -l {0}
+        shell: bash -e -l {0}
 
     name: ${{ matrix.runs-on }} • ${{ matrix.sys.compiler }} ${{ matrix.sys.version }} - ${{ matrix.sys.name }}
     runs-on: ${{ matrix.runs-on }}
@@ -56,10 +56,12 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Set conda environment
-      uses: mamba-org/provision-with-micromamba@main
+      uses: mamba-org/setup-micromamba@main
       with:
         environment-name: myenv
         environment-file: environment-dev.yml
+        init-shell: bash
+        cache-downloads: true
 
     - name: Configure using CMake
       run: cmake -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON ${{ matrix.sys.flags }}
@@ -85,7 +87,7 @@ jobs:
 
     defaults:
       run:
-        shell: bash -l {0}
+        shell: bash -e -l {0}
 
     name: ${{ matrix.runs-on }} • default - default
     runs-on: ${{ matrix.runs-on }}
@@ -99,13 +101,15 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Set conda environment
-      uses: mamba-org/provision-with-micromamba@main
+      uses: mamba-org/setup-micromamba@main
       with:
         environment-name: myenv
         environment-file: environment-dev.yml
-        extra-specs: |
-          sel(win): ninja
-          sel(win): tbb-devel
+        init-shell: bash
+        cache-downloads: true
+        create-args: |
+          ${{ runner.os == 'Windows' && 'ninja-64' || '' }}
+          ${{ runner.os == 'Windows' && 'tbb-devel' || '' }}
 
     - name: Configure using CMake
       if: runner.os != 'Windows'

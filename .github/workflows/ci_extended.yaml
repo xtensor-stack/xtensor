@@ -34,12 +34,14 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Set conda environment
-      uses: mamba-org/provision-with-micromamba@main
+      uses: mamba-org/setup-micromamba@main
       with:
         environment-name: myenv
         environment-file: environment-dev.yml
-        extra-specs: |
-          tbb-devel
+        init-shell: bash
+        cache-downloads: true
+        create-args: |
+          ${{ (matrix.sys.name == 'tbb' || matrix.sys.name == 'xsimd-tbb' ) && 'tbb-devel' || '' }}
 
     - name: Configure using CMake
       run: cmake -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON ${{ matrix.sys.flags }}
@@ -80,12 +82,14 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Set conda environment
-      uses: mamba-org/provision-with-micromamba@main
+      uses: mamba-org/setup-micromamba@main
       with:
         environment-name: myenv
         environment-file: environment-dev.yml
-        extra-specs: |
-          sel(win): ninja
+        init-shell: bash
+        cache-downloads: true
+        create-args: |
+          ${{ runner.os == 'Windows' && 'ninja-64' || '' }}
 
     - name: Configure using CMake
       run: cmake -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON -G Ninja ${{ matrix.sys.flags }}
