@@ -25,7 +25,7 @@ namespace xt
         ss << info(test) << std::endl;
     }
 
-#ifndef __clang__  || // See https://github.com/xtensor-stack/xtensor/issues/2694
+#ifndef __clang__ // See https://github.com/xtensor-stack/xtensor/issues/2694
     TEST(xinfo, typename)
     {
         xarray<double> test = {{1, 2, 3}, {4, 5, 6}};
