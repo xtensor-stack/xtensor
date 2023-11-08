@@ -24,7 +24,7 @@ jobs:
 
     defaults:
       run:
-        shell: bash -l {0}
+        shell: bash -e -l {0}
 
     name: ${{ matrix.runs-on }} • default - ${{ matrix.sys.name }}
     runs-on: ${{ matrix.runs-on }}
@@ -67,7 +67,7 @@ jobs:
 
     defaults:
       run:
-        shell: bash -l {0}
+        shell: bash -e -l {0}
 
     name: ${{ matrix.runs-on }} • clang - default
     runs-on: ${{ matrix.runs-on }}
