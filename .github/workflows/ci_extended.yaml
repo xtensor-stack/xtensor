@@ -54,7 +54,7 @@ jobs:
 
     - name: Run tests
       working-directory: build
-      run: ctest -R ^xtest$ --output-on-failure
+      run: ctest -R ^xtest$ --verbose
 
   clang:
 
@@ -100,4 +100,4 @@ jobs:
 
     - name: Run tests
       working-directory: build
-      run: ctest -R ^xtest$ --output-on-failure
+      run: ctest -R ^xtest$ --verbose
