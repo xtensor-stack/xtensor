@@ -105,6 +105,7 @@ jobs:
         environment-file: environment-dev.yml
         extra-specs: |
           sel(win): ninja
+          sel(win): tbb-devel
 
     - name: Configure using CMake
       if: runner.os != 'Windows'
