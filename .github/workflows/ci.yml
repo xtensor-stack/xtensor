@@ -19,11 +19,11 @@ jobs:
         - {compiler: gcc, version: '11', name: c++17, flags: -DCPP17=ON}
         - {compiler: clang, version: '15', name: assert, flags: -DXTENSOR_ENABLE_ASSERT=ON}
         - {compiler: clang, version: '16', name: column-major, flags: -DDEFAULT_COLUMN_MAJOR=ON}
-        - {compiler: default, version: '*', name: tbb, flags: -DXTENSOR_USE_TBB=ON -DTBB_INCLUDE_DIR=$CONDA_PREFIX/include -DTBB_LIBRARY=$CONDA_PREFIX/lib}
-        - {compiler: default, version: '*', name: openmp, flags: -DXTENSOR_USE_OPENMP=ON}
-        - {compiler: default, version: '*', name: noexcept, flags: -DXTENSOR_DISABLE_EXCEPTIONS=ON}
-        - {compiler: default, version: '*', name: xsimd, flags: -DXTENSOR_USE_XSIMD=ON}
-        - {compiler: default, version: '*', name: xsimd-tbb, flags: -DXTENSOR_USE_XSIMD=ON -DXTENSOR_USE_TBB=ON}
+        - {compiler: default, version: '', name: tbb, flags: -DXTENSOR_USE_TBB=ON -DTBB_INCLUDE_DIR=$CONDA_PREFIX/include -DTBB_LIBRARY=$CONDA_PREFIX/lib}
+        - {compiler: default, version: '', name: openmp, flags: -DXTENSOR_USE_OPENMP=ON}
+        - {compiler: default, version: '', name: noexcept, flags: -DXTENSOR_DISABLE_EXCEPTIONS=ON}
+        - {compiler: default, version: '', name: xsimd, flags: -DXTENSOR_USE_XSIMD=ON}
+        - {compiler: default, version: '', name: xsimd-tbb, flags: -DXTENSOR_USE_XSIMD=ON -DXTENSOR_USE_TBB=ON}
 
     defaults:
       run:
