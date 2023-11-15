@@ -807,6 +807,66 @@ namespace xt
         );
     }
 
+    namespace detail
+    {
+        // if shape is signed do the check
+        template <class S, class R>
+        using do_shape_recalculation = std::
+            enable_if_t<std::is_signed<get_value_type_t<typename std::decay<S>::type>>::value, R>;
+
+        // if shape is unsigned pass through
+        template <class S, class R>
+        using no_shape_recalculation = std::
+            enable_if_t<!std::is_signed<get_value_type_t<typename std::decay<S>::type>>::value, R>;
+
+        template <typename T>
+        inline no_shape_recalculation<T, T> make_unsigned_shape(T shape)
+        {
+            return shape;
+        }
+
+        template <typename S, typename Enable = void>
+        struct rebind_shape;
+
+        template <class S>
+        struct rebind_shape<S, std::enable_if_t<!std::is_signed<get_value_type_t<typename std::decay_t<S>>>::value>>
+        {
+            using Shape = S;
+        };
+
+        template <class S>
+        struct rebind_shape<S, std::enable_if_t<std::is_signed<get_value_type_t<typename std::decay_t<S>>>::value>>
+        {
+            using Shape = rebind_container_t<size_t, S>;
+        };
+
+        template <class S, do_shape_recalculation<S, bool> = true>
+        inline auto recalculate_shape_impl(S& shape, size_t size)
+        {
+            using value_type = get_value_type_t<typename std::decay_t<S>>;
+            auto iter = std::find(shape.begin(), shape.end(), -1);
+            if (iter != std::end(shape))
+            {
+                const auto total = std::accumulate(shape.cbegin(), shape.cend(), -1, std::multiplies<int>{});
+                const auto missing_dimension = size / total;
+                (*iter) = static_cast<value_type>(missing_dimension);
+            }
+            return shape;
+        }
+
+        template <class S, no_shape_recalculation<S, bool> = true>
+        inline auto recalculate_shape_impl(S& shape, size_t)
+        {
+            return shape;
+        }
+
+        template <class S>
+        inline auto recalculate_shape(S&& shape, size_t size)
+        {
+            return recalculate_shape_impl(shape, size);
+        }
+    }
+
     template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E, class S>
     inline auto reshape_view(E&& e, S&& shape)
     {
@@ -815,18 +875,26 @@ namespace xt
             "traversal has to be row or column major"
         );
 
-        using shape_type = std::decay_t<S>;
-        get_strides_t<shape_type> strides;
+        using shape_type = std::decay_t<decltype(shape)>;
+        using unsigned_shape_type = typename detail::rebind_shape<shape_type>::Shape;
+        get_strides_t<unsigned_shape_type> strides;
 
+        detail::recalculate_shape(shape, e.size());
         xt::resize_container(strides, shape.size());
         compute_strides(shape, L, strides);
         constexpr auto computed_layout = std::decay_t<E>::static_layout == L ? L : layout_type::dynamic;
         using view_type = xstrided_view<
             xclosure_t<E>,
-            shape_type,
+            unsigned_shape_type,
             computed_layout,
             detail::flat_adaptor_getter<xclosure_t<E>, L>>;
-        return view_type(std::forward<E>(e), std::forward<S>(shape), std::move(strides), 0, e.layout());
+        return view_type(
+            std::forward<E>(e),
+            xtl::forward_sequence<unsigned_shape_type, S>(shape),
+            std::move(strides),
+            0,
+            e.layout()
+        );
     }
 
     /**
@@ -858,7 +926,7 @@ namespace xt
     template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E, class I, std::size_t N>
     inline auto reshape_view(E&& e, const I (&shape)[N])
     {
-        using shape_type = std::array<std::size_t, N>;
+        using shape_type = std::array<I, N>;
         return reshape_view<L>(std::forward<E>(e), xtl::forward_sequence<shape_type, decltype(shape)>(shape));
     }
 }
