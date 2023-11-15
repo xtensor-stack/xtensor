@@ -831,7 +831,7 @@ namespace xt
         template <class S>
         struct rebind_shape<S, std::enable_if_t<!std::is_signed<get_value_type_t<typename std::decay_t<S>>>::value>>
         {
-            using Shape = S;
+            using type = S;
         };
 
         template <class S>
