@@ -824,8 +824,9 @@ namespace xt
             using type = rebind_container_t<size_t, S>;
         };
 
-        template <class S, std::
-            enable_if_t<std::is_signed<get_value_type_t<typename std::decay<S>::type>>::value, bool> = true>
+        template <
+            class S,
+            std::enable_if_t<std::is_signed<get_value_type_t<typename std::decay<S>::type>>::value, bool> = true>
         inline auto recalculate_shape_impl(S& shape, size_t size)
         {
             using value_type = get_value_type_t<typename std::decay_t<S>>;
@@ -841,8 +842,9 @@ namespace xt
             return shape;
         }
 
-        template <class S, std::
-            enable_if_t<!std::is_signed<get_value_type_t<typename std::decay<S>::type>>::value, bool> = true>
+        template <
+            class S,
+            std::enable_if_t<!std::is_signed<get_value_type_t<typename std::decay<S>::type>>::value, bool> = true>
         inline auto recalculate_shape_impl(S& shape, size_t)
         {
             return shape;
