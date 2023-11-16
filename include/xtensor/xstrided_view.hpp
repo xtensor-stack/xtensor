@@ -827,11 +827,10 @@ namespace xt
         template <
             class S,
             std::enable_if_t<std::is_signed<get_value_type_t<typename std::decay<S>::type>>::value, bool> = true>
-        inline auto recalculate_shape_impl(S& shape, size_t size)
+        inline void recalculate_shape_impl(S& shape, size_t size)
         {
             using value_type = get_value_type_t<typename std::decay_t<S>>;
-            const auto num_auto_dims = std::count(shape.cbegin(), shape.cend(), -1);
-            XTENSOR_ASSERT(num_auto_dims <= 1);
+            XTENSOR_ASSERT(std::count(shape.cbegin(), shape.cend(), -1) <= 1);
             auto iter = std::find(shape.begin(), shape.end(), -1);
             if (iter != std::end(shape))
             {
@@ -839,15 +838,13 @@ namespace xt
                 const auto missing_dimension = size / total;
                 (*iter) = static_cast<value_type>(missing_dimension);
             }
-            return shape;
         }
 
         template <
             class S,
             std::enable_if_t<!std::is_signed<get_value_type_t<typename std::decay<S>::type>>::value, bool> = true>
-        inline auto recalculate_shape_impl(S& shape, size_t)
+        inline void recalculate_shape_impl(S&, size_t)
         {
-            return shape;
         }
 
         template <class S>
