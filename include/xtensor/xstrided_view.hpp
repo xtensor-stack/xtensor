@@ -809,17 +809,17 @@ namespace xt
 
     namespace detail
     {
-        template <typename S, typename Enable = void>
+        template <typename S>
         struct rebind_shape;
 
-        template <class S>
-        struct rebind_shape<S, std::enable_if_t<!std::is_signed<get_value_type_t<typename std::decay_t<S>>>::value>>
+        template <std::size_t... X>
+        struct rebind_shape<xt::fixed_shape<X...>>
         {
-            using type = S;
+            using type = xt::fixed_shape<X...>;
         };
 
         template <class S>
-        struct rebind_shape<S, std::enable_if_t<std::is_signed<get_value_type_t<typename std::decay_t<S>>>::value>>
+        struct rebind_shape
         {
             using type = rebind_container_t<size_t, S>;
         };
