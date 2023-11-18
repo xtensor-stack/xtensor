@@ -696,17 +696,20 @@ namespace xt
         EXPECT_EQ(av, e);
         EXPECT_EQ(av, a);
 
-        bool truthy;
-        truthy = std::is_same<
-            typename decltype(xv)::temporary_type,
-            xtensor_fixed<double, xshape<3, 3>, XTENSOR_DEFAULT_LAYOUT>>();
-        EXPECT_TRUE(truthy);
-
-        truthy = std::is_same<typename decltype(av)::temporary_type, xtensor<double, 2, XTENSOR_DEFAULT_LAYOUT>>(
+        static_assert(
+            std::is_same<
+                typename decltype(xv)::temporary_type,
+                xtensor_fixed<double, xshape<3, 3>, XTENSOR_DEFAULT_LAYOUT>>::value,
+            "Container types do not match"
         );
-        EXPECT_TRUE(truthy);
-        truthy = std::is_same<typename decltype(av)::shape_type, typename decltype(e)::shape_type>::value;
-        EXPECT_TRUE(truthy);
+        static_assert(
+            std::is_same<typename decltype(av)::temporary_type, xtensor<double, 2, XTENSOR_DEFAULT_LAYOUT>>::value,
+            "Container types do not match"
+        );
+        static_assert(
+            std::is_same<typename decltype(av)::shape_type, typename decltype(e)::shape_type>::value,
+            "Shape types do not match"
+        );
 
         xarray<int> xa = {{1, 2, 3}, {4, 5, 6}};
         std::vector<std::size_t> new_shape = {3, 2};
@@ -714,6 +717,10 @@ namespace xt
 
         xarray<int> xres = {{1, 2}, {3, 4}, {5, 6}};
         EXPECT_EQ(xrv, xres);
+
+        auto nv = xt::reshape_view<XTENSOR_DEFAULT_LAYOUT>(a, {-1, 3});
+        std::vector<size_t> expected_shape({3, 3});
+        EXPECT_TRUE(std::equal(nv.shape().begin(), nv.shape().end(), expected_shape.begin()));
     }
 
     TEST(xstrided_view, reshape_view_assign)
