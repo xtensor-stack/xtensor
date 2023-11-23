@@ -8,27 +8,25 @@
  ****************************************************************************/
 
 #include "xtensor/xarray.hpp"
-#include "xtensor/xtensor.hpp"
-#include "xtensor/xfixed.hpp"
 #include "xtensor/xaxis_iterator.hpp"
+#include "xtensor/xfixed.hpp"
+#include "xtensor/xtensor.hpp"
 
 #include "test_common_macros.hpp"
 
-#define ROW_TYPES \
-    xarray<int, layout_type::row_major>, \
-    xtensor<int, 3, layout_type::row_major>, \
-    xtensor_fixed<int, xt::xshape<2, 3, 4>, layout_type::row_major>
-#define COL_TYPES \
-    xarray<int, layout_type::column_major>, \
-    xtensor<int, 3, layout_type::column_major>, \
-    xtensor_fixed<int, xt::xshape<2, 3, 4>, layout_type::column_major>
+#define ROW_TYPES                                                                 \
+    xarray<int, layout_type::row_major>, xtensor<int, 3, layout_type::row_major>, \
+        xtensor_fixed<int, xt::xshape<2, 3, 4>, layout_type::row_major>
+#define COL_TYPES                                                                       \
+    xarray<int, layout_type::column_major>, xtensor<int, 3, layout_type::column_major>, \
+        xtensor_fixed<int, xt::xshape<2, 3, 4>, layout_type::column_major>
 #define ALL_TYPES ROW_TYPES, COL_TYPES
 
 namespace xt
 {
     using std::size_t;
 
-    template<typename T=xarray<int>>
+    template <typename T = xarray<int>>
     T get_test_array()
     {
         T res = {

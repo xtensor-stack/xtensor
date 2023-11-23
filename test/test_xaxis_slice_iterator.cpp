@@ -8,20 +8,18 @@
  ****************************************************************************/
 
 #include "xtensor/xarray.hpp"
+#include "xtensor/xaxis_slice_iterator.hpp"
 #include "xtensor/xfixed.hpp"
 #include "xtensor/xtensor.hpp"
-#include "xtensor/xaxis_slice_iterator.hpp"
 
 #include "test_common_macros.hpp"
 
-#define ROW_TYPES \
-    xarray<int, layout_type::row_major>, \
-    xtensor<int, 3, layout_type::row_major>, \
-    xtensor_fixed<int, xt::xshape<2, 3, 4>, layout_type::row_major>
-#define COL_TYPES \
-    xarray<int, layout_type::column_major>, \
-    xtensor<int, 3, layout_type::column_major>, \
-    xtensor_fixed<int, xt::xshape<2, 3, 4>, layout_type::column_major>
+#define ROW_TYPES                                                                 \
+    xarray<int, layout_type::row_major>, xtensor<int, 3, layout_type::row_major>, \
+        xtensor_fixed<int, xt::xshape<2, 3, 4>, layout_type::row_major>
+#define COL_TYPES                                                                       \
+    xarray<int, layout_type::column_major>, xtensor<int, 3, layout_type::column_major>, \
+        xtensor_fixed<int, xt::xshape<2, 3, 4>, layout_type::column_major>
 #define ALL_TYPES ROW_TYPES, COL_TYPES
 
 namespace xt
@@ -29,7 +27,7 @@ namespace xt
     using std::size_t;
     constexpr auto _col = layout_type::column_major;
 
-    template<typename T=xarray<int>>
+    template <typename T = xarray<int>>
     T get_slice_test_array()
     {
         T res = {
@@ -134,7 +132,7 @@ namespace xt
 
     TEST_CASE_TEMPLATE("xaxis_slice_iterator.axis_0_col", T, COL_TYPES)
     {
-       T a = get_slice_test_array<T>();
+        T a = get_slice_test_array<T>();
         auto iter = axis_slice_begin(a, size_t(0));
 
         EXPECT_EQ(a(0, 0, 0), (*iter)(0));
