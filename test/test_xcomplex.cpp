@@ -224,7 +224,7 @@ namespace xt
         EXPECT_TRUE(all(equal(expected, xt::isinf(e))));
     }
 
-    TEST(xcomplex, isclose)
+    TEST(xcomplex, isclose_double)
     {
         xarray<std::complex<double>> arg = {
             {0.40101756 + 0.71233018i, 0.62731701 + 0.42786349i, 0.32415089 + 0.2977805i},
@@ -245,6 +245,37 @@ namespace xt
         double inf = std::numeric_limits<double>::infinity();
         double nan = std::numeric_limits<double>::quiet_NaN();
         using c_t = std::complex<double>;
+
+        EXPECT_TRUE(isclose(c_t(0, nan), c_t(0, nan))() == false);
+        EXPECT_TRUE(isclose(c_t(0, nan), c_t(0, nan), 1e-5, 1e-3, true)() == true);
+        EXPECT_TRUE(isclose(c_t(0, inf), c_t(0, inf))() == true);
+        EXPECT_TRUE(isclose(c_t(0, -inf), c_t(0, inf))() == false);
+
+        EXPECT_TRUE(isclose(c_t(inf, -inf), c_t(0, inf))() == false);
+        EXPECT_TRUE(isclose(c_t(5, 5), c_t(5, -5))() == false);
+    }
+
+    TEST(xcomplex, isclose_float)
+    {
+        xarray<std::complex<float>> arg = {
+            {0.40101756f + 0.71233018if, 0.62731701f + 0.42786349if, 0.32415089f + 0.2977805if},
+            {0.24475928f + 0.49208478if, 0.69475518f + 0.74029639if, 0.59390240f + 0.35772892if},
+            {0.63179202f + 0.41720995if, 0.44025718f + 0.65472131if, 0.08372648f + 0.37380143if}};
+
+        xarray<std::complex<float>> compare = {
+            {0.401f + 0.712if, 0.627f + 0.427if, 0.324f + 0.297if},
+            {0.244f + 0.492if, 0.694f + 0.740if, 0.593f + 0.357if},
+            {0.631f + 0.417if, 0.440f + 0.654if, 0.083f + 0.373if}};
+
+        auto veryclose = isclose(arg, compare, 1e-5);
+        auto looselyclose = isclose(arg, compare, 1e-1);
+
+        EXPECT_TRUE(all(equal(false, veryclose)));
+        EXPECT_TRUE(all(equal(true, looselyclose)));
+
+        float inf = std::numeric_limits<float>::infinity();
+        float nan = std::numeric_limits<float>::quiet_NaN();
+        using c_t = std::complex<float>;
 
         EXPECT_TRUE(isclose(c_t(0, nan), c_t(0, nan))() == false);
         EXPECT_TRUE(isclose(c_t(0, nan), c_t(0, nan), 1e-5, 1e-3, true)() == true);
