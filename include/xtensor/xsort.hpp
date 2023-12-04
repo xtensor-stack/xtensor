@@ -1173,8 +1173,16 @@ namespace xt
             {
                 auto begin = e.template begin<L>();
                 auto end = e.template end<L>();
-                std::size_t i = static_cast<std::size_t>(std::distance(begin, std::min_element(begin, end)));
-                return xtensor<size_t, 0>{i};
+                if (std::is_same<F, std::less<value_type>>::value)
+                {
+                    std::size_t i = static_cast<std::size_t>(std::distance(begin, std::min_element(begin, end)));
+                    return xtensor<size_t, 0>{i};
+                }
+                else
+                {
+                    std::size_t i = static_cast<std::size_t>(std::distance(begin, std::max_element(begin, end)));
+                    return xtensor<size_t, 0>{i};
+                }
             }
 
             result_shape_type alt_shape;
