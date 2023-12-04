@@ -59,15 +59,15 @@ namespace xt
      * Alias template on xarray_container with default parameters for data container
      * type and shape / strides container type. This allows to write
      *
-     * \code{.cpp}
+     * @code{.cpp}
      * xt::xarray<double> a = {{1., 2.}, {3., 4.}};
-     * \endcode
+     * @endcode
      *
      * instead of the heavier syntax
      *
-     * \code{.cpp}
+     * @code{.cpp}
      * xt::xarray_container<std::vector<double>, std::vector<std::size_t>> a = ...
-     * \endcode
+     * @endcode
      *
      * @tparam T The value type of the elements.
      * @tparam L The layout_type of the xarray_container (default: XTENSOR_DEFAULT_LAYOUT).
@@ -118,15 +118,15 @@ namespace xt
      * Alias template on xtensor_container with default parameters for data container
      * type. This allows to write
      *
-     * \code{.cpp}
+     * @code{.cpp}
      * xt::xtensor<double, 2> a = {{1., 2.}, {3., 4.}};
-     * \endcode
+     * @endcode
      *
      * instead of the heavier syntax
      *
-     * \code{.cpp}
+     * @code{.cpp}
      * xt::xtensor_container<std::vector<double>, 2> a = ...
-     * \endcode
+     * @endcode
      *
      * @tparam T The value type of the elements.
      * @tparam N The dimension of the tensor.
@@ -163,15 +163,15 @@ namespace xt
      * Alias template on xfixed_container with default parameters for layout
      * type. This allows to write
      *
-     * \code{.cpp}
+     * @code{.cpp}
      * xt::xtensor_fixed<double, xt::xshape<2, 2>> a = {{1., 2.}, {3., 4.}};
-     * \endcode
+     * @endcode
      *
      * instead of the syntax
      *
-     * \code{.cpp}
+     * @code{.cpp}
      * xt::xfixed_container<double, xt::xshape<2, 2>, xt::layout_type::row_major> a = ...
-     * \endcode
+     * @endcode
      *
      * @tparam T The value type of the elements.
      * @tparam FSH A xshape template shape.

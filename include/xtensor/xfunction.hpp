@@ -637,12 +637,12 @@ namespace xt
      * it is possible.
      * @warning This method is NOT compatible with broadcasting, meaning the following
      * code has undefined behavior:
-     * \code{.cpp}
+     * @code{.cpp}
      * xt::xarray<double> a = {{0, 1}, {2, 3}};
      * xt::xarray<double> b = {0, 1};
      * auto fd = a + b;
      * double res = fd.unchecked(0, 1);
-     * \endcode
+     * @endcode
      */
     template <class F, class... CT>
     template <class... Args>

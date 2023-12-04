@@ -33,11 +33,11 @@ namespace xt
     /**
      * Force evaluation of xexpression.
      *
-     * \code{.cpp}
+     * @code{.cpp}
      * xt::xarray<double> a = {1, 2, 3, 4};
      * auto&& b = xt::eval(a); // b is a reference to a, no copy!
      * auto&& c = xt::eval(a + b); // c is xarray<double>, not an xexpression
-     * \endcode
+     * @endcode
      *
      * @ingroup xt_xeval
      * @return xt::xarray or xt::xtensor depending on shape type
@@ -120,7 +120,7 @@ namespace xt
      * Force evaluation of xexpression not providing a data interface
      * and convert to the required layout.
      *
-     * \code{.cpp}
+     * @code{.cpp}
      * xt::xarray<double, xt::layout_type::row_major> a = {1, 2, 3, 4};
      *
      * // take reference to a (no copy!)
@@ -137,7 +137,7 @@ namespace xt
      *
      * // xarray<int> with the required layout
      * auto&& e = xt::as_strided<xt::layout_type::column_major>(a_cast);
-     * \endcode
+     * @endcode
      *
      * @warning This function should be used in a local context only.
      *          Returning the value returned by this function could lead to a dangling reference.

@@ -95,8 +95,8 @@ namespace xt
             XTENSOR_ASSERT(e1.dimension() == e2.dimension());
 
             const std::size_t n_iters = leading_axis_n_iters(e1);
-            std::ptrdiff_t const secondary_stride1 = get_secondary_stride(e1);
-            std::ptrdiff_t const secondary_stride2 = get_secondary_stride(e2);
+            const std::ptrdiff_t secondary_stride1 = get_secondary_stride(e1);
+            const std::ptrdiff_t secondary_stride2 = get_secondary_stride(e2);
             XTENSOR_ASSERT(secondary_stride1 == secondary_stride2);
 
             const auto begin1 = e1.data();
@@ -163,7 +163,7 @@ namespace xt
                 return res;
             }
 
-            std::size_t const ax = normalize_axis(e.dimension(), axis);
+            const std::size_t ax = normalize_axis(e.dimension(), axis);
             if (ax == detail::leading_axis(e))
             {
                 R res = e;
@@ -546,7 +546,7 @@ namespace xt
      *
      * This function uses ``std::nth_element`` internally.
      *
-     * \code{cpp}
+     * @code{cpp}
      * xt::xarray<float> a = {1, 10, -10, 123};
      * std::cout << xt::partition(a, 0) << std::endl; // {-10, 1, 123, 10} the correct entry at index 0
      * std::cout << xt::partition(a, 3) << std::endl; // {1, 10, -10, 123} the correct entry at index 3
@@ -641,7 +641,7 @@ namespace xt
      *
      * This function uses ``std::nth_element`` internally.
      *
-     * \code{cpp}
+     * @code{cpp}
      * xt::xarray<float> a = {1, 10, -10, 123};
      * std::cout << xt::argpartition(a, 0) << std::endl; // {2, 0, 3, 1} the correct entry at index 0
      * std::cout << xt::argpartition(a, 3) << std::endl; // {0, 1, 2, 3} the correct entry at index 3
@@ -734,7 +734,7 @@ namespace xt
             );
         };
 
-        std::size_t const ax = normalize_axis(de.dimension(), axis);
+        const std::size_t ax = normalize_axis(de.dimension(), axis);
         if (ax == detail::leading_axis(de))
         {
             result_type res = result_type::from_shape(de.shape());
@@ -836,7 +836,7 @@ namespace xt
         template <class E, class I>
         inline auto fancy_indexing(E&& e, const I& indices, std::ptrdiff_t axis)
         {
-            std::size_t const ax = normalize_axis(e.dimension(), axis);
+            const std::size_t ax = normalize_axis(e.dimension(), axis);
             using shape_t = get_strides_t<typename std::decay_t<E>::shape_type>;
             auto shape = xtl::forward_sequence<shape_t, decltype(e.shape())>(e.shape());
             shape[ax] = indices.size();
@@ -915,8 +915,8 @@ namespace xt
         using tmp_shape_t = get_strides_t<typename std::decay_t<E>::shape_type>;
         using id_t = typename tmp_shape_t::value_type;
 
-        std::size_t const ax = normalize_axis(e.dimension(), axis);
-        std::size_t const n = e.shape()[ax];
+        const std::size_t ax = normalize_axis(e.dimension(), axis);
+        const std::size_t n = e.shape()[ax];
         auto kth_gamma = detail::quantile_kth_gamma<T, id_t, P>(n, probas, alpha, beta);
 
         // Select relevant values for computing interpolating quantiles

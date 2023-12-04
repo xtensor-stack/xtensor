@@ -409,16 +409,16 @@ namespace xt
     {
     };
 
-#define XTENSOR_FORWARD_CONST_METHOD(name)                                 \
-    auto name() const->decltype(std::declval<xtl::constify_t<E>>().name()) \
-    {                                                                      \
-        return m_ptr->name();                                              \
+#define XTENSOR_FORWARD_CONST_METHOD(name)                                   \
+    auto name() const -> decltype(std::declval<xtl::constify_t<E>>().name()) \
+    {                                                                        \
+        return m_ptr->name();                                                \
     }
 
-#define XTENSOR_FORWARD_METHOD(name)                \
-    auto name()->decltype(std::declval<E>().name()) \
-    {                                               \
-        return m_ptr->name();                       \
+#define XTENSOR_FORWARD_METHOD(name)                  \
+    auto name() -> decltype(std::declval<E>().name()) \
+    {                                                 \
+        return m_ptr->name();                         \
     }
 
 #define XTENSOR_FORWARD_CONST_ITERATOR_METHOD(name)                                               \
@@ -489,7 +489,7 @@ namespace xt
      * For example, when a temporary expression needs to be used twice in another
      * expression, shared expressions can come to the rescue:
      *
-     * \code{.cpp}
+     * @code{.cpp}
      * template <class E>
      * auto cos_plus_sin(xexpression<E>&& expr)
      * {
@@ -502,7 +502,7 @@ namespace xt
      *     std::cout << shared_expr.use_count() << std::endl; // Will print 3 because used twice in expression
      *     return result; // all valid because expr lifetime managed by xshared_expression / shared_ptr.
      * }
-     * \endcode
+     * @endcode
      */
     template <class E>
     class xshared_expression : public xexpression<xshared_expression<E>>

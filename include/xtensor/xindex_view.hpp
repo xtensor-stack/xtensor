@@ -772,13 +772,13 @@ namespace xt
      * @param e the underlying xexpression
      * @param indices the indices to select
      *
-     * \code{.cpp}
+     * @code{.cpp}
      * xarray<double> a = {{1,5,3}, {4,5,6}};
      * b = index_view(a, {{0, 0}, {1, 0}, {1, 1}});
      * std::cout << b << std::endl; // {1, 4, 5}
      * b += 100;
      * std::cout << a << std::endl; // {{101, 5, 3}, {104, 105, 6}}
-     * \endcode
+     * @endcode
      */
     template <class E, class I>
     inline auto index_view(E&& e, I&& indices) noexcept
@@ -807,11 +807,11 @@ namespace xt
      * @param e the underlying xexpression
      * @param condition xexpression with shape of \a e which selects indices
      *
-     * \code{.cpp}
+     * @code{.cpp}
      * xarray<double> a = {{1,5,3}, {4,5,6}};
      * b = filter(a, a >= 5);
      * std::cout << b << std::endl; // {5, 5, 6}
-     * \endcode
+     * @endcode
      *
      * \sa filtration
      */
@@ -834,11 +834,11 @@ namespace xt
      * @param e the \ref xexpression to filter
      * @param condition the filtering \ref xexpression
      *
-     * \code{.cpp}
+     * @code{.cpp}
      * xarray<double> a = {{1,5,3}, {4,5,6}};
      * filtration(a, a >= 5) += 2;
      * std::cout << a << std::endl; // {{1, 7, 3}, {4, 7, 8}}
-     * \endcode
+     * @endcode
      */
     template <class E, class C>
     inline auto filtration(E&& e, C&& condition) noexcept

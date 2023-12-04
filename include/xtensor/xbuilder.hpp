@@ -772,13 +772,13 @@ namespace xt
      * @param axis axis along which elements are concatenated
      * @returns xgenerator evaluating to concatenated elements
      *
-     * \code{.cpp}
+     * @code{.cpp}
      * xt::xarray<double> a = {{1, 2, 3}};
      * xt::xarray<double> b = {{2, 3, 4}};
      * xt::xarray<double> c = xt::concatenate(xt::xtuple(a, b)); // => {{1, 2, 3},
      *                                                           //     {2, 3, 4}}
      * xt::xarray<double> d = xt::concatenate(xt::xtuple(a, b), 1); // => {{1, 2, 3, 2, 3, 4}}
-     * \endcode
+     * @endcode
      */
     template <class... CT>
     inline auto concatenate(std::tuple<CT...>&& t, std::size_t axis = 0)
@@ -823,7 +823,7 @@ namespace xt
      * @param axis axis along which elements are stacked
      * @returns xgenerator evaluating to stacked elements
      *
-     * \code{.cpp}
+     * @code{.cpp}
      * xt::xarray<double> a = {1, 2, 3};
      * xt::xarray<double> b = {5, 6, 7};
      * xt::xarray<double> s = xt::stack(xt::xtuple(a, b)); // => {{1, 2, 3},
@@ -831,7 +831,7 @@ namespace xt
      * xt::xarray<double> t = xt::stack(xt::xtuple(a, b), 1); // => {{1, 5},
      *                                                        //     {2, 6},
      *                                                        //     {3, 7}}
-     * \endcode
+     * @endcode
      */
     template <class... CT>
     inline auto stack(std::tuple<CT...>&& t, std::size_t axis = 0)
@@ -1093,12 +1093,12 @@ namespace xt
      *               from which the diagonals should be taken.
      * @returns xexpression with values of the diagonal
      *
-     * \code{.cpp}
+     * @code{.cpp}
      * xt::xarray<double> a = {{1, 2, 3},
      *                         {4, 5, 6}
      *                         {7, 8, 9}};
      * auto b = xt::diagonal(a); // => {1, 5, 9}
-     * \endcode
+     * @endcode
      */
     template <class E>
     inline auto diagonal(E&& arr, int offset = 0, std::size_t axis_1 = 0, std::size_t axis_2 = 1)
@@ -1145,12 +1145,12 @@ namespace xt
      * @param k the offset of the considered diagonal
      * @returns xexpression function with shape n x n and arr on the diagonal
      *
-     * \code{.cpp}
+     * @code{.cpp}
      * xt::xarray<double> a = {1, 5, 9};
      * auto b = xt::diag(a); // => {{1, 0, 0},
      *                       //     {0, 5, 0},
      *                       //     {0, 0, 9}}
-     * \endcode
+     * @endcode
      */
     template <class E>
     inline auto diag(E&& arr, int k = 0)

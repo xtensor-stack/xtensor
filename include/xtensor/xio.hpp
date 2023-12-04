@@ -129,11 +129,11 @@ namespace xt
          * io manipulator used to set the width of the lines when printing
          * an expression.
          *
-         * \code{.cpp}
+         * @code{.cpp}
          * using po = xt::print_options;
          * xt::xarray<double> a = {{1, 2, 3}, {4, 5, 6}};
          * std::cout << po::line_width(100) << a << std::endl;
-         * \endcode
+         * @endcode
          */
         DEFINE_LOCAL_PRINT_OPTION(line_width)
 
@@ -143,11 +143,11 @@ namespace xt
          * io manipulator used to set the threshold after which summarization is
          * triggered.
          *
-         * \code{.cpp}
+         * @code{.cpp}
          * using po = xt::print_options;
          * xt::xarray<double> a = xt::rand::randn<double>({2000, 500});
          * std::cout << po::threshold(50) << a << std::endl;
-         * \endcode
+         * @endcode
          */
         DEFINE_LOCAL_PRINT_OPTION(threshold)
 
@@ -157,11 +157,11 @@ namespace xt
          * io manipulator used to set the number of egde items if
          * the summarization is triggered.
          *
-         * \code{.cpp}
+         * @code{.cpp}
          * using po = xt::print_options;
          * xt::xarray<double> a = xt::rand::randn<double>({2000, 500});
          * std::cout << po::edge_items(5) << a << std::endl;
-         * \endcode
+         * @endcode
          */
         DEFINE_LOCAL_PRINT_OPTION(edge_items)
 
@@ -171,11 +171,11 @@ namespace xt
          * io manipulator used to set the precision of the floating point values
          * when printing an expression.
          *
-         * \code{.cpp}
+         * @code{.cpp}
          * using po = xt::print_options;
          * xt::xarray<double> a = xt::rand::randn<double>({2000, 500});
          * std::cout << po::precision(5) << a << std::endl;
-         * \endcode
+         * @endcode
          */
         DEFINE_LOCAL_PRINT_OPTION(precision)
     }

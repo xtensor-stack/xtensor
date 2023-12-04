@@ -213,7 +213,8 @@ namespace xt
         }
         return input_chunk_range_type{
             multiindex_iterator_begin<input_chunk_index_type>(input_chunks_begin, input_chunks_end),
-            multiindex_iterator_end<input_chunk_index_type>(input_chunks_begin, input_chunks_end)};
+            multiindex_iterator_end<input_chunk_index_type>(input_chunks_begin, input_chunks_end)
+        };
     }
 
     template <class CT, class F, class X, class O>

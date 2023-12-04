@@ -351,8 +351,8 @@ namespace xt
     {
         view_shape_type shape = {2, 3, 4};
         xarray<double, layout_type::row_major> a(shape);
-        std::vector<double> data = {
-            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
+        std::vector<double> data = {1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
+                                    13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
         std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
 
         auto view1 = view(a, range(0, 2), 1, range(1, 4));
@@ -392,11 +392,11 @@ namespace xt
     {
         view_shape_type shape = {2, 3, 4};
         xarray<double, layout_type::row_major> a(shape), res(shape);
-        std::vector<double> data = {
-            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
+        std::vector<double> data = {1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
+                                    13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
         std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
-        std::vector<double> data_res = {
-            1, 2, 3, 4, 5, 4, 4, 4, 9, 10, 11, 12, 13, 14, 15, 16, 17, 4, 4, 4, 21, 22, 23, 24};
+        std::vector<double> data_res = {1,  2,  3,  4,  5,  4, 4, 4, 9,  10, 11, 12,
+                                        13, 14, 15, 16, 17, 4, 4, 4, 21, 22, 23, 24};
         std::copy(data_res.cbegin(), data_res.cend(), res.template begin<layout_type::row_major>());
         auto view1 = view(a, range(0, 2), 1, range(1, 4));
         view1.fill(4);
@@ -407,8 +407,8 @@ namespace xt
     {
         view_shape_type shape = {2, 3, 4};
         xarray<double, layout_type::row_major> a(shape);
-        std::vector<double> data = {
-            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
+        std::vector<double> data = {1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
+                                    13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
         std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
 
         auto view1 = view(a, range(0, 2), 1, range(1, 4));
@@ -998,7 +998,8 @@ namespace xt
         xtensor<double, 3, layout_type::row_major> a = {
             {{1, 2, 3, 4}, {5, 6, 7, 8}},
             {{9, 10, 11, 12}, {13, 14, 15, 16}},
-            {{17, 18, 19, 20}, {21, 22, 23, 24}}};
+            {{17, 18, 19, 20}, {21, 22, 23, 24}}
+        };
 
         auto v1 = xt::view(a, keep(1), keep(0, 1), keep(0, 3));
         xtensor<double, 3> exp_v1 = {{{9, 12}, {13, 16}}};
@@ -1039,7 +1040,8 @@ namespace xt
         xtensor<double, 3, layout_type::row_major> a = {
             {{1, 2, 3, 4}, {5, 6, 7, 8}},
             {{9, 10, 11, 12}, {13, 14, 15, 16}},
-            {{17, 18, 19, 20}, {21, 22, 23, 24}}};
+            {{17, 18, 19, 20}, {21, 22, 23, 24}}
+        };
 
         auto v1 = xt::view(a, keep(-2), keep(-0, -1), keep(0, -1));
         xtensor<double, 3> exp_v1 = {{{9, 12}, {13, 16}}};
@@ -1060,7 +1062,8 @@ namespace xt
         xtensor<double, 3, layout_type::row_major> a = {
             {{1, 2, 3, 4}, {5, 6, 7, 8}},
             {{9, 10, 11, 12}, {13, 14, 15, 16}},
-            {{17, 18, 19, 20}, {21, 22, 23, 24}}};
+            {{17, 18, 19, 20}, {21, 22, 23, 24}}
+        };
 
         auto v1 = xt::view(a, drop(0, 2), keep(0, 1), drop(1, 2));
         xtensor<double, 3> exp_v1 = {{{9, 12}, {13, 16}}};
@@ -1097,7 +1100,8 @@ namespace xt
         xtensor<double, 3, layout_type::row_major> a = {
             {{1, 2, 3, 4}, {5, 6, 7, 8}},
             {{9, 10, 11, 12}, {13, 14, 15, 16}},
-            {{17, 18, 19, 20}, {21, 22, 23, 24}}};
+            {{17, 18, 19, 20}, {21, 22, 23, 24}}
+        };
 
         // auto v1 = xt::view(a, keep(-2), keep(-0, -1), keep(0, -1));
         auto v1 = xt::view(a, drop(-3, -1), keep(0, 1), drop(-3, -2));
@@ -1413,10 +1417,7 @@ namespace xt
 
         auto b = a * xt::view(a, xt::all(), xt::newaxis());
 
-        xt::xarray<double> exp = {
-            {0.015625, 0.125, -0.015625},
-            {0.125, 1., -0.125},
-            {-0.015625, -0.125, 0.015625}};
+        xt::xarray<double> exp = {{0.015625, 0.125, -0.015625}, {0.125, 1., -0.125}, {-0.015625, -0.125, 0.015625}};
 
         EXPECT_EQ(b, exp);
     }

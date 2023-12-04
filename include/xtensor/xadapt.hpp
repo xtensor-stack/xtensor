@@ -664,7 +664,7 @@ namespace xt
     /**
      * Adapt a smart pointer to a typed memory block (unique_ptr or shared_ptr)
      *
-     * \code{.cpp}
+     * @code{.cpp}
      * #include <xtensor/xadapt.hpp>
      * #include <xtensor/xio.hpp>
      *
@@ -674,7 +674,7 @@ namespace xt
      * auto xptr = adapt_smart_ptr(sptr, shape);
      * xptr(1, 3) = 123.;
      * std::cout << xptr;
-     * \endcode
+     * @endcode
      *
      * @ingroup xt_xadapt
      * @param smart_ptr a smart pointer to a memory block of T[]
@@ -701,7 +701,7 @@ namespace xt
      * a given shape and operate naturally on it. Memory will be automatically
      * handled by the smart pointer implementation.
      *
-     * \code{.cpp}
+     * @code{.cpp}
      * #include <xtensor/xadapt.hpp>
      * #include <xtensor/xio.hpp>
      *
@@ -733,7 +733,7 @@ namespace xt
      *                                shape, std::move(unique_buf));
      *     std::cout << obj << std::endl;
      * }
-     * \endcode
+     * @endcode
      *
      * @ingroup xt_xadapt
      * @param data_ptr A pointer to a typed data block (e.g. double*)
@@ -763,7 +763,7 @@ namespace xt
     /**
      * Adapt a smart pointer to a typed memory block (unique_ptr or shared_ptr)
      *
-     * \code{.cpp}
+     * @code{.cpp}
      * #include <xtensor/xadapt.hpp>
      * #include <xtensor/xio.hpp>
      *
@@ -772,7 +772,7 @@ namespace xt
      * auto xptr = adapt_smart_ptr(sptr, {4, 2});
      * xptr(1, 3) = 123.;
      * std::cout << xptr;
-     * \endcode
+     * @endcode
      *
      * @ingroup xt_xadapt
      * @param smart_ptr a smart pointer to a memory block of T[]
@@ -802,7 +802,7 @@ namespace xt
      * a given shape and operate naturally on it. Memory will be automatically
      * handled by the smart pointer implementation.
      *
-     * \code{.cpp}
+     * @code{.cpp}
      * #include <xtensor/xadapt.hpp>
      * #include <xtensor/xio.hpp>
      *
@@ -832,7 +832,7 @@ namespace xt
      *                                {2, 4}, std::move(unique_buf));
      *     std::cout << obj << std::endl;
      * }
-     * \endcode
+     * @endcode
      *
      * @ingroup xt_xadapt
      * @param data_ptr A pointer to a typed data block (e.g. double*)
@@ -868,14 +868,14 @@ namespace xt
      *
      * Construct for example with:
      *
-     * \code{.cpp}
+     * @code{.cpp}
      * #include <xtensor/xadapt.hpp>
      *
      * std::array<size_t, 2> shape = {2, 2};
      * std::vector<double> data = {1, 2, 3, 4};
      *
      * xt::xtensor_pointer<double, 2> a = xt::adapt(data.data(), 4, xt::no_ownership(), shape);
-     * \endcode
+     * @endcode
      *
      * @ingroup xt_xadapt
      * @tparam T The data type (e.g. ``double``).
@@ -893,14 +893,14 @@ namespace xt
      *
      * Construct for example with:
      *
-     * \code{.cpp}
+     * @code{.cpp}
      * #include <xtensor/xadapt.hpp>
      *
      * std::vector<int> data(4, 0);
      * xt::svector<size_t> shape({2, 2});
      *
      * xt::xarray_pointer<int> a = xt::adapt(data.data(), data.size(), xt::no_ownership(), shape);
-     * \endcode
+     * @endcode
      *
      * @ingroup xt_xadapt
      * @tparam T The data type (e.g. ``double``).

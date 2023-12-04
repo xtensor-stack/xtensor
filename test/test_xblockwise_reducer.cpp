@@ -128,7 +128,8 @@ namespace xt
                 dynamic_shape<std::size_t>({2}),
                 dynamic_shape<std::size_t>({0, 1}),
                 dynamic_shape<std::size_t>({0, 2}),
-                dynamic_shape<std::size_t>({0, 1, 2})};
+                dynamic_shape<std::size_t>({0, 1, 2})
+            };
 
             for (const auto& axes : axes_vec)
             {
@@ -199,7 +200,8 @@ namespace xt
                 dynamic_shape<std::size_t>({2}),
                 dynamic_shape<std::size_t>({0, 1}),
                 dynamic_shape<std::size_t>({0, 2}),
-                dynamic_shape<std::size_t>({0, 1, 2})};
+                dynamic_shape<std::size_t>({0, 1, 2})
+            };
 
             for (const auto& axes : axes_vec)
             {

@@ -132,8 +132,8 @@ namespace xt
     {
         view_shape_type shape = {2, 3, 4};
         xarray<double> a(shape);
-        std::vector<double> data{
-            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
+        std::vector<double> data{1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
+                                 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
         std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
 
         auto view1 = strided_view(a, xstrided_slice_vector({range(0, 2), 1, range(1, 4)}));
@@ -175,11 +175,11 @@ namespace xt
     {
         view_shape_type shape = {2, 3, 4};
         xarray<double> a(shape), res(shape);
-        std::vector<double> data{
-            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
+        std::vector<double> data{1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
+                                 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
         std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
-        std::vector<double> data_res = {
-            1, 2, 3, 4, 5, 4, 4, 4, 9, 10, 11, 12, 13, 14, 15, 16, 17, 4, 4, 4, 21, 22, 23, 24};
+        std::vector<double> data_res = {1,  2,  3,  4,  5,  4, 4, 4, 9,  10, 11, 12,
+                                        13, 14, 15, 16, 17, 4, 4, 4, 21, 22, 23, 24};
         std::copy(data_res.cbegin(), data_res.cend(), res.template begin<layout_type::row_major>());
         auto view1 = strided_view(a, xstrided_slice_vector({range(0, 2), 1, range(1, 4)}));
         view1.fill(4);
@@ -635,8 +635,8 @@ namespace xt
     {
         view_shape_type shape = {2, 3, 4};
         xarray<double, layout_type::row_major> a(shape);
-        std::vector<double> data = {
-            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
+        std::vector<double> data = {1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
+                                    13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
         std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
 
         auto view1 = strided_view(a, {range(0, 2), 1, range(1, 4)});
