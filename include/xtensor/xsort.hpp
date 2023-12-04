@@ -1173,7 +1173,7 @@ namespace xt
             {
                 auto begin = e.template begin<L>();
                 auto end = e.template end<L>();
-                // todo C++17 : constexpr 
+                // todo C++17 : constexpr
                 if (std::is_same<F, std::less<value_type>>::value)
                 {
                     std::size_t i = static_cast<std::size_t>(std::distance(begin, std::min_element(begin, end)));
