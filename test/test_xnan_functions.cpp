@@ -89,7 +89,8 @@ namespace xt
 
         xarray<double> exp = {
             {0, 0, 123},
-            {0.5123, std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max()}};
+            {0.5123, std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max()}
+        };
         xarray<double> assigned = exp;
         EXPECT_EQ(assigned, exp);
     }

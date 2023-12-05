@@ -244,11 +244,11 @@ namespace xt
      *
      * Note: ellipsis can only be used in strided_view!
      *
-     * \code{.cpp}
+     * @code{.cpp}
      * xarray<double> a = xarray<double>::from_shape({5, 5, 1, 1, 5});
      * auto v = xt::strided_view(a, {2, xt::ellipsis(), 2});
      * // equivalent to using {2, xt::all(), xt::all(), xt::all(), 2};
-     * \endcode
+     * @endcode
      *
      * @sa strided_view
      */
@@ -391,12 +391,12 @@ namespace xt
      * Create a non-contigous slice from a container of indices to keep.
      * Note: this slice cannot be used in the xstrided_view!
      *
-     * \code{.cpp}
+     * @code{.cpp}
      * xt::xarray<double> a = xt::arange(9);
      * a.reshape({3, 3});
      * xt::view(a, xt::keep(0, 2); // => {{0, 1, 2}, {6, 7, 8}}
      * xt::view(a, xt::keep(1, 1, 1); // => {{3, 4, 5}, {3, 4, 5}, {3, 4, 5}}
-     * \endcode
+     * @endcode
      *
      * @param indices The indices container
      * @return instance of xkeep_slice
@@ -516,11 +516,11 @@ namespace xt
      * Create a non-contigous slice from a container of indices to drop.
      * Note: this slice cannot be used in the xstrided_view!
      *
-     * \code{.cpp}
+     * @code{.cpp}
      * xt::xarray<double> a = xt::arange(9);
      * a.reshape({3, 3});
      * xt::view(a, xt::drop(0, 2); // => {{3, 4, 5}}
-     * \endcode
+     * @endcode
      *
      * @param indices The container of indices to drop
      * @return instance of xdrop_slice
@@ -804,13 +804,13 @@ namespace xt
      * Select a range from start_val to stop_val (excluded).
      * You can use the shorthand `_` syntax to select from the start or until the end.
      *
-     * \code{.cpp}
+     * @code{.cpp}
      * using namespace xt::placeholders;  // to enable _ syntax
      *
      * range(3, _)  // select from index 3 to the end
      * range(_, 5)  // select from index 0 to 5 (excluded)
      * range(_, _)  // equivalent to `all()`
-     * \endcode
+     * @endcode
      *
      * @sa view, strided_view
      */
@@ -828,10 +828,10 @@ namespace xt
      * Select a range from start_val to stop_val (excluded) with step
      * You can use the shorthand `_` syntax to select from the start or until the end.
      *
-     * \code{.cpp}
+     * @code{.cpp}
      * using namespace xt::placeholders;  // to enable _ syntax
      * range(3, _, 5)  // select from index 3 to the end with stepsize 5
-     * \endcode
+     * @endcode
      *
      * @sa view, strided_view
      */

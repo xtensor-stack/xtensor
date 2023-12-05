@@ -56,17 +56,19 @@ namespace xt
             EXPECT_TRUE(check_strided_assign(lhs, rhs));
         }
         {
-            auto data = std::vector<double>{
-                1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
+            auto data = std::vector<double>{1,  2,  3,  4,  5,  6,  7,  8,  9,  10,
+                                            11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
             auto simple_xtensor_12 = xt::xtensor<double, 2, layout_type::row_major>{
                 {1, 2, 3, 4},
                 {5, 6, 7, 8},
-                {9, 10, 11, 12}};
+                {9, 10, 11, 12}
+            };
             auto simple_xtensor_16 = xt::xtensor<double, 2, layout_type::row_major>{
                 {1, 2, 3, 4},
                 {5, 6, 7, 8},
                 {9, 10, 11, 12},
-                {13, 14, 15, 16}};
+                {13, 14, 15, 16}
+            };
             auto adapter_strided_noncont = xt::adapt(
                 data.data(),
                 12,
@@ -188,8 +190,8 @@ namespace xt
                 EXPECT_TRUE(check_strided_assign(linear_adapter2, strided_adapter));
                 EXPECT_TRUE(check_strided_assign(strided_adapter, linear_adapter2));
                 xt::noalias(strided_adapter) = linear_adapter2;
-                auto result_expected = std::vector<double>{
-                    -1, -1, 3, 4, -1, -1, 7, 8, -1, -1, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
+                auto result_expected = std::vector<double>{-1, -1, 3,  4,  -1, -1, 7,  8,  -1, -1,
+                                                           11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
                 EXPECT_EQ(data, result_expected);
             }
         }

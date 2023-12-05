@@ -276,12 +276,12 @@ namespace xt
      * it is possible.
      * @warning This method is NOT compatible with broadcasting, meaning the following
      *  code has undefined behavior:
-     * \code{.cpp}
+     * @code{.cpp}
      * xt::xarray<double> a = {{0, 1}, {2, 3}};
      * xt::xarray<double> b = {0, 1};
      * auto fd = a + b;
      * double res = fd.uncheked(0, 1);
-     * \endcode
+     * @endcode
      */
     template <class F, class R, class S>
     template <class... Args>
@@ -380,10 +380,10 @@ namespace xt
      * Reshapes the generator and keeps old elements. The `shape` argument can have one of its value
      * equal to `-1`, in this case the value is inferred from the number of elements in the generator
      * and the remaining values in the `shape`.
-     * \code{.cpp}
+     * @code{.cpp}
      * auto a = xt::arange<double>(50).reshape({-1, 10});
      * //a.shape() is {5, 10}
-     * \endcode
+     * @endcode
      * @param shape the new shape (has to have same number of elements as the original generator)
      */
     template <class F, class R, class S>

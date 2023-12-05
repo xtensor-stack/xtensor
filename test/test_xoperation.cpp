@@ -573,11 +573,8 @@ namespace xt
             EXPECT_EQ(expected, argwhere(a));
 
             int_container_2d b = {{0, 2, 1}, {2, 1, 0}};
-            std::vector<xindex_type_t<typename int_container_2d::shape_type>> expected_b = {
-                {0, 1},
-                {0, 2},
-                {1, 0},
-                {1, 1}};
+            std::vector<xindex_type_t<typename int_container_2d::shape_type>> expected_b =
+                {{0, 1}, {0, 2}, {1, 0}, {1, 1}};
             EXPECT_EQ(expected_b, argwhere(b));
 
             auto c = equal(b, 0);

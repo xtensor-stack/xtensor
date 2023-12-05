@@ -28,7 +28,8 @@ namespace xt
     {
         xarray<int> a = {
             {{0, 1, 2, 3}, {4, 5, 6, 7}, {8, 9, 10, 11}},
-            {{12, 13, 14, 15}, {16, 17, 18, 19}, {20, 21, 22, 23}}};
+            {{12, 13, 14, 15}, {16, 17, 18, 19}, {20, 21, 22, 23}}
+        };
 
         auto view0 = dynamic_view(a, xdynamic_slice_vector({1, keep(0, 2), range(1, 4)}));
         EXPECT_EQ(view0.dimension(), size_t(2));
@@ -78,7 +79,8 @@ namespace xt
     {
         xarray<int> a = {
             {{0, 1, 2, 3}, {4, 5, 6, 7}, {8, 9, 10, 11}},
-            {{12, 13, 14, 15}, {16, 17, 18, 19}, {20, 21, 22, 23}}};
+            {{12, 13, 14, 15}, {16, 17, 18, 19}, {20, 21, 22, 23}}
+        };
 
         auto view0 = dynamic_view(a, xdynamic_slice_vector({1, keep(0, 2), range(1, 4)}));
         auto iter = view0.template begin<layout_type::row_major>();
@@ -103,7 +105,8 @@ namespace xt
     {
         xarray<int> a = {
             {{0, 1, 2, 3}, {4, 5, 6, 7}, {8, 9, 10, 11}},
-            {{12, 13, 14, 15}, {16, 17, 18, 19}, {20, 21, 22, 23}}};
+            {{12, 13, 14, 15}, {16, 17, 18, 19}, {20, 21, 22, 23}}
+        };
 
         auto view0 = dynamic_view(a, xdynamic_slice_vector({1, drop(1), range(1, 4)}));
         EXPECT_EQ(view0.dimension(), size_t(2));
@@ -140,7 +143,8 @@ namespace xt
     {
         xarray<int> a = {
             {{0, 1, 2, 3}, {4, 5, 6, 7}, {8, 9, 10, 11}},
-            {{12, 13, 14, 15}, {16, 17, 18, 19}, {20, 21, 22, 23}}};
+            {{12, 13, 14, 15}, {16, 17, 18, 19}, {20, 21, 22, 23}}
+        };
 
         auto view0 = dynamic_view(a, xdynamic_slice_vector({1, drop(1), range(1, 4)}));
         auto iter = view0.template begin<layout_type::row_major>();
@@ -165,7 +169,8 @@ namespace xt
     {
         xarray<int> a = {
             {{0, 1, 2, 3}, {4, 5, 6, 7}, {8, 9, 10, 11}},
-            {{12, 13, 14, 15}, {16, 17, 18, 19}, {20, 21, 22, 23}}};
+            {{12, 13, 14, 15}, {16, 17, 18, 19}, {20, 21, 22, 23}}
+        };
 
         xarray<int> b1 = {{13, 14, 15}, {21, 22, 23}};
         xarray<int> b2 = {{0, 1, 2}, {3, 4, 5}};

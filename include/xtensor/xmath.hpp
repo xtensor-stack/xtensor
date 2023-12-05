@@ -1059,7 +1059,7 @@ namespace xt
      *
      * This function can be used to easily create performant xfunctions from lambdas:
      *
-     * \code{cpp}
+     * @code{cpp}
      * template <class E1>
      * inline auto square(E1&& e1) noexcept
      * {
@@ -1068,7 +1068,7 @@ namespace xt
      *     };
      *     return make_lambda_xfunction(std::move(fnct), std::forward<E1>(e1));
      * }
-     * \endcode
+     * @endcode
      *
      * Lambda function allow the reusal of a single arguments in multiple places (otherwise
      * only correctly possible when using xshared_expressions). ``auto`` lambda functions are
@@ -3257,9 +3257,9 @@ namespace xt
         {
             using value_type = typename std::decay<E1>::type::value_type;
 
-            std::size_t const na = e1.size();
-            std::size_t const nv = e2.size();
-            std::size_t const n = na - nv + 1;
+            const std::size_t na = e1.size();
+            const std::size_t nv = e2.size();
+            const std::size_t n = na - nv + 1;
             xt::xtensor<value_type, 1> out = xt::zeros<value_type>({n});
             for (std::size_t i = 0; i < n; i++)
             {
@@ -3276,14 +3276,14 @@ namespace xt
         {
             using value_type = typename std::decay<E1>::type::value_type;
 
-            std::size_t const na = e1.size();
-            std::size_t const nv = e2.size();
-            std::size_t const n = na + nv - 1;
+            const std::size_t na = e1.size();
+            const std::size_t nv = e2.size();
+            const std::size_t n = na + nv - 1;
             xt::xtensor<value_type, 1> out = xt::zeros<value_type>({n});
             for (std::size_t i = 0; i < n; i++)
             {
-                std::size_t const jmn = (i >= nv - 1) ? i - (nv - 1) : 0;
-                std::size_t const jmx = (i < na - 1) ? i : na - 1;
+                const std::size_t jmn = (i >= nv - 1) ? i - (nv - 1) : 0;
+                const std::size_t jmx = (i < na - 1) ? i : na - 1;
                 for (std::size_t j = jmn; j <= jmx; ++j)
                 {
                     out(i) += e1(j) * e2(i - j);

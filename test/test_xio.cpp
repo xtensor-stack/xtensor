@@ -223,7 +223,8 @@ namespace xt
         xarray<double> e{
             {{1, 2}, {3, 4}, {5, 6}, {7, 8}},
             {{9, 10}, {11, 12}, {7, 9}, {11, 14}},
-            {{5, 26}, {7, 8}, {10, 8}, {4, 3}}};
+            {{5, 26}, {7, 8}, {10, 8}, {4, 3}}
+        };
         std::stringstream out;
         out << e;
         EXPECT_EQ(threed_double, out.str());
@@ -241,7 +242,8 @@ namespace xt
     {
         xt::xarray<std::string> e = {
             {"some", "random very long and very very", "boring"},
-            {"strings", "in", "xtensor xarray"}};
+            {"strings", "in", "xtensor xarray"}
+        };
         std::stringstream out;
         out << e;
         EXPECT_EQ(long_strings, out.str());

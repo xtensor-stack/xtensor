@@ -276,7 +276,8 @@ namespace xt
     {
         xarray<double> arr{
             {1.0, std::numeric_limits<double>::quiet_NaN()},
-            {std::numeric_limits<double>::quiet_NaN(), 0.0}};
+            {std::numeric_limits<double>::quiet_NaN(), 0.0}
+        };
         xarray<bool> expected{{false, true}, {true, false}};
         EXPECT_TRUE(all(equal(expected, xt::isnan(arr))));
     }
@@ -955,7 +956,8 @@ namespace xt
                 420.,
                 460.,
                 500.,
-                540.};
+                540.
+            };
             xt::xarray<double> phase_deg = xt::fmod(xt::linspace<double>(0, 720, 19), 360) - 180;
             auto unwrapped = xt::unwrap(phase_deg, xnone(), -1, 360.0);
             EXPECT_TRUE(xt::allclose(expected, unwrapped));

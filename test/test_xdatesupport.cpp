@@ -73,7 +73,8 @@ namespace xt
         xarray<tp> tarr = {
             std::chrono::system_clock::now(),
             std::chrono::system_clock::now(),
-            std::chrono::system_clock::now()};
+            std::chrono::system_clock::now()
+        };
 
         auto hours = std::chrono::hours(15);
 

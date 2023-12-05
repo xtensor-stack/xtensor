@@ -26,7 +26,9 @@ namespace xt
 
         nlohmann::json ref = {
             {"text/html",
-             "<table style='border-style:solid;border-width:1px;'><tbody><tr><td style='font-family:monospace;' title='(0, 0)'><pre>  1.</pre></td><td style='font-family:monospace;' title='(0, 1)'><pre>  2.</pre></td><td style='font-family:monospace;' title='(0, 2)'><pre>  3.</pre></td><td style='font-family:monospace;' title='(0, 3)'><pre>  4.</pre></td></tr><tr><td style='font-family:monospace;' title='(1, 0)'><pre>  5.</pre></td><td style='font-family:monospace;' title='(1, 1)'><pre>  6.</pre></td><td style='font-family:monospace;' title='(1, 2)'><pre>  7.</pre></td><td style='font-family:monospace;' title='(1, 3)'><pre>  8.</pre></td></tr><tr><td style='font-family:monospace;' title='(2, 0)'><pre>  9.</pre></td><td style='font-family:monospace;' title='(2, 1)'><pre> 10.</pre></td><td style='font-family:monospace;' title='(2, 2)'><pre> 11.</pre></td><td style='font-family:monospace;' title='(2, 3)'><pre> 12.</pre></td></tr></tbody></table>"}};
+             "<table style='border-style:solid;border-width:1px;'><tbody><tr><td style='font-family:monospace;' title='(0, 0)'><pre>  1.</pre></td><td style='font-family:monospace;' title='(0, 1)'><pre>  2.</pre></td><td style='font-family:monospace;' title='(0, 2)'><pre>  3.</pre></td><td style='font-family:monospace;' title='(0, 3)'><pre>  4.</pre></td></tr><tr><td style='font-family:monospace;' title='(1, 0)'><pre>  5.</pre></td><td style='font-family:monospace;' title='(1, 1)'><pre>  6.</pre></td><td style='font-family:monospace;' title='(1, 2)'><pre>  7.</pre></td><td style='font-family:monospace;' title='(1, 3)'><pre>  8.</pre></td></tr><tr><td style='font-family:monospace;' title='(2, 0)'><pre>  9.</pre></td><td style='font-family:monospace;' title='(2, 1)'><pre> 10.</pre></td><td style='font-family:monospace;' title='(2, 2)'><pre> 11.</pre></td><td style='font-family:monospace;' title='(2, 3)'><pre> 12.</pre></td></tr></tbody></table>"
+            }
+        };
 
         EXPECT_EQ(ser, ref);
     }

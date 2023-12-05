@@ -770,21 +770,21 @@ namespace xt
      *
      * @return initialized strided_view according to slices
      *
-     * \code{.cpp}
+     * @code{.cpp}
      * xt::xarray<double> a = {{1, 2, 3}, {4, 5, 6}};
      * xt::xstrided_slice_vector sv({xt::range(0, 1)});
      * sv.push_back(xt::range(0, 3, 2));
      * auto v = xt::strided_view(a, sv);
      * // ==> {{1, 3}}
-     * \endcode
+     * @endcode
      *
      * You can also achieve the same with the following short-hand syntax:
      *
-     * \code{.cpp}
+     * @code{.cpp}
      * xt::xarray<double> a = {{1, 2, 3}, {4, 5, 6}};
      * auto v = xt::strided_view(a, {xt::range(0, 1), xt::range(0, 3, 2)});
      * // ==> {{1, 3}}
-     * \endcode
+     * @endcode
      */
     template <class E>
     inline auto strided_view(E&& e, const xstrided_slice_vector& slices)
