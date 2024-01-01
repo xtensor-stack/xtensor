@@ -497,20 +497,44 @@ namespace xt
             template <class It>
             inline value_type access(const tuple_type& t, size_type axis, It first, It last) const
             {
-                xindex index(first, last);
-                auto match = [&index, axis](auto& arr)
+                // trim off extra indices if provided to match behavior of containers
+                auto dim_offset = std::distance(first, last) - std::get<0>(t).dimension();
+                size_t axis_dim = *(first + axis + dim_offset);
+                auto match = [&](auto& arr)
                 {
-                    if (index[axis] >= arr.shape()[axis])
+                    if (axis_dim >= arr.shape()[axis])
                     {
-                        index[axis] -= arr.shape()[axis];
+                        axis_dim -= arr.shape()[axis];
                         return false;
                     }
                     return true;
                 };
 
-                auto get = [&index](auto& arr)
+                auto get = [&](auto& arr)
                 {
-                    return arr[index];
+                    size_t offset = 0;
+                    const size_t end = arr.dimension();
+                    for (size_t i = 0; i < end; i++)
+                    {
+                        const auto& shape = arr.shape();
+                        const size_t stride = std::accumulate(
+                            shape.begin() + i + 1,
+                            shape.end(),
+                            1,
+                            std::multiplies<size_t>()
+                        );
+                        if (i == axis)
+                        {
+                            offset += axis_dim * stride;
+                        }
+                        else
+                        {
+                            const auto len = (*(first + i + dim_offset));
+                            offset += len * stride;
+                        }
+                    }
+                    const auto element = arr.begin() + offset;
+                    return *element;
                 };
 
                 size_type i = 0;
