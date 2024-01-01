@@ -535,7 +535,7 @@ namespace xt
             using value_type = xtl::promote_type_t<typename std::decay_t<CT>::value_type...>;
 
             template <class It>
-            inline value_type access(const tuple_type& t, size_type axis, It first, It last) const
+            inline value_type access(const tuple_type& t, size_type axis, It first, It) const
             {
                 auto get_item = [&](auto& arr)
                 {
@@ -548,7 +548,8 @@ namespace xt
                         {
                             after_axis = true;
                         }
-                        const auto& stride = arr.strides()[i];
+                        const auto& shape = arr.shape();
+                        const size_t stride = std::accumulate(shape.begin() + i + 1, shape.end(), 1, std::multiplies<size_t>());
                         const auto len =  (*(first + i + after_axis));
                         offset += len * stride;
                     }
