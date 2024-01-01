@@ -542,15 +542,20 @@ namespace xt
                     size_t offset = 0;
                     const size_t end = arr.dimension();
                     bool after_axis = false;
-                    for(size_t i = 0; i < end; i++)
+                    for (size_t i = 0; i < end; i++)
                     {
-                        if(i == axis)
+                        if (i == axis)
                         {
                             after_axis = true;
                         }
                         const auto& shape = arr.shape();
-                        const size_t stride = std::accumulate(shape.begin() + i + 1, shape.end(), 1, std::multiplies<size_t>());
-                        const auto len =  (*(first + i + after_axis));
+                        const size_t stride = std::accumulate(
+                            shape.begin() + i + 1,
+                            shape.end(),
+                            1,
+                            std::multiplies<size_t>()
+                        );
+                        const auto len = (*(first + i + after_axis));
                         offset += len * stride;
                     }
                     const auto element = arr.begin() + offset;
@@ -565,6 +570,7 @@ namespace xt
         class vstack_access
         {
         public:
+
             using tuple_type = std::tuple<CT...>;
             using size_type = std::size_t;
             using value_type = xtl::promote_type_t<typename std::decay_t<CT>::value_type...>;
@@ -581,9 +587,11 @@ namespace xt
                     return concatonate.access(t, axis, first, last);
                 }
             }
+
         private:
+
             concatenate_access<CT...> concatonate;
-            stack_access<CT...>  stack;
+            stack_access<CT...> stack;
         };
 
         template <template <class...> class F, class... CT>
@@ -616,6 +624,7 @@ namespace xt
             }
 
         private:
+
             F<CT...> access_method;
             tuple_type m_t;
             size_type m_axis;
