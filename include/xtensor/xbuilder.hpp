@@ -565,12 +565,12 @@ namespace xt
                 {
                     size_t offset = 0;
                     const size_t end = arr.dimension();
-                    bool after_axis = false;
+                    size_t after_axis = 0;
                     for (size_t i = 0; i < end; i++)
                     {
                         if (i == axis)
                         {
-                            after_axis = true;
+                            after_axis = 1;
                         }
                         const auto& shape = arr.shape();
                         const size_t stride = std::accumulate(
