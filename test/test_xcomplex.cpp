@@ -308,15 +308,15 @@ namespace xt
     {
         using cmplx = std::complex<long double>;
         xt::xtensor<cmplx, 2> a = xt::empty<cmplx>({5, 5});
-        xt::real(a) = 123.321;
-        xt::imag(a) = -123.321;
+        xt::real(a) = 123.321L;
+        xt::imag(a) = -123.321L;
 
-        EXPECT_EQ(a(4, 4), cmplx(123.321, -123.321));
+        EXPECT_EQ(a(4, 4), cmplx(123.321L, -123.321L));
 
         xt::real(a) = xt::imag(a);
 
-        EXPECT_EQ(a(0, 0), cmplx(-123.321, -123.321));
-        EXPECT_EQ(a(4, 4), cmplx(-123.321, -123.321));
+        EXPECT_EQ(a(0, 0), cmplx(-123.321L, -123.321L));
+        EXPECT_EQ(a(4, 4), cmplx(-123.321L, -123.321L));
     }
 
     TEST(xcomplex, build_from_double)
