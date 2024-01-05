@@ -159,11 +159,11 @@ namespace xt
         ASSERT_EQ(m_assigned(10), 15.f);
         ASSERT_EQ(m_assigned(3), 11.5f);
 
-        auto l3 = arange<float>(0, 1, 0.3f);
+        auto l3 = arange<float>(0, 0.99f, 0.25f);
         decltype(l3)::shape_type expected_shape_2 = {4};
         ASSERT_EQ(l3.shape(), expected_shape_2);
         ASSERT_EQ(l3[{0}], 0.f);
-        ASSERT_EQ(3.f * 0.3f, l3[{3}]);
+        ASSERT_EQ(0.25f * 3.f, l3[{3}]);
 
         auto l4 = arange<int>(0, 10, 3);
         ASSERT_EQ(l4.shape(), expected_shape_2);
