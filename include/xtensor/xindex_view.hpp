@@ -15,6 +15,7 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include <array>
 
 #include "xexpression.hpp"
 #include "xiterable.hpp"
@@ -791,7 +792,7 @@ namespace xt
     inline auto index_view(E&& e, const xindex (&indices)[L]) noexcept
     {
         using view_type = xindex_view<xclosure_t<E>, std::array<xindex, L>>;
-        return view_type(std::forward<E>(e), to_array(indices));
+        return view_type(std::forward<E>(e), xt::to_array(indices));
     }
 
     /**
