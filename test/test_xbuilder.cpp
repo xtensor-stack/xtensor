@@ -453,7 +453,7 @@ namespace xt
         ASSERT_EQ(11, c(1, 1, 1, 2));
         ASSERT_EQ(11, c(1, 1, 2, 2));
 
-        auto e = arange(1, 4);
+        xarray<double> e = arange(1, 4);
         xarray<double> f = {2, 3, 4};
         xarray<double> k = stack(xtuple(e, f));
         xarray<double> l = stack(xtuple(e, f), 1);
