@@ -11,6 +11,7 @@
 #define XTENSOR_INDEX_VIEW_HPP
 
 #include <algorithm>
+#include <array>
 #include <cstddef>
 #include <tuple>
 #include <type_traits>
@@ -791,7 +792,7 @@ namespace xt
     inline auto index_view(E&& e, const xindex (&indices)[L]) noexcept
     {
         using view_type = xindex_view<xclosure_t<E>, std::array<xindex, L>>;
-        return view_type(std::forward<E>(e), to_array(indices));
+        return view_type(std::forward<E>(e), xt::to_array(indices));
     }
 
     /**
