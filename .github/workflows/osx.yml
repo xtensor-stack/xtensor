@@ -1,0 +1,50 @@
+name: OSX
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches: [master]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.job }}-${{ github.ref }}
+  cancel-in-progress: true
+defaults:
+  run:
+    shell: bash -e -l {0}
+jobs:
+  build:
+    runs-on: macos-${{ matrix.os }}
+    name: macos-${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+        - 11
+        - 12
+
+    steps:
+
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set conda environment
+      uses: mamba-org/setup-micromamba@main
+      with:
+        environment-name: myenv
+        environment-file: environment-dev.yml
+        init-shell: bash
+        cache-downloads: true
+
+    - name: Configure using CMake
+      run: cmake -Bbuild -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON
+
+    - name: Install
+      working-directory: build
+      run: cmake --install .
+
+    - name: Build
+      working-directory: build
+      run: cmake --build . --target test_xtensor_lib --parallel 8
+
+    - name: Run tests
+      working-directory: build
+      run: ctest -R ^xtest$ --output-on-failure
