@@ -11,11 +11,11 @@
 #define XTENSOR_INDEX_VIEW_HPP
 
 #include <algorithm>
+#include <array>
 #include <cstddef>
 #include <tuple>
 #include <type_traits>
 #include <utility>
-#include <array>
 
 #include "xexpression.hpp"
 #include "xiterable.hpp"
