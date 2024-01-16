@@ -1,0 +1,63 @@
+name: Windows
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches: [master]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.job }}-${{ github.ref }}
+  cancel-in-progress: true
+defaults:
+  run:
+    shell: bash -e -l {0}
+jobs:
+  build:
+    runs-on: ${{ matrix.runs-on }}
+    name: ${{ matrix.sys.compiler }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runs-on: [windows-latest]
+        sys:
+        - {compiler: default}
+        - {compiler: clang}
+
+    steps:
+
+    - name: Setup MSVC
+      if: matrix.sys.compiler == 'default'
+      uses: ilammy/msvc-dev-cmd@v1
+
+    - name: Setup clang
+      if: matrix.sys.compiler == 'clang'
+      run: |
+        echo "CC=clang" >> $GITHUB_ENV
+        echo "CXX=clang++" >> $GITHUB_ENV
+
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set conda environment
+      uses: mamba-org/setup-micromamba@main
+      with:
+        environment-name: myenv
+        environment-file: environment-dev.yml
+        init-shell: bash
+        cache-downloads: true
+        create-args: |
+          ninja
+
+    - name: Configure using CMake
+      run: cmake -Bbuild -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON -G Ninja
+
+    - name: Install
+      working-directory: build
+      run: cmake --install .
+
+    - name: Build
+      working-directory: build
+      run: cmake --build . --target test_xtensor_lib --parallel 8
+
+    - name: Run tests
+      working-directory: build
+      run: ctest -R ^xtest$ --output-on-failure
