@@ -11,8 +11,8 @@
 #define XTENSOR_CONFIG_HPP
 
 #define XTENSOR_VERSION_MAJOR 0
-#define XTENSOR_VERSION_MINOR 24
-#define XTENSOR_VERSION_PATCH 7
+#define XTENSOR_VERSION_MINOR 25
+#define XTENSOR_VERSION_PATCH 0
 
 
 // Define if the library is going to be using exceptions.

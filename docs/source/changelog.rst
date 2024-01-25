@@ -7,6 +7,38 @@
 Changelog
 =========
 
+0.25.0
+------
+
+- Fix conversion warning in xrepeat
+  `# 2732 https://github.com/xtensor-stack/xtensor/pull/2732`
+- Upraded to xsimd 11
+  `# 2735 https://github.com/xtensor-stack/xtensor/pull/2735`
+- Update to use XTENSOR_DEFAULT_ALIGNMENT when using XSIMD
+  `# 2739 https://github.com/xtensor-stack/xtensor/pull/2739`
+- Removed failing test xinfo on clang 16
+  `# 2740 https://github.com/xtensor-stack/xtensor/pull/2740`
+- [CI] Switching to mamba-org/setup-micromamba
+  `# 2742 https://github.com/xtensor-stack/xtensor/pull/2742`
+- Bump cmake version and resolve build issues
+  `# 2744 https://github.com/xtensor-stack/xtensor/pull/2744`
+- Make reshape_view accept -1 as a wildcard dimension
+  `# 2746 https://github.com/xtensor-stack/xtensor/pull/2746`
+- Fixing bug in argmin/argmax called with axis on rank-1 container
+  `# 2753 https://github.com/xtensor-stack/xtensor/pull/2753`
+- pre-commit autoupdate
+  `# 2754 https://github.com/xtensor-stack/xtensor/pull/2754`
+- Use L suffix for long double constants
+  `# 2762 https://github.com/xtensor-stack/xtensor/pull/2762`
+- Use 1/4 step for testing arange
+  `# 2763 https://github.com/xtensor-stack/xtensor/pull/2763`
+- [Optimization] Updated concatenate_access and stack_access to remove allocations
+  `# 2759 https://github.com/xtensor-stack/xtensor/pull/2759`
+- [CI] Added more compilers
+  `# 2767 https://github.com/xtensor-stack/xtensor/pull/2767`
+- Minor xindex_view to_array cleanup
+  `# 2765 https://github.com/xtensor-stack/xtensor/pull/2765`
+
 0.24.7
 ------
 
