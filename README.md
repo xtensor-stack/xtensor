@@ -1,8 +1,8 @@
 # ![xtensor](docs/source/xtensor.svg)
 
-![linux](https://github.com/xtensor-stack/xtensor/actions/workflows/linux.yml/badge.svg)
-![osx](https://github.com/xtensor-stack/xtensor/actions/workflows/osx.yml/badge.svg)
-![windows](https://github.com/xtensor-stack/xtensor/actions/workflows/windows.yml/badge.svg)
+[![GHA Linux](https://github.com/xtensor-stack/xtensor/actions/workflows/linux.yml/badge.svg)](https://github.com/xtensor-stack/xtensor/actions/workflows/linux.yml)
+[![GHA OSX](https://github.com/xtensor-stack/xtensor/actions/workflows/osx.yml/badge.svg)](https://github.com/xtensor-stack/xtensor/actions/workflows/osx.yml)
+[![GHA Windows](https://github.com/xtensor-stack/xtensor/actions/workflows/windows.yml/badge.svg)](https://github.com/xtensor-stack/xtensor/actions/workflows/windows.yml)
 [![Documentation](http://readthedocs.org/projects/xtensor/badge/?version=latest)](https://xtensor.readthedocs.io/en/latest/?badge=latest)
 [![Doxygen -> gh-pages](https://github.com/xtensor-stack/xtensor/workflows/gh-pages/badge.svg)](https://xtensor-stack.github.io/xtensor)
 [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/xtensor-stack/xtensor/stable?filepath=notebooks%2Fxtensor.ipynb)
