@@ -118,6 +118,29 @@ namespace xt
         return linear_end(c.expression());
     }
 
+    /*************************************
+     * overlapping_memory_checker_traits *
+     *************************************/
+
+    template <class E>
+    struct overlapping_memory_checker_traits<
+        E,
+        std::enable_if_t<!has_memory_address<E>::value && is_specialization_of<xbroadcast, E>::value>>
+    {
+        static bool check_overlap(const E& expr, const memory_range& dst_range)
+        {
+            if (expr.size() == 0)
+            {
+                return false;
+            }
+            else
+            {
+                using ChildE = std::decay_t<decltype(expr.expression())>;
+                return overlapping_memory_checker_traits<ChildE>::check_overlap(expr.expression(), dst_range);
+            }
+        }
+    };
+
     /**
      * @class xbroadcast
      * @brief Broadcasted xexpression to a specified shape.
