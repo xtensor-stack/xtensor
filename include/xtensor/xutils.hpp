@@ -793,8 +793,8 @@ namespace xt
     {
         using base_type = A;
         using value_type = typename A::value_type;
-        using reference = value_type &;
-        using const_reference = const value_type &;
+        using reference = value_type&;
+        using const_reference = const value_type&;
         using pointer = typename std::allocator_traits<A>::pointer;
         using const_pointer = typename std::allocator_traits<A>::const_pointer;
         using size_type = typename std::allocator_traits<A>::size_type;
