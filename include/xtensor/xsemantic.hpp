@@ -217,6 +217,29 @@ namespace xt
     template <class E, class R = void>
     using disable_xcontainer_semantics = typename std::enable_if<!has_container_semantics<E>::value, R>::type;
 
+
+    template <class D>
+    class xview_semantic;
+
+    template <class E>
+    struct overlapping_memory_checker_traits<
+        E,
+        std::enable_if_t<!has_memory_address<E>::value && is_crtp_base_of<xview_semantic, E>::value>>
+    {
+        static bool check_overlap(const E& expr, const memory_range& dst_range)
+        {
+            if (expr.size() == 0)
+            {
+                return false;
+            }
+            else
+            {
+                using ChildE = std::decay_t<decltype(expr.expression())>;
+                return overlapping_memory_checker_traits<ChildE>::check_overlap(expr.expression(), dst_range);
+            }
+        }
+    };
+
     /**
      * @class xview_semantic
      * @brief Implementation of the xsemantic_base interface for
@@ -598,8 +621,22 @@ namespace xt
     template <class E>
     inline auto xsemantic_base<D>::operator=(const xexpression<E>& e) -> derived_type&
     {
+#ifdef XTENSOR_FORCE_TEMPORARY_MEMORY_IN_ASSIGNMENTS
         temporary_type tmp(e);
         return this->derived_cast().assign_temporary(std::move(tmp));
+#else
+        auto&& this_derived = this->derived_cast();
+        auto memory_checker = make_overlapping_memory_checker(this_derived);
+        if (memory_checker.check_overlap(e.derived_cast()))
+        {
+            temporary_type tmp(e);
+            return this_derived.assign_temporary(std::move(tmp));
+        }
+        else
+        {
+            return this->assign(e);
+        }
+#endif
     }
 
     /**************************************

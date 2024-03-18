@@ -76,6 +76,21 @@ namespace xt
         using size_type = std::size_t;
     };
 
+    /*************************************
+     * overlapping_memory_checker_traits *
+     *************************************/
+
+    template <class E>
+    struct overlapping_memory_checker_traits<
+        E,
+        std::enable_if_t<!has_memory_address<E>::value && is_specialization_of<xgenerator, E>::value>>
+    {
+        static bool check_overlap(const E&, const memory_range&)
+        {
+            return false;
+        }
+    };
+
     /**
      * @class xgenerator
      * @brief Multidimensional function operating on indices.

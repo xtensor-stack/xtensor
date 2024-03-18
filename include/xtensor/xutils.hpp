@@ -119,6 +119,20 @@ namespace xt
         using type = T;
     };
 
+    /***************************************
+     * is_specialization_of implementation *
+     ***************************************/
+
+    template <template <class...> class TT, class T>
+    struct is_specialization_of : std::false_type
+    {
+    };
+
+    template <template <class...> class TT, class... Ts>
+    struct is_specialization_of<TT, TT<Ts...>> : std::true_type
+    {
+    };
+
     /*******************************
      * remove_class implementation *
      *******************************/
@@ -859,6 +873,139 @@ namespace xt
         : std::true_type
     {
     };
+
+    /*************************************
+     * overlapping_memory_checker_traits *
+     *************************************/
+
+    template <class T, class Enable = void>
+    struct has_memory_address : std::false_type
+    {
+    };
+
+    template <class T>
+    struct has_memory_address<T, void_t<decltype(std::addressof(*std::declval<T>().begin()))>> : std::true_type
+    {
+    };
+
+    struct memory_range
+    {
+        // Checking pointer overlap is more correct in integer values,
+        // for more explanation check https://devblogs.microsoft.com/oldnewthing/20170927-00/?p=97095
+        const uintptr_t m_first = 0;
+        const uintptr_t m_last = 0;
+
+        explicit memory_range() = default;
+
+        template <class T>
+        explicit memory_range(T* first, T* last)
+            : m_first(reinterpret_cast<uintptr_t>(last < first ? last : first))
+            , m_last(reinterpret_cast<uintptr_t>(last < first ? first : last))
+        {
+        }
+
+        template <class T>
+        bool overlaps(T* first, T* last) const
+        {
+            if (first <= last)
+            {
+                return reinterpret_cast<uintptr_t>(first) <= m_last
+                       && reinterpret_cast<uintptr_t>(last) >= m_first;
+            }
+            else
+            {
+                return reinterpret_cast<uintptr_t>(last) <= m_last
+                       && reinterpret_cast<uintptr_t>(first) >= m_first;
+            }
+        }
+    };
+
+    template <class E, class Enable = void>
+    struct overlapping_memory_checker_traits
+    {
+        static bool check_overlap(const E&, const memory_range&)
+        {
+            return true;
+        }
+    };
+
+    template <class E>
+    struct overlapping_memory_checker_traits<E, std::enable_if_t<has_memory_address<E>::value>>
+    {
+        static bool check_overlap(const E& expr, const memory_range& dst_range)
+        {
+            if (expr.size() == 0)
+            {
+                return false;
+            }
+            else
+            {
+                return dst_range.overlaps(std::addressof(*expr.begin()), std::addressof(*expr.rbegin()));
+            }
+        }
+    };
+
+    struct overlapping_memory_checker_base
+    {
+        memory_range m_dst_range;
+
+        explicit overlapping_memory_checker_base() = default;
+
+        explicit overlapping_memory_checker_base(memory_range dst_memory_range)
+            : m_dst_range(std::move(dst_memory_range))
+        {
+        }
+
+        template <class E>
+        bool check_overlap(const E& expr) const
+        {
+            if (!m_dst_range.m_first || !m_dst_range.m_last)
+            {
+                return false;
+            }
+            else
+            {
+                return overlapping_memory_checker_traits<E>::check_overlap(expr, m_dst_range);
+            }
+        }
+    };
+
+    template <class Dst, class Enable = void>
+    struct overlapping_memory_checker : overlapping_memory_checker_base
+    {
+        explicit overlapping_memory_checker(const Dst&)
+            : overlapping_memory_checker_base()
+        {
+        }
+    };
+
+    template <class Dst>
+    struct overlapping_memory_checker<Dst, std::enable_if_t<has_memory_address<Dst>::value>>
+        : overlapping_memory_checker_base
+    {
+        explicit overlapping_memory_checker(const Dst& aDst)
+            : overlapping_memory_checker_base(
+                [&]()
+                {
+                    if (aDst.size() == 0)
+                    {
+                        return memory_range();
+                    }
+                    else
+                    {
+                        return memory_range(std::addressof(*aDst.begin()), std::addressof(*aDst.rbegin()));
+                    }
+                }()
+            )
+        {
+        }
+    };
+
+    template <class Dst>
+    auto make_overlapping_memory_checker(const Dst& a_dst)
+    {
+        return overlapping_memory_checker<Dst>(a_dst);
+    }
 
     /********************
      * rebind_container *

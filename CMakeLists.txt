@@ -199,6 +199,7 @@ target_link_libraries(xtensor INTERFACE xtl)
 
 OPTION(XTENSOR_ENABLE_ASSERT "xtensor bound check" OFF)
 OPTION(XTENSOR_CHECK_DIMENSION "xtensor dimension check" OFF)
+OPTION(XTENSOR_FORCE_TEMPORARY_MEMORY_IN_ASSIGNMENTS "xtensor force the use of temporary memory when assigning instead of an automatic overlap check" ON)
 OPTION(BUILD_TESTS "xtensor test suite" OFF)
 OPTION(BUILD_BENCHMARK "xtensor benchmark" OFF)
 OPTION(DOWNLOAD_GTEST "build gtest from downloaded sources" OFF)
@@ -217,6 +218,10 @@ endif()
 
 if(XTENSOR_CHECK_DIMENSION)
     add_definitions(-DXTENSOR_ENABLE_CHECK_DIMENSION)
+endif()
+
+if(XTENSOR_FORCE_TEMPORARY_MEMORY_IN_ASSIGNMENTS)
+    add_definitions(-DXTENSOR_FORCE_TEMPORARY_MEMORY_IN_ASSIGNMENTS)
 endif()
 
 if(DEFAULT_COLUMN_MAJOR)
