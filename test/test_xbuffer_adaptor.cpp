@@ -76,9 +76,9 @@ namespace xt
     {
     public:
 
-        size_t* allocate(size_t n, const void* hint = 0)
+        size_t* allocate(size_t n)
         {
-            size_t* res = std::allocator<size_t>::allocate(n, hint);
+            size_t* res = std::allocator<size_t>::allocate(n);
             // store the size into the result so we can
             // check if the size is correct when we deallocate.
             res[0] = n;
