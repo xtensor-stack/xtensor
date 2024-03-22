@@ -7,6 +7,8 @@
  * The full license is in the file LICENSE, distributed with this software. *
  ****************************************************************************/
 
+#include <memory>
+
 #include "xtensor/xbuffer_adaptor.hpp"
 
 #include "test_common_macros.hpp"
@@ -215,5 +217,26 @@ namespace xt
         EXPECT_EQ(data[size - 1], 1.2);
 
         delete[] data;
+    }
+
+    TEST(xbuffer_adaptor, shared_owner)
+    {
+        using T = double;
+        using xbuf = xbuffer_adaptor<T, xt::smart_ownership, std::shared_ptr<T[]>>;
+        size_t size = 100;
+        auto data = std::shared_ptr<T[]>(new T[size]);
+
+        xbuf adapt(data.get(), size, data);
+        xbuf adapt2(adapt);
+        EXPECT_EQ(adapt.size(), adapt2.size());
+        EXPECT_EQ(adapt.data(), adapt2.data());
+
+        xbuf adapt3(std::move(adapt2));
+        EXPECT_EQ(adapt.size(), adapt3.size());
+        EXPECT_EQ(adapt.data(), adapt3.data());
+
+        size_t size2 = 50;
+        XT_EXPECT_THROW(adapt.resize(size2), std::runtime_error);
+        XT_EXPECT_NO_THROW(adapt.resize(size));
     }
 }
