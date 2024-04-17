@@ -30,7 +30,7 @@
 
 #include "xtensor_config.hpp"
 
-#if (_MSC_VER >= 1910)
+#if (defined(_MSC_VER) && _MSC_VER >= 1910)
 #define NOEXCEPT(T)
 #else
 #define NOEXCEPT(T) noexcept(T)
