@@ -162,6 +162,42 @@ namespace xt
     {
     };
 
+    /*************************************
+     * overlapping_memory_checker_traits *
+     *************************************/
+
+    template <class E>
+    struct overlapping_memory_checker_traits<
+        E,
+        std::enable_if_t<!has_memory_address<E>::value && is_specialization_of<xfunction, E>::value>>
+    {
+        template <std::size_t I = 0, class... T, std::enable_if_t<(I == sizeof...(T)), int> = 0>
+        static bool check_tuple(const std::tuple<T...>&, const memory_range&)
+        {
+            return false;
+        }
+
+        template <std::size_t I = 0, class... T, std::enable_if_t<(I < sizeof...(T)), int> = 0>
+        static bool check_tuple(const std::tuple<T...>& t, const memory_range& dst_range)
+        {
+            using ChildE = std::decay_t<decltype(std::get<I>(t))>;
+            return overlapping_memory_checker_traits<ChildE>::check_overlap(std::get<I>(t), dst_range)
+                   || check_tuple<I + 1>(t, dst_range);
+        }
+
+        static bool check_overlap(const E& expr, const memory_range& dst_range)
+        {
+            if (expr.size() == 0)
+            {
+                return false;
+            }
+            else
+            {
+                return check_tuple(expr.arguments(), dst_range);
+            }
+        }
+    };
+
     /*************
      * xfunction *
      *************/
