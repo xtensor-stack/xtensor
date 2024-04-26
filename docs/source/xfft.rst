@@ -6,12 +6,12 @@ xfft
 
 Defined in ``xtensor/xfft.hpp``
 
-.. doxygenclass:: xt::fft_convolve
+.. doxygenclass:: xt::fft::convolve
    :project: xtensor
    :members:
 
-.. doxygentypedef:: xt::fft
+.. doxygentypedef:: xt::fft::fft
    :project: xtensor
 
-.. doxygentypedef:: xt::ifft
+.. doxygentypedef:: xt::fft::ifft
    :project: xtensor

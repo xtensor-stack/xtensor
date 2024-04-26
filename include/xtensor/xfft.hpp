@@ -153,7 +153,7 @@ namespace xt
         }
 
         /**
-         * @breif 1D FFT of an Nd array along a specified axis
+         * @brief 1D FFT of an Nd array along a specified axis
          * @param e an Nd expression to be transformed to the fourier domain
          * @param axis the axis along which to perform the 1D FFT
          * @return a transformed xarray of the specified precision
