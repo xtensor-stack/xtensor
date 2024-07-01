@@ -186,6 +186,7 @@ set(XTENSOR_TESTS
     test_xdynamic_view.cpp
     test_xfunctor_adaptor.cpp
     test_xfixed.cpp
+    test_xfft.cpp
     test_xhistogram.cpp
     test_xpad.cpp
     test_xindex_view.cpp
