@@ -807,12 +807,12 @@ namespace xt
     {
         using base_type = A;
         using value_type = typename A::value_type;
-        using reference = typename A::reference;
-        using const_reference = typename A::const_reference;
-        using pointer = typename A::pointer;
-        using const_pointer = typename A::const_pointer;
-        using size_type = typename A::size_type;
-        using difference_type = typename A::difference_type;
+        using reference = value_type&;
+        using const_reference = const value_type&;
+        using pointer = typename std::allocator_traits<A>::pointer;
+        using const_pointer = typename std::allocator_traits<A>::const_pointer;
+        using size_type = typename std::allocator_traits<A>::size_type;
+        using difference_type = typename std::allocator_traits<A>::difference_type;
 
         tracking_allocator() = default;
 
@@ -835,9 +835,13 @@ namespace xt
             return base_type::allocate(n);
         }
 
-        using base_type::construct;
         using base_type::deallocate;
+
+// Construct and destroy are removed in --std=c++-20
+#if ((defined(__cplusplus) && __cplusplus < 202002L) || (defined(_MSVC_LANG) && _MSVC_LANG < 202002L))
+        using base_type::construct;
         using base_type::destroy;
+#endif
 
         template <class U>
         struct rebind
