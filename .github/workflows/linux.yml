@@ -12,23 +12,24 @@ defaults:
     shell: bash -e -l {0}
 jobs:
   build:
-    runs-on: ubuntu-20.04
     name: ${{ matrix.sys.compiler }} ${{ matrix.sys.version }} - ${{ matrix.sys.name }}
     strategy:
       fail-fast: false
       matrix:
         sys:
-        - {compiler: clang, version: '15', name: assert, flags: -DXTENSOR_ENABLE_ASSERT=ON}
-        - {compiler: clang, version: '16', name: column-major, flags: -DDEFAULT_COLUMN_MAJOR=ON}
-        - {compiler: gcc, version: '8', name: openmp, flags: -DXTENSOR_USE_OPENMP=ON}
-        - {compiler: gcc, version: '9', name: noexcept, flags: -DXTENSOR_DISABLE_EXCEPTIONS=ON}
-        - {compiler: gcc, version: '10', name: xsimd, flags: -DXTENSOR_USE_XSIMD=ON}
-        - {compiler: gcc, version: '11', name: c++17, flags: -DCPP17=ON}
-        - {compiler: gcc, version: '11', name: xsimd-tbb, flags: -DXTENSOR_USE_XSIMD=ON -DXTENSOR_USE_TBB=ON}
-        - {compiler: gcc, version: '11', name: tbb, flags: -DXTENSOR_USE_TBB=ON -DTBB_INCLUDE_DIR=$CONDA_PREFIX/include -DTBB_LIBRARY=$CONDA_PREFIX/lib}
-
+        - {os: ubuntu-20.04, compiler: clang, version: '15', name: assert, flags: -DXTENSOR_ENABLE_ASSERT=ON}
+        - {os: ubuntu-20.04, compiler: clang, version: '16', name: column-major, flags: -DDEFAULT_COLUMN_MAJOR=ON}
+        - {os: ubuntu-20.04, compiler: gcc, version: '8', name: openmp, flags: -DXTENSOR_USE_OPENMP=ON}
+        - {os: ubuntu-20.04, compiler: gcc, version: '9', name: noexcept, flags: -DXTENSOR_DISABLE_EXCEPTIONS=ON}
+        - {os: ubuntu-22.04, compiler: gcc, version: '10', name: xsimd, flags: -DXTENSOR_USE_XSIMD=ON}
+        - {os: ubuntu-22.04, compiler: gcc, version: '11', name: c++17, flags: -DCPP17=ON}
+        - {os: ubuntu-22.04, compiler: gcc, version: '11', name: xsimd-tbb, flags: -DXTENSOR_USE_XSIMD=ON -DXTENSOR_USE_TBB=ON}
+        - {os: ubuntu-22.04, compiler: gcc, version: '11', name: tbb, flags: -DXTENSOR_USE_TBB=ON -DTBB_INCLUDE_DIR=$CONDA_PREFIX/include -DTBB_LIBRARY=$CONDA_PREFIX/lib}
+        - {os: ubuntu-22.04, compiler: gcc, version: '12', name: c++17, flags: -DCPP17=ON}
+        - {os: ubuntu-22.04, compiler: gcc, version: '12', name: xsimd-tbb, flags: -DXTENSOR_USE_XSIMD=ON -DXTENSOR_USE_TBB=ON}
+        - {os: ubuntu-22.04, compiler: gcc, version: '12', name: tbb, flags: -DXTENSOR_USE_TBB=ON -DTBB_INCLUDE_DIR=$CONDA_PREFIX/include -DTBB_LIBRARY=$CONDA_PREFIX/lib}
+    runs-on: ${{ matrix.sys.os }}
     steps:
-
     - name: Setup GCC
       if: ${{ matrix.sys.compiler == 'gcc' }}
       run: |
@@ -39,7 +40,6 @@ jobs:
         echo "CC=$CC" >> $GITHUB_ENV
         CXX=g++-$GCC_VERSION
         echo "CXX=$CXX" >> $GITHUB_ENV
-
     - name: Setup clang
       if: ${{ matrix.sys.compiler == 'clang' }}
       run: |
