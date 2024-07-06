@@ -466,9 +466,9 @@ namespace xt
 
     /**
      * @ingroup bitwise_operators
-     * @brief Bitwise left shift
+     * @brief Bitwise right shift
      *
-     * Returns an \ref xfunction for the element-wise bitwise left shift of e1
+     * Returns an \ref xfunction for the element-wise bitwise right shift of e1
      * by e2.
      * @param e1 an \ref xexpression
      * @param e2 an \ref xexpression
