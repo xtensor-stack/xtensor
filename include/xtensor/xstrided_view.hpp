@@ -55,7 +55,7 @@ namespace xt
 
     namespace detail
     {
-                template <class C, class = void_t<>>
+        template <class C, class = void_t<>>
         struct get_linear_iterator : std::false_type
         {
             using iterator = typename C::iterator;
@@ -183,7 +183,8 @@ namespace xt
 
         using linear_iterator = typename detail::get_linear_iterator<storage_type>::iterator;
         using const_linear_iterator = typename detail::get_const_linear_iterator<storage_type>::iterator;
-        using reverse_linear_iterator = std::reverse_iterator<typename detail::get_linear_iterator<storage_type>::iterator>;
+        using reverse_linear_iterator = std::reverse_iterator<
+            typename detail::get_linear_iterator<storage_type>::iterator>;
         using const_reverse_linear_iterator = std::reverse_iterator<
             typename detail::get_const_linear_iterator<storage_type>::iterator>;
 
@@ -533,7 +534,8 @@ namespace xt
         return xtl::mpl::static_if<detail::get_const_linear_iterator<storage_type>::value>(
             [&](auto self)
             {
-                return self(this->storage()).linear_begin() + static_cast<std::ptrdiff_t>(data_offset() + size());
+                return self(this->storage()).linear_begin()
+                       + static_cast<std::ptrdiff_t>(data_offset() + size());
             },
             [&](auto self)
             {
