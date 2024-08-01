@@ -153,7 +153,7 @@ namespace xt
                 (L == layout_type::row_major) || (L == layout_type::column_major),
                 "Layout not supported for fixed array"
             );
-#if (_MSC_VER >= 1910)
+#if (defined(_MSC_VER_) && _MSC_VER >= 1910)
             using temp_type = std::index_sequence<X...>;
             return R({workaround::get_computed_strides<L, I, temp_type>(shape[I] == 1)...});
 #else
