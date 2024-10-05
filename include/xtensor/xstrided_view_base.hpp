@@ -903,8 +903,11 @@ namespace xt
                     if (ptr != nullptr)
                     {
                         auto slice0 = static_cast<old_strides_value_type>(*ptr);
-            	        if (slice0 < 0) slice0 += shape[i_ax];
-            	        if (slice0 < 0 || slice0 >= shape[i_ax])
+                        if (slice0 < 0)
+                        {
+                            slice0 += shape[i_ax];
+                        }
+                        if (slice0 < 0 || slice0 >= shape[i_ax])
                         {
                             XTENSOR_THROW(std::runtime_error, "Slice index out of range.");
                         }
