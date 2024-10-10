@@ -1141,6 +1141,8 @@ namespace xt
         std::size_t simd_size = inner_loop_size / simd_type::size;
         std::size_t simd_rest = inner_loop_size % simd_type::size;
 
+        bool e1_is_contiguous = E1::contiguous_layout || e1.is_contiguous();
+
         auto fct_stepper = e2.stepper_begin(e1.shape());
         auto res_stepper = e1.stepper_begin(e1.shape());
 
@@ -1191,7 +1193,7 @@ namespace xt
                 fct_stepper.to_begin();
 
                 // need to step E1 as well if not contigous assign (e.g. view)
-                if (!E1::contiguous_layout)
+                if (!E1::contiguous_layout && !e1_is_contiguous)
                 {
                     res_stepper.to_begin();
                     for (std::size_t i = 0; i < idx.size(); ++i)
@@ -1266,7 +1268,7 @@ namespace xt
                         fct_stepper.to_begin();
 
                         // need to step E1 as well if not contigous assign (e.g. view)
-                        if (!E1::contiguous_layout)
+                        if (!E1::contiguous_layout && !e1_is_contiguous)
                         {
                             res_stepper.to_begin();
                             for (std::size_t i = 0; i < idx.size(); ++i)
@@ -1311,7 +1313,7 @@ namespace xt
                 fct_stepper.to_begin();
 
                 // need to step E1 as well if not contigous assign (e.g. view)
-                if (!E1::contiguous_layout)
+                if (!E1::contiguous_layout && !e1_is_contiguous)
                 {
                     res_stepper.to_begin();
                     for (std::size_t i = 0; i < idx.size(); ++i)
