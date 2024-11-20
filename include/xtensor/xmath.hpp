@@ -1088,10 +1088,8 @@ namespace xt
         return xfunction_type(detail::lambda_adapt<F>(std::forward<F>(lambda)), std::forward<E>(args)...);
     }
 
-#define XTENSOR_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
-
 // Workaround for MSVC 2015 & GCC 4.9
-#if (defined(_MSC_VER) && _MSC_VER < 1910) || (defined(__GNUC__) && GCC_VERSION < 49999)
+#if (defined(_MSC_VER) && _MSC_VER < 1910) || (defined(__GNUC__) && __GNUC__ < 5)
 #define XTENSOR_DISABLE_LAMBDA_FCT
 #endif
 
@@ -1161,7 +1159,6 @@ namespace xt
 #endif
     }
 
-#undef XTENSOR_GCC_VERSION
 #undef XTENSOR_DISABLE_LAMBDA_FCT
 
     namespace detail
