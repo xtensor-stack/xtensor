@@ -9,25 +9,36 @@
 
 #include "xtensor/xarray.hpp"
 #include "xtensor/xaxis_iterator.hpp"
+#include "xtensor/xfixed.hpp"
+#include "xtensor/xtensor.hpp"
 
 #include "test_common_macros.hpp"
+
+#define ROW_TYPES                                                                 \
+    xarray<int, layout_type::row_major>, xtensor<int, 3, layout_type::row_major>, \
+        xtensor_fixed<int, xt::xshape<2, 3, 4>, layout_type::row_major>
+#define COL_TYPES                                                                       \
+    xarray<int, layout_type::column_major>, xtensor<int, 3, layout_type::column_major>, \
+        xtensor_fixed<int, xt::xshape<2, 3, 4>, layout_type::column_major>
+#define ALL_TYPES ROW_TYPES, COL_TYPES
 
 namespace xt
 {
     using std::size_t;
 
-    xarray<int> get_test_array()
+    template <typename T = xarray<int>>
+    T get_test_array()
     {
-        xarray<int> res = {
+        T res = {
             {{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}},
             {{13, 14, 15, 16}, {17, 18, 19, 20}, {21, 22, 23, 24}}
         };
         return res;
     }
 
-    TEST(xaxis_iterator, begin)
+    TEST_CASE_TEMPLATE("xaxis_iterator.begin", T, ALL_TYPES)
     {
-        xarray<int> a = get_test_array();
+        T a = get_test_array<T>();
         auto iter_begin = axis_begin(a);
         EXPECT_EQ(size_t(2), iter_begin->dimension());
         EXPECT_EQ(a.shape()[1], iter_begin->shape()[0]);
@@ -38,9 +49,9 @@ namespace xt
         EXPECT_EQ(a(0, 2, 3), (*iter_begin)(2, 3));
     }
 
-    TEST(xaxis_iterator, increment)
+    TEST_CASE_TEMPLATE("xaxis_iterator.increment", T, ROW_TYPES)
     {
-        xarray<int> a = get_test_array();
+        T a = get_test_array<T>();
         auto iter = axis_begin(a);
         ++iter;
 
@@ -53,9 +64,9 @@ namespace xt
         EXPECT_EQ(a(1, 2, 3), (*iter)(2, 3));
     }
 
-    TEST(xaxis_iterator, end)
+    TEST_CASE_TEMPLATE("xaxis_iterator.end", T, ALL_TYPES)
     {
-        xarray<int> a = get_test_array();
+        T a = get_test_array<T>();
         auto iter_begin = axis_begin(a, 1u);
         auto iter_end = axis_end(a, 1u);
         auto dist = std::distance(iter_begin, iter_end);
@@ -81,9 +92,9 @@ namespace xt
         EXPECT_EQ(iter_begin_row, iter_end_row);
     }
 
-    TEST(xaxis_iterator, nested)
+    TEST_CASE_TEMPLATE("xaxis_iterator.nested", T, ROW_TYPES)
     {
-        xarray<int> a = get_test_array();
+        T a = get_test_array<T>();
         auto iter = axis_begin(a);
         ++iter;
         auto niter = axis_begin(*iter);
@@ -96,9 +107,9 @@ namespace xt
         EXPECT_EQ(a(1, 1, 3), (*niter)(3));
     }
 
-    TEST(xaxis_iterator, const_array)
+    TEST_CASE_TEMPLATE("xaxis_iterator.const_array", T, ROW_TYPES)
     {
-        const xarray<int> a = get_test_array();
+        const T a = get_test_array<T>();
         auto iter = axis_begin(a);
         ++iter;
 
@@ -111,9 +122,9 @@ namespace xt
         EXPECT_EQ(a(1, 2, 3), (*iter)(2, 3));
     }
 
-    TEST(xaxis_iterator, axis_0)
+    TEST_CASE_TEMPLATE("xaxis_iterator.axis_0", T, ROW_TYPES)
     {
-        xarray<int> a = get_test_array();
+        T a = get_test_array<T>();
         auto iter = axis_begin(a, 0);
 
         EXPECT_EQ(a(0, 0, 0), (*iter)(0, 0));
@@ -143,9 +154,9 @@ namespace xt
         EXPECT_EQ(a(1, 2, 3), (*iter)(2, 3));
     }
 
-    TEST(xaxis_iterator, axis_1)
+    TEST_CASE_TEMPLATE("xaxis_iterator.axis_1", T, ROW_TYPES)
     {
-        xarray<int> a = get_test_array();
+        T a = get_test_array<T>();
         auto iter = axis_begin(a, 1u);
 
         EXPECT_EQ(a(0, 0, 0), (*iter)(0, 0));
@@ -176,9 +187,9 @@ namespace xt
         EXPECT_EQ(a(1, 2, 3), (*iter)(1, 3));
     }
 
-    TEST(xaxis_iterator, axis_2)
+    TEST_CASE_TEMPLATE("xaxis_iterator.axis_2", T, ROW_TYPES)
     {
-        xarray<int> a = get_test_array();
+        T a = get_test_array<T>();
         auto iter = axis_begin(a, 2u);
 
         EXPECT_EQ(a(0, 0, 0), (*iter)(0, 0));
