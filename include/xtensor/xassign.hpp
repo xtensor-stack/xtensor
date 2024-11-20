@@ -1174,7 +1174,7 @@ namespace xt
 
                 for (std::size_t i = 0; i < simd_size; ++i)
                 {
-                    res_stepper.template store_simd(fct_stepper.template step_simd<value_type>());
+                    res_stepper.store_simd(fct_stepper.template step_simd<value_type>());
                 }
                 for (std::size_t i = 0; i < simd_rest; ++i)
                 {
@@ -1249,7 +1249,7 @@ namespace xt
 
                         for (std::size_t i = 0; i < simd_size; ++i)
                         {
-                            res_stepper.template store_simd(fct_stepper.template step_simd<value_type>());
+                            res_stepper.store_simd(fct_stepper.template step_simd<value_type>());
                         }
                         for (std::size_t i = 0; i < simd_rest; ++i)
                         {
