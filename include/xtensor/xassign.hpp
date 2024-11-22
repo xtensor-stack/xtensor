@@ -456,24 +456,22 @@ namespace xt
         constexpr bool simd_strided_assign = traits::simd_strided_assign();
         if (linear_assign)
         {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wduplicated-branches"
+            if(simd_linear_assign || traits::simd_linear_assign(de1, de2))
+            {
             // Do not use linear_assigner<true> here since it will make the compiler
             // instantiate this branch even if the runtime condition is false, resulting
             // in compilation error for expressions that do not provide a SIMD interface.
             // simd_assign is true if simd_linear_assign() or simd_linear_assign(de1, de2)
             // is true.
-            if constexpr(simd_assign) {
-                if(simd_linear_assign || traits::simd_linear_assign(de1, de2))
-                {
-                    linear_assigner<true>::run(de1, de2);
+                linear_assigner<simd_assign>::run(de1, de2);
                 }
                 else
                 {
                     linear_assigner<false>::run(de1, de2);
                 }
-            } else
-            {
-                linear_assigner<false>::run(de1, de2);
-            }
+#pragma GCC diagnostic pop
         }
         else if (simd_strided_assign)
         {
