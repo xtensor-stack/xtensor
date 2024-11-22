@@ -456,6 +456,8 @@ namespace xt
         constexpr bool simd_strided_assign = traits::simd_strided_assign();
         if (linear_assign)
         {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wduplicated-branches"
             if (simd_linear_assign || traits::simd_linear_assign(de1, de2))
             {
                 // Do not use linear_assigner<true> here since it will make the compiler
@@ -469,6 +471,7 @@ namespace xt
             {
                 linear_assigner<false>::run(de1, de2);
             }
+#pragma GCC diagnostic pop
         }
         else if (simd_strided_assign)
         {
