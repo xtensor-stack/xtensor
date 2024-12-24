@@ -18,8 +18,9 @@ jobs:
       fail-fast: false
       matrix:
         os:
-        - 12
         - 13
+        - 14
+        - 15
 
     steps:
 
