@@ -81,21 +81,27 @@ namespace xt
     XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);
 
 
-#define XTENSOR_UNARY_MATH_FUNCTOR(NAME)              \
-    struct NAME##_fun                                 \
-    {                                                 \
-        template <class T>                            \
-        constexpr auto operator()(const T& arg) const \
-        {                                             \
-            using math::NAME;                         \
-            return NAME(arg);                         \
-        }                                             \
-        template <class B>                            \
-        constexpr auto simd_apply(const B& arg) const \
-        {                                             \
-            using math::NAME;                         \
-            return NAME(arg);                         \
-        }                                             \
+#define XTENSOR_UNARY_MATH_FUNCTOR(NAME)                \
+    struct NAME##_fun                                   \
+    {                                                   \
+        template <class T>                              \
+        constexpr auto operator()(const T& arg) const   \
+        {                                               \
+            using math::NAME;                           \
+            return NAME(arg);                           \
+        }                                               \
+        template <class B>                              \
+        constexpr auto simd_apply(const B& arg) const   \
+        {                                               \
+            using math::NAME;                           \
+            return NAME(arg);                           \
+        }                                               \
+        template <class B>                              \
+        constexpr auto device_apply(const B& arg) const \
+        {                                               \
+            using math::NAME;                           \
+            return NAME(arg);                           \
+        }                                               \        
     }
 
 #define XTENSOR_UNARY_MATH_FUNCTOR_COMPLEX_REDUCING(NAME) \
@@ -109,6 +115,12 @@ namespace xt
         }                                                 \
         template <class B>                                \
         constexpr auto simd_apply(const B& arg) const     \
+        {                                                 \
+            using math::NAME;                             \
+            return NAME(arg);                             \
+        }                                                 \
+        template <class B>                                \
+        constexpr auto device_apply(const B& arg) const   \
         {                                                 \
             using math::NAME;                             \
             return NAME(arg);                             \
@@ -130,6 +142,12 @@ namespace xt
             using math::NAME;                                           \
             return NAME(arg1, arg2);                                    \
         }                                                               \
+        template <class B>                                              \
+        constexpr auto device_apply(const B& arg1, const B& arg2) const   \
+        {                                                               \
+            using math::NAME;                                           \
+            return NAME(arg1, arg2);                                    \
+        }                                                               \
     }
 
 #define XTENSOR_TERNARY_MATH_FUNCTOR(NAME)                                              \
@@ -143,6 +161,12 @@ namespace xt
         }                                                                               \
         template <class B>                                                              \
         auto simd_apply(const B& arg1, const B& arg2, const B& arg3) const              \
+        {                                                                               \
+            using math::NAME;                                                           \
+            return NAME(arg1, arg2, arg3);                                              \
+        }                                                                               \
+        template <class B>                                                              \
+        auto device_apply(const B& arg1, const B& arg2, const B& arg3) const              \
         {                                                                               \
             using math::NAME;                                                           \
             return NAME(arg1, arg2, arg3);                                              \

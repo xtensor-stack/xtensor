@@ -27,6 +27,7 @@
 #include "xstrides.hpp"
 #include "xtensor_config.hpp"
 #include "xtensor_forward.hpp"
+#include "xdevice.hpp"
 
 namespace xt
 {
@@ -112,6 +113,8 @@ namespace xt
         using reverse_linear_iterator = typename iterable_base::reverse_linear_iterator;
         using const_reverse_linear_iterator = typename iterable_base::const_reverse_linear_iterator;
 
+        using container_device_return_type_t = host_device_batch<value_type>;
+
         static_assert(static_layout != layout_type::any, "Container layout can never be layout_type::any!");
 
         size_type size() const noexcept;
@@ -186,6 +189,19 @@ namespace xt
         template <class align, class requested_type = value_type, std::size_t N = xt_simd::simd_traits<requested_type>::size>
         container_simd_return_type_t<storage_type, value_type, requested_type>
         /*simd_return_type<requested_type>*/ load_simd(size_type i) const;
+
+        template<class device_batch>
+        void store_device(device_batch&& e)
+        {
+            //check length matching
+            e.store_host(storage().data());
+        }
+
+        container_device_return_type_t load_device() const
+        {
+            auto ptr = data();
+            return container_device_return_type_t(ptr, size());
+        }
 
         linear_iterator linear_begin() noexcept;
         linear_iterator linear_end() noexcept;

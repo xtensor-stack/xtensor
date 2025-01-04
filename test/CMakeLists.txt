@@ -183,6 +183,7 @@ set(XTENSOR_TESTS
     test_xcomplex.cpp
     test_xcsv.cpp
     test_xdatesupport.cpp
+    test_xdevice_assign.cpp
     test_xdynamic_view.cpp
     test_xfunctor_adaptor.cpp
     test_xfixed.cpp
