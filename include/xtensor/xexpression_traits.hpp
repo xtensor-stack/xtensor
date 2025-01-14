@@ -103,16 +103,15 @@ namespace xt
             using type = xarray<T, L>;
         };
 
-#if defined(__GNUC__) && (__GNUC__ > 6)
-#if __cplusplus == 201703L
+// Workaround for rebind_container problems when C++17 feature is enabled
+#ifdef __cpp_template_template_args
         template <template <class, std::size_t, class, bool> class S, class X, std::size_t N, class A, bool Init>
         struct xtype_for_shape<S<X, N, A, Init>>
         {
             template <class T, layout_type L>
             using type = xarray<T, L>;
         };
-#endif  // __cplusplus == 201703L
-#endif  // __GNUC__ && (__GNUC__ > 6)
+#endif  // __cpp_template_template_args
 
         template <template <class, std::size_t> class S, class X, std::size_t N>
         struct xtype_for_shape<S<X, N>>
