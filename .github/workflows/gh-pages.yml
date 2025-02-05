@@ -24,11 +24,13 @@ jobs:
     - name: Basic GitHub action setup
       uses: actions/checkout@v2
 
-    - name: Set mamba environment "test"
-      uses: mamba-org/provision-with-micromamba@main
+    - name: Set mamba environment
+      uses: mamba-org/setup-micromamba@main
       with:
         environment-file: docs/ghp_environment.yml
         environment-name: xtensor-doc
+        init-shell: bash
+        cache-downloads: true
 
     - name: Run doxygen
       working-directory: docs
