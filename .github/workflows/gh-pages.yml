@@ -23,8 +23,8 @@ jobs:
 
     - name: Basic GitHub action setup
       uses: actions/checkout@v2
-   
-    - name: Set conda environment
+
+    - name: Set mamba environment
       uses: mamba-org/setup-micromamba@main
       with:
         environment-file: docs/ghp_environment.yml
