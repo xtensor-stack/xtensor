@@ -201,4 +201,62 @@ namespace xt
         test_iterator_types<tensor_type, iterator, const_iterator>();
         test_iterator_types<const_tensor_type, const_iterator, const_iterator>();
     }
+
+    namespace xt_shared
+    {
+        template <class T, std::size_t N, layout_type L = layout_type::dynamic>
+        using xtensor_buffer = xtensor_adaptor<xbuffer_adaptor<T, xt::smart_ownership, std::shared_ptr<T[]>>, N, L>;
+    }
+
+    TEST(xtensor_shared_buffer, share_shared_pointer)
+    {
+        using T = double;
+        using xtensor_type = xt_shared::xtensor_buffer<double, 1>;
+        using storage_type = xtensor_type::storage_type;
+        using inner_shape_type = typename xtensor_type::inner_shape_type;
+        using inner_strides_type = typename xtensor_type::inner_strides_type;
+        auto shape = xtensor_type::shape_type{100};
+        auto size = std::accumulate(shape.begin(), shape.end(), 1, std::multiplies<size_t>());
+        auto data = std::shared_ptr<T[]>(new T[size]);
+        auto data2 = std::shared_ptr<T[]>(new T[size]);
+        inner_shape_type inner_shape = shape;
+        inner_shape_type inner_shape2 = shape;
+        inner_strides_type inner_strides;
+        xt::compute_strides(inner_shape, XTENSOR_DEFAULT_LAYOUT, inner_strides);
+
+        // Create storage with shared ownership
+        storage_type s(data.get(), size, data);
+        storage_type s2(data.get(), size, data);
+        // s3 has no shared ownership
+        storage_type s3(data2.get(), size, data);
+        // Now create the respective tensors
+        xtensor_type x(std::move(s), inner_shape_type(shape), inner_strides_type(inner_strides));
+        xtensor_type x2(std::move(s2), inner_shape_type(shape), inner_strides_type(inner_strides));
+        xtensor_type x3(std::move(s3), inner_shape_type(shape), inner_strides_type(inner_strides));
+
+        // Initialize both tensors (x & x3) to zero
+        x = xt::broadcast(double(0), {size});
+        x3 = xt::broadcast(double(0), {size});
+
+        // Assign another shared memory tensor to x shared memory
+        xtensor_type y = x;
+
+        // Modify the value in x
+        x(0) = 1.0;
+
+        // Use x2 now
+        y = x2;
+
+        // We do get 1.0 in y, because x and y share the same memory
+        EXPECT_EQ(y(0), 1.0);
+
+        // Now assign x3 memory to y (i.e. unshare it with x)
+        y = x3;
+        // Change value in x2
+        x2(0) = 2.0;
+        // We do not get 2.0 in y, because x2 and y do not share the same memory
+        EXPECT_EQ(y(0), 0.0);
+        // We do get 2.0 in x2
+        EXPECT_EQ(x2(0), 2.0);
+    }
 }
