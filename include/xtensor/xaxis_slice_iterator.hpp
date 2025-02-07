@@ -34,8 +34,8 @@ namespace xt
         using xexpression_type = std::decay_t<CT>;
         using size_type = typename xexpression_type::size_type;
         using difference_type = typename xexpression_type::difference_type;
-        using shape_type = typename xexpression_type::shape_type;
-        using strides_type = typename xexpression_type::strides_type;
+        using shape_type = std::array<typename xexpression_type::shape_type::value_type, 1>;
+        using strides_type = std::array<typename xexpression_type::strides_type::value_type, 1>;
         using value_type = xstrided_view<CT, shape_type>;
         using reference = std::remove_reference_t<apply_cv_t<CT, value_type>>;
         using pointer = xtl::xclosure_pointer<std::remove_reference_t<apply_cv_t<CT, value_type>>>;
