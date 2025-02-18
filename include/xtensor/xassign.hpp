@@ -168,6 +168,17 @@ namespace xt
         static void run_impl(E1& e1, const E2& e2, std::false_type);
     };
 
+    class device_assigner
+    {
+    public:
+
+        template <class E1, class E2>
+        static void run(E1& e1, const E2& e2)
+        {
+            e1.store_device(e2.load_device());
+        }
+    };
+
     /*************************
      * strided_loop_assigner *
      *************************/
@@ -463,7 +474,8 @@ namespace xt
                 // in compilation error for expressions that do not provide a SIMD interface.
                 // simd_assign is true if simd_linear_assign() or simd_linear_assign(de1, de2)
                 // is true.
-                linear_assigner<simd_assign>::run(de1, de2);
+                //linear_assigner<simd_assign>::run(de1, de2);
+                device_assigner::run(de1, de2);
             }
             else
             {
