@@ -111,7 +111,7 @@ namespace xt
             using size_type = typename allocator_traits::size_type;
             using difference_type = typename allocator_traits::difference_type;
 
-            xbuffer_smart_pointer();
+            xbuffer_smart_pointer() = default;
 
             template <class P, class DT>
             xbuffer_smart_pointer(P&& data_ptr, size_type size, DT&& destruct);
