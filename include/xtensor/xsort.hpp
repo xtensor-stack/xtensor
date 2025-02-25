@@ -1242,7 +1242,6 @@ namespace xt
     template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E>
     inline auto argmin(const xexpression<E>& e)
     {
-        using value_type = typename E::value_type;
         auto&& ed = eval(e.derived_cast());
         auto begin = ed.template begin<L>();
         auto end = ed.template end<L>();
@@ -1272,7 +1271,6 @@ namespace xt
     template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E>
     inline auto argmax(const xexpression<E>& e)
     {
-        using value_type = typename E::value_type;
         auto&& ed = eval(e.derived_cast());
         auto begin = ed.template begin<L>();
         auto end = ed.template end<L>();
