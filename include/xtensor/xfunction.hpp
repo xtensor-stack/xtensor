@@ -397,7 +397,7 @@ namespace xt
 
         tuple_type m_e;
         functor_type m_f;
-        mutable xfunction_cache<detail::promote_index<typename std::decay_t<CT>::shape_type...>> m_cache;
+        mutable xfunction_cache<detail::promote_index<typename std::decay_t<CT>::shape_type...>> m_cache{};
 
         friend class xfunction_iterator<F, CT...>;
         friend class xfunction_stepper<F, CT...>;
@@ -721,7 +721,13 @@ namespace xt
     {
         if (m_cache.is_initialized && reuse_cache)
         {
+            // Disable spurious warning when copying into a 1-sized `std::array`
+            // in gcc >= 12.4.0; see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=107852
+            #pragma GCC diagnostic push
+            #pragma GCC diagnostic ignored "-Warray-bounds"
+            #pragma GCC diagnostic ignored "-Wstringop-overflow"
             std::copy(m_cache.shape.cbegin(), m_cache.shape.cend(), shape.begin());
+            #pragma GCC diagnostic pop
             return m_cache.is_trivial;
         }
         else
