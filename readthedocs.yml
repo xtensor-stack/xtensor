@@ -5,5 +5,9 @@ build:
   tools:
     python: mambaforge-22.9
 
+sphinx:
+  # Path to Sphinx configuration file
+  configuration: docs/source/conf.py
+
 conda:
   environment: docs/rtd_environment.yml
