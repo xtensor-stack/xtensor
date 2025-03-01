@@ -131,6 +131,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xcomplex.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xcontainer.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xcsv.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xdevice.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xdynamic_view.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xeval.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xexception.hpp

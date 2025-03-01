@@ -79,6 +79,11 @@ namespace xt
         {                                                              \
             return (arg1 OP arg2);                                     \
         }                                                              \
+        template <class B>                                             \
+        constexpr auto device_apply(B&& arg1, const B&& arg2) const \
+        {                                                              \
+            return (arg1 OP arg2);                                     \
+        }                                                              \
     }
 
     namespace detail

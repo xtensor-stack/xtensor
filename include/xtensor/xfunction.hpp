@@ -31,6 +31,7 @@
 #include "xstrides.hpp"
 #include "xtensor_simd.hpp"
 #include "xutils.hpp"
+#include "xdevice.hpp"
 
 namespace xt
 {
@@ -283,6 +284,7 @@ namespace xt
         using const_iterator = typename iterable_base::const_iterator;
         using reverse_iterator = typename iterable_base::reverse_iterator;
         using const_reverse_iterator = typename iterable_base::const_reverse_iterator;
+        using device_return_type = host_device_batch<value_type>;
 
         template <class Func, class... CTA, class U = std::enable_if_t<!std::is_base_of<std::decay_t<Func>, self_type>::value>>
         xfunction(Func&& f, CTA&&... e) noexcept;
@@ -361,6 +363,8 @@ namespace xt
         template <class align, class requested_type = value_type, std::size_t N = xt_simd::simd_traits<requested_type>::size>
         simd_return_type<requested_type> load_simd(size_type i) const;
 
+        device_return_type load_device() const;
+
         const tuple_type& arguments() const noexcept;
 
         const functor_type& functor() const noexcept;
@@ -384,6 +388,9 @@ namespace xt
 
         template <class align, class requested_type, std::size_t N, std::size_t... I>
         auto load_simd_impl(std::index_sequence<I...>, size_type i) const;
+
+        template <std::size_t... I>
+        inline auto load_device_impl(std::index_sequence<I...>) const;
 
         template <class Func, std::size_t... I>
         const_stepper build_stepper(Func&& f, std::index_sequence<I...>) const noexcept;
@@ -845,6 +852,12 @@ namespace xt
     }
 
     template <class F, class... CT>
+    inline auto xfunction<F, CT...>::load_device() const -> device_return_type
+    {
+        return load_device_impl(std::make_index_sequence<sizeof...(CT)>());
+    }
+
+    template <class F, class... CT>
     template <class align, class requested_type, std::size_t N>
     inline auto xfunction<F, CT...>::load_simd(size_type i) const -> simd_return_type<requested_type>
     {
@@ -910,6 +923,13 @@ namespace xt
     inline auto xfunction<F, CT...>::load_simd_impl(std::index_sequence<I...>, size_type i) const
     {
         return m_f.simd_apply((std::get<I>(m_e).template load_simd<align, requested_type>(i))...);
+    }
+
+    template <class F, class... CT>
+    template <std::size_t... I>
+    inline auto xfunction<F, CT...>::load_device_impl(std::index_sequence<I...>) const
+    {
+        return m_f.device_apply((std::get<I>(m_e).load_device())...);
     }
 
     template <class F, class... CT>
