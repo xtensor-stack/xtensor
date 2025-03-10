@@ -718,7 +718,7 @@ namespace xt
         using size_type = typename E1::size_type;
         size_type size = e1.size();
         constexpr size_type simd_size = simd_type::size;
-        constexpr bool needs_cast = has_assign_conversion<e1_value_type, e2_value_type>::value;
+        constexpr bool needs_cast = has_assign_conversion<e2_value_type, e1_value_type>::value;
 
         size_type align_begin = is_aligned ? 0 : xt_simd::get_alignment_offset(e1.data(), size, simd_size);
         size_type align_end = align_begin + ((size - align_begin) & ~(simd_size - 1));
@@ -1131,7 +1131,7 @@ namespace xt
         // std::fill(idx.begin(), idx.end(), 0);
         using e1_value_type = typename E1::value_type;
         using e2_value_type = typename E2::value_type;
-        constexpr bool needs_cast = has_assign_conversion<e1_value_type, e2_value_type>::value;
+        constexpr bool needs_cast = has_assign_conversion<e2_value_type, e1_value_type>::value;
         using value_type = typename xassign_traits<E1, E2>::requested_value_type;
         using simd_type = std::conditional_t<
             std::is_same<e1_value_type, bool>::value,
