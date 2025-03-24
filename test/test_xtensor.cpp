@@ -9,9 +9,9 @@
 
 #include <type_traits>
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xio.hpp"
-#include "xtensor/xtensor.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/containers/xtensor.hpp"
+#include "xtensor/io/xio.hpp"
 
 #include "test_common.hpp"
 #include "test_common_macros.hpp"

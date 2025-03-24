@@ -12,16 +12,16 @@
 #if (defined(__GNUC__) && !defined(__clang__))
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
-#include "xtensor/xmath.hpp"
+#include "xtensor/core/xmath.hpp"
 #pragma GCC diagnostic pop
 #endif
 
-#include <xtensor/xindex_view.hpp>
+#include <xtensor/views/xindex_view.hpp>
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xmath.hpp"
-#include "xtensor/xstrided_view.hpp"
-#include "xtensor/xtensor.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/containers/xtensor.hpp"
+#include "xtensor/core/xmath.hpp"
+#include "xtensor/views/xstrided_view.hpp"
 
 #include "xtl/xtype_traits.hpp"
 

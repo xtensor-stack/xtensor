@@ -9,10 +9,10 @@
 
 #include <sstream>
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xexpression.hpp"
-#include "xtensor/xio.hpp"
-#include "xtensor/xmath.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/core/xexpression.hpp"
+#include "xtensor/core/xmath.hpp"
+#include "xtensor/io/xio.hpp"
 
 #include "test_common_macros.hpp"
 

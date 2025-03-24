@@ -7,9 +7,9 @@
  * The full license is in the file LICENSE, distributed with this software. *
  ****************************************************************************/
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xio.hpp"
-#include "xtensor/xoptional_assembly.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/io/xio.hpp"
+#include "xtensor/optional/xoptional_assembly.hpp"
 
 #include "test_common.hpp"
 #include "test_common_macros.hpp"

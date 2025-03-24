@@ -7,11 +7,11 @@
  * The full license is in the file LICENSE, distributed with this software. *
  ****************************************************************************/
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xcomplex.hpp"
-#include "xtensor/xfunctor_view.hpp"
-#include "xtensor/xio.hpp"
-#include "xtensor/xnoalias.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/core/xnoalias.hpp"
+#include "xtensor/io/xio.hpp"
+#include "xtensor/misc/xcomplex.hpp"
+#include "xtensor/views/xfunctor_view.hpp"
 
 #include "test_common_macros.hpp"
 

@@ -13,11 +13,11 @@
 
 #include <sstream>
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xbuilder.hpp"
-#include "xtensor/xfixed.hpp"
-#include "xtensor/xio.hpp"
-#include "xtensor/xtensor.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/containers/xfixed.hpp"
+#include "xtensor/containers/xtensor.hpp"
+#include "xtensor/generators/xbuilder.hpp"
+#include "xtensor/io/xio.hpp"
 
 #include "test_common.hpp"
 

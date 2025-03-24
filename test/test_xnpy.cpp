@@ -10,8 +10,8 @@
 #include <cstdint>
 #include <fstream>
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xnpy.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/io/xnpy.hpp"
 
 #include "test_common_macros.hpp"
 

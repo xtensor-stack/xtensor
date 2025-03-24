@@ -15,7 +15,7 @@ set(XTENSOR_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 # Versionning
 # ===========
 
-file(STRINGS "${XTENSOR_INCLUDE_DIR}/xtensor/xtensor_config.hpp" xtensor_version_defines
+file(STRINGS "${XTENSOR_INCLUDE_DIR}/xtensor/core/xtensor_config.hpp" xtensor_version_defines
      REGEX "#define XTENSOR_VERSION_(MAJOR|MINOR|PATCH)")
 foreach(ver ${xtensor_version_defines})
     if(ver MATCHES "#define XTENSOR_VERSION_(MAJOR|MINOR|PATCH) +([^ ]+)$")
@@ -113,79 +113,79 @@ endif()
 # =====
 
 set(XTENSOR_HEADERS
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xaccessible.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xaccumulator.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xadapt.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xarray.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xassign.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xaxis_iterator.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xaxis_slice_iterator.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xblockwise_reducer.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xblockwise_reducer_functors.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xbroadcast.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xbuffer_adaptor.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xbuilder.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xchunked_array.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xchunked_assign.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xchunked_view.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xcomplex.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xcontainer.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xcsv.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xdynamic_view.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xeval.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xexception.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xexpression.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xexpression_holder.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xexpression_traits.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xfixed.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xfunction.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xfunctor_view.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xfft.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xgenerator.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xhistogram.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xindex_view.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xinfo.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xio.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xiterable.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xiterator.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xjson.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xlayout.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xmanipulation.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xmasked_view.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xmath.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xmime.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xmultiindex_iterator.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xnoalias.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xnorm.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xnpy.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xoffset_view.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xoperation.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xoptional.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xoptional_assembly.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xoptional_assembly_base.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xoptional_assembly_storage.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xpad.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xrandom.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xreducer.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xrepeat.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xscalar.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xsemantic.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xset_operation.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xshape.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xslice.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xsort.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xstorage.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xstrided_view.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xstrided_view_base.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xstrides.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xtensor.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xtensor_config.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xtensor_forward.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xtensor_simd.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xutils.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xvectorize.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xview.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xview_utils.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/chunk/xchunked_array.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/chunk/xchunked_assign.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/chunk/xchunked_view.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/containers/xadapt.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/containers/xarray.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/containers/xbuffer_adaptor.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/containers/xcontainer.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/containers/xfixed.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/containers/xscalar.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/containers/xstorage.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/containers/xtensor.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/core/xaccessible.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/core/xassign.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/core/xeval.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/core/xexpression.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/core/xexpression_traits.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/core/xfunction.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/core/xiterable.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/core/xiterator.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/core/xlayout.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/core/xmath.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/core/xmultiindex_iterator.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/core/xnoalias.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/core/xoperation.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/core/xsemantic.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/core/xshape.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/core/xstrides.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/core/xtensor_config.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/core/xtensor_forward.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/core/xvectorize.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/generators/xbuilder.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/generators/xgenerator.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/generators/xrandom.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/io/xcsv.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/io/xinfo.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/io/xio.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/io/xjson.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/io/xmime.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/io/xnpy.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/misc/xcomplex.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/misc/xexpression_holder.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/misc/xfft.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/misc/xhistogram.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/misc/xmanipulation.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/misc/xpad.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/misc/xset_operation.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/misc/xsort.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/optional/xoptional.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/optional/xoptional_assembly.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/optional/xoptional_assembly_base.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/optional/xoptional_assembly_storage.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/reducers/xaccumulator.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/reducers/xblockwise_reducer.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/reducers/xblockwise_reducer_functors.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/reducers/xnorm.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/reducers/xreducer.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/utils/xexception.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/utils/xtensor_simd.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/utils/xutils.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/views/xaxis_iterator.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/views/xaxis_slice_iterator.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/views/xbroadcast.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/views/xdynamic_view.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/views/xfunctor_view.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/views/xindex_view.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/views/xmasked_view.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/views/xoffset_view.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/views/xrepeat.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/views/xslice.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/views/xstrided_view.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/views/xstrided_view_base.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/views/xview.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/views/xview_utils.hpp
 )
 
 add_library(xtensor INTERFACE)
@@ -263,8 +263,8 @@ install(TARGETS xtensor
 export(EXPORT ${PROJECT_NAME}-targets
        FILE "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake")
 
-install(FILES ${XTENSOR_HEADERS}
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/xtensor)
+install(DIRECTORY ${XTENSOR_INCLUDE_DIR}/xtensor
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 set(XTENSOR_CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_DATADIR}/cmake/${PROJECT_NAME}" CACHE
     STRING "install path for xtensorConfig.cmake")
@@ -317,10 +317,10 @@ endfunction()
 set(XTENSOR_SINGLE_INCLUDE ${XTENSOR_HEADERS})
 string(REPLACE "${XTENSOR_INCLUDE_DIR}/" "" XTENSOR_SINGLE_INCLUDE "${XTENSOR_SINGLE_INCLUDE}")
 list(REMOVE_ITEM XTENSOR_SINGLE_INCLUDE
-    xtensor/xexpression_holder.hpp
-    xtensor/xjson.hpp
-    xtensor/xmime.hpp
-    xtensor/xnpy.hpp)
+    xtensor/misc/xexpression_holder.hpp
+    xtensor/io/xjson.hpp
+    xtensor/io/xmime.hpp
+    xtensor/io/xnpy.hpp)
 
 PREPEND(XTENSOR_SINGLE_INCLUDE "#include <" ${XTENSOR_SINGLE_INCLUDE})
 POSTFIX(XTENSOR_SINGLE_INCLUDE ">" ${XTENSOR_SINGLE_INCLUDE})

@@ -11,10 +11,10 @@
 #include <limits>
 
 // For some obscure reason xtensor.hpp need to be included first for Windows' Clangcl
-#include "xtensor/xtensor.hpp"
+#include "xtensor/containers/xtensor.hpp"
 //
-#include "xtensor/xhistogram.hpp"
-#include "xtensor/xrandom.hpp"
+#include "xtensor/generators/xrandom.hpp"
+#include "xtensor/misc/xhistogram.hpp"
 
 #include "test_common_macros.hpp"
 

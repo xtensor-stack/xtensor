@@ -9,11 +9,11 @@
 
 #include <limits>
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xbuilder.hpp"
-#include "xtensor/xnoalias.hpp"
-#include "xtensor/xnorm.hpp"
-#include "xtensor/xview.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/core/xnoalias.hpp"
+#include "xtensor/generators/xbuilder.hpp"
+#include "xtensor/reducers/xnorm.hpp"
+#include "xtensor/views/xview.hpp"
 
 #include "test_common_macros.hpp"
 

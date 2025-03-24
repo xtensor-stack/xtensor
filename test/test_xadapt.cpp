@@ -7,8 +7,8 @@
  * The full license is in the file LICENSE, distributed with this software. *
  ****************************************************************************/
 
-#include "xtensor/xadapt.hpp"
-#include "xtensor/xstrides.hpp"
+#include "xtensor/containers/xadapt.hpp"
+#include "xtensor/core/xstrides.hpp"
 
 #include "test_common_macros.hpp"
 

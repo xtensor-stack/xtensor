@@ -10,8 +10,8 @@
 #include <sstream>
 #include <string>
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xinfo.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/io/xinfo.hpp"
 
 #include "test_common_macros.hpp"
 

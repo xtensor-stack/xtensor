@@ -7,10 +7,10 @@
  * The full license is in the file LICENSE, distributed with this software. *
  ****************************************************************************/
 
-#include "xtensor/xbroadcast.hpp"
-#include "xtensor/xchunked_array.hpp"
-#include "xtensor/xcsv.hpp"
-#include "xtensor/xnoalias.hpp"
+#include "xtensor/chunk/xchunked_array.hpp"
+#include "xtensor/core/xnoalias.hpp"
+#include "xtensor/io/xcsv.hpp"
+#include "xtensor/views/xbroadcast.hpp"
 
 #include "test_common_macros.hpp"
 

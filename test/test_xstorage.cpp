@@ -9,8 +9,8 @@
 
 #include <numeric>
 
-#include "xtensor/xstorage.hpp"
-#include "xtensor/xtensor_config.hpp"
+#include "xtensor/containers/xstorage.hpp"
+#include "xtensor/core/xtensor_config.hpp"
 
 #include "test_common_macros.hpp"
 

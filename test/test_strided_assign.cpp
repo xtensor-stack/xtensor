@@ -10,13 +10,13 @@
 #include <type_traits>
 #include <vector>
 
-#include "xtensor/xadapt.hpp"
-#include "xtensor/xarray.hpp"
-#include "xtensor/xassign.hpp"
-#include "xtensor/xlayout.hpp"
-#include "xtensor/xnoalias.hpp"
-#include "xtensor/xtensor.hpp"
-#include "xtensor/xview.hpp"
+#include "xtensor/containers/xadapt.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/containers/xtensor.hpp"
+#include "xtensor/core/xassign.hpp"
+#include "xtensor/core/xlayout.hpp"
+#include "xtensor/core/xnoalias.hpp"
+#include "xtensor/views/xview.hpp"
 
 #include "test_common.hpp"
 #include "test_common_macros.hpp"

@@ -12,9 +12,9 @@
 
 #include <algorithm>
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xhistogram.hpp"
-#include "xtensor/xtensor.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/containers/xtensor.hpp"
+#include "xtensor/misc/xhistogram.hpp"
 
 #include "test_common_macros.hpp"
 

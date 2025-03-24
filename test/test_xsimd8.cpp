@@ -9,8 +9,8 @@
 
 #include <complex>
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xcomplex.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/misc/xcomplex.hpp"
 
 #include "test_common_macros.hpp"
 

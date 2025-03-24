@@ -10,11 +10,11 @@
 #include <complex>
 #include <limits>
 
-#include "xtensor/xadapt.hpp"
-#include "xtensor/xarray.hpp"
-#include "xtensor/xmath.hpp"
-#include "xtensor/xoptional_assembly.hpp"
-#include "xtensor/xrandom.hpp"
+#include "xtensor/containers/xadapt.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/core/xmath.hpp"
+#include "xtensor/generators/xrandom.hpp"
+#include "xtensor/optional/xoptional_assembly.hpp"
 
 #include "test_common_macros.hpp"
 

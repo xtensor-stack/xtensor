@@ -7,9 +7,9 @@
  * The full license is in the file LICENSE, distributed with this software. *
  ****************************************************************************/
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xchunked_array.hpp"
-#include "xtensor/xchunked_view.hpp"
+#include "xtensor/chunk/xchunked_array.hpp"
+#include "xtensor/chunk/xchunked_view.hpp"
+#include "xtensor/containers/xarray.hpp"
 
 #include "test_common_macros.hpp"
 

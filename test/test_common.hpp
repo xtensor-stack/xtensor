@@ -12,9 +12,9 @@
 
 #include <sstream>
 
-#include "xtensor/xlayout.hpp"
-#include "xtensor/xmanipulation.hpp"
-#include "xtensor/xreducer.hpp"  // tuple_idx_of
+#include "xtensor/core/xlayout.hpp"
+#include "xtensor/misc/xmanipulation.hpp"
+#include "xtensor/reducers/xreducer.hpp"  // tuple_idx_of
 
 #include "test_common_macros.hpp"
 

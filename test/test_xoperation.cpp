@@ -10,9 +10,9 @@
 
 #include <cstddef>
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xoptional_assembly.hpp"
-#include "xtensor/xtensor.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/containers/xtensor.hpp"
+#include "xtensor/optional/xoptional_assembly.hpp"
 
 #include "test_common.hpp"
 #include "test_common_macros.hpp"

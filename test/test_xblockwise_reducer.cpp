@@ -4,9 +4,9 @@
 #include <typeinfo>
 #include <vector>
 
-#include "xtensor/xblockwise_reducer.hpp"
-#include "xtensor/xio.hpp"
-#include "xtensor/xnorm.hpp"
+#include "xtensor/io/xio.hpp"
+#include "xtensor/reducers/xblockwise_reducer.hpp"
+#include "xtensor/reducers/xnorm.hpp"
 
 #include "test_common.hpp"
 

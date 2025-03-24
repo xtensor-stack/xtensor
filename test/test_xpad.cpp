@@ -10,8 +10,8 @@
 #include <complex>
 #include <limits>
 
-#include "xtensor/xio.hpp"
-#include "xtensor/xpad.hpp"
+#include "xtensor/io/xio.hpp"
+#include "xtensor/misc/xpad.hpp"
 
 #include "test_common_macros.hpp"
 

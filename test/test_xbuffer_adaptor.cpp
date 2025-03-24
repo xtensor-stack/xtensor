@@ -7,7 +7,7 @@
  * The full license is in the file LICENSE, distributed with this software. *
  ****************************************************************************/
 
-#include "xtensor/xbuffer_adaptor.hpp"
+#include "xtensor/containers/xbuffer_adaptor.hpp"
 
 #include "test_common_macros.hpp"
 

@@ -1,6 +1,6 @@
 #include <vector>
 
-#include "xtensor/xmultiindex_iterator.hpp"
+#include "xtensor/core/xmultiindex_iterator.hpp"
 
 #include "test_common.hpp"
 

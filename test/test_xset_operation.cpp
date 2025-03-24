@@ -9,9 +9,9 @@
 
 #include <cstddef>
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xset_operation.hpp"
-#include "xtensor/xtensor.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/containers/xtensor.hpp"
+#include "xtensor/misc/xset_operation.hpp"
 
 #include "test_common_macros.hpp"
 
