@@ -10,10 +10,10 @@
 
 #include <type_traits>
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xio.hpp"
-#include "xtensor/xmanipulation.hpp"
-#include "xtensor/xtensor.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/containers/xtensor.hpp"
+#include "xtensor/io/xio.hpp"
+#include "xtensor/misc/xmanipulation.hpp"
 
 #include "test_common.hpp"
 

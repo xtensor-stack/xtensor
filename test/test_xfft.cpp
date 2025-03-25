@@ -1,5 +1,5 @@
-#include "xtensor/xarray.hpp"
-#include "xtensor/xfft.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/misc/xfft.hpp"
 
 #include "test_common_macros.hpp"
 

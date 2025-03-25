@@ -5,7 +5,7 @@
 #include <limits>
 #include <type_traits>
 
-#include "xtensor/xexpression.hpp"
+#include "xtensor/core/xexpression.hpp"
 
 namespace xt
 {

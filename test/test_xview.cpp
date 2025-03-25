@@ -16,20 +16,20 @@
 #if (defined(__GNUC__) && !defined(__clang__))
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuninitialized"
-#include "xtensor/xgenerator.hpp"
+#include "xtensor/generators/xgenerator.hpp"
 #pragma GCC diagnostic pop
 #else
 #endif
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xbuilder.hpp"
-#include "xtensor/xfixed.hpp"
-#include "xtensor/xmanipulation.hpp"
-#include "xtensor/xnoalias.hpp"
-#include "xtensor/xrandom.hpp"
-#include "xtensor/xstrided_view.hpp"
-#include "xtensor/xtensor.hpp"
-#include "xtensor/xview.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/containers/xfixed.hpp"
+#include "xtensor/containers/xtensor.hpp"
+#include "xtensor/core/xnoalias.hpp"
+#include "xtensor/generators/xbuilder.hpp"
+#include "xtensor/generators/xrandom.hpp"
+#include "xtensor/misc/xmanipulation.hpp"
+#include "xtensor/views/xstrided_view.hpp"
+#include "xtensor/views/xview.hpp"
 
 namespace xt
 {

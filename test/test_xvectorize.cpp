@@ -7,8 +7,8 @@
  * The full license is in the file LICENSE, distributed with this software. *
  ****************************************************************************/
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xvectorize.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/core/xvectorize.hpp"
 
 #include "test_common_macros.hpp"
 

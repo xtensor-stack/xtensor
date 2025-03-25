@@ -11,8 +11,8 @@
 
 #include <nlohmann/json.hpp>
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xmime.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/io/xmime.hpp"
 
 #include "test_common_macros.hpp"
 

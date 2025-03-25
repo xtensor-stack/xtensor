@@ -7,13 +7,13 @@
  * The full license is in the file LICENSE, distributed with this software. *
  ****************************************************************************/
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xbuilder.hpp"
-#include "xtensor/xio.hpp"
-#include "xtensor/xmanipulation.hpp"
-#include "xtensor/xrandom.hpp"
-#include "xtensor/xtensor.hpp"
-#include "xtensor/xview.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/containers/xtensor.hpp"
+#include "xtensor/generators/xbuilder.hpp"
+#include "xtensor/generators/xrandom.hpp"
+#include "xtensor/io/xio.hpp"
+#include "xtensor/misc/xmanipulation.hpp"
+#include "xtensor/views/xview.hpp"
 
 #include "test_common_macros.hpp"
 

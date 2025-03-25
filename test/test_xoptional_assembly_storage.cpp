@@ -7,9 +7,9 @@
  * The full license is in the file LICENSE, distributed with this software. *
  ****************************************************************************/
 
-#include "xtensor/xio.hpp"
-#include "xtensor/xoptional_assembly_storage.hpp"
-#include "xtensor/xstorage.hpp"
+#include "xtensor/containers/xstorage.hpp"
+#include "xtensor/io/xio.hpp"
+#include "xtensor/optional/xoptional_assembly_storage.hpp"
 
 #include "test_common_macros.hpp"
 

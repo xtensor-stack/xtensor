@@ -11,10 +11,10 @@
 #include <type_traits>
 #include <vector>
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xassign.hpp"
-#include "xtensor/xnoalias.hpp"
-#include "xtensor/xtensor.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/containers/xtensor.hpp"
+#include "xtensor/core/xassign.hpp"
+#include "xtensor/core/xnoalias.hpp"
 
 #include "test_common.hpp"
 #include "test_common_macros.hpp"

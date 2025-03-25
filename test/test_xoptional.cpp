@@ -12,8 +12,8 @@
 #include <string>
 #include <vector>
 
-#include "xtensor/xio.hpp"
-#include "xtensor/xoptional.hpp"
+#include "xtensor/io/xio.hpp"
+#include "xtensor/optional/xoptional.hpp"
 
 #include "test_common_macros.hpp"
 

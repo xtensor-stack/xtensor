@@ -10,11 +10,11 @@
 // Warning: This file should not be modified directly! Instead, modify the `*.cppy` file.
 
 
-#include <xtensor/xarray.hpp>
-#include <xtensor/xio.hpp>
-#include <xtensor/xmath.hpp>
-#include <xtensor/xsort.hpp>
-#include <xtensor/xview.hpp>
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/core/xmath.hpp"
+#include "xtensor/io/xio.hpp"
+#include "xtensor/misc/xsort.hpp"
+#include "xtensor/views/xview.hpp"
 
 #include "test_common_macros.hpp"
 

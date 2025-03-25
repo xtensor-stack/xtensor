@@ -11,12 +11,12 @@
 
 #include <xtl/xcomplex.hpp>
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xbuilder.hpp"
-#include "xtensor/xcomplex.hpp"
-#include "xtensor/xio.hpp"
-#include "xtensor/xnorm.hpp"
-#include "xtensor/xview.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/generators/xbuilder.hpp"
+#include "xtensor/io/xio.hpp"
+#include "xtensor/misc/xcomplex.hpp"
+#include "xtensor/reducers/xnorm.hpp"
+#include "xtensor/views/xview.hpp"
 
 #include "test_common_macros.hpp"
 

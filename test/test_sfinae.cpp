@@ -10,12 +10,13 @@
 #include <complex>
 #include <limits>
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xtensor.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/containers/xtensor.hpp"
+#include "xtensor/views/xview.hpp"
 
 #include "test_common_macros.hpp"
+
 // #include "xtensor/xfixed.hpp"
-#include "xtensor/xview.hpp"
 
 namespace xt
 {

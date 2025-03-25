@@ -13,7 +13,7 @@
 
 #include <string>
 
-#include "xtensor/xexception.hpp"
+#include "xtensor/utils/xexception.hpp"
 
 #include "test_common_macros.hpp"
 

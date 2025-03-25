@@ -5,7 +5,7 @@
 #define DOCTEST_CONFIG_NO_EXCEPTIONS_BUT_WITH_ALL_ASSERTS
 #endif
 
-#include "xtensor/xtensor_config.hpp"
+#include "xtensor/core/xtensor_config.hpp"
 
 #include "doctest/doctest.h"
 #include "test_utils.hpp"

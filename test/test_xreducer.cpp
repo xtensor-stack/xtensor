@@ -13,23 +13,23 @@
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #pragma GCC diagnostic ignored "-Wconversion"
 #pragma GCC diagnostic ignored "-Wfloat-conversion"
-#include "xtensor/xmath.hpp"
+#include "xtensor/core/xmath.hpp"
 #pragma GCC diagnostic pop
 #else
-#include "xtensor/xmath.hpp"
+#include "xtensor/core/xmath.hpp"
 #endif
-#include "xtensor/xarray.hpp"
-#include "xtensor/xbuilder.hpp"
-#include "xtensor/xfixed.hpp"
-#include "xtensor/xio.hpp"
-#include "xtensor/xmanipulation.hpp"
-#include "xtensor/xoptional.hpp"
-#include "xtensor/xoptional_assembly.hpp"
-#include "xtensor/xrandom.hpp"
-#include "xtensor/xreducer.hpp"
-#include "xtensor/xtensor.hpp"
-#include "xtensor/xutils.hpp"
-#include "xtensor/xview.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/containers/xfixed.hpp"
+#include "xtensor/containers/xtensor.hpp"
+#include "xtensor/generators/xbuilder.hpp"
+#include "xtensor/generators/xrandom.hpp"
+#include "xtensor/io/xio.hpp"
+#include "xtensor/misc/xmanipulation.hpp"
+#include "xtensor/optional/xoptional.hpp"
+#include "xtensor/optional/xoptional_assembly.hpp"
+#include "xtensor/reducers/xreducer.hpp"
+#include "xtensor/utils/xutils.hpp"
+#include "xtensor/views/xview.hpp"
 
 namespace xt
 {

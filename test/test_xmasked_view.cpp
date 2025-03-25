@@ -7,9 +7,9 @@
  * The full license is in the file LICENSE, distributed with this software. *
  ****************************************************************************/
 
-#include "xtensor/xio.hpp"
-#include "xtensor/xmasked_view.hpp"
-#include "xtensor/xoptional_assembly.hpp"
+#include "xtensor/io/xio.hpp"
+#include "xtensor/optional/xoptional_assembly.hpp"
+#include "xtensor/views/xmasked_view.hpp"
 
 #include "test_common_macros.hpp"
 

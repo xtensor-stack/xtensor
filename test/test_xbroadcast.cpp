@@ -8,8 +8,8 @@
  ****************************************************************************/
 
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xbroadcast.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/views/xbroadcast.hpp"
 
 #include "test_common.hpp"
 

@@ -7,7 +7,7 @@
  * The full license is in the file LICENSE, distributed with this software. *
  ****************************************************************************/
 
-#include "xtensor/xnoalias.hpp"
+#include "xtensor/core/xnoalias.hpp"
 
 #include "test_common_macros.hpp"
 #include "test_xsemantic.hpp"

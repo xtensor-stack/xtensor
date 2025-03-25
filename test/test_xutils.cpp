@@ -12,13 +12,13 @@
 #include <tuple>
 #include <type_traits>
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xfixed.hpp"
-#include "xtensor/xshape.hpp"
-#include "xtensor/xstrided_view.hpp"
-#include "xtensor/xtensor.hpp"
-#include "xtensor/xutils.hpp"
-#include "xtensor/xview.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/containers/xfixed.hpp"
+#include "xtensor/containers/xtensor.hpp"
+#include "xtensor/core/xshape.hpp"
+#include "xtensor/utils/xutils.hpp"
+#include "xtensor/views/xstrided_view.hpp"
+#include "xtensor/views/xview.hpp"
 
 #include "test_common_macros.hpp"
 

@@ -10,9 +10,9 @@
 #include <iostream>
 #include <sstream>
 
-#include "xtensor/xcsv.hpp"
-#include "xtensor/xio.hpp"
-#include "xtensor/xmath.hpp"
+#include "xtensor/core/xmath.hpp"
+#include "xtensor/io/xcsv.hpp"
+#include "xtensor/io/xio.hpp"
 
 #include "test_common_macros.hpp"
 

@@ -12,14 +12,14 @@
 #if (defined(__GNUC__) && !defined(__clang__))
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#include "xtensor/xrandom.hpp"
+#include "xtensor/generators/xrandom.hpp"
 #pragma GCC diagnostic pop
 #else
-#include "xtensor/xrandom.hpp"
+#include "xtensor/generators/xrandom.hpp"
 #endif
-#include "xtensor/xarray.hpp"
-#include "xtensor/xset_operation.hpp"
-#include "xtensor/xview.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/misc/xset_operation.hpp"
+#include "xtensor/views/xview.hpp"
 
 #include "test_common_macros.hpp"
 

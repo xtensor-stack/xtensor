@@ -9,10 +9,10 @@
 
 #include <cstddef>
 
-#include "xtensor/xexpression.hpp"
-#include "xtensor/xio.hpp"
-#include "xtensor/xtensor.hpp"
-#include "xtensor/xview.hpp"
+#include "xtensor/containers/xtensor.hpp"
+#include "xtensor/core/xexpression.hpp"
+#include "xtensor/io/xio.hpp"
+#include "xtensor/views/xview.hpp"
 
 #include "test_common_macros.hpp"
 
