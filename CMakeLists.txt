@@ -7,7 +7,7 @@
 # The full license is in the file LICENSE, distributed with this software. #
 ############################################################################
 
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.29)
 project(xtensor CXX)
 
 set(XTENSOR_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -29,7 +29,7 @@ message(STATUS "Building xtensor v${${PROJECT_NAME}_VERSION}")
 # Dependencies
 # ============
 
-set(xtl_REQUIRED_VERSION 0.7.5)
+set(xtl_REQUIRED_VERSION 0.8.0)
 if(TARGET xtl)
     set(xtl_VERSION ${XTL_VERSION_MAJOR}.${XTL_VERSION_MINOR}.${XTL_VERSION_PATCH})
     # Note: This is not SEMVER compatible comparison
@@ -194,7 +194,7 @@ target_include_directories(xtensor INTERFACE
     $<BUILD_INTERFACE:${XTENSOR_INCLUDE_DIR}>
     $<INSTALL_INTERFACE:include>)
 
-target_compile_features(xtensor INTERFACE cxx_std_14)
+target_compile_features(xtensor INTERFACE cxx_std_17)
 
 target_link_libraries(xtensor INTERFACE xtl)
 
@@ -205,8 +205,6 @@ OPTION(BUILD_TESTS "xtensor test suite" OFF)
 OPTION(BUILD_BENCHMARK "xtensor benchmark" OFF)
 OPTION(DOWNLOAD_GBENCHMARK "download google benchmark and build from source" ON)
 OPTION(DEFAULT_COLUMN_MAJOR "set default layout to column major" OFF)
-OPTION(DISABLE_VS2017 "disables the compilation of some test with Visual Studio 2017" OFF)
-OPTION(CPP17 "enables C++17" OFF)
 OPTION(CPP20 "enables C++20 (experimental)" OFF)
 OPTION(XTENSOR_DISABLE_EXCEPTIONS "Disable C++ exceptions" OFF)
 OPTION(DISABLE_MSVC_ITERATOR_CHECK "Disable the MVSC iterator check" ON)

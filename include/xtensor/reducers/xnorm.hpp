@@ -395,7 +395,7 @@ namespace xt
 #define XTENSOR_EMPTY
 #define XTENSOR_COMMA ,
 #define XTENSOR_NORM_FUNCTION(NAME, RESULT_TYPE, REDUCE_EXPR, REDUCE_OP, MERGE_FUNC)                                       \
-    template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS, XTL_REQUIRES(xtl::negation<is_reducer_options<X>>)> \
+    template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS, XTL_REQUIRES(std::negation<is_reducer_options<X>>)> \
     inline auto NAME(E&& e, X&& axes, EVS es = EVS()) noexcept                                                             \
     {                                                                                                                      \
         using value_type = typename std::decay_t<E>::value_type;                                                           \
@@ -512,7 +512,7 @@ namespace xt
         class E,
         class X,
         class EVS = DEFAULT_STRATEGY_REDUCERS,
-        XTL_REQUIRES(is_xexpression<E>, xtl::negation<is_reducer_options<X>>)>
+        XTL_REQUIRES(is_xexpression<E>, std::negation<is_reducer_options<X>>)>
     inline auto norm_l2(E&& e, X&& axes, EVS es = EVS()) noexcept
     {
         return sqrt(norm_sq(std::forward<E>(e), std::forward<X>(axes), es));
@@ -553,7 +553,7 @@ namespace xt
      * When no axes are provided, the norm is calculated over the entire array. In this case,
      * the reducer represents a scalar result, otherwise an array of appropriate dimension.
      */
-    template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS, XTL_REQUIRES(xtl::negation<is_reducer_options<X>>)>
+    template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS, XTL_REQUIRES(std::negation<is_reducer_options<X>>)>
     inline auto norm_lp_to_p(E&& e, double p, X&& axes, EVS es = EVS()) noexcept
     {
         using value_type = typename std::decay_t<E>::value_type;
@@ -597,7 +597,7 @@ namespace xt
      * When no axes are provided, the norm is calculated over the entire array. In this case,
      * the reducer represents a scalar result, otherwise an array of appropriate dimension.
      */
-    template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS, XTL_REQUIRES(xtl::negation<is_reducer_options<X>>)>
+    template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS, XTL_REQUIRES(std::negation<is_reducer_options<X>>)>
     inline auto norm_lp(E&& e, double p, X&& axes, EVS es = EVS())
     {
         XTENSOR_PRECONDITION(p != 0, "norm_lp(): p must be nonzero, use norm_l0() instead.");

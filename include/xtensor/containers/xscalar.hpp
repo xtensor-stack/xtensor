@@ -322,13 +322,13 @@ namespace xt
         template <class... E>
         struct all_xscalar
         {
-            static constexpr bool value = xtl::conjunction<is_xscalar<std::decay_t<E>>...>::value;
+            static constexpr bool value = std::conjunction<is_xscalar<std::decay_t<E>>...>::value;
         };
     }
 
     // Note: MSVC bug workaround. Cannot just define
     // template <class... E>
-    // using all_xscalar = xtl::conjunction<is_xscalar<std::decay_t<E>>...>;
+    // using all_xscalar = std::conjunction<is_xscalar<std::decay_t<E>>...>;
 
     template <class... E>
     using all_xscalar = detail::all_xscalar<E...>;

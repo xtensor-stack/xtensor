@@ -67,7 +67,7 @@ namespace xt
     using disable_xslice = typename std::enable_if<!is_xslice<E>::value, R>::type;
 
     template <class... E>
-    using has_xslice = xtl::disjunction<is_xslice<E>...>;
+    using has_xslice = std::disjunction<is_xslice<E>...>;
 
     /**************
      * slice tags *

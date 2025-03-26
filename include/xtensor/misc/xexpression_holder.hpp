@@ -17,7 +17,6 @@
 #include "../containers/xarray.hpp"
 #include "../core/xtensor_config.hpp"
 #include "../io/xjson.hpp"
-#include "xtl/xany.hpp"
 
 namespace xt
 {

@@ -58,7 +58,7 @@ namespace xt
                 size_type nrows = view.shape()[0];
                 for (size_type i = 0; i != nrows; ++i)
                 {
-                    slices.push_back(i);
+                    slices.push_back(static_cast<std::ptrdiff_t>(i));
                     nlohmann::basic_json<M> k;
                     to_json_impl(k, e, slices);
                     j.push_back(std::move(k));
@@ -83,7 +83,7 @@ namespace xt
                 size_type nrows = view.shape()[0];
                 for (size_type i = 0; i != nrows; ++i)
                 {
-                    slices.push_back(i);
+                    slices.push_back(static_cast<std::ptrdiff_t>(i));
                     const nlohmann::basic_json<M>& k = j[i];
                     from_json_impl(k, e, slices);
                     slices.pop_back();

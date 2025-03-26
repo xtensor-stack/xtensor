@@ -359,7 +359,7 @@ namespace xt
 
     template <class D, class T>
     struct has_simd_interface<xfunctor_applier_base<D>, T>
-        : xtl::conjunction<
+        : std::conjunction<
               has_simd_type<T>,
               has_simd_interface<typename xfunctor_applier_base<D>::xexpression_type>,
               detail::has_simd_interface_impl<xfunctor_applier_base<D>, T>>

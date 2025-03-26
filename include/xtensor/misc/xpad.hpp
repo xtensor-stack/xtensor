@@ -298,7 +298,7 @@ namespace xt
         return detail::tile(std::forward<E>(e), std::vector<S>{reps});
     }
 
-    template <class E, class C, XTL_REQUIRES(xtl::negation<xtl::is_integral<C>>)>
+    template <class E, class C, XTL_REQUIRES(std::negation<xtl::is_integral<C>>)>
     inline auto tile(E&& e, const C& reps)
     {
         return detail::tile(std::forward<E>(e), reps);

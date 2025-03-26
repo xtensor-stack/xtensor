@@ -420,65 +420,53 @@ namespace xt
     template <class C>
     XTENSOR_CONSTEXPR_RETURN auto linear_begin(C& c) noexcept
     {
-        return xtl::mpl::static_if<detail::has_linear_iterator<C>::value>(
-            [&](auto self)
-            {
-                return self(c).linear_begin();
-            },
-            /*else*/
-            [&](auto self)
-            {
-                return self(c).begin();
-            }
-        );
+        if constexpr (detail::has_linear_iterator<C>::value)
+        {
+            return c.linear_begin();
+        }
+        else
+        {
+            return c.begin();
+        }
     }
 
     template <class C>
     XTENSOR_CONSTEXPR_RETURN auto linear_end(C& c) noexcept
     {
-        return xtl::mpl::static_if<detail::has_linear_iterator<C>::value>(
-            [&](auto self)
-            {
-                return self(c).linear_end();
-            },
-            /*else*/
-            [&](auto self)
-            {
-                return self(c).end();
-            }
-        );
+        if constexpr (detail::has_linear_iterator<C>::value)
+        {
+            return c.linear_end();
+        }
+        else
+        {
+            return c.end();
+        }
     }
 
     template <class C>
     XTENSOR_CONSTEXPR_RETURN auto linear_begin(const C& c) noexcept
     {
-        return xtl::mpl::static_if<detail::has_linear_iterator<C>::value>(
-            [&](auto self)
-            {
-                return self(c).linear_cbegin();
-            },
-            /*else*/
-            [&](auto self)
-            {
-                return self(c).cbegin();
-            }
-        );
+        if constexpr (detail::has_linear_iterator<C>::value)
+        {
+            return c.linear_cbegin();
+        }
+        else
+        {
+            return c.cbegin();
+        }
     }
 
     template <class C>
     XTENSOR_CONSTEXPR_RETURN auto linear_end(const C& c) noexcept
     {
-        return xtl::mpl::static_if<detail::has_linear_iterator<C>::value>(
-            [&](auto self)
-            {
-                return self(c).linear_cend();
-            },
-            /*else*/
-            [&](auto self)
-            {
-                return self(c).cend();
-            }
-        );
+        if constexpr (detail::has_linear_iterator<C>::value)
+        {
+            return c.linear_cend();
+        }
+        else
+        {
+            return c.cend();
+        }
     }
 
     /***************************

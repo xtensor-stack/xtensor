@@ -130,19 +130,11 @@ namespace xt
 
         reducer_options(const T& tpl)
         {
-            xtl::mpl::static_if<initial_val_idx != std::tuple_size<T>::value>(
-                [this, &tpl](auto no_compile)
-                {
-                    // use no_compile to prevent compilation if initial_val_idx is out of bounds!
-                    this->initial_value = no_compile(
-                                              std::get < initial_val_idx != std::tuple_size<T>::value
-                                                  ? initial_val_idx
-                                                  : 0 > (tpl)
-                    )
-                                              .value();
-                },
-                [](auto /*np_compile*/) {}
-            );
+            if constexpr (initial_val_idx != std::tuple_size<T>::value)
+            {
+                initial_value = std::get < initial_val_idx != std::tuple_size<T>::value ? initial_val_idx
+                                                                                        : 0 > (tpl).value();
+            }
         }
 
         using evaluation_strategy = std::conditional_t<
@@ -272,7 +264,7 @@ namespace xt
         class F,
         class E,
         class R,
-        XTL_REQUIRES(xtl::negation<std::is_convertible<typename E::value_type, typename R::value_type>>)>
+        XTL_REQUIRES(std::negation<std::is_convertible<typename E::value_type, typename R::value_type>>)>
     inline void copy_to_reduced(F& f, const E& e, R& result)
     {
         if (e.layout() == layout_type::row_major)
@@ -998,7 +990,7 @@ namespace xt
         class E,
         class X,
         class EVS = DEFAULT_STRATEGY_REDUCERS,
-        XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, detail::is_xreducer_functors<F>)>
+        XTL_REQUIRES(std::negation<is_reducer_options<X>>, detail::is_xreducer_functors<F>)>
     inline auto reduce(F&& f, E&& e, X&& axes, EVS&& options = EVS())
     {
         return detail::reduce_impl(
@@ -1015,7 +1007,7 @@ namespace xt
         class E,
         class X,
         class EVS = DEFAULT_STRATEGY_REDUCERS,
-        XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::negation<detail::is_xreducer_functors<F>>)>
+        XTL_REQUIRES(std::negation<is_reducer_options<X>>, std::negation<detail::is_xreducer_functors<F>>)>
     inline auto reduce(F&& f, E&& e, X&& axes, EVS&& options = EVS())
     {
         return reduce(
@@ -1049,7 +1041,7 @@ namespace xt
         class F,
         class E,
         class EVS = DEFAULT_STRATEGY_REDUCERS,
-        XTL_REQUIRES(is_reducer_options<EVS>, xtl::negation<detail::is_xreducer_functors<F>>)>
+        XTL_REQUIRES(is_reducer_options<EVS>, std::negation<detail::is_xreducer_functors<F>>)>
     inline auto reduce(F&& f, E&& e, EVS&& options = EVS())
     {
         return reduce(make_xreducer_functor(std::forward<F>(f)), std::forward<E>(e), std::forward<EVS>(options));
@@ -1081,7 +1073,7 @@ namespace xt
         class I,
         std::size_t N,
         class EVS = DEFAULT_STRATEGY_REDUCERS,
-        XTL_REQUIRES(xtl::negation<detail::is_xreducer_functors<F>>)>
+        XTL_REQUIRES(std::negation<detail::is_xreducer_functors<F>>)>
     inline auto reduce(F&& f, E&& e, const I (&axes)[N], EVS options = EVS())
     {
         return reduce(make_xreducer_functor(std::forward<F>(f)), std::forward<E>(e), axes, options);
@@ -1154,7 +1146,7 @@ namespace xt
         template <std::size_t X, std::size_t... I>
         struct in
         {
-            static constexpr bool value = xtl::disjunction<std::integral_constant<bool, X == I>...>::value;
+            static constexpr bool value = std::disjunction<std::integral_constant<bool, X == I>...>::value;
         };
 
         template <std::size_t Z, class S1, class S2, class R>

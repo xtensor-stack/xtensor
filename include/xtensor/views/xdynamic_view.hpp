@@ -9,8 +9,9 @@
 #ifndef XTENSOR_DYNAMIC_VIEW_HPP
 #define XTENSOR_DYNAMIC_VIEW_HPP
 
+#include <variant>
+
 #include <xtl/xsequence.hpp>
-#include <xtl/xvariant.hpp>
 
 #include "../core/xexpression.hpp"
 #include "../core/xiterable.hpp"
@@ -143,7 +144,7 @@ namespace xt
         using bool_load_type = typename base_type::bool_load_type;
 
         using strides_vt = typename strides_type::value_type;
-        using slice_type = xtl::variant<detail::xfake_slice<strides_vt>, xkeep_slice<strides_vt>, xdrop_slice<strides_vt>>;
+        using slice_type = std::variant<detail::xfake_slice<strides_vt>, xkeep_slice<strides_vt>, xdrop_slice<strides_vt>>;
         using slice_vector_type = std::vector<slice_type>;
 
         template <class CTA, class SA>
@@ -287,7 +288,7 @@ namespace xt
      **************************/
 
     template <class T>
-    using xdynamic_slice = xtl::variant<
+    using xdynamic_slice = std::variant<
         T,
 
         xrange_adaptor<placeholders::xtuph, T, T>,
@@ -505,7 +506,7 @@ namespace xt
     inline auto xdynamic_view<CT, S, L, FST>::data_offset() const noexcept -> size_type
     {
         size_type offset = base_type::data_offset();
-        size_type sl_offset = xtl::visit(
+        size_type sl_offset = std::visit(
             [](const auto& sl)
             {
                 return sl(size_type(0));
@@ -648,7 +649,7 @@ namespace xt
     xdynamic_view<CT, S, L, FST>::adjust_offset_impl(offset_type offset, size_type idx_offset, T idx, Args... args)
         const noexcept -> offset_type
     {
-        offset_type sl_offset = xtl::visit(
+        offset_type sl_offset = std::visit(
             [idx](const auto& sl)
             {
                 using type = typename std::decay_t<decltype(sl)>::size_type;
@@ -681,7 +682,7 @@ namespace xt
         for (offset_type i = loop_offset; i < dim; ++i, ++first)
         {
             offset_type j = static_cast<offset_type>(first[idx_offset]);
-            offset_type sl_offset = xtl::visit(
+            offset_type sl_offset = std::visit(
                 [j](const auto& sl)
                 {
                     return static_cast<offset_type>(sl(j));
@@ -764,11 +765,11 @@ namespace xt
                 get_strides_t<S>& strides
             )
             {
-                auto* sl = xtl::get_if<SL>(&slices[sl_idx]);
+                auto* sl = std::get_if<SL>(&slices[sl_idx]);
                 if (sl != nullptr)
                 {
                     new_slices[i] = *sl;
-                    auto& ns = xtl::get<SL>(new_slices[i]);
+                    auto& ns = std::get<SL>(new_slices[i]);
                     ns.normalize(old_shape);
                     shape[i] = static_cast<std::size_t>(ns.size());
                     strides[i] = std::ptrdiff_t(0);

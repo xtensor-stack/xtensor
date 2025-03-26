@@ -948,17 +948,14 @@ namespace xt
     template <layout_type L>
     inline auto xcontiguous_iterable<D>::begin() noexcept -> select_iterator<L>
     {
-        return xtl::mpl::static_if<L == static_layout>(
-            [&](auto self)
-            {
-                return self(*this).derived_cast().linear_begin();
-            },
-            /*else*/
-            [&](auto self)
-            {
-                return self(*this).iterable_base::template begin<L>();
-            }
-        );
+        if constexpr (L == static_layout)
+        {
+            return derived_cast().linear_begin();
+        }
+        else
+        {
+            return iterable_base::template begin<L>();
+        }
     }
 
     /**
@@ -970,17 +967,14 @@ namespace xt
     template <layout_type L>
     inline auto xcontiguous_iterable<D>::end() noexcept -> select_iterator<L>
     {
-        return xtl::mpl::static_if<L == static_layout>(
-            [&](auto self)
-            {
-                return self(*this).derived_cast().linear_end();
-            },
-            /*else*/
-            [&](auto self)
-            {
-                return self(*this).iterable_base::template end<L>();
-            }
-        );
+        if constexpr (L == static_layout)
+        {
+            return derived_cast().linear_end();
+        }
+        else
+        {
+            return iterable_base::template end<L>();
+        }
     }
 
     /**
@@ -1014,17 +1008,14 @@ namespace xt
     template <layout_type L>
     inline auto xcontiguous_iterable<D>::cbegin() const noexcept -> select_const_iterator<L>
     {
-        return xtl::mpl::static_if<L == static_layout>(
-            [&](auto self)
-            {
-                return self(*this).derived_cast().linear_cbegin();
-            },
-            /*else*/
-            [&](auto self)
-            {
-                return self(*this).iterable_base::template cbegin<L>();
-            }
-        );
+        if constexpr (L == static_layout)
+        {
+            return derived_cast().linear_cbegin();
+        }
+        else
+        {
+            return iterable_base::template cbegin<L>();
+        }
     }
 
     /**
@@ -1036,17 +1027,14 @@ namespace xt
     template <layout_type L>
     inline auto xcontiguous_iterable<D>::cend() const noexcept -> select_const_iterator<L>
     {
-        return xtl::mpl::static_if<L == static_layout>(
-            [&](auto self)
-            {
-                return self(*this).derived_cast().linear_cend();
-            },
-            /*else*/
-            [&](auto self)
-            {
-                return self(*this).iterable_base::template cend<L>();
-            }
-        );
+        if constexpr (L == static_layout)
+        {
+            return derived_cast().linear_cend();
+        }
+        else
+        {
+            return iterable_base::template cend<L>();
+        }
     }
 
     //@}
@@ -1063,17 +1051,14 @@ namespace xt
     template <layout_type L>
     inline auto xcontiguous_iterable<D>::rbegin() noexcept -> select_reverse_iterator<L>
     {
-        return xtl::mpl::static_if<L == static_layout>(
-            [&](auto self)
-            {
-                return self(*this).derived_cast().linear_rbegin();
-            },
-            /*else*/
-            [&](auto self)
-            {
-                return self(*this).iterable_base::template rbegin<L>();
-            }
-        );
+        if constexpr (L == static_layout)
+        {
+            return derived_cast().linear_rbegin();
+        }
+        else
+        {
+            return iterable_base::template rbegin<L>();
+        }
     }
 
     /**
@@ -1085,17 +1070,14 @@ namespace xt
     template <layout_type L>
     inline auto xcontiguous_iterable<D>::rend() noexcept -> select_reverse_iterator<L>
     {
-        return xtl::mpl::static_if<L == static_layout>(
-            [&](auto self)
-            {
-                return self(*this).derived_cast().linear_rend();
-            },
-            /*else*/
-            [&](auto self)
-            {
-                return self(*this).iterable_base::template rend<L>();
-            }
-        );
+        if constexpr (L == static_layout)
+        {
+            return derived_cast().linear_rend();
+        }
+        else
+        {
+            return iterable_base::template rend<L>();
+        }
     }
 
     /**
@@ -1129,17 +1111,14 @@ namespace xt
     template <layout_type L>
     inline auto xcontiguous_iterable<D>::crbegin() const noexcept -> select_const_reverse_iterator<L>
     {
-        return xtl::mpl::static_if<L == static_layout>(
-            [&](auto self)
-            {
-                return self(*this).derived_cast().linear_crbegin();
-            },
-            /*else*/
-            [&](auto self)
-            {
-                return self(*this).iterable_base::template crbegin<L>();
-            }
-        );
+        if constexpr (L == static_layout)
+        {
+            return derived_cast().linear_crbegin();
+        }
+        else
+        {
+            return iterable_base::template crbegin<L>();
+        }
     }
 
     /**
@@ -1151,17 +1130,14 @@ namespace xt
     template <layout_type L>
     inline auto xcontiguous_iterable<D>::crend() const noexcept -> select_const_reverse_iterator<L>
     {
-        return xtl::mpl::static_if<L == static_layout>(
-            [&](auto self)
-            {
-                return self(*this).derived_cast().linear_crend();
-            },
-            /*else*/
-            [&](auto self)
-            {
-                return self(*this).iterable_base::template crend<L>();
-            }
-        );
+        if constexpr (L == static_layout)
+        {
+            return derived_cast().linear_crend();
+        }
+        else
+        {
+            return iterable_base::template crend<L>();
+        }
     }
 
     //@}
