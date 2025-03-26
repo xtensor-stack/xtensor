@@ -15,7 +15,7 @@
 #ifndef VS_SKIP_XFIXED
 
 
-#if (_MSC_VER < 1910 && _WIN64) || (_MSC_VER >= 1910 && !defined(DISABLE_VS2017)) || !defined(_MSC_VER)
+#if (_MSC_VER < 1910 && _WIN64) || (_MSC_VER >= 1910) || !defined(_MSC_VER)
 
 #include <complex>
 #include <limits>
