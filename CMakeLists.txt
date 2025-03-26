@@ -226,10 +226,6 @@ if(DEFAULT_COLUMN_MAJOR)
     add_definitions(-DXTENSOR_DEFAULT_LAYOUT=layout_type::column_major)
 endif()
 
-if(DISABLE_VS2017)
-    add_definitions(-DDISABLE_VS2017)
-endif()
-
 if(MSVC AND DISABLE_MSVC_ITERATOR_CHECK)
     add_compile_definitions($<$<CONFIG:Debug>:_ITERATOR_DEBUG_LEVEL=0>)
 endif()

@@ -12,52 +12,44 @@ defaults:
     shell: bash -e -l {0}
 jobs:
   build:
+    runs-on: ubuntu-24.04
     name: ${{ matrix.sys.compiler }} ${{ matrix.sys.version }} - ${{ matrix.sys.name }}
     strategy:
       fail-fast: false
       matrix:
         sys:
-        - {os: ubuntu-20.04, compiler: clang, version: '15', name: assert, flags: -DXTENSOR_ENABLE_ASSERT=ON}
-        - {os: ubuntu-20.04, compiler: clang, version: '16', name: column-major, flags: -DDEFAULT_COLUMN_MAJOR=ON}
-        - {os: ubuntu-20.04, compiler: gcc, version: '8', name: openmp, flags: -DXTENSOR_USE_OPENMP=ON}
-        - {os: ubuntu-20.04, compiler: gcc, version: '9', name: noexcept, flags: -DXTENSOR_DISABLE_EXCEPTIONS=ON}
-        - {os: ubuntu-22.04, compiler: gcc, version: '10', name: xsimd, flags: -DXTENSOR_USE_XSIMD=ON}
-        - {os: ubuntu-22.04, compiler: gcc, version: '11', name: c++17, flags: -DCPP17=ON}
-        - {os: ubuntu-22.04, compiler: gcc, version: '11', name: xsimd-tbb, flags: -DXTENSOR_USE_XSIMD=ON -DXTENSOR_USE_TBB=ON}
-        - {os: ubuntu-22.04, compiler: gcc, version: '11', name: tbb, flags: -DXTENSOR_USE_TBB=ON -DTBB_INCLUDE_DIR=$CONDA_PREFIX/include -DTBB_LIBRARY=$CONDA_PREFIX/lib}
-        - {os: ubuntu-22.04, compiler: gcc, version: '12', name: c++17, flags: -DCPP17=ON}
-        - {os: ubuntu-22.04, compiler: gcc, version: '12', name: xsimd-tbb, flags: -DXTENSOR_USE_XSIMD=ON -DXTENSOR_USE_TBB=ON}
-        - {os: ubuntu-22.04, compiler: gcc, version: '12', name: tbb, flags: -DXTENSOR_USE_TBB=ON -DTBB_INCLUDE_DIR=$CONDA_PREFIX/include -DTBB_LIBRARY=$CONDA_PREFIX/lib}
-    runs-on: ${{ matrix.sys.os }}
+        - {compiler: clang, version: '17', name: assert, flags: -DXTENSOR_ENABLE_ASSERT=ON}
+        - {compiler: clang, version: '18', name: column-major, flags: -DDEFAULT_COLUMN_MAJOR=ON}
+          #- {compiler: clang, version: '19', name: assert, flags: -DXTENSOR_ENABLE_ASSERT=ON}
+          #- {compiler: clang, version: '20', name: column-major, flags: -DDEFAULT_COLUMN_MAJOR=ON}
+        - {compiler: gcc, version: '11', name: openmp, flags: -DXTENSOR_USE_OPENMP=ON}
+        - {compiler: gcc, version: '11', name: noexcept, flags: -DXTENSOR_DISABLE_EXCEPTIONS=ON}
+        - {compiler: gcc, version: '12', name: xsimd, flags: -DXTENSOR_USE_XSIMD=ON}
+        - {compiler: gcc, version: '13', name: xsimd-tbb, flags: -DXTENSOR_USE_XSIMD=ON -DXTENSOR_USE_TBB=ON}
+        - {compiler: gcc, version: '13', name: tbb, flags: -DXTENSOR_USE_TBB=ON -DTBB_INCLUDE_DIR=$CONDA_PREFIX/include -DTBB_LIBRARY=$CONDA_PREFIX/lib}
+        - {compiler: gcc, version: '14', name: xsimd-tbb, flags: -DXTENSOR_USE_XSIMD=ON -DXTENSOR_USE_TBB=ON}
+        - {compiler: gcc, version: '14', name: tbb, flags: -DXTENSOR_USE_TBB=ON -DTBB_INCLUDE_DIR=$CONDA_PREFIX/include -DTBB_LIBRARY=$CONDA_PREFIX/lib}
     steps:
-    - name: Setup GCC
-      if: ${{ matrix.sys.compiler == 'gcc' }}
+    - name: Install GCC
+      if: matrix.sys.compiler == 'gcc'
+      uses: egor-tensin/setup-gcc@v1
+      with:
+        version: ${{matrix.sys.version}}
+        platform: x64
+
+    - name: Install LLVM and Clang
+      if: matrix.sys.compiler == 'clang'
       run: |
-        GCC_VERSION=${{ matrix.sys.version }}
-        sudo apt-get update
-        sudo apt-get --no-install-suggests --no-install-recommends install g++-$GCC_VERSION
-        CC=gcc-$GCC_VERSION
-        echo "CC=$CC" >> $GITHUB_ENV
-        CXX=g++-$GCC_VERSION
-        echo "CXX=$CXX" >> $GITHUB_ENV
-    - name: Setup clang
-      if: ${{ matrix.sys.compiler == 'clang' }}
-      run: |
-        LLVM_VERSION=${{ matrix.sys.version }}
-        wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add - || exit 1
-        if [[ $LLVM_VERSION -ge 13 ]]; then
-          sudo add-apt-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-$LLVM_VERSION main" || exit 1
-        else
-          sudo add-apt-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal main" || exit 1
-        fi || exit 1
-        sudo apt-get update || exit 1
-        sudo apt-get --no-install-suggests --no-install-recommends install clang-$LLVM_VERSION || exit 1
-        sudo apt-get --no-install-suggests --no-install-recommends install g++-9 g++-9-multilib || exit 1
-        sudo ln -s /usr/include/asm-generic /usr/include/asm
-        CC=clang-$LLVM_VERSION
-        echo "CC=$CC" >> $GITHUB_ENV
-        CXX=clang++-$LLVM_VERSION
-        echo "CXX=$CXX" >> $GITHUB_ENV
+        wget https://apt.llvm.org/llvm.sh
+        chmod +x llvm.sh
+        sudo ./llvm.sh ${{matrix.sys.version}}
+        sudo apt-get install -y clang-tools-${{matrix.sys.version}}
+        sudo update-alternatives --install /usr/bin/clang++                 clang++                     /usr/bin/clang++-${{matrix.sys.version}} 200
+        sudo update-alternatives --install /usr/bin/clang                       clang                         /usr/bin/clang-${{matrix.sys.version}} 200
+        sudo update-alternatives --install /usr/bin/clang-scan-deps   clang-scan-deps     /usr/bin/clang-scan-deps-${{matrix.sys.version}} 200
+        sudo update-alternatives --set clang /usr/bin/clang-${{matrix.sys.version}}
+        sudo update-alternatives --set clang++ /usr/bin/clang++-${{matrix.sys.version}}
+        sudo update-alternatives --set clang-scan-deps /usr/bin/clang-scan-deps-${{matrix.sys.version}}
 
     - name: Checkout code
       uses: actions/checkout@v3
@@ -73,10 +65,9 @@ jobs:
           ${{ (matrix.sys.name == 'tbb' || matrix.sys.name == 'xsimd-tbb' ) && 'tbb-devel' || '' }}
 
     - name: Configure using CMake
-      #      env:
-      #        CC: ${{ env.CC }}
-      #        CXX: ${{ env.CXX }}
-      run: cmake -G Ninja -Bbuild -DCMAKE_C_COMPILER=$CC -DCMAKE_CXX_COMPILER=$CXX -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON ${{ matrix.sys.flags }}
+      run: |
+        if [[ "${{matrix.sys.compiler}}" = "gcc" ]]; then export CC=gcc-${{matrix.sys.version}}; export CXX=g++-${{matrix.sys.version}}; else export CC=clang; export CXX=clang++; fi
+        cmake -G Ninja -Bbuild -DCMAKE_C_COMPILER=$CC -DCMAKE_CXX_COMPILER=$CXX -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON ${{ matrix.sys.flags }}
 
     - name: Install
       working-directory: build

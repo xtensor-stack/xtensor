@@ -38,7 +38,7 @@
 // test_fixed removed from MSVC x86 because of recurring ICE.
 // Will be enabled again when the compiler is fixed
 
-#if (_MSC_VER < 1910 && _WIN64) || (_MSC_VER >= 1910 && !defined(DISABLE_VS2017)) || !defined(_MSC_VER)
+#if (_MSC_VER < 1910 && _WIN64) || (_MSC_VER >= 1910) || !defined(_MSC_VER)
 
 namespace xt
 {
