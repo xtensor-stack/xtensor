@@ -338,7 +338,7 @@ namespace xt
 
             using type = xt::fixed_shape<
                 broadcast_fixed_shape_cmp_impl<JX, fixed_shape<I...>, fixed_shape<J...>>::ordinate...>;
-            static constexpr bool value = xtl::conjunction<
+            static constexpr bool value = std::conjunction<
                 broadcast_fixed_shape_cmp_impl<JX, fixed_shape<I...>, fixed_shape<J...>>...>::value;
         };
 
@@ -390,18 +390,18 @@ namespace xt
         };
 
         template <class... S>
-        using only_array = xtl::conjunction<xtl::disjunction<is_array<S>, is_fixed<S>>...>;
+        using only_array = std::conjunction<std::disjunction<is_array<S>, is_fixed<S>>...>;
 
         // test that at least one argument is a fixed shape. If yes, then either argument has to be fixed or
         // scalar
         template <class... S>
         using only_fixed = std::integral_constant<
             bool,
-            xtl::disjunction<is_fixed<S>...>::value
-                && xtl::conjunction<xtl::disjunction<is_fixed<S>, is_scalar_shape<S>>...>::value>;
+            std::disjunction<is_fixed<S>...>::value
+                && std::conjunction<std::disjunction<is_fixed<S>, is_scalar_shape<S>>...>::value>;
 
         template <class... S>
-        using all_fixed = xtl::conjunction<is_fixed<S>...>;
+        using all_fixed = std::conjunction<is_fixed<S>...>;
 
         // The promote_index meta-function returns std::vector<promoted_value_type> in the
         // general case and an array of the promoted value type and maximal size if all
@@ -461,7 +461,7 @@ namespace xt
         public:
 
             using type = typename result::type;
-            static constexpr bool value = xtl::conjunction<intermediate, result>::value;
+            static constexpr bool value = std::conjunction<intermediate, result>::value;
         };
 
         template <bool all_index, bool all_array, class... S>

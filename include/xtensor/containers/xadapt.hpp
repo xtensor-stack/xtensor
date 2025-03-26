@@ -52,13 +52,13 @@ namespace xt
         using default_allocator_for_ptr_t = typename default_allocator_for_ptr<P>::type;
 
         template <class T>
-        using not_an_array = xtl::negation<is_array<T>>;
+        using not_an_array = std::negation<is_array<T>>;
 
         template <class T>
-        using not_a_pointer = xtl::negation<std::is_pointer<T>>;
+        using not_a_pointer = std::negation<std::is_pointer<T>>;
 
         template <class T>
-        using not_a_layout = xtl::negation<std::is_same<layout_type, T>>;
+        using not_a_layout = std::negation<std::is_same<layout_type, T>>;
     }
 
 #ifndef IN_DOXYGEN

@@ -168,7 +168,7 @@ namespace xt
 
         template <template <class> class B, class E, template <class> class F>
         struct is_crtp_base_of_impl<B, F<E>>
-            : xtl::disjunction<std::is_base_of<B<E>, F<E>>, std::is_base_of<B<F<E>>, F<E>>>
+            : std::disjunction<std::is_base_of<B<E>, F<E>>, std::is_base_of<B<F<E>>, F<E>>>
         {
         };
     }
@@ -186,7 +186,7 @@ namespace xt
     using disable_xexpression = typename std::enable_if<!is_xexpression<E>::value, R>::type;
 
     template <class... E>
-    using has_xexpression = xtl::disjunction<is_xexpression<E>...>;
+    using has_xexpression = std::disjunction<is_xexpression<E>...>;
 
     template <class E>
     using is_xsharable_expression = is_crtp_base_of<xsharable_expression, E>;
@@ -405,7 +405,7 @@ namespace xt
 
     template <class... E>
     struct xoptional_comparable
-        : xtl::conjunction<xtl::disjunction<is_xtensor_expression<E>, is_xoptional_expression<E>>...>
+        : std::conjunction<std::disjunction<is_xtensor_expression<E>, is_xoptional_expression<E>>...>
     {
     };
 

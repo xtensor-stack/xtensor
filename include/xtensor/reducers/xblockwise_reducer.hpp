@@ -291,7 +291,7 @@ namespace xt
         class BS,                                                                                             \
         class X,                                                                                              \
         class O = DEFAULT_STRATEGY_REDUCERS,                                                                  \
-        XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::negation<xtl::is_integral<std::decay_t<X>>>)> \
+        XTL_REQUIRES(std::negation<is_reducer_options<X>>, std::negation<xtl::is_integral<std::decay_t<X>>>)> \
     auto FNAME(E&& e, BS&& block_shape, X&& axes, O options = O())                                            \
     {                                                                                                         \
         using input_expression_type = std::decay_t<E>;                                                        \
@@ -329,7 +329,7 @@ namespace xt
         class E,                                                                                              \
         class BS,                                                                                             \
         class O = DEFAULT_STRATEGY_REDUCERS,                                                                  \
-        XTL_REQUIRES(is_reducer_options<O>, xtl::negation<xtl::is_integral<std::decay_t<O>>>)>                \
+        XTL_REQUIRES(is_reducer_options<O>, std::negation<xtl::is_integral<std::decay_t<O>>>)>                \
     auto FNAME(E&& e, BS&& block_shape, O options = O())                                                      \
     {                                                                                                         \
         using input_expression_type = std::decay_t<E>;                                                        \
@@ -380,7 +380,7 @@ namespace xt
         class BS,                                                                                                               \
         class X,                                                                                                                \
         class O = DEFAULT_STRATEGY_REDUCERS,                                                                                    \
-        XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::negation<xtl::is_integral<std::decay_t<X>>>)>                   \
+        XTL_REQUIRES(std::negation<is_reducer_options<X>>, std::negation<xtl::is_integral<std::decay_t<X>>>)>                   \
     auto FNAME(E&& e, BS&& block_shape, X&& axes, O options = O())                                                              \
     {                                                                                                                           \
         using input_expression_type = std::decay_t<E>;                                                                          \
@@ -411,7 +411,7 @@ namespace xt
         class E,                                                                                                                \
         class BS,                                                                                                               \
         class O = DEFAULT_STRATEGY_REDUCERS,                                                                                    \
-        XTL_REQUIRES(is_reducer_options<O>, xtl::negation<xtl::is_integral<std::decay_t<O>>>)>                                  \
+        XTL_REQUIRES(is_reducer_options<O>, std::negation<xtl::is_integral<std::decay_t<O>>>)>                                  \
     auto FNAME(E&& e, BS&& block_shape, O options = O())                                                                        \
     {                                                                                                                           \
         using input_expression_type = std::decay_t<E>;                                                                          \
@@ -458,7 +458,7 @@ namespace xt
         class BS,                                                                                                               \
         class X,                                                                                                                \
         class O = DEFAULT_STRATEGY_REDUCERS,                                                                                    \
-        XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::negation<xtl::is_integral<std::decay_t<X>>>)>                   \
+        XTL_REQUIRES(std::negation<is_reducer_options<X>>, std::negation<xtl::is_integral<std::decay_t<X>>>)>                   \
     auto FNAME(E&& e, BS&& block_shape, double p, X&& axes, O options = O())                                                    \
     {                                                                                                                           \
         using input_expression_type = std::decay_t<E>;                                                                          \
@@ -489,7 +489,7 @@ namespace xt
         class E,                                                                                                                \
         class BS,                                                                                                               \
         class O = DEFAULT_STRATEGY_REDUCERS,                                                                                    \
-        XTL_REQUIRES(is_reducer_options<O>, xtl::negation<xtl::is_integral<std::decay_t<O>>>)>                                  \
+        XTL_REQUIRES(is_reducer_options<O>, std::negation<xtl::is_integral<std::decay_t<O>>>)>                                  \
     auto FNAME(E&& e, BS&& block_shape, double p, O options = O())                                                              \
     {                                                                                                                           \
         using input_expression_type = std::decay_t<E>;                                                                          \

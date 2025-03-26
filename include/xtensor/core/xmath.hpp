@@ -370,7 +370,7 @@ namespace xt
         class E,                                                                                                     \
         class X,                                                                                                     \
         class EVS = DEFAULT_STRATEGY_REDUCERS,                                                                       \
-        XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::negation<xtl::is_integral<std::decay_t<X>>>)>        \
+        XTL_REQUIRES(std::negation<is_reducer_options<X>>, std::negation<xtl::is_integral<std::decay_t<X>>>)>        \
     inline auto NAME(E&& e, X&& axes, EVS es = EVS())                                                                \
     {                                                                                                                \
         using init_value_type = std::conditional_t<std::is_same<T, void>::value, INIT_VALUE_TYPE, T>;                \
@@ -389,7 +389,7 @@ namespace xt
         class E,                                                                                                     \
         class X,                                                                                                     \
         class EVS = DEFAULT_STRATEGY_REDUCERS,                                                                       \
-        XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::is_integral<std::decay_t<X>>)>                       \
+        XTL_REQUIRES(std::negation<is_reducer_options<X>>, xtl::is_integral<std::decay_t<X>>)>                       \
     inline auto NAME(E&& e, X axis, EVS es = EVS())                                                                  \
     {                                                                                                                \
         return NAME(std::forward<E>(e), {axis}, es);                                                                 \
@@ -1874,7 +1874,7 @@ namespace xt
             class X,
             class D,
             class EVS,
-            XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::is_integral<D>)>
+            XTL_REQUIRES(std::negation<is_reducer_options<X>>, xtl::is_integral<D>)>
         inline auto mean(E&& e, X&& axes, const D& ddof, EVS es)
         {
             // sum cannot always be a double. It could be a complex number which cannot operate on
@@ -1928,7 +1928,7 @@ namespace xt
         class E,
         class X,
         class EVS = DEFAULT_STRATEGY_REDUCERS,
-        XTL_REQUIRES(xtl::negation<is_reducer_options<X>>)>
+        XTL_REQUIRES(std::negation<is_reducer_options<X>>)>
     inline auto mean(E&& e, X&& axes, EVS es = EVS())
     {
         return detail::mean<T>(std::forward<E>(e), std::forward<X>(axes), 0u, es);
@@ -1969,7 +1969,7 @@ namespace xt
         class W,
         class X,
         class EVS = DEFAULT_STRATEGY_REDUCERS,
-        XTL_REQUIRES(is_reducer_options<EVS>, xtl::negation<xtl::is_integral<X>>)>
+        XTL_REQUIRES(is_reducer_options<EVS>, std::negation<xtl::is_integral<X>>)>
     inline auto average(E&& e, W&& weights, X&& axes, EVS ev = EVS())
     {
         xindex_type_t<typename std::decay_t<E>::shape_type> broadcast_shape;
@@ -2113,7 +2113,7 @@ namespace xt
         class X,
         class D,
         class EVS = DEFAULT_STRATEGY_REDUCERS,
-        XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::is_integral<D>)>
+        XTL_REQUIRES(std::negation<is_reducer_options<X>>, xtl::is_integral<D>)>
     inline auto variance(E&& e, X&& axes, const D& ddof, EVS es = EVS())
     {
         decltype(auto) sc = detail::shared_forward<E>(e);
@@ -2142,7 +2142,7 @@ namespace xt
         class E,
         class X,
         class EVS = DEFAULT_STRATEGY_REDUCERS,
-        XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::negation<xtl::is_integral<std::decay_t<X>>>, is_reducer_options<EVS>)>
+        XTL_REQUIRES(std::negation<is_reducer_options<X>>, std::negation<xtl::is_integral<std::decay_t<X>>>, is_reducer_options<EVS>)>
     inline auto variance(E&& e, X&& axes, EVS es = EVS())
     {
         return variance<T>(std::forward<E>(e), std::forward<X>(axes), 0u, es);
@@ -2174,7 +2174,7 @@ namespace xt
         class E,
         class X,
         class EVS = DEFAULT_STRATEGY_REDUCERS,
-        XTL_REQUIRES(xtl::negation<is_reducer_options<X>>)>
+        XTL_REQUIRES(std::negation<is_reducer_options<X>>)>
     inline auto stddev(E&& e, X&& axes, EVS es = EVS())
     {
         return sqrt(variance<T>(std::forward<E>(e), std::forward<X>(axes), es));
@@ -2541,7 +2541,7 @@ namespace xt
         class E,
         class X,
         class EVS = DEFAULT_STRATEGY_REDUCERS,
-        XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::negation<xtl::is_integral<X>>)>
+        XTL_REQUIRES(std::negation<is_reducer_options<X>>, std::negation<xtl::is_integral<X>>)>
     inline auto count_nonzero(E&& e, X&& axes, EVS es = EVS())
     {
         COUNT_NON_ZEROS_CONTENT;
@@ -2557,7 +2557,7 @@ namespace xt
         class E,
         class X,
         class EVS = DEFAULT_STRATEGY_REDUCERS,
-        XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::is_integral<X>)>
+        XTL_REQUIRES(std::negation<is_reducer_options<X>>, xtl::is_integral<X>)>
     inline auto count_nonzero(E&& e, X axis, EVS es = EVS())
     {
         return count_nonzero(std::forward<E>(e), {axis}, es);
@@ -2587,7 +2587,7 @@ namespace xt
         class E,
         class X,
         class EVS = DEFAULT_STRATEGY_REDUCERS,
-        XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::negation<xtl::is_integral<X>>)>
+        XTL_REQUIRES(std::negation<is_reducer_options<X>>, std::negation<xtl::is_integral<X>>)>
     inline auto count_nonnan(E&& e, X&& axes, EVS es = EVS())
     {
         return xt::count_nonzero(!xt::isnan(std::forward<E>(e)), std::forward<X>(axes), es);
@@ -2597,7 +2597,7 @@ namespace xt
         class E,
         class X,
         class EVS = DEFAULT_STRATEGY_REDUCERS,
-        XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::is_integral<X>)>
+        XTL_REQUIRES(std::negation<is_reducer_options<X>>, xtl::is_integral<X>)>
     inline auto count_nonnan(E&& e, X&& axes, EVS es = EVS())
     {
         return xt::count_nonzero(!xt::isnan(std::forward<E>(e)), {axes}, es);
@@ -2742,7 +2742,7 @@ namespace xt
         class E,
         class X,
         class EVS = DEFAULT_STRATEGY_REDUCERS,
-        XTL_REQUIRES(xtl::negation<is_reducer_options<X>>)>
+        XTL_REQUIRES(std::negation<is_reducer_options<X>>)>
     inline auto nanmean(E&& e, X&& axes, EVS es = EVS())
     {
         decltype(auto) sc = detail::shared_forward<E>(e);
@@ -2819,7 +2819,7 @@ namespace xt
         class E,
         class X,
         class EVS = DEFAULT_STRATEGY_REDUCERS,
-        XTL_REQUIRES(xtl::negation<is_reducer_options<X>>)>
+        XTL_REQUIRES(std::negation<is_reducer_options<X>>)>
     inline auto nanvar(E&& e, X&& axes, EVS es = EVS())
     {
         decltype(auto) sc = detail::shared_forward<E>(e);
@@ -2867,7 +2867,7 @@ namespace xt
         class E,
         class X,
         class EVS = DEFAULT_STRATEGY_REDUCERS,
-        XTL_REQUIRES(xtl::negation<is_reducer_options<X>>)>
+        XTL_REQUIRES(std::negation<is_reducer_options<X>>)>
     inline auto nanstd(E&& e, X&& axes, EVS es = EVS())
     {
         return sqrt(nanvar<T>(std::forward<E>(e), std::forward<X>(axes), es));

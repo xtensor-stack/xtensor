@@ -428,7 +428,7 @@ namespace xt
         -> std::enable_if_t<xtl::is_signed<std::decay_t<decltype(*std::begin(axes))>>::value, R>
     {
         R res;
-        xt::resize_container(res, xtl::sequence_size(axes));
+        xt::resize_container(res, std::size(axes));
         auto dim = expr.dimension();
         std::transform(
             std::begin(axes),
@@ -460,7 +460,7 @@ namespace xt
         static_cast<void>(expr);
 
         R res;
-        xt::resize_container(res, xtl::sequence_size(axes));
+        xt::resize_container(res, std::size(axes));
         std::copy(std::begin(axes), std::end(axes), std::begin(res));
         XTENSOR_ASSERT(std::all_of(
             res.begin(),
@@ -620,24 +620,6 @@ namespace xt
         return detail::to_array_impl(a, std::make_index_sequence<N>{});
     }
 
-    /********************************
-     * sequence_size implementation *
-     ********************************/
-
-    // equivalent to std::size(c) in c++17
-    template <class C>
-    constexpr auto sequence_size(const C& c) -> decltype(c.size())
-    {
-        return c.size();
-    }
-
-    // equivalent to std::size(a) in c++17
-    template <class T, std::size_t N>
-    constexpr std::size_t sequence_size(const T (&)[N])
-    {
-        return N;
-    }
-
     /***********************************
      * has_storage_type implementation *
      ***********************************/
@@ -652,7 +634,7 @@ namespace xt
 
     template <class T>
     struct has_storage_type<T, void_t<typename xcontainer_inner_types<T>::storage_type>>
-        : xtl::negation<
+        : std::negation<
               std::is_same<typename std::remove_cv<typename xcontainer_inner_types<T>::storage_type>::type, invalid_type>>
     {
     };

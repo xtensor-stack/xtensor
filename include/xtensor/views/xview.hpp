@@ -155,7 +155,7 @@ namespace xt
         struct is_strided_view
             : std::integral_constant<
                   bool,
-                  xtl::conjunction<has_data_interface<E>, is_strided_slice_impl<std::decay_t<S>>...>::value>
+                  std::conjunction<has_data_interface<E>, is_strided_slice_impl<std::decay_t<S>>...>::value>
         {
         };
 
@@ -272,7 +272,7 @@ namespace xt
         {
             // if we have no `range` in the slices we can re-use the shape with an offset
             using type = std::conditional_t<
-                xtl::disjunction<is_xrange<S>...>::value,
+                std::disjunction<is_xrange<S>...>::value,
                 typename xview_shape_type<typename E::shape_type, S...>::type,
                 // In the false branch we know that we have only integers at the front OR end, and NO range
                 typename unwrap_offset_container<E::static_layout, typename E::inner_shape_type, integral_count<S...>()>::type>;
@@ -405,7 +405,7 @@ namespace xt
         using storage_type = typename inner_types::storage_type;
 
         static constexpr bool has_trivial_strides = is_contiguous_view
-                                                    && !xtl::disjunction<detail::is_xrange<S>...>::value;
+                                                    && !std::disjunction<detail::is_xrange<S>...>::value;
         using inner_strides_type = std::conditional_t<
             has_trivial_strides,
             typename detail::unwrap_offset_container<
@@ -973,30 +973,22 @@ namespace xt
     template <class CT, class... S>
     inline layout_type xview<CT, S...>::layout() const noexcept
     {
-        return xtl::mpl::static_if<is_strided_view>(
-            [&](auto self)
+        if constexpr (is_strided_view)
+        {
+            if (static_layout != layout_type::dynamic)
             {
-                if (static_layout != layout_type::dynamic)
-                {
-                    return static_layout;
-                }
-                else
-                {
-                    bool strides_match = do_strides_match(
-                        self(this)->shape(),
-                        self(this)->strides(),
-                        self(this)->m_e.layout(),
-                        true
-                    );
-                    return strides_match ? self(this)->m_e.layout() : layout_type::dynamic;
-                }
-            },
-            /* else */
-            [&](auto /*self*/)
-            {
-                return layout_type::dynamic;
+                return static_layout;
             }
-        );
+            else
+            {
+                bool strides_match = do_strides_match(shape(), strides(), m_e.layout(), true);
+                return strides_match ? m_e.layout() : layout_type::dynamic;
+            }
+        }
+        else
+        {
+            return layout_type::dynamic;
+        }
     }
 
     template <class CT, class... S>
@@ -1020,17 +1012,14 @@ namespace xt
     template <class T>
     inline void xview<CT, S...>::fill(const T& value)
     {
-        xtl::mpl::static_if<static_layout != layout_type::dynamic>(
-            [&](auto self)
-            {
-                std::fill(self(this)->linear_begin(), self(this)->linear_end(), value);
-            },
-            /*else*/
-            [&](auto self)
-            {
-                std::fill(self(this)->begin(), self(this)->end(), value);
-            }
-        );
+        if constexpr (static_layout != layout_type::dynamic)
+        {
+            std::fill(linear_begin(), linear_end(), value);
+        }
+        else
+        {
+            std::fill(this->begin(), this->end(), value);
+        }
     }
 
     /**
@@ -1409,18 +1398,14 @@ namespace xt
     template <class ST>
     inline bool xview<CT, S...>::has_linear_assign(const ST& str) const
     {
-        return xtl::mpl::static_if<is_strided_view>(
-            [&](auto self)
-            {
-                return str.size() == self(this)->strides().size()
-                       && std::equal(str.cbegin(), str.cend(), self(this)->strides().begin());
-            },
-            /*else*/
-            [](auto /*self*/)
-            {
-                return false;
-            }
-        );
+        if constexpr (is_strided_view)
+        {
+            return str.size() == strides().size() && std::equal(str.cbegin(), str.cend(), strides().begin());
+        }
+        else
+        {
+            return false;
+        }
     }
 
     //@}

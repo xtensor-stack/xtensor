@@ -214,18 +214,15 @@ namespace xt
     template <class E1, class E2>
     inline void assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2)
     {
-        xtl::mpl::static_if<has_assign_to<E1, E2>::value>(
-            [&](auto self)
-            {
-                self(e2).derived_cast().assign_to(e1);
-            },
-            /*else*/
-            [&](auto /*self*/)
-            {
-                using tag = xexpression_tag_t<E1, E2>;
-                xexpression_assigner<tag>::assign_xexpression(e1, e2);
-            }
-        );
+        if constexpr (has_assign_to<E1, E2>::value)
+        {
+            e2.derived_cast().assign_to(e1);
+        }
+        else
+        {
+            using tag = xexpression_tag_t<E1, E2>;
+            xexpression_assigner<tag>::assign_xexpression(e1, e2);
+        }
     }
 
     template <class E1, class E2>
@@ -320,7 +317,7 @@ namespace xt
         template <class F, class... CT>
         struct use_strided_loop<xfunction<F, CT...>>
         {
-            static constexpr bool value = xtl::conjunction<use_strided_loop<std::decay_t<CT>>...>::value;
+            static constexpr bool value = std::conjunction<use_strided_loop<std::decay_t<CT>>...>::value;
         };
 
         /**
@@ -585,31 +582,28 @@ namespace xt
     template <class E1, class F, class... CT>
     inline bool xexpression_assigner<Tag>::resize(E1& e1, const xfunction<F, CT...>& e2)
     {
-        return xtl::mpl::static_if<detail::is_fixed<typename xfunction<F, CT...>::shape_type>::value>(
-            [&](auto /*self*/)
-            {
-                /*
-                 * If the shape of the xfunction is statically known, we can compute the broadcast triviality
-                 * at compile time plus we can resize right away.
-                 */
-                // resize in case LHS is not a fixed size container. If it is, this is a NOP
-                e1.resize(typename xfunction<F, CT...>::shape_type{});
-                return detail::static_trivial_broadcast<
-                    detail::is_fixed<typename xfunction<F, CT...>::shape_type>::value,
-                    CT...>::value;
-            },
-            /* else */
-            [&](auto /*self*/)
-            {
-                using index_type = xindex_type_t<typename E1::shape_type>;
-                using size_type = typename E1::size_type;
-                size_type size = e2.dimension();
-                index_type shape = uninitialized_shape<index_type>(size);
-                bool trivial_broadcast = e2.broadcast_shape(shape, true);
-                e1.resize(std::move(shape));
-                return trivial_broadcast;
-            }
-        );
+        if constexpr (detail::is_fixed<typename xfunction<F, CT...>::shape_type>::value)
+        {
+            /*
+             * If the shape of the xfunction is statically known, we can compute the broadcast triviality
+             * at compile time plus we can resize right away.
+             */
+            // resize in case LHS is not a fixed size container. If it is, this is a NOP
+            e1.resize(typename xfunction<F, CT...>::shape_type{});
+            return detail::static_trivial_broadcast<
+                detail::is_fixed<typename xfunction<F, CT...>::shape_type>::value,
+                CT...>::value;
+        }
+        else
+        {
+            using index_type = xindex_type_t<typename E1::shape_type>;
+            using size_type = typename E1::size_type;
+            size_type size = e2.dimension();
+            index_type shape = uninitialized_shape<index_type>(size);
+            bool trivial_broadcast = e2.broadcast_shape(shape, true);
+            e1.resize(std::move(shape));
+            return trivial_broadcast;
+        }
     }
 
     /***********************************

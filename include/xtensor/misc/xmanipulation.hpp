@@ -147,7 +147,7 @@ namespace xt
         template <class E, class S>
         inline auto transpose_impl(E&& e, S&& permutation, check_policy::none)
         {
-            if (sequence_size(permutation) != e.dimension())
+            if (std::size(permutation) != e.dimension())
             {
                 XTENSOR_THROW(transpose_error, "Permutation does not have the same size as shape");
             }
@@ -197,9 +197,9 @@ namespace xt
         inline auto transpose_impl(E&& e, S&& permutation, check_policy::full)
         {
             // check if axis appears twice in permutation
-            for (std::size_t i = 0; i < sequence_size(permutation); ++i)
+            for (std::size_t i = 0; i < std::size(permutation); ++i)
             {
-                for (std::size_t j = i + 1; j < sequence_size(permutation); ++j)
+                for (std::size_t j = i + 1; j < std::size(permutation); ++j)
                 {
                     if (permutation[i] == permutation[j])
                     {

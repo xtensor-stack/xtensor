@@ -11,9 +11,9 @@
 #define XTENSOR_STRIDED_VIEW_BASE_HPP
 
 #include <type_traits>
+#include <variant>
 
 #include <xtl/xsequence.hpp>
-#include <xtl/xvariant.hpp>
 
 #include "../core/xaccessible.hpp"
 #include "../core/xstrides.hpp"
@@ -87,7 +87,7 @@ namespace xt
 
         template <class E, class ST>
         struct provides_data_interface
-            : xtl::conjunction<has_data_interface<std::decay_t<E>>, xtl::negation<is_flat_expression_adaptor<ST>>>
+            : std::conjunction<has_data_interface<std::decay_t<E>>, std::negation<is_flat_expression_adaptor<ST>>>
         {
         };
     }
@@ -846,17 +846,17 @@ namespace xt
                 bool has_ellipsis = false;
                 for (const auto& el : slices)
                 {
-                    if (xtl::get_if<xt::xnewaxis_tag>(&el) != nullptr)
+                    if (std::get_if<xt::xnewaxis_tag>(&el) != nullptr)
                     {
                         ++dimension;
                         ++n_newaxis;
                     }
-                    else if (xtl::get_if<std::ptrdiff_t>(&el) != nullptr)
+                    else if (std::get_if<std::ptrdiff_t>(&el) != nullptr)
                     {
                         --dimension;
                         --dimension_check;
                     }
-                    else if (xtl::get_if<xt::xellipsis_tag>(&el) != nullptr)
+                    else if (std::get_if<xt::xellipsis_tag>(&el) != nullptr)
                     {
                         if (has_ellipsis == true)
                         {
@@ -899,19 +899,19 @@ namespace xt
                 for (; i < slices.size(); ++i)
                 {
                     i_ax = static_cast<std::size_t>(static_cast<std::ptrdiff_t>(i) - axis_skip);
-                    auto ptr = xtl::get_if<std::ptrdiff_t>(&slices[i]);
+                    auto ptr = std::get_if<std::ptrdiff_t>(&slices[i]);
                     if (ptr != nullptr)
                     {
                         auto slice0 = static_cast<old_strides_value_type>(*ptr);
                         new_offset += static_cast<std::size_t>(slice0 * old_strides[i_ax]);
                     }
-                    else if (xtl::get_if<xt::xnewaxis_tag>(&slices[i]) != nullptr)
+                    else if (std::get_if<xt::xnewaxis_tag>(&slices[i]) != nullptr)
                     {
                         new_shape[idx] = 1;
                         base_type::set_fake_slice(idx);
                         ++axis_skip, ++idx;
                     }
-                    else if (xtl::get_if<xt::xellipsis_tag>(&slices[i]) != nullptr)
+                    else if (std::get_if<xt::xellipsis_tag>(&slices[i]) != nullptr)
                     {
                         for (std::size_t j = 0; j < n_add_all; ++j)
                         {
@@ -922,7 +922,7 @@ namespace xt
                         }
                         axis_skip = axis_skip - static_cast<std::ptrdiff_t>(n_add_all) + 1;
                     }
-                    else if (xtl::get_if<xt::xall_tag>(&slices[i]) != nullptr)
+                    else if (std::get_if<xt::xall_tag>(&slices[i]) != nullptr)
                     {
                         new_shape[idx] = old_shape[i_ax];
                         new_strides[idx] = old_strides[i_ax];
@@ -936,7 +936,7 @@ namespace xt
                     else
                     {
                         slice_getter.idx = i_ax;
-                        auto info = xtl::visit(slice_getter, slices[i]);
+                        auto info = std::visit(slice_getter, slices[i]);
                         new_offset += static_cast<std::size_t>(info[0] * old_strides[i_ax]);
                         new_shape[idx] = static_cast<std::size_t>(info[1]);
                         new_strides[idx] = info[2] * old_strides[i_ax];

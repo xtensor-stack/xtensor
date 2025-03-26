@@ -15,9 +15,9 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include <variant>
 
 #include <xtl/xsequence.hpp>
-#include <xtl/xvariant.hpp>
 
 #include "../containers/xstorage.hpp"
 #include "../core/xexpression.hpp"
@@ -315,7 +315,7 @@ namespace xt
      **************************/
 
     template <class T>
-    using xstrided_slice = xtl::variant<
+    using xstrided_slice = std::variant<
         T,
 
         xrange_adaptor<placeholders::xtuph, T, T>,

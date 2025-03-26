@@ -418,11 +418,11 @@ namespace xt
                 ss_shape << *shape_it << ", ";
             }
             s_shape = ss_shape.str();
-            if (xtl::sequence_size(shape) > 1)
+            if (std::size(shape) > 1)
             {
                 s_shape = s_shape.erase(s_shape.size() - 2);
             }
-            else if (xtl::sequence_size(shape) == 1)
+            else if (std::size(shape) == 1)
             {
                 s_shape = s_shape.erase(s_shape.size() - 1);
             }

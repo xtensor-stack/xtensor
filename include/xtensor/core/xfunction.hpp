@@ -38,7 +38,7 @@ namespace xt
     {
 
         template <bool... B>
-        using conjunction_c = xtl::conjunction<std::integral_constant<bool, B>...>;
+        using conjunction_c = std::conjunction<std::integral_constant<bool, B>...>;
 
         /************************
          * xfunction_cache_impl *
@@ -155,7 +155,7 @@ namespace xt
     };
 
     template <class T, class F, class... CT>
-    struct has_simd_interface<xfunction<F, CT...>, T> : xtl::conjunction<
+    struct has_simd_interface<xfunction<F, CT...>, T> : std::conjunction<
                                                             has_simd_type<T>,
                                                             has_simd_apply<F, xt_simd::simd_type<T>>,
                                                             has_simd_interface<std::decay_t<CT>, T>...>
@@ -589,16 +589,13 @@ namespace xt
     template <class F, class... CT>
     inline auto xfunction<F, CT...>::shape() const -> const inner_shape_type&
     {
-        xtl::mpl::static_if<!detail::is_fixed<inner_shape_type>::value>(
-            [&](auto self)
+        if constexpr (!detail::is_fixed<inner_shape_type>::value)
+        {
+            if (!m_cache.is_initialized)
             {
-                if (!m_cache.is_initialized)
-                {
-                    self(this)->compute_cached_shape();
-                }
-            },
-            [](auto /*self*/) {}
-        );
+                compute_cached_shape();
+            }
+        }
         return m_cache.shape;
     }
 

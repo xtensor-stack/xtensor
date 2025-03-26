@@ -7,7 +7,7 @@
 # The full license is in the file LICENSE, distributed with this software. #
 ############################################################################
 
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.29)
 
 if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     project(xtensor-test CXX)
@@ -34,19 +34,7 @@ string(TOUPPER "${CMAKE_BUILD_TYPE}" U_CMAKE_BUILD_TYPE)
 
 include(set_compiler_flag.cmake)
 
-
-
-if(CPP17)
-  # User requested C++17, but compiler might not oblige.
-  set_compiler_flag(
-    _cxx_std_flag CXX
-    "-std=c++17"  # this should work with GNU, Intel, PGI
-    "/std:c++17"  # this should work with MSVC
-  )
-  if(_cxx_std_flag)
-    message(STATUS "Building with C++17")
-  endif()
-elseif(CPP20)
+if(CPP20)
   # User requested C++17, but compiler might not oblige.
   set_compiler_flag(
     _cxx_std_flag CXX
@@ -59,14 +47,14 @@ elseif(CPP20)
 else()
   set_compiler_flag(
     _cxx_std_flag CXX REQUIRED
-    "-std=c++14"  # this should work with GNU, Intel, PGI
-    "/std:c++14"  # this should work with MSVC
+    "-std=c++17"  # this should work with GNU, Intel, PGI
+    "/std:c++17"  # this should work with MSVC
   )
-  message(STATUS "Building with C++14")
+  message(STATUS "Building with C++17")
 endif()
 
 if(NOT _cxx_std_flag)
-  message(FATAL_ERROR "xtensor-blas needs a C++14-compliant compiler.")
+  message(FATAL_ERROR "xtensor needs a C++17-compliant compiler.")
 endif()
 
 OPTION(XTENSOR_ENABLE_WERROR "Turn on -Werror" OFF)
@@ -221,11 +209,6 @@ if(nlohmann_json_FOUND)
     list(APPEND XTENSOR_TESTS test_xjson.cpp)
     list(APPEND XTENSOR_TESTS test_xmime.cpp)
     list(APPEND XTENSOR_TESTS test_xexpression_holder.cpp)
-endif()
-
-# remove xinfo tests for compilers < GCC 5
-if(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU") AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5))
-    list(REMOVE_ITEM XTENSOR_TESTS test_xinfo.cpp)
 endif()
 
 # Add files for npy tests

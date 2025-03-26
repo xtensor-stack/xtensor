@@ -203,7 +203,7 @@ namespace xt
             }
         }
 
-        template <class R, class E, class U, class X, XTL_REQUIRES(xtl::negation<xtl::is_integral<X>>)>
+        template <class R, class E, class U, class X, XTL_REQUIRES(std::negation<xtl::is_integral<X>>)>
         inline void arange_assign_to(xexpression<E>& e, U start, U stop, X step, bool endpoint) noexcept
         {
             auto& buf = e.derived_cast().storage();
@@ -282,15 +282,15 @@ namespace xt
         };
 
         template <class T, class S>
-        using both_integer = xtl::conjunction<xtl::is_integral<T>, xtl::is_integral<S>>;
+        using both_integer = std::conjunction<xtl::is_integral<T>, xtl::is_integral<S>>;
 
         template <class T, class S>
-        using integer_with_signed_integer = xtl::conjunction<both_integer<T, S>, xtl::is_signed<S>>;
+        using integer_with_signed_integer = std::conjunction<both_integer<T, S>, xtl::is_signed<S>>;
 
         template <class T, class S>
-        using integer_with_unsigned_integer = xtl::conjunction<both_integer<T, S>, std::is_unsigned<S>>;
+        using integer_with_unsigned_integer = std::conjunction<both_integer<T, S>, std::is_unsigned<S>>;
 
-        template <class T, class S = T, XTL_REQUIRES(xtl::negation<both_integer<T, S>>)>
+        template <class T, class S = T, XTL_REQUIRES(std::negation<both_integer<T, S>>)>
         inline auto arange_impl(T start, T stop, S step = 1) noexcept
         {
             std::size_t shape = static_cast<std::size_t>(std::ceil((stop - start) / step));
@@ -712,7 +712,7 @@ namespace xt
     namespace detail
     {
         template <bool... values>
-        using all_true = xtl::conjunction<std::integral_constant<bool, values>...>;
+        using all_true = std::conjunction<std::integral_constant<bool, values>...>;
 
         template <class X, class Y, std::size_t axis, class AxesSequence>
         struct concat_fixed_shape_impl;
