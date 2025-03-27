@@ -20,8 +20,8 @@ jobs:
         sys:
         - {compiler: clang, version: '17', name: assert, flags: -DXTENSOR_ENABLE_ASSERT=ON}
         - {compiler: clang, version: '18', name: column-major, flags: -DDEFAULT_COLUMN_MAJOR=ON}
-          #- {compiler: clang, version: '19', name: assert, flags: -DXTENSOR_ENABLE_ASSERT=ON}
-          #- {compiler: clang, version: '20', name: column-major, flags: -DDEFAULT_COLUMN_MAJOR=ON}
+        - {compiler: clang, version: '19', name: assert, flags: -DXTENSOR_ENABLE_ASSERT=ON}
+        - {compiler: clang, version: '20', name: column-major, flags: -DDEFAULT_COLUMN_MAJOR=ON}
         - {compiler: gcc, version: '11', name: openmp, flags: -DXTENSOR_USE_OPENMP=ON}
         - {compiler: gcc, version: '11', name: noexcept, flags: -DXTENSOR_DISABLE_EXCEPTIONS=ON}
         - {compiler: gcc, version: '12', name: xsimd, flags: -DXTENSOR_USE_XSIMD=ON}
