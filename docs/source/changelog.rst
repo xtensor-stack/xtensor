@@ -7,6 +7,40 @@
 Changelog
 =========
 
+0.26.0
+------
+
+- Adding the ability to enable memory overlap check in assignment to avoid unneeded temporary memory allocation
+  `# 2768 https://github.com/xtensor-stack/xtensor/pull/2768`
+- Pure xtensor FFT implementation
+  `# 2782 https://github.com/xtensor-stack/xtensor/pull/2782`
+- Update for C++ 20 compatibility
+  `# 2774 https://github.com/xtensor-stack/xtensor/pull/2774`
+- Fixed CI added OSX 13 and GCC 12
+  `# 2796 https://github.com/xtensor-stack/xtensor/pull/2796`
+- Fix compile issue with clang 19.1.1
+  `# 2813 https://github.com/xtensor-stack/xtensor/pull/2813`
+- Avoid warnings in compiler version checks
+  `# 2781 https://github.com/xtensor-stack/xtensor/pull/2781`
+- Bump OSX Version 12 -> 13 to avoid deprecated environment
+  `# 2818 https://github.com/xtensor-stack/xtensor/pull/2818`
+- Update gh-pages.yml
+  `# 2824 https://github.com/xtensor-stack/xtensor/pull/2824`
+- Upgraded to xsimd 13.2.0
+  `# 2825 https://github.com/xtensor-stack/xtensor/pull/2825`
+- Added missing configuration key for RTD
+  `# 2826 https://github.com/xtensor-stack/xtensor/pull/2826`
+- Code reorganization
+  `# 2829 https://github.com/xtensor-stack/xtensor/pull/2829`
+- Adding fix for incorrect usage of xt::has_assign_conversion in xassig
+  `# 2830 https://github.com/xtensor-stack/xtensor/pull/2830`
+- Upgraded to xtl 0.8.0 and C++17
+  `# 2831 https://github.com/xtensor-stack/xtensor/pull/2831`
+- Migrated to more recent compilers
+  `# 2832 https://github.com/xtensor-stack/xtensor/pull/2832`
+- Fix for Clang19
+  `# 2833 https://github.com/xtensor-stack/xtensor/pull/2833`
+
 0.25.0
 ------
 
