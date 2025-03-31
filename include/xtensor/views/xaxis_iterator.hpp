@@ -41,8 +41,8 @@ namespace xt
         using difference_type = typename xexpression_type::difference_type;
         using shape_type = typename xexpression_type::shape_type;
         using value_type = xstrided_view<CT, shape_type>;
-        using reference = std::remove_reference_t<apply_cv_t<CT, value_type>>;
-        using pointer = xtl::xclosure_pointer<std::remove_reference_t<apply_cv_t<CT, value_type>>>;
+        using reference = std::remove_reference_t<xtl::apply_cv_t<CT, value_type>>;
+        using pointer = xtl::xclosure_pointer<std::remove_reference_t<xtl::apply_cv_t<CT, value_type>>>;
 
         using iterator_category = std::forward_iterator_tag;
 
