@@ -104,16 +104,16 @@ namespace xt
     TEST(utils, apply)
     {
         ASSERT_TRUE(foo(std::make_tuple(1, 2, 3)) == 2);
-        EXPECT_FALSE(noexcept(foo(std::make_tuple(1, 2, 3))));
+        static_assert(!noexcept(foo(std::make_tuple(1, 2, 3))));
         auto func_ne = [](int i) noexcept
         {
             return i;
         };
         auto t = std::make_tuple(1, 2, 3);
 #if (_MSC_VER >= 1910)
-        EXPECT_FALSE(noexcept(apply<int>(1, func_ne, t)));
+        static_assert(!noexcept(apply<int>(1, func_ne, t)));
 #else
-        EXPECT_TRUE(noexcept(apply<int>(1, func_ne, t)));
+        static_assert(noexcept(apply<int>(1, func_ne, t)));
 #endif
     }
 
