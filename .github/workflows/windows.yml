@@ -52,7 +52,7 @@ jobs:
           ninja
 
     - name: Configure using CMake
-      run: cmake -Bbuild -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON -G Ninja
+      run: cmake -Bbuild -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_CXX_FLAGS=/std:c++20 -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_TESTS=ON -G Ninja
 
     - name: Install
       working-directory: build
