@@ -194,7 +194,7 @@ target_include_directories(xtensor INTERFACE
     $<BUILD_INTERFACE:${XTENSOR_INCLUDE_DIR}>
     $<INSTALL_INTERFACE:include>)
 
-target_compile_features(xtensor INTERFACE cxx_std_17)
+target_compile_features(xtensor INTERFACE cxx_std_20)
 
 target_link_libraries(xtensor INTERFACE xtl)
 
