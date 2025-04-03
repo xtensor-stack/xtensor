@@ -19,9 +19,9 @@ jobs:
       matrix:
         runs-on: [windows-latest]
         sys:
-        - {compiler: default, os: windows-latest}        
+        - {compiler: default, os: windows-latest}
         - {compiler: default, os: windows-2019}
-        - {compiler: clang-cl, os: windows-latest}        
+        - {compiler: clang-cl, os: windows-latest}
         # Enable again and fix remaining issues after refactoring
         #- {compiler: clang}
 
