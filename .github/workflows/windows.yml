@@ -19,7 +19,9 @@ jobs:
       matrix:
         runs-on: [windows-latest]
         sys:
-        - {compiler: default}
+        - {compiler: default, os: windows-latest}        
+        - {compiler: default, os: windows-2019}
+        - {compiler: clang-cl, os: windows-latest}        
         # Enable again and fix remaining issues after refactoring
         #- {compiler: clang}
 
@@ -29,11 +31,12 @@ jobs:
       if: matrix.sys.compiler == 'default'
       uses: ilammy/msvc-dev-cmd@v1
 
-    - name: Setup clang
-      if: matrix.sys.compiler == 'clang'
+    - name: Setup clang-cl
+      if: matrix.sys.compiler == 'clang-cl'
       run: |
-        echo "CC=clang" >> $GITHUB_ENV
-        echo "CXX=clang++" >> $GITHUB_ENV
+        echo "CC=clang-cl" >> $GITHUB_ENV
+        echo "CXX=clang-cl" >> $GITHUB_ENV
+        echo "clang-cl --version"
 
     - name: Checkout code
       uses: actions/checkout@v3
