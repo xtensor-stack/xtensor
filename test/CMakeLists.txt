@@ -35,7 +35,7 @@ string(TOUPPER "${CMAKE_BUILD_TYPE}" U_CMAKE_BUILD_TYPE)
 include(set_compiler_flag.cmake)
 
 if(CPP23)
-  # User requested C++20, but compiler might not oblige.
+  # User requested C++23, but compiler might not oblige.
   set_compiler_flag(
     _cxx_std_flag CXX
     "-std=c++23"  # this should work with GNU, Intel, PGI
