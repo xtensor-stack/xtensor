@@ -34,27 +34,27 @@ string(TOUPPER "${CMAKE_BUILD_TYPE}" U_CMAKE_BUILD_TYPE)
 
 include(set_compiler_flag.cmake)
 
-if(CPP20)
-  # User requested C++17, but compiler might not oblige.
+if(CPP23)
+  # User requested C++20, but compiler might not oblige.
   set_compiler_flag(
     _cxx_std_flag CXX
-    "-std=c++2a"  # this should work with GNU, Intel, PGI
-    "/std:c++20"  # this should work with MSVC
+    "-std=c++23"  # this should work with GNU, Intel, PGI
+    "/std:c++23"  # this should work with MSVC
   )
   if(_cxx_std_flag)
-    message(STATUS "Building with C++20")
+    message(STATUS "Building with C++23")
   endif()
 else()
   set_compiler_flag(
     _cxx_std_flag CXX REQUIRED
-    "-std=c++17"  # this should work with GNU, Intel, PGI
-    "/std:c++17"  # this should work with MSVC
+    "-std=c++20"  # this should work with GNU, Intel, PGI
+    "/std:c++20"  # this should work with MSVC
   )
-  message(STATUS "Building with C++17")
+  message(STATUS "Building with C++20")
 endif()
 
 if(NOT _cxx_std_flag)
-  message(FATAL_ERROR "xtensor needs a C++17-compliant compiler.")
+  message(FATAL_ERROR "xtensor needs a C++20-compliant compiler.")
 endif()
 
 OPTION(XTENSOR_ENABLE_WERROR "Turn on -Werror" OFF)
