@@ -205,7 +205,7 @@ OPTION(BUILD_TESTS "xtensor test suite" OFF)
 OPTION(BUILD_BENCHMARK "xtensor benchmark" OFF)
 OPTION(DOWNLOAD_GBENCHMARK "download google benchmark and build from source" ON)
 OPTION(DEFAULT_COLUMN_MAJOR "set default layout to column major" OFF)
-OPTION(CPP20 "enables C++20 (experimental)" OFF)
+OPTION(CPP23 "enables C++23 (experimental)" OFF)
 OPTION(XTENSOR_DISABLE_EXCEPTIONS "Disable C++ exceptions" OFF)
 OPTION(DISABLE_MSVC_ITERATOR_CHECK "Disable the MVSC iterator check" ON)
 
