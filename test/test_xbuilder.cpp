@@ -676,7 +676,8 @@ namespace xt
 
         xt::dynamic_shape<std::size_t> sd = {3, 2, 1};
         auto ed1 = empty<double>(sd);
-#if defined(_MSVC_LANG)	
+// TODO : The ed2 expression do not work on MSVC due to bad deduction since cpp20. We need to fix it for MSVC.
+#if defined(_MSVC_LANG)
         using ShapeType = xt::dynamic_shape<std::size_t>;
         auto ed2 = empty<double, xt::layout_type::column_major, ShapeType>(ShapeType({3, 3, 3}));
 #else
