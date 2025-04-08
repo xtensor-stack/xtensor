@@ -676,8 +676,12 @@ namespace xt
 
         xt::dynamic_shape<std::size_t> sd = {3, 2, 1};
         auto ed1 = empty<double>(sd);
+#if defined(_MSVC_LANG)	
         using ShapeType = xt::dynamic_shape<std::size_t>;
         auto ed2 = empty<double, xt::layout_type::column_major, ShapeType>(ShapeType({3, 3, 3}));
+#else
+        auto ed2 = empty<double, xt::layout_type::column_major>(xt::dynamic_shape<std::size_t>({3, 3, 3}));
+#endif
         auto ed3 = empty<double>(std::vector<std::size_t>({3, 3, 3}));
         b = std::is_same<decltype(ed1), xarray<double>>::value;
         EXPECT_TRUE(b);
