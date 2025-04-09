@@ -7,7 +7,7 @@
 xadapt
 ======
 
-Defined in ``xtensor/xadapt.hpp``
+Defined in ``xtensor/containers/xadapt.hpp``
 
 .. cpp:namespace-push:: xt
 

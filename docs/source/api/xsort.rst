@@ -7,7 +7,7 @@
 xsort
 =====
 
-Defined in ``xtensor/xsort.hpp``
+Defined in ``xtensor/misc/xsort.hpp``
 
 .. cpp:namespace-push:: xt
 

@@ -142,7 +142,7 @@ Alignment of fixed-size members
 When building with *xsimd* (see :ref:`external-dependencies`), if you define a structure
 having members of fixed-size xtensor types, you must ensure that the buffers properly
 aligned. For this you can use the macro ``XTENSOR_FIXED_ALIGN`` available in
-``xtensor/xtensor_config.hpp``.
+``xtensor/core/xtensor_config.hpp``.
 Consider the following example:
 
 .. code-block:: cpp

@@ -7,7 +7,7 @@
 xset_operation
 ==============
 
-Defined in ``xtensor/xset_operation.hpp``
+Defined in ``xtensor/misc/xset_operation.hpp``
 
 .. doxygenenum:: xt::isin(E&&, F&&)
 

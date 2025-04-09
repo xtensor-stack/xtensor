@@ -32,8 +32,8 @@ array argument is a 0-D argument:
 
 .. code::
 
-    #include <xtensor/xarray.hpp>
-    #include <xtensor/xio.hpp>
+    #include <xtensor/containers/xarray.hpp>
+    #include <xtensor/io/xio.hpp>
 
     xt::xarray<double> x = 1;
     std::cout << xt::cumsum(x, 0) << std::endl;

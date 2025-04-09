@@ -7,7 +7,7 @@
 xstrides
 ========
 
-Defined in ``xtensor/xstrides.hpp``
+Defined in ``xtensor/core/xstrides.hpp``
 
 .. cpp:namespace-push:: xt
 

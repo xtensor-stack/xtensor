@@ -7,7 +7,7 @@
 xexpression
 ===========
 
-Defined in ``xtensor/xexpression.hpp``
+Defined in ``xtensor/core/xexpression.hpp``
 
 .. doxygenclass:: xt::xexpression
    :members:

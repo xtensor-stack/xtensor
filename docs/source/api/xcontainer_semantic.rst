@@ -7,7 +7,7 @@
 xcontainer_semantic
 ===================
 
-Defined in ``xtensor/xsemantic.hpp``
+Defined in ``xtensor/core/xsemantic.hpp``
 
 .. doxygenclass:: xt::xcontainer_semantic
    :members:

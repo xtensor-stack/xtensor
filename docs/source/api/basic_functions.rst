@@ -9,7 +9,7 @@ Basic functions
 
 **xtensor** provides the following basic functions for xexpressions and scalars:
 
-Defined in ``xtensor/xmath.hpp``
+Defined in ``xtensor/core/xmath.hpp``
 
 .. doxygenfunction:: abs(E&&)
 

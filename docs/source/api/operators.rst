@@ -7,7 +7,7 @@
 Operators and related functions
 ===============================
 
-Defined in ``xtensor/xmath.hpp`` and ``xtensor/xoperation.hpp``
+Defined in ``xtensor/core/xmath.hpp`` and ``xtensor/core/xoperation.hpp``
 
 .. doxygenfunction:: operator+(E&&)
 

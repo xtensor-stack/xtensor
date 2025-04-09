@@ -7,7 +7,7 @@
 xindex_view
 ===========
 
-Defined in ``xtensor/xindex_view.hpp``
+Defined in ``xtensor/views/xindex_view.hpp``
 
 .. doxygenclass:: xt::xindex_view
    :members:

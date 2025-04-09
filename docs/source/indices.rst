@@ -14,9 +14,9 @@ There are two types of indices: *array indices* and *flat indices*. Consider thi
 
 .. code-block:: cpp
 
-    #include <xtensor/xtensor.hpp>
-    #include <xtensor/xarray.hpp>
-    #include <xtensor/xio.hpp>
+    #include <xtensor/containers/xtensor.hpp>
+    #include <xtensor/containers/xarray.hpp>
+    #include <xtensor/io/xio.hpp>
 
     int main()
     {
@@ -183,9 +183,9 @@ For the same example:
 
 .. code-block:: cpp
 
-    #include <xtensor/xtensor.hpp>
-    #include <xtensor/xarray.hpp>
-    #include <xtensor/xio.hpp>
+    #include <xtensor/containers/xtensor.hpp>
+    #include <xtensor/containers/xarray.hpp>
+    #include <xtensor/io/xio.hpp>
 
     int main()
     {
@@ -222,9 +222,9 @@ For example:
 
 .. code-block:: cpp
 
-    #include <xtensor/xtensor.hpp>
-    #include <xtensor/xview.hpp>
-    #include <xtensor/xio.hpp>
+    #include <xtensor/containers/xtensor.hpp>
+    #include <xtensor/views/xview.hpp>
+    #include <xtensor/io/xio.hpp>
 
     int main()
     {
@@ -252,10 +252,10 @@ For example
 
 .. code-block:: cpp
 
-    #include <xtensor/xarray.hpp>
-    #include <xtensor/xtensor.hpp>
-    #include <xtensor/xstrides.hpp>
-    #include <xtensor/xio.hpp>
+    #include <xtensor/containers/xarray.hpp>
+    #include <xtensor/containers/xtensor.hpp>
+    #include <xtensor/core/xstrides.hpp>
+    #include <xtensor/io/xio.hpp>
 
     int main()
     {

@@ -37,7 +37,7 @@ Example 1: Use an algorithm of the C++ library on a NumPy array in-place
 
     #include <numeric>                        // Standard library import for std::accumulate
     #include <pybind11/pybind11.h>            // Pybind11 import to define Python bindings
-    #include <xtensor/xmath.hpp>              // xtensor import for the C++ universal functions
+    #include <xtensor/core/xmath.hpp>         // xtensor import for the C++ universal functions
     #define FORCE_IMPORT_ARRAY                // NumPy C api loading
     #include <xtensor-python/pyarray.hpp>     // NumPy bindings
 
@@ -169,7 +169,7 @@ Example 1: Use an algorithm of the C++ library with a Julia array
     #include <numeric>                        // Standard library import for std::accumulate
     #include <cxx_wrap.hpp>                   // CxxWrap import to define Julia bindings
     #include <xtensor-julia/jltensor.hpp>     // Import the jltensor container definition
-    #include <xtensor/xmath.hpp>              // xtensor import for the C++ universal functions
+    #include <xtensor/core/xmath.hpp>         // xtensor import for the C++ universal functions
 
     double sum_of_sines(xt::jltensor<double, 2> m)
     {
@@ -280,7 +280,7 @@ Example 1: Use an algorithm of the C++ library on a R array in-place
 .. code::
 
     #include <numeric>                    // Standard library import for std::accumulate
-    #include <xtensor/xmath.hpp>          // xtensor import for the C++ universal functions
+    #include <xtensor/core/xmath.hpp>     // xtensor import for the C++ universal functions
     #include <xtensor-r/rarray.hpp>       // R bindings
     #include <Rcpp.h>
 
@@ -339,13 +339,13 @@ Calculate the derivative of a (discretized) field in Fourier space, e.g. a sine 
 
 .. code::
 
-    #include <xtensor-fftw/basic.hpp>   // rfft, irfft
-    #include <xtensor-fftw/helper.hpp>  // rfftscale
-    #include <xtensor/xarray.hpp>
-    #include <xtensor/xbuilder.hpp>     // xt::arange
-    #include <xtensor/xmath.hpp>        // xt::sin, cos
+    #include <xtensor-fftw/basic.hpp>          // rfft, irfft
+    #include <xtensor-fftw/helper.hpp>         // rfftscale
+    #include <xtensor/containers/xarray.hpp>
+    #include <xtensor/generators/xbuilder.hpp> // xt::arange
+    #include <xtensor/core/xmath.hpp>          // xt::sin, cos
     #include <complex>
-    #include <xtensor/xio.hpp>
+    #include <xtensor/io/xio.hpp>
 
     // generate a sinusoid field
     double dx = M_PI / 100;

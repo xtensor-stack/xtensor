@@ -4,7 +4,7 @@
 xfft
 ====
 
-Defined in ``xtensor/xfft.hpp``
+Defined in ``xtensor/misc/xfft.hpp``
 
 .. doxygenclass:: xt::fft::convolve
    :project: xtensor

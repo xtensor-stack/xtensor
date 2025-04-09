@@ -128,7 +128,7 @@ You can access the elements of any :cpp:type:`xt::xexpression` with :cpp:func:`~
 
 .. code::
 
-    #include <xtensor/xarray.hpp>
+    #include <xtensor/containers/xarray.hpp>
 
     xt::xarray<double> a = {{1., 2., 3.}, {4., 5., 6.}};
     auto f = 2 * a;
@@ -145,7 +145,7 @@ of the expression:
 
 .. code::
 
-    #include <xtensor/xarray.hpp>
+    #include <xtensor/containers/xarray.hpp>
 
     xt::xarray<double> a = {{1., 2., 3.}, {4., 5., 6.}};
 
@@ -169,7 +169,7 @@ Shape
 .. code::
 
     #include <vector>
-    #include <xtensor/xarray.hpp>
+    #include <xtensor/containers/xarray.hpp>
 
     using array_type = xt::xarray<double>;
     using shape_type = array_type::shape_type;
@@ -199,7 +199,7 @@ Element access
 .. code::
 
     #include <vector>
-    #inclde "xtensor/xarray.hpp"
+    #inclde "xtensor/containers/xarray.hpp"
 
     // xt::xarray<double> a = ...
     std::vector<size_t> index = {1, 1, 1};

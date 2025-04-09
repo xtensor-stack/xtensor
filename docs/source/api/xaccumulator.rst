@@ -7,7 +7,7 @@
 xaccumulator
 ============
 
-Defined in ``xtensor/xaccumulator.hpp``
+Defined in ``xtensor/reducers/xaccumulator.hpp``
 
 .. doxygenfunction:: xt::accumulate(F&&, E&&, EVS)
 

@@ -9,7 +9,7 @@ Exponential functions
 
 **xtensor** provides the following exponential functions for xexpressions:
 
-Defined in ``xtensor/xmath.hpp``
+Defined in ``xtensor/core/xmath.hpp``
 
 .. doxygenfunction:: exp(E&&)
 

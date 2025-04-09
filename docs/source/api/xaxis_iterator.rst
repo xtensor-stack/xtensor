@@ -7,7 +7,7 @@
 xaxis_iterator
 ==============
 
-Defined in ``xtensor/xaxis_iterator.hpp``
+Defined in ``xtensor/views/xaxis_iterator.hpp``
 
 .. doxygenclass:: xt::xaxis_iterator
    :members:

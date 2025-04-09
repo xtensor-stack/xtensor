@@ -7,7 +7,7 @@
 Index related functions
 =======================
 
-Defined in ``xtensor/xoperation.hpp``
+Defined in ``xtensor/core/xoperation.hpp``
 
 .. doxygenfunction:: where(const T&)
 

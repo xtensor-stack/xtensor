@@ -7,7 +7,7 @@
 layout
 ======
 
-Defined in ``xtensor/xlayout.hpp``
+Defined in ``xtensor/core/xlayout.hpp``
 
 .. doxygenenum:: xt::layout_type
 
@@ -16,7 +16,7 @@ Defined in ``xtensor/xlayout.hpp``
 xcontainer
 ==========
 
-Defined in ``xtensor/xcontainer.hpp``
+Defined in ``xtensor/containers/xcontainer.hpp``
 
 .. doxygenclass:: xt::xcontainer
    :members:
@@ -24,7 +24,7 @@ Defined in ``xtensor/xcontainer.hpp``
 xstrided_container
 ==================
 
-Defined in ``xtensor/xcontainer.hpp``
+Defined in ``xtensor/containers/xcontainer.hpp``
 
 .. doxygenclass:: xt::xstrided_container
    :members:

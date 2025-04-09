@@ -7,7 +7,7 @@
 xoptional_assembly_base
 =======================
 
-Defined in ``xtensor/xoptional_assembly_base.hpp``
+Defined in ``xtensor/optional/xoptional_assembly_base.hpp``
 
 .. doxygenclass:: xt::xoptional_assembly_base
    :members:

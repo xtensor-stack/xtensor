@@ -207,7 +207,7 @@ strides based on the shape and the layout, so the implementation of the ``resize
 
 .. code::
 
-    #include <xtensor/xstrides.hpp> // for utility functions
+    #include <xtensor/core/xstrides.hpp> // for utility functions
 
     template <class T>
     void resize(const shape_type& shape)
@@ -464,7 +464,7 @@ This part is relatively straightforward:
     template <class S>
     bool broadcast_shape(const S& s) const
     {
-        // Available in "xtensor/xtrides.hpp"
+        // Available in "xtensor/core/xstrides.hpp"
         return xt::broadcast_shape(shape(), s);
     }
 
