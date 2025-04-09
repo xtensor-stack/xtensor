@@ -563,9 +563,8 @@ namespace xt
      */
     template <
         class E,
-        class C,
-        class R = detail::flatten_sort_result_type_t<E>,
-        class = std::enable_if_t<!xtl::is_integral<C>::value, int>>
+        xtl::non_integral_concept C,
+        class R = detail::flatten_sort_result_type_t<E>>
     inline R partition(const xexpression<E>& e, C kth_container, placeholders::xtuph /*ax*/)
     {
         const auto& de = e.derived_cast();
@@ -596,7 +595,7 @@ namespace xt
         return partition(e, std::array<std::size_t, 1>({kth}), tag);
     }
 
-    template <class E, class C, class = std::enable_if_t<!xtl::is_integral<C>::value, int>>
+    template <class E, xtl::non_integral_concept C>
     inline auto partition(const xexpression<E>& e, C kth_container, std::ptrdiff_t axis = -1)
     {
         using eval_type = typename detail::sort_eval_type<E>::type;
@@ -658,9 +657,8 @@ namespace xt
      */
     template <
         class E,
-        class C,
-        class R = typename detail::linear_argsort_result_type<typename detail::sort_eval_type<E>::type>::type,
-        class = std::enable_if_t<!xtl::is_integral<C>::value, int>>
+        xtl::non_integral_concept C,
+        class R = typename detail::linear_argsort_result_type<typename detail::sort_eval_type<E>::type>::type>
     inline R argpartition(const xexpression<E>& e, C kth_container, placeholders::xtuph)
     {
         using eval_type = typename detail::sort_eval_type<E>::type;
@@ -704,7 +702,7 @@ namespace xt
         return argpartition(e, std::array<std::size_t, 1>({kth}), tag);
     }
 
-    template <class E, class C, class = std::enable_if_t<!xtl::is_integral<C>::value, int>>
+    template <class E, xtl::non_integral_concept C>
     inline auto argpartition(const xexpression<E>& e, C kth_container, std::ptrdiff_t axis = -1)
     {
         using eval_type = typename detail::sort_eval_type<E>::type;

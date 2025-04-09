@@ -25,14 +25,6 @@
 
 namespace xt
 {
-
-    namespace detail
-    {
-        template <class It>
-        using require_input_iter = typename std::enable_if<
-            std::is_convertible<typename std::iterator_traits<It>::iterator_category, std::input_iterator_tag>::value>::type;
-    }
-
     template <class C>
     struct is_contiguous_container : std::true_type
     {
@@ -64,7 +56,7 @@ namespace xt
         explicit uvector(size_type count, const allocator_type& alloc = allocator_type());
         uvector(size_type count, const_reference value, const allocator_type& alloc = allocator_type());
 
-        template <class InputIt, class = detail::require_input_iter<InputIt>>
+        template <input_iterator_concept InputIt>
         uvector(InputIt first, InputIt last, const allocator_type& alloc = allocator_type());
 
         uvector(std::initializer_list<T> init, const allocator_type& alloc = allocator_type());
@@ -277,7 +269,7 @@ namespace xt
     }
 
     template <class T, class A>
-    template <class InputIt, class>
+    template <input_iterator_concept InputIt>
     inline uvector<T, A>::uvector(InputIt first, InputIt last, const allocator_type& alloc)
         : m_allocator(alloc)
         , p_begin(nullptr)
@@ -675,10 +667,10 @@ namespace xt
 
         svector(const std::vector<T>& vec);
 
-        template <class IT, class = detail::require_input_iter<IT>>
+        template <input_iterator_concept IT>
         svector(IT begin, IT end, const allocator_type& alloc = allocator_type());
 
-        template <std::size_t N2, bool I2, class = std::enable_if_t<N != N2, void>>
+        template <std::size_t N2, bool I2> requires (N != N2)
         explicit svector(const svector<T, N2, A, I2>& rhs);
 
         svector& operator=(const svector& rhs);
@@ -686,7 +678,7 @@ namespace xt
         svector& operator=(const std::vector<T>& rhs);
         svector& operator=(std::initializer_list<T> il);
 
-        template <std::size_t N2, bool I2, class = std::enable_if_t<N != N2, void>>
+        template <std::size_t N2, bool I2> requires (N != N2)
         svector& operator=(const svector<T, N2, A, I2>& rhs);
 
         svector(const svector& other);
@@ -809,7 +801,7 @@ namespace xt
     }
 
     template <class T, std::size_t N, class A, bool Init>
-    template <class IT, class>
+    template <input_iterator_concept IT>
     inline svector<T, N, A, Init>::svector(IT begin, IT end, const allocator_type& alloc)
         : m_allocator(alloc)
     {
@@ -817,7 +809,7 @@ namespace xt
     }
 
     template <class T, std::size_t N, class A, bool Init>
-    template <std::size_t N2, bool I2, class>
+    template <std::size_t N2, bool I2> requires (N != N2)
     inline svector<T, N, A, Init>::svector(const svector<T, N2, A, I2>& rhs)
         : m_allocator(rhs.get_allocator())
     {
@@ -876,7 +868,7 @@ namespace xt
     }
 
     template <class T, std::size_t N, class A, bool Init>
-    template <std::size_t N2, bool I2, class>
+    template <std::size_t N2, bool I2> requires (N != N2)
     inline svector<T, N, A, Init>& svector<T, N, A, Init>::operator=(const svector<T, N2, A, I2>& rhs)
     {
         m_allocator = std::allocator_traits<allocator_type>::select_on_container_copy_construction(

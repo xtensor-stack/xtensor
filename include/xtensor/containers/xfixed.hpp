@@ -325,8 +325,7 @@ namespace xt
         explicit xfixed_container(const inner_shape_type& shape, layout_type l = L);
         explicit xfixed_container(const inner_shape_type& shape, value_type v, layout_type l = L);
 
-        // remove this enable_if when removing the other value_type constructor
-        template <class IX = std::integral_constant<std::size_t, N>, class EN = std::enable_if_t<IX::value != 0, int>>
+        template <class IX = std::integral_constant<std::size_t, N>> requires (IX::value != 0)
         xfixed_container(nested_initializer_list_t<value_type, N> t);
 
         ~xfixed_container() = default;
@@ -639,7 +638,7 @@ namespace xt
      * Note: for clang < 3.8 this is an initializer_list and the size is not checked at compile-or runtime.
      */
     template <class ET, class S, layout_type L, bool SH, class Tag>
-    template <class IX, class EN>
+    template <class IX> requires (IX::value != 0)
     inline xfixed_container<ET, S, L, SH, Tag>::xfixed_container(nested_initializer_list_t<value_type, N> t)
     {
         XTENSOR_ASSERT_MSG(

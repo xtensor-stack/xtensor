@@ -5,6 +5,7 @@
 
 #include <xtl/xcomplex.hpp>
 
+#include "./xtl_concepts.hpp"
 #include "../containers/xarray.hpp"
 #include "../core/xmath.hpp"
 #include "../core/xnoalias.hpp"
@@ -19,9 +20,7 @@ namespace xt
     {
         namespace detail
         {
-            template <
-                class E,
-                typename std::enable_if<xtl::is_complex<typename std::decay<E>::type::value_type>::value, bool>::type = true>
+            template <xtl::complex_concept E>
             inline auto radix2(E&& e)
             {
                 using namespace xt::placeholders;
@@ -119,19 +118,19 @@ namespace xt
             }
         }  // namespace detail
 
-        /**
+			 /**
          * @brief 1D FFT of an Nd array along a specified axis
          * @param e an Nd expression to be transformed to the fourier domain
          * @param axis the axis along which to perform the 1D FFT
          * @return a transformed xarray of the specified precision
          */
-        template <
-            class E,
-            typename std::enable_if<xtl::is_complex<typename std::decay<E>::type::value_type>::value, bool>::type = true>
+        template<class E>
         inline auto fft(E&& e, std::ptrdiff_t axis = -1)
         {
-            using value_type = typename std::decay_t<E>::value_type;
-            using precision = typename value_type::value_type;
+					using value_type = typename std::decay<E>::type::value_type;
+					if constexpr (xtl::is_complex<typename std::decay<E>::type::value_type>::value)
+					{
+						using precision = typename value_type::value_type;
             const auto saxis = xt::normalize_axis(e.dimension(), axis);
             const size_t N = e.shape(saxis);
             const bool powerOfTwo = !(N == 0) && !(N & (N - 1));
@@ -150,29 +149,19 @@ namespace xt
                 }
             }
             return out;
-        }
+					}
+					else
+					{
+						return fft(xt::cast<std::complex<value_type>>(e), axis);
+					}
+				}
 
-        /**
-         * @brief 1D FFT of an Nd array along a specified axis
-         * @param e an Nd expression to be transformed to the fourier domain
-         * @param axis the axis along which to perform the 1D FFT
-         * @return a transformed xarray of the specified precision
-         */
-        template <
-            class E,
-            typename std::enable_if<!xtl::is_complex<typename std::decay<E>::type::value_type>::value, bool>::type = true>
-        inline auto fft(E&& e, std::ptrdiff_t axis = -1)
+        template <class E>
+        inline auto ifft(E&& e, std::ptrdiff_t axis = -1)
         {
-            using value_type = typename std::decay<E>::type::value_type;
-            return fft(xt::cast<std::complex<value_type>>(e), axis);
-        }
-
-        template <
-            class E,
-            typename std::enable_if<xtl::is_complex<typename std::decay<E>::type::value_type>::value, bool>::type = true>
-        auto ifft(E&& e, std::ptrdiff_t axis = -1)
-        {
-            // check the length of the data on that axis
+					if constexpr (xtl::is_complex<typename std::decay<E>::type::value_type>::value)
+					{
+						// check the length of the data on that axis
             const std::size_t n = e.shape(axis);
             if (n == 0)
             {
@@ -182,15 +171,12 @@ namespace xt
             auto fft_res = xt::fft::fft(complex_args, axis);
             fft_res = xt::conj(fft_res);
             return fft_res;
-        }
-
-        template <
-            class E,
-            typename std::enable_if<!xtl::is_complex<typename std::decay<E>::type::value_type>::value, bool>::type = true>
-        inline auto ifft(E&& e, std::ptrdiff_t axis = -1)
-        {
+					}
+					else
+					{
             using value_type = typename std::decay<E>::type::value_type;
             return ifft(xt::cast<std::complex<value_type>>(e), axis);
+					}
         }
 
         /*

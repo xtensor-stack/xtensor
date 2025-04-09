@@ -59,6 +59,8 @@ namespace xt
 
     template <class F, class R, class S>
     class xgenerator;
+    
+		template<typename T> concept xgenerator_concept = is_specialization_of<xgenerator, std::decay_t<T>>::value;
 
     template <class C, class R, class S>
     struct xiterable_inner_types<xgenerator<C, R, S>>
@@ -80,10 +82,8 @@ namespace xt
      * overlapping_memory_checker_traits *
      *************************************/
 
-    template <class E>
-    struct overlapping_memory_checker_traits<
-        E,
-        std::enable_if_t<!has_memory_address<E>::value && is_specialization_of<xgenerator, E>::value>>
+    template <xgenerator_concept E> requires without_memory_address_concept<E>
+    struct overlapping_memory_checker_traits<E>
     {
         static bool check_overlap(const E&, const memory_range&)
         {
@@ -165,7 +165,7 @@ namespace xt
         template <class O>
         const_stepper stepper_end(const O& shape, layout_type) const noexcept;
 
-        template <class E, class FE = F, class = std::enable_if_t<has_assign_to<E, FE>::value>>
+        template <class E, class FE = F> requires has_assign_to_v<E, FE>
         void assign_to(xexpression<E>& e) const noexcept;
 
         const functor_type& functor() const noexcept;
@@ -371,7 +371,7 @@ namespace xt
     }
 
     template <class F, class R, class S>
-    template <class E, class, class>
+    template <class E, class FE> requires has_assign_to_v<E, FE>
     inline void xgenerator<F, R, S>::assign_to(xexpression<E>& e) const noexcept
     {
         e.derived_cast().resize(m_shape);

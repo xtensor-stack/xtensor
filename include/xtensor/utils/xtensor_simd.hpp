@@ -268,6 +268,8 @@ namespace xt
     struct has_simd_interface : detail::has_simd_interface_impl<E, T>
     {
     };
+    
+    template <class E> concept has_simd_interface_concept = has_simd_interface<E>::value;
 
     template <class T>
     struct has_simd_type : std::integral_constant<bool, !std::is_same<T, xt_simd::simd_type<T>>::value>

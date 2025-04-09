@@ -22,6 +22,7 @@
 #include "../utils/xutils.hpp"
 #include "../views/xrepeat.hpp"
 #include "../views/xstrided_view.hpp"
+#include "xtl_concepts.hpp"
 
 namespace xt
 {
@@ -64,7 +65,7 @@ namespace xt
     template <class E>
     auto squeeze(E&& e);
 
-    template <class E, class S, class Tag = check_policy::none, std::enable_if_t<!xtl::is_integral<S>::value, int> = 0>
+    template <class E, xtl::non_integral_concept S, class Tag = check_policy::none>
     auto squeeze(E&& e, S&& axis, Tag check_policy = Tag());
 
     template <class E>
@@ -210,20 +211,21 @@ namespace xt
             return transpose_impl(std::forward<E>(e), std::forward<S>(permutation), check_policy::none());
         }
 
-        template <class E, class S, class X, std::enable_if_t<has_data_interface<std::decay_t<E>>::value>* = nullptr>
-        inline void compute_transposed_strides(E&& e, const S&, X& strides)
+        template <class E, class S, class X>
+        inline void compute_transposed_strides(E&& e, const S& shape, X& strides)
         {
-            std::copy(e.strides().crbegin(), e.strides().crend(), strides.begin());
-        }
-
-        template <class E, class S, class X, std::enable_if_t<!has_data_interface<std::decay_t<E>>::value>* = nullptr>
-        inline void compute_transposed_strides(E&&, const S& shape, X& strides)
-        {
+					if constexpr (has_data_interface<std::decay_t<E>>::value)
+					{
+						std::copy(e.strides().crbegin(), e.strides().crend(), strides.begin());
+					}
+					else
+					{
             // In the case where E does not have a data interface, the transposition
             // makes use of a flat storage adaptor that has layout XTENSOR_DEFAULT_TRAVERSAL
             // which should be the one inverted.
             layout_type l = transpose_layout(XTENSOR_DEFAULT_TRAVERSAL);
             compute_strides(shape, l, strides);
+					}
         }
     }
 
@@ -588,7 +590,7 @@ namespace xt
      * @param check_policy select check_policy. With check_policy::full(), selecting an axis
      *        which is greater than one will throw a runtime_error.
      */
-    template <class E, class S, class Tag, std::enable_if_t<!xtl::is_integral<S>::value, int>>
+    template <class E, xtl::non_integral_concept S, class Tag>
     inline auto squeeze(E&& e, S&& axis, Tag check_policy)
     {
         return detail::squeeze_impl(std::forward<E>(e), std::forward<S>(axis), check_policy);
