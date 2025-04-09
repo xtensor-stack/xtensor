@@ -670,16 +670,16 @@ namespace xt
         template <input_iterator_concept IT>
         svector(IT begin, IT end, const allocator_type& alloc = allocator_type());
 
-        template <std::size_t N2, bool I2> requires (N != N2)
-        explicit svector(const svector<T, N2, A, I2>& rhs);
+        template <std::size_t N2, bool I2>
+        requires(N != N2) explicit svector(const svector<T, N2, A, I2>& rhs);
 
         svector& operator=(const svector& rhs);
         svector& operator=(svector&& rhs) noexcept(std::is_nothrow_move_assignable<value_type>::value);
         svector& operator=(const std::vector<T>& rhs);
         svector& operator=(std::initializer_list<T> il);
 
-        template <std::size_t N2, bool I2> requires (N != N2)
-        svector& operator=(const svector<T, N2, A, I2>& rhs);
+        template <std::size_t N2, bool I2>
+        requires(N != N2) svector& operator=(const svector<T, N2, A, I2>& rhs);
 
         svector(const svector& other);
         svector(svector&& other) noexcept(std::is_nothrow_move_constructible<value_type>::value);
@@ -809,8 +809,8 @@ namespace xt
     }
 
     template <class T, std::size_t N, class A, bool Init>
-    template <std::size_t N2, bool I2> requires (N != N2)
-    inline svector<T, N, A, Init>::svector(const svector<T, N2, A, I2>& rhs)
+    template <std::size_t N2, bool I2>
+    requires(N != N2) inline svector<T, N, A, Init>::svector(const svector<T, N2, A, I2>& rhs)
         : m_allocator(rhs.get_allocator())
     {
         assign(rhs.begin(), rhs.end());
@@ -868,8 +868,10 @@ namespace xt
     }
 
     template <class T, std::size_t N, class A, bool Init>
-    template <std::size_t N2, bool I2> requires (N != N2)
-    inline svector<T, N, A, Init>& svector<T, N, A, Init>::operator=(const svector<T, N2, A, I2>& rhs)
+    template <std::size_t N2, bool I2>
+    requires(N != N2) inline svector<T, N, A, Init>& svector<T, N, A, Init>::operator=(
+        const svector<T, N2, A, I2>& rhs
+    )
     {
         m_allocator = std::allocator_traits<allocator_type>::select_on_container_copy_construction(
             rhs.get_allocator()

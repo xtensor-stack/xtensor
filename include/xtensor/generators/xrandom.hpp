@@ -27,9 +27,9 @@
 #include "../core/xtensor_config.hpp"
 #include "../generators/xbuilder.hpp"
 #include "../generators/xgenerator.hpp"
+#include "../misc/xtl_concepts.hpp"
 #include "../views/xindex_view.hpp"
 #include "../views/xview.hpp"
-#include "../misc/xtl_concepts.hpp"
 
 namespace xt
 {
@@ -177,10 +177,10 @@ namespace xt
         void shuffle(xexpression<T>& e, E& engine = random::get_default_random_engine());
 
         template <xtl::integral_concept T, class E = random::default_engine_type>
-				xtensor<T, 1> permutation(T e, E& engine = random::get_default_random_engine());
+        xtensor<T, 1> permutation(T e, E& engine = random::get_default_random_engine());
 
         template <xexpression_concept T, class E = random::default_engine_type>
-				std::decay_t<T> permutation(T&& e, E& engine = random::get_default_random_engine());
+        std::decay_t<T> permutation(T&& e, E& engine = random::get_default_random_engine());
 
         template <class T, class E = random::default_engine_type>
         xtensor<typename T::value_type, 1> choice(
@@ -835,7 +835,7 @@ namespace xt
          * @return randomly permuted copy of container or arange.
          */
         template <xtl::integral_concept T, class E>
-				xtensor<T, 1> permutation(T e, E& engine)
+        xtensor<T, 1> permutation(T e, E& engine)
         {
             xt::xtensor<T, 1> res = xt::arange<T>(e);
             shuffle(res, engine);
@@ -844,7 +844,7 @@ namespace xt
 
         /// @cond DOXYGEN_INCLUDE_SFINAE
         template <xexpression_concept T, class E>
-				std::decay_t<T> permutation(T&& e, E& engine)
+        std::decay_t<T> permutation(T&& e, E& engine)
         {
             using copy_type = std::decay_t<T>;
             copy_type res = e;

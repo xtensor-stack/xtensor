@@ -214,18 +214,18 @@ namespace xt
         template <class E, class S, class X>
         inline void compute_transposed_strides(E&& e, const S& shape, X& strides)
         {
-					if constexpr (has_data_interface<std::decay_t<E>>::value)
-					{
-						std::copy(e.strides().crbegin(), e.strides().crend(), strides.begin());
-					}
-					else
-					{
-            // In the case where E does not have a data interface, the transposition
-            // makes use of a flat storage adaptor that has layout XTENSOR_DEFAULT_TRAVERSAL
-            // which should be the one inverted.
-            layout_type l = transpose_layout(XTENSOR_DEFAULT_TRAVERSAL);
-            compute_strides(shape, l, strides);
-					}
+            if constexpr (has_data_interface<std::decay_t<E>>::value)
+            {
+                std::copy(e.strides().crbegin(), e.strides().crend(), strides.begin());
+            }
+            else
+            {
+                // In the case where E does not have a data interface, the transposition
+                // makes use of a flat storage adaptor that has layout XTENSOR_DEFAULT_TRAVERSAL
+                // which should be the one inverted.
+                layout_type l = transpose_layout(XTENSOR_DEFAULT_TRAVERSAL);
+                compute_strides(shape, l, strides);
+            }
         }
     }
 

@@ -508,7 +508,8 @@ namespace xt
         };
     }
 
-		template<typename T> concept fixed_shape_container_concept = detail::is_fixed<typename std::decay_t<T>::shape_type>::value;
+    template <typename T>
+    concept fixed_shape_container_concept = detail::is_fixed<typename std::decay_t<T>::shape_type>::value;
 
     template <class... S>
     struct promote_shape

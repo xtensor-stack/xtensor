@@ -5,7 +5,6 @@
 
 #include <xtl/xcomplex.hpp>
 
-#include "./xtl_concepts.hpp"
 #include "../containers/xarray.hpp"
 #include "../core/xmath.hpp"
 #include "../core/xnoalias.hpp"
@@ -13,6 +12,7 @@
 #include "../misc/xcomplex.hpp"
 #include "../views/xaxis_slice_iterator.hpp"
 #include "../views/xview.hpp"
+#include "./xtl_concepts.hpp"
 
 namespace xt
 {
@@ -118,65 +118,65 @@ namespace xt
             }
         }  // namespace detail
 
-			 /**
+        /**
          * @brief 1D FFT of an Nd array along a specified axis
          * @param e an Nd expression to be transformed to the fourier domain
          * @param axis the axis along which to perform the 1D FFT
          * @return a transformed xarray of the specified precision
          */
-        template<class E>
+        template <class E>
         inline auto fft(E&& e, std::ptrdiff_t axis = -1)
         {
-					using value_type = typename std::decay<E>::type::value_type;
-					if constexpr (xtl::is_complex<typename std::decay<E>::type::value_type>::value)
-					{
-						using precision = typename value_type::value_type;
-            const auto saxis = xt::normalize_axis(e.dimension(), axis);
-            const size_t N = e.shape(saxis);
-            const bool powerOfTwo = !(N == 0) && !(N & (N - 1));
-            xt::xarray<std::complex<precision>> out = xt::eval(e);
-            auto begin = xt::axis_slice_begin(out, saxis);
-            auto end = xt::axis_slice_end(out, saxis);
-            for (auto iter = begin; iter != end; iter++)
+            using value_type = typename std::decay<E>::type::value_type;
+            if constexpr (xtl::is_complex<typename std::decay<E>::type::value_type>::value)
             {
-                if (powerOfTwo)
+                using precision = typename value_type::value_type;
+                const auto saxis = xt::normalize_axis(e.dimension(), axis);
+                const size_t N = e.shape(saxis);
+                const bool powerOfTwo = !(N == 0) && !(N & (N - 1));
+                xt::xarray<std::complex<precision>> out = xt::eval(e);
+                auto begin = xt::axis_slice_begin(out, saxis);
+                auto end = xt::axis_slice_end(out, saxis);
+                for (auto iter = begin; iter != end; iter++)
                 {
-                    xt::noalias(*iter) = detail::radix2(*iter);
+                    if (powerOfTwo)
+                    {
+                        xt::noalias(*iter) = detail::radix2(*iter);
+                    }
+                    else
+                    {
+                        xt::noalias(*iter) = detail::transform_bluestein(*iter);
+                    }
                 }
-                else
-                {
-                    xt::noalias(*iter) = detail::transform_bluestein(*iter);
-                }
+                return out;
             }
-            return out;
-					}
-					else
-					{
-						return fft(xt::cast<std::complex<value_type>>(e), axis);
-					}
-				}
+            else
+            {
+                return fft(xt::cast<std::complex<value_type>>(e), axis);
+            }
+        }
 
         template <class E>
         inline auto ifft(E&& e, std::ptrdiff_t axis = -1)
         {
-					if constexpr (xtl::is_complex<typename std::decay<E>::type::value_type>::value)
-					{
-						// check the length of the data on that axis
-            const std::size_t n = e.shape(axis);
-            if (n == 0)
+            if constexpr (xtl::is_complex<typename std::decay<E>::type::value_type>::value)
             {
-                XTENSOR_THROW(std::runtime_error, "Cannot take the iFFT along an empty dimention");
+                // check the length of the data on that axis
+                const std::size_t n = e.shape(axis);
+                if (n == 0)
+                {
+                    XTENSOR_THROW(std::runtime_error, "Cannot take the iFFT along an empty dimention");
+                }
+                auto complex_args = xt::conj(e);
+                auto fft_res = xt::fft::fft(complex_args, axis);
+                fft_res = xt::conj(fft_res);
+                return fft_res;
             }
-            auto complex_args = xt::conj(e);
-            auto fft_res = xt::fft::fft(complex_args, axis);
-            fft_res = xt::conj(fft_res);
-            return fft_res;
-					}
-					else
-					{
-            using value_type = typename std::decay<E>::type::value_type;
-            return ifft(xt::cast<std::complex<value_type>>(e), axis);
-					}
+            else
+            {
+                using value_type = typename std::decay<E>::type::value_type;
+                return ifft(xt::cast<std::complex<value_type>>(e), axis);
+            }
         }
 
         /*

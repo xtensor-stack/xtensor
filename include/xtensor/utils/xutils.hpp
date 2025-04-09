@@ -585,9 +585,10 @@ namespace xt
     struct has_data_interface<E, void_t<decltype(std::declval<E>().data())>> : std::true_type
     {
     };
-		
-		template <class E> concept has_data_interface_concept = has_data_interface<E>::value;
-		
+
+    template <class E>
+    concept has_data_interface_concept = has_data_interface<E>::value;
+
     template <class E, class = void>
     struct has_strides : std::false_type
     {
@@ -607,7 +608,7 @@ namespace xt
     struct has_iterator_interface<E, void_t<decltype(std::declval<E>().begin())>> : std::true_type
     {
     };
-    
+
     template <class E>
     concept has_iterator_interface_concept = has_iterator_interface<E>::value;
 
@@ -628,10 +629,13 @@ namespace xt
         : std::true_type
     {
     };
-    
-    template<typename E> concept       iterator_concept = is_iterator<E>::value;
-    template<typename E> concept input_iterator_concept = std::is_convertible<typename std::iterator_traits<E>::iterator_category, std::input_iterator_tag>::value;
-    
+
+    template <typename E>
+    concept iterator_concept = is_iterator<E>::value;
+    template <typename E>
+    concept input_iterator_concept = std::
+        is_convertible<typename std::iterator_traits<E>::iterator_category, std::input_iterator_tag>::value;
+
     /********************************************
      * xtrivial_default_construct implemenation *
      ********************************************/
@@ -800,8 +804,9 @@ namespace xt
         : std::true_type
     {
     };
-    
-    template <class E1, class E2> constexpr bool has_assign_to_v = has_assign_to <E1, E2>::value ; 
+
+    template <class E1, class E2>
+    constexpr bool has_assign_to_v = has_assign_to<E1, E2>::value;
 
     /*************************************
      * overlapping_memory_checker_traits *
@@ -816,9 +821,11 @@ namespace xt
     struct has_memory_address<T, void_t<decltype(std::addressof(*std::declval<T>().begin()))>> : std::true_type
     {
     };
-    
-    template<typename T> concept    with_memory_address_concept =  has_memory_address< std::decay_t<T> >::value;
-    template<typename T> concept without_memory_address_concept = !has_memory_address< std::decay_t<T> >::value;
+
+    template <typename T>
+    concept with_memory_address_concept = has_memory_address<std::decay_t<T>>::value;
+    template <typename T>
+    concept without_memory_address_concept = !has_memory_address<std::decay_t<T>>::value;
 
     struct memory_range
     {

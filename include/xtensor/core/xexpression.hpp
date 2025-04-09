@@ -178,7 +178,7 @@ namespace xt
 
     template <class E>
     using is_xexpression = is_crtp_base_of<xexpression, E>;
-    
+
     template <class E>
     concept xexpression_concept = is_xexpression<E>::value;
 

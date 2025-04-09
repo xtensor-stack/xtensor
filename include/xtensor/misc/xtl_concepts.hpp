@@ -10,14 +10,17 @@
 #ifndef XTENSOR_CONCEPTS_HPP
 #define XTENSOR_CONCEPTS_HPP
 
-#include <xtl/xtype_traits.hpp>
 #include <xtl/xcomplex.hpp>
+#include <xtl/xtype_traits.hpp>
 
 namespace xtl
 {
-	template<typename T> concept     integral_concept =  xtl::is_integral<T>::value;
-	template<typename T> concept non_integral_concept = !xtl::is_integral<T>::value;
-	template<typename T> concept      complex_concept = xtl::is_complex<typename std::decay<T>::type::value_type>::value;
+    template <typename T>
+    concept integral_concept = xtl::is_integral<T>::value;
+    template <typename T>
+    concept non_integral_concept = !xtl::is_integral<T>::value;
+    template <typename T>
+    concept complex_concept = xtl::is_complex<typename std::decay<T>::type::value_type>::value;
 }
 
-#endif // XTENSOR_CONCEPTS_HPP
+#endif  // XTENSOR_CONCEPTS_HPP

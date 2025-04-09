@@ -561,10 +561,7 @@ namespace xt
      *
      * @return partially sorted xcontainer
      */
-    template <
-        class E,
-        xtl::non_integral_concept C,
-        class R = detail::flatten_sort_result_type_t<E>>
+    template <class E, xtl::non_integral_concept C, class R = detail::flatten_sort_result_type_t<E>>
     inline R partition(const xexpression<E>& e, C kth_container, placeholders::xtuph /*ax*/)
     {
         const auto& de = e.derived_cast();
