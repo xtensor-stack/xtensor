@@ -318,7 +318,7 @@ namespace xt
     using is_xscalar = detail::is_xscalar_impl<E>;
 
     template <class E>
-    concept is_xscalar_concept = is_xscalar<std::decay_t<E>>::value;
+    concept xscalar_concept = is_xscalar<std::decay_t<E>>::value;
 
     namespace detail
     {

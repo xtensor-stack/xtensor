@@ -596,13 +596,13 @@ namespace xt
         inline const_container_iterator data_xend(layout_type l, size_type offset) const noexcept;
 
         // Conversion operator enabled for statically "scalar" views
-        template <is_xscalar_concept ST = self_type>
+        template <xscalar_concept ST = self_type>
         operator reference()
         {
             return (*this)();
         }
 
-        template <is_xscalar_concept ST = self_type>
+        template <xscalar_concept ST = self_type>
         operator const_reference() const
         {
             return (*this)();

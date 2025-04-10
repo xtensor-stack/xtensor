@@ -632,9 +632,6 @@ namespace xt
 
     template <typename E>
     concept iterator_concept = is_iterator<E>::value;
-    template <typename E>
-    concept input_iterator_concept = std::
-        is_convertible<typename std::iterator_traits<E>::iterator_category, std::input_iterator_tag>::value;
 
     /********************************************
      * xtrivial_default_construct implemenation *
