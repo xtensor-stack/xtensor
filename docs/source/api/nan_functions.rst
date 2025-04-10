@@ -9,7 +9,7 @@ NaN functions
 
 **xtensor** provides the following functions that deal with NaNs in xexpressions:
 
-Defined in ``xtensor/xmath.hpp``
+Defined in ``xtensor/core/xmath.hpp``
 
 .. doxygenfunction:: nan_to_num(E&&)
 

@@ -9,7 +9,7 @@ Nearest integer floating point operations
 
 **xtensor** provides the following rounding operations for xexpressions:
 
-Defined in ``xtensor/xmath.hpp``
+Defined in ``xtensor/core/xmath.hpp``
 
 .. doxygenfunction:: ceil(E&&)
 

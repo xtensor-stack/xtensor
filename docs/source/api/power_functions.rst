@@ -10,7 +10,7 @@ Power functions
 
 **xtensor** provides the following power functions for xexpressions and scalars:
 
-Defined in ``xtensor/xmath.hpp``
+Defined in ``xtensor/core/xmath.hpp``
 
 .. doxygenfunction:: pow(E1&&, E2&&)
 

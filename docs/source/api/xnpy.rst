@@ -7,7 +7,7 @@
 xnpy: read/write NPY files
 ==========================
 
-Defined in ``xtensor/xnpy.hpp``
+Defined in ``xtensor/io/xnpy.hpp``
 
 .. doxygenfunction:: xt::load_npy(std::istream&)
 

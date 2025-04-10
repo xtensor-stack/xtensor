@@ -7,7 +7,7 @@
 xstrided_view
 =============
 
-Defined in ``xtensor/xstrided_view.hpp``
+Defined in ``xtensor/views/xstrided_view.hpp``
 
 .. doxygenclass:: xt::xstrided_view
    :members:

@@ -7,7 +7,7 @@
 xmanipulation
 =============
 
-Defined in ``xtensor/xmanipulation.hpp``
+Defined in ``xtensor/misc/xmanipulation.hpp``
 
 .. cpp:namespace-push:: xt
 

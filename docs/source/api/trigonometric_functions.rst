@@ -9,7 +9,7 @@ Trigonometric functions
 
 **xtensor** provides the following trigonometric functions for xexpressions and scalars:
 
-Defined in ``xtensor/xmath.hpp``
+Defined in ``xtensor/core/xmath.hpp``
 
 .. doxygenfunction:: sin(E&&)
 

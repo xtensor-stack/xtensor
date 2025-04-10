@@ -20,8 +20,8 @@ The following example shows how to bring an ``std::vector`` into the expression 
 
     #include <cstddef>
     #include <vector>
-    #include <xtensor/xarray.hpp>
-    #include <xtensor/xadapt.hpp>
+    #include <xtensor/containers/xarray.hpp>
+    #include <xtensor/containers/xadapt.hpp>
 
     std::vector<double> v = {1., 2., 3., 4., 5., 6. };
     std::vector<std::size_t> shape = { 2, 3 };
@@ -50,7 +50,7 @@ ownership of the array:
 .. code::
 
     #include <cstddef>
-    #include <xtensor/xadapt.hpp>
+    #include <xtensor/containers/xadapt.hpp>
 
     void compute(double* data, std::size_t size)
     {
@@ -82,8 +82,8 @@ the ownership of the array, meaning it will be deleted when the adaptor is destr
 .. code::
 
     #include <cstddef>
-    #include <xtensor/xarray.hpp>
-    #include <xtensor/xadapt.hpp>
+    #include <xtensor/containers/xarray.hpp>
+    #include <xtensor/containers/xadapt.hpp>
 
     void compute(double*& data, std::size_t size)
     {
@@ -119,8 +119,8 @@ adaptor before calling ``compute`` and pass it to the function:
 .. code::
 
     #include <cstddef>
-    #include <xtensor/xarray.hpp>
-    #include <xtensor/xadapt.hpp>
+    #include <xtensor/containers/xarray.hpp>
+    #include <xtensor/containers/xadapt.hpp>
 
     template <class A>
     void compute(A& a)
@@ -154,8 +154,8 @@ Adapting C arrays allocated on the stack is as simple as adapting ``std::vector`
 
     #include <cstddef>
     #include <vector>
-    #include <xtensor/xarray.hpp>
-    #include <xtensor/xadapt.hpp>
+    #include <xtensor/containers/xarray.hpp>
+    #include <xtensor/containers/xadapt.hpp>
 
     double v[6] = {1., 2., 3., 4., 5., 6. };
     std::vector<std::size_t> shape = { 2, 3 };
@@ -185,8 +185,8 @@ It will automatically increment the reference count of shared pointers upon crea
 .. code::
 
     #include <memory>
-    #include <xtensor/xadapt.hpp>
-    #include <xtensor/xio.hpp>
+    #include <xtensor/containers/xadapt.hpp>
+    #include <xtensor/io/xio.hpp>
 
     std::shared_ptr<double> sptr(new double[8], std::default_delete<double[]>());
     sptr.get()[2] = 321.;
@@ -201,8 +201,8 @@ memory) as follows:
 .. code::
 
     #include <memory>
-    #include <xtensor/xadapt.hpp>
-    #include <xtensor/xio.hpp>
+    #include <xtensor/containers/xadapt.hpp>
+    #include <xtensor/io/xio.hpp>
 
     struct Buffer {
         Buffer(std::vector<double>& buf) : m_buf(buf) {}

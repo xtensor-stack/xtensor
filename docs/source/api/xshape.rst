@@ -7,7 +7,7 @@
 xshape
 ======
 
-Defined in ``xtensor/xshape.hpp``
+Defined in ``xtensor/core/xshape.hpp``
 
 .. cpp:namespace-push:: xt
 

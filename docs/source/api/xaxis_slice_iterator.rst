@@ -8,7 +8,7 @@
 xaxis_slice_iterator
 ====================
 
-Defined in ``xtensor/xaxis_slice_iterator.hpp``
+Defined in ``xtensor/views/xaxis_slice_iterator.hpp``
 
 .. doxygenclass:: xt::xaxis_slice_iterator
    :members:

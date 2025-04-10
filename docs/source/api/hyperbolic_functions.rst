@@ -9,7 +9,7 @@ Hyperbolic functions
 
 **xtensor** provides the following hyperbolic functions for xexpressions:
 
-Defined in ``xtensor/xmath.hpp``
+Defined in ``xtensor/core/xmath.hpp``
 
 .. _sinh-function-reference:
 .. doxygenfunction:: sinh(E&&)

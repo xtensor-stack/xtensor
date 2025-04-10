@@ -7,7 +7,7 @@
 xhistogram
 ==========
 
-Defined in ``xtensor/xhistogram.hpp``
+Defined in ``xtensor/misc/xhistogram.hpp``
 
 .. doxygenenum:: xt::histogram_algorithm
 

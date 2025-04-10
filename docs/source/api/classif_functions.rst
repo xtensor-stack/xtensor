@@ -9,7 +9,7 @@ Classification functions
 
 **xtensor** provides the following classification functions for xexpressions and scalars:
 
-Defined in ``xtensor/xmath.hpp``
+Defined in ``xtensor/core/xmath.hpp``
 
 .. doxygenfunction:: isfinite(E&&)
 

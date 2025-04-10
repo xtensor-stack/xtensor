@@ -7,15 +7,15 @@
 xio: pretty printing
 ====================
 
-Defined in ``xtensor/xio.hpp``
+Defined in ``xtensor/io/xio.hpp``
 
 This file defines functions for pretty printing xexpressions. It defines appropriate
 overloads for the ``<<`` operator for std::ostreams and xexpressions.
 
 .. code::
 
-    #include <xtensor/xio.hpp>
-    #include <xtensor/xarray.hpp>
+    #include <xtensor/io/xio.hpp>
+    #include <xtensor/containers/xarray.hpp>
 
     int main()
     {

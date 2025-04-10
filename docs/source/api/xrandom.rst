@@ -7,7 +7,7 @@
 xrandom
 =======
 
-Defined in ``xtensor/xrandom.hpp``
+Defined in ``xtensor/generators/xrandom.hpp``
 
 .. warning:: xtensor uses a lazy generator for random numbers. You need to assign them or use ``eval`` to keep the generated values consistent.
 

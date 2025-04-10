@@ -7,7 +7,7 @@
 xview_semantic
 ==============
 
-Defined in ``xtensor/xsemantic.hpp``
+Defined in ``xtensor/core/xsemantic.hpp``
 
 .. doxygenclass:: xt::xview_semantic
    :members:

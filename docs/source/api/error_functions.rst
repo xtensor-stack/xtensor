@@ -9,7 +9,7 @@ Error and gamma functions
 
 **xtensor** provides the following error and gamma functions for xexpressions:
 
-Defined in ``xtensor/xmath.hpp``
+Defined in ``xtensor/core/xmath.hpp``
 
 .. doxygenfunction:: erf(E&&)
 

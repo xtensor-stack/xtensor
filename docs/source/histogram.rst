@@ -30,9 +30,9 @@ with that difference that the bin-edges are obtained by a separate function call
 
 .. code-block:: cpp
 
-    #include <xtensor/xtensor.hpp>
-    #include <xtensor/xhistogram.hpp>
-    #include <xtensor/xio.hpp>
+    #include <xtensor/containers/xtensor.hpp>
+    #include <xtensor/misc/xhistogram.hpp>
+    #include <xtensor/io/xio.hpp>
 
     int main()
     {
@@ -53,9 +53,9 @@ To customize the algorithm to be used to construct the histogram, one needs to m
 
 .. code-block:: cpp
 
-    #include <xtensor/xtensor.hpp>
-    #include <xtensor/xhistogram.hpp>
-    #include <xtensor/xio.hpp>
+    #include <xtensor/containers/xtensor.hpp>
+    #include <xtensor/misc/xhistogram.hpp>
+    #include <xtensor/io/xio.hpp>
 
     int main()
     {

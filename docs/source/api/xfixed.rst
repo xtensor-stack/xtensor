@@ -7,7 +7,7 @@
 xtensor_fixed
 =============
 
-Defined in ``xtensor/xfixed.hpp``
+Defined in ``xtensor/containers/xfixed.hpp``
 
 .. doxygenclass:: xt::xfixed_container
    :members:

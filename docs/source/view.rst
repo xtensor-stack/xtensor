@@ -33,8 +33,8 @@ Slices can be specified in the following ways:
 .. code::
 
     #include <vector>
-    #include <xtensor/xarray.hpp>
-    #include <xtensor/xview.hpp>
+    #include <xtensor/containers/xarray.hpp>
+    #include <xtensor/views/xview.hpp>
 
     std::vector<size_t> shape = {3, 2, 4};
     xt::xarray<int> a(shape);
@@ -70,8 +70,8 @@ The range function supports the placeholder ``_`` syntax:
 
 .. code::
 
-    #include <xtensor/xarray.hpp>
-    #include <xtensor/xview.hpp>
+    #include <xtensor/containers/xarray.hpp>
+    #include <xtensor/views/xview.hpp>
 
     using namespace xt::placeholders;  // required for ``_`` to work
 
@@ -87,8 +87,8 @@ you are actually also altering the underlying expression.
 .. code::
 
     #include <vector>
-    #include <xtensor/xarray.hpp>
-    #include <xtensor/xview.hpp>
+    #include <xtensor/containers/xarray.hpp>
+    #include <xtensor/views/xview.hpp>
 
     std::vector<size_t> shape = {3, 2, 4};
     xt::xarray<int> a(shape, 0);
@@ -102,8 +102,8 @@ The convenient methods :cpp:func:`xt::row` and :cpp:func:`xt::col` are available
 .. code::
 
     #include <vector>
-    #include <xtensor/xtensor.hpp>
-    #include <xtensor/xview.hpp>
+    #include <xtensor/containers/xtensor.hpp>
+    #include <xtensor/views/xview.hpp>
 
     xt::xtensor<double, 2> a = {{1, 2}, {3, 4}};
     auto r = xt::row(a, 0);
@@ -125,8 +125,8 @@ The strided view does not support the slices returned by the :cpp:func:`xt::keep
 
 .. code::
 
-    #include <xtensor/xarray.hpp>
-    #include <xtensor/xstrided_view.hpp>
+    #include <xtensor/containers/xarray.hpp>
+    #include <xtensor/views/xstrided_view.hpp>
 
     auto a = xt::xarray<int>::from_shape({3, 2, 3, 4, 5});
 
@@ -149,8 +149,8 @@ Since ``xtensor 0.16.3``, a new range syntax can be used with strided views:
 
 .. code::
 
-    #include <xtensor/xarray.hpp>
-    #include <xtensor/xstrided_view.hpp>
+    #include <xtensor/containers/xarray.hpp>
+    #include <xtensor/views/xstrided_view.hpp>
 
     using namespace xt::placeholders;
 
@@ -171,8 +171,8 @@ Trying to build a transposed view on a expression with a dynamic layout throws a
 
 .. code::
 
-    #include <xtensor/xarray.hpp>
-    #include <xtensor/xstrided_view.hpp>
+    #include <xtensor/containers/xarray.hpp>
+    #include <xtensor/views/xstrided_view.hpp>
 
     xt::xarray<int> a = { {0, 1, 2}, {3, 4, 5} };
     auto tr = xt::transpose(a);
@@ -194,8 +194,8 @@ uses the layout of the expression.
 
 .. code::
 
-    #include <xtensor/xarray.hpp>
-    #include <xtensor/xstrided_view.hpp>
+    #include <xtensor/containers/xarray.hpp>
+    #include <xtensor/views/xstrided_view.hpp>
 
     xt::xarray<int> a = { {0, 1, 2}, {3, 4, 5} };
     auto flc = xt::ravel<layout_type::column_major>(a);
@@ -217,8 +217,8 @@ the view modifies the underlying expression.
 
 .. code::
 
-    #include <xtensor/xarray.hpp>
-    #include <xtensor/xstrided_view.hpp>
+    #include <xtensor/containers/xarray.hpp>
+    #include <xtensor/views/xstrided_view.hpp>
 
     auto a = xt::xarray<int>::from_shape({3, 2, 4});
     auto v = xt::reshape_view(a, { 4, 2, 3 });
@@ -240,7 +240,7 @@ keeping or dropping of a slice is involved.
 
 .. code::
 
-    #include <xtensor/xarray.hpp>
+    #include <xtensor/containers/xarray.hpp>
     #include <xtensor/xdynamic_view.hp>
 
     auto a = xt::xarray<int>::from_shape({3, 2, 3, 4, 5});
@@ -266,8 +266,8 @@ Index views should be built with the :cpp:func:`xt::index_view` helper function.
 
 .. code::
 
-    #include <xtensor/xarray.hpp>
-    #include <xtensor/xindex_view.hpp>
+    #include <xtensor/containers/xarray.hpp>
+    #include <xtensor/views/xindex_view.hpp>
 
     xt::xarray<double> a = {{1, 5, 3}, {4, 5, 6}};
     auto b = xt::index_view(a, {{0,0}, {1, 0}, {0, 1}});
@@ -280,8 +280,8 @@ The same stands for the type of the list of indices:
 
 .. code::
 
-    #include <xtensor/xarray.hpp>
-    #include <xtensor/xindex_view.hpp>
+    #include <xtensor/containers/xarray.hpp>
+    #include <xtensor/views/xindex_view.hpp>
 
     xt::xarray<double> a = {{1, 5, 3}, {4, 5, 6}};
     using index_type = std::array<std::size_t, 2>;
@@ -300,8 +300,8 @@ Filters should be built with the :cpp:func:`xt::filter` helper function.
 
 .. code::
 
-    #include <xtensor/xarray.hpp>
-    #include <xtensor/xindex_view.hpp>
+    #include <xtensor/containers/xarray.hpp>
+    #include <xtensor/views/xindex_view.hpp>
 
     xt::xarray<double> a = {{1, 5, 3}, {4, 5, 6}};
     auto v = xt::filter(a, a >= 5);
@@ -320,8 +320,8 @@ computed scalar assignments.
 
 .. code::
 
-    #include <xtensor/xarray.hpp>
-    #include <xtensor/xindex_view.hpp>
+    #include <xtensor/containers/xarray.hpp>
+    #include <xtensor/views/xindex_view.hpp>
 
     xt::xarray<double> a = {{1, 5, 3}, {4, 5, 6}};
     filtration(a, a >= 5) += 100;
@@ -334,8 +334,8 @@ Masked views are multidimensional views that apply a mask on an :cpp:type:`xt::x
 
 .. code::
 
-    #include <xtensor/xarray.hpp>
-    #include <xtensor/xmasked_view.hpp>
+    #include <xtensor/containers/xarray.hpp>
+    #include <xtensor/views/xmasked_view.hpp>
 
     xt::xarray<double> a = {{1, 5, 3}, {4, 5, 6}};
     xt::xarray<bool> mask = {{true, false, false}, {false, true, false}};
@@ -357,8 +357,8 @@ Broadcasting views should be built with the :cpp:func:`xt::broadcast` helper fun
 .. code::
 
     #include <vector>
-    #include <xtensor/xarray.hpp>
-    #include <xtensor/xbroadcast.hpp>
+    #include <xtensor/containers/xarray.hpp>
+    #include <xtensor/views/xbroadcast.hpp>
 
     std::vector<size_t> s1 = { 2, 3 };
     std::vector<size_t> s2 = { 3, 2, 3 };
@@ -390,8 +390,8 @@ The returned value is an expression holding a closure on the passed argument.
 .. code::
 
     #include <complex>
-    #include <xtensor/xarray.hpp>
-    #include <xtensor/xcomplex.hpp>
+    #include <xtensor/containers/xarray.hpp>
+    #include <xtensor/misc/xcomplex.hpp>
 
     using namespace std::complex_literals;
 
@@ -411,8 +411,8 @@ However, since views *cannot be resized*, when assigning an expression to a view
 
 .. code::
 
-    #include <xtensor/xarray.hpp>
-    #include <xtensor/xview.hpp>
+    #include <xtensor/containers/xarray.hpp>
+    #include <xtensor/views/xview.hpp>
 
     xarray<double> a = {{0., 1., 2.}, {3., 4., 5.}};
     double b = 1.2;

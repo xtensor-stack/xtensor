@@ -9,7 +9,7 @@ Reducing functions
 
 **xtensor** provides the following reducing functions for xexpressions:
 
-Defined in ``xtensor/xmath.hpp``
+Defined in ``xtensor/core/xmath.hpp``
 
 .. doxygenfunction:: sum(E&&, EVS)
 
@@ -49,7 +49,7 @@ Defined in ``xtensor/xmath.hpp``
 
 .. doxygenfunction:: trapz(const xexpression<T>&, const xexpression<E>&, std::ptrdiff_t)
 
-Defined in ``xtensor/xnorm.hpp``
+Defined in ``xtensor/reducers/xnorm.hpp``
 
 .. doxygenfunction:: norm_l0(E&&, X&&, EVS)
 

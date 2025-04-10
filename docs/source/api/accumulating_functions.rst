@@ -9,7 +9,7 @@ Accumulating functions
 
 **xtensor** provides the following accumulating functions for xexpressions:
 
-Defined in ``xtensor/xmath.hpp``
+Defined in ``xtensor/core/xmath.hpp``
 
 .. doxygenfunction:: cumsum(E&&)
 

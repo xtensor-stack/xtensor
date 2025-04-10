@@ -41,7 +41,7 @@ The following example shows how to initialize a multi-dimensional array of dynam
 .. code::
 
     #include <vector>
-    #include <xtensor/xarray.hpp>
+    #include <xtensor/containers/xarray.hpp>
 
     std::vector<size_t> shape = { 3, 2, 4 };
     std::vector<size_t> strides = { 8, 4, 1 };
@@ -53,7 +53,7 @@ We can use the following shortcut to specify the strides instead of computing th
 .. code::
 
     #include <vector>
-    #include <xtensor/xarray.hpp>
+    #include <xtensor/containers/xarray.hpp>
 
     std::vector<size_t> shape = { 3, 2, 4 };
     xt::xarray<double, xt::layout_type::dynamic> a(shape, xt::layout_type::row_major);
@@ -63,7 +63,7 @@ If the layout of the array can be fixed at compile time, we can make it even sim
 .. code::
 
     #include <vector>
-    #include <xtensor/xarray.hpp>
+    #include <xtensor/containers/xarray.hpp>
 
     std::vector<size_t> shape = { 3, 2, 4 };
     xt::xarray<double, xt::layout_type::row_major> a(shape);
@@ -91,7 +91,7 @@ Let's use :cpp:type:`xt::xtensor` instead of :cpp:type:`xt::xarray` in the previ
 .. code::
 
     #include <array>
-    #include <xtensor/xtensor.hpp>
+    #include <xtensor/containers/xtensor.hpp>
 
     std::array<size_t, 3> shape = { 3, 2, 4 };
     xt::xtensor<double, 3> a(shape);
@@ -102,7 +102,7 @@ Or when using :cpp:type:`xt::xtensor_fixed`:
 
 .. code::
 
-    #include <xtensor/xfixed.hpp>
+    #include <xtensor/containers/xfixed.hpp>
 
     xt::xtensor_fixed<double, xt::xshape<3, 2, 4>> a();
     // or xt::xtensor_fixed<double, xt::xshape<3, 2, 4>, xt::layout_type::row_major>()
@@ -128,7 +128,7 @@ remain the same:
 
 .. code::
 
-    #include <xtensor/xarray.hpp>
+    #include <xtensor/containers/xarray.hpp>
 
     xt::xarray<int> a = { 1, 2, 3, 4, 5, 6, 7, 8};
     // The following two lines ...
@@ -145,7 +145,7 @@ In this case, the value is inferred from the number of elements in the container
 
 .. code::
 
-    #include <xtensor/xarray.hpp>
+    #include <xtensor/containers/xarray.hpp>
     xt::xarray<int> a = { 1, 2, 3, 4, 5, 6, 7, 8};
     a.reshape({2, -1});
     // a.shape() return {2, 4}
@@ -183,8 +183,8 @@ A mechanism is provided to forcibly prevent usage of a temporary variable:
 
 .. code::
 
-    #include <xtensor/xarray.hpp>
-    #include <xtensor/xnoalias.hpp>
+    #include <xtensor/containers/xarray.hpp>
+    #include <xtensor/core/xnoalias.hpp>
 
     // a, b, and c are xt::xarrays previously initialized
     xt::noalias(b) = a + c;
@@ -199,7 +199,7 @@ The aliasing phenomenon is illustrated in the following example:
 .. code::
 
     #include <vector>
-    #include <xtensor/xarray.hpp>
+    #include <xtensor/containers/xarray.hpp>
 
     std::vector<size_t> a_shape = {3, 2, 4};
     xt::xarray<double> a(a_shape);

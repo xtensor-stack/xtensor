@@ -7,7 +7,7 @@
 xpad
 ====
 
-Defined in ``xtensor/xpad.hpp``
+Defined in ``xtensor/misc/xpad.hpp``
 
 .. doxygenenum:: xt::pad_mode
 

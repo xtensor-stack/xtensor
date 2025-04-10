@@ -7,7 +7,7 @@
 xcsv: read/write CSV files
 ==========================
 
-Defined in ``xtensor/xcsv.hpp``
+Defined in ``xtensor/io/xcsv.hpp``
 
 .. doxygenfunction:: xt::load_csv
 

@@ -7,7 +7,7 @@
 xview
 =====
 
-Defined in ``xtensor/xview.hpp``
+Defined in ``xtensor/views/xview.hpp``
 
 .. doxygenclass:: xt::xview
    :members:
@@ -18,7 +18,7 @@ Defined in ``xtensor/xview.hpp``
 
 .. doxygenfunction:: xt::col
 
-Defined in ``xtensor/xslice.hpp``
+Defined in ``xtensor/views/xslice.hpp``
 
 .. doxygenfunction:: xt::range(A, B)
 
