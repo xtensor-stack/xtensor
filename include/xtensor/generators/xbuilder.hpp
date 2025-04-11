@@ -833,7 +833,7 @@ namespace xt
         return detail::make_xgenerator(detail::concatenate_impl<CT...>(std::move(t), axis), shape);
     }
 
-    template <std::size_t axis, class... CT, typename = std::enable_if_t<detail::all_fixed_shapes<CT...>::value>>
+    template <std::size_t axis, fixed_shape_container_concept... CT>
     inline auto concatenate(std::tuple<CT...>&& t)
     {
         using shape_type = detail::concat_fixed_shape_t<axis, typename std::decay_t<CT>::shape_type...>;

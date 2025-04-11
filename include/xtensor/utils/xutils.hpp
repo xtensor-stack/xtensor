@@ -586,6 +586,9 @@ namespace xt
     {
     };
 
+    template <class E>
+    concept has_data_interface_concept = has_data_interface<E>::value;
+
     template <class E, class = void>
     struct has_strides : std::false_type
     {
@@ -606,6 +609,9 @@ namespace xt
     {
     };
 
+    template <class E>
+    concept has_iterator_interface_concept = has_iterator_interface<E>::value;
+
     /******************************
      * is_iterator implementation *
      ******************************/
@@ -623,6 +629,9 @@ namespace xt
         : std::true_type
     {
     };
+
+    template <typename E>
+    concept iterator_concept = is_iterator<E>::value;
 
     /********************************************
      * xtrivial_default_construct implemenation *
@@ -793,6 +802,9 @@ namespace xt
     {
     };
 
+    template <class E1, class E2>
+    constexpr bool has_assign_to_v = has_assign_to<E1, E2>::value;
+
     /*************************************
      * overlapping_memory_checker_traits *
      *************************************/
@@ -806,6 +818,11 @@ namespace xt
     struct has_memory_address<T, void_t<decltype(std::addressof(*std::declval<T>().begin()))>> : std::true_type
     {
     };
+
+    template <typename T>
+    concept with_memory_address_concept = has_memory_address<std::decay_t<T>>::value;
+    template <typename T>
+    concept without_memory_address_concept = !has_memory_address<std::decay_t<T>>::value;
 
     struct memory_range
     {

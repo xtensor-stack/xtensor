@@ -179,6 +179,9 @@ namespace xt
     template <class E>
     using is_xexpression = is_crtp_base_of<xexpression, E>;
 
+    template <class E>
+    concept xexpression_concept = is_xexpression<E>::value;
+
     template <class E, class R = void>
     using enable_xexpression = typename std::enable_if<is_xexpression<E>::value, R>::type;
 

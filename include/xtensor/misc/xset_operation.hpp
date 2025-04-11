@@ -87,8 +87,9 @@ namespace xt
      * @param test_elements an array
      * @return a boolean array
      */
-    template <class E, class F, class = typename std::enable_if_t<has_iterator_interface<F>::value>>
+    template <class E, class F>
     inline auto isin(E&& element, F&& test_elements) noexcept
+        requires(has_iterator_interface_concept<F>)
     {
         auto lambda = detail::lambda_isin<std::is_lvalue_reference<F>::value>::make(std::forward<F>(test_elements
         ));
@@ -106,7 +107,7 @@ namespace xt
      * @param test_elements_end iterator to the end of an array
      * @return a boolean array
      */
-    template <class E, class I, class = typename std::enable_if_t<is_iterator<I>::value>>
+    template <class E, iterator_concept I>
     inline auto isin(E&& element, I&& test_elements_begin, I&& test_elements_end) noexcept
     {
         auto lambda = [&test_elements_begin, &test_elements_end](const auto& t)
@@ -143,8 +144,9 @@ namespace xt
      * @param test_elements an array
      * @return a boolean array
      */
-    template <class E, class F, class = typename std::enable_if_t<has_iterator_interface<F>::value>>
+    template <class E, class F>
     inline auto in1d(E&& element, F&& test_elements) noexcept
+        requires(has_iterator_interface_concept<F>)
     {
         XTENSOR_ASSERT(element.dimension() == 1ul);
         XTENSOR_ASSERT(test_elements.dimension() == 1ul);
@@ -162,7 +164,7 @@ namespace xt
      * @param test_elements_end iterator to the end of an array
      * @return a boolean array
      */
-    template <class E, class I, class = typename std::enable_if_t<is_iterator<I>::value>>
+    template <class E, iterator_concept I>
     inline auto in1d(E&& element, I&& test_elements_begin, I&& test_elements_end) noexcept
     {
         XTENSOR_ASSERT(element.dimension() == 1ul);
