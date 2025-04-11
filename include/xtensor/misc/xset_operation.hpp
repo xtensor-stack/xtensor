@@ -88,8 +88,8 @@ namespace xt
      * @return a boolean array
      */
     template <class E, class F>
-        requires has_iterator_interface_concept<F>
     inline auto isin(E&& element, F&& test_elements) noexcept
+        requires(has_iterator_interface_concept<F>)
     {
         auto lambda = detail::lambda_isin<std::is_lvalue_reference<F>::value>::make(std::forward<F>(test_elements
         ));
@@ -145,8 +145,8 @@ namespace xt
      * @return a boolean array
      */
     template <class E, class F>
-        requires has_iterator_interface_concept<F>
     inline auto in1d(E&& element, F&& test_elements) noexcept
+        requires(has_iterator_interface_concept<F>)
     {
         XTENSOR_ASSERT(element.dimension() == 1ul);
         XTENSOR_ASSERT(test_elements.dimension() == 1ul);
