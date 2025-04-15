@@ -720,7 +720,8 @@ namespace xt
         size_type sliced_access(const xslice<T>& slice, Arg arg, Args... args) const;
 
         template <typename std::decay_t<CT>::size_type I, class T, class... Args>
-        disable_xslice<T, size_type> sliced_access(const T& squeeze, Args...) const;
+        size_type sliced_access(const T& squeeze, Args...) const
+            requires(!is_xslice<T>::value);
 
         using base_index_type = xindex_type_t<typename xexpression_type::shape_type>;
 
@@ -1674,7 +1675,8 @@ namespace xt
 
     template <class CT, class... S>
     template <typename std::decay_t<CT>::size_type I, class T, class... Args>
-    inline auto xview<CT, S...>::sliced_access(const T& squeeze, Args...) const -> disable_xslice<T, size_type>
+    inline auto xview<CT, S...>::sliced_access(const T& squeeze, Args...) const -> size_type
+        requires(!is_xslice<T>::value)
     {
         return static_cast<size_type>(squeeze);
     }

@@ -72,6 +72,9 @@ namespace xt
     template <class CT, class X>
     class xbroadcast;
 
+    template <class E>
+    concept xbroadcast_concept = is_specialization_of<xbroadcast, E>::value;
+
     template <class CT, class X>
     struct xiterable_inner_types<xbroadcast<CT, X>>
     {
@@ -122,10 +125,9 @@ namespace xt
      * overlapping_memory_checker_traits *
      *************************************/
 
-    template <class E>
-    struct overlapping_memory_checker_traits<
-        E,
-        std::enable_if_t<!has_memory_address<E>::value && is_specialization_of<xbroadcast, E>::value>>
+    template <xbroadcast_concept E>
+        requires(without_memory_address_concept<E>)
+    struct overlapping_memory_checker_traits<E>
     {
         static bool check_overlap(const E& expr, const memory_range& dst_range)
         {
@@ -223,7 +225,7 @@ namespace xt
         template <class S>
         const_stepper stepper_end(const S& shape, layout_type l) const noexcept;
 
-        template <class E, class XCT = CT, class = std::enable_if_t<xt::is_xscalar<XCT>::value>>
+        template <class E, xscalar_concept XCT = CT>
         void assign_to(xexpression<E>& e) const;
 
         template <class E>
@@ -463,7 +465,7 @@ namespace xt
     }
 
     template <class CT, class X>
-    template <class E, class XCT, class>
+    template <class E, xscalar_concept XCT>
     inline void xbroadcast<CT, X>::assign_to(xexpression<E>& e) const
     {
         auto& ed = e.derived_cast();
