@@ -585,10 +585,6 @@ namespace xt
             {
                 return xall<std::ptrdiff_t>(static_cast<std::ptrdiff_t>(size));
             }
-            else
-            {
-                static_assert(false, "function is not implemented");
-            }
         }
 
         A start() const
