@@ -180,8 +180,8 @@ namespace xt
         using simd_value_type = xt_simd::simd_type<value_type>;
         using bool_load_type = typename base_type::bool_load_type;
 
-        static constexpr bool providedSimdInterface = has_simd_interface<xexpression_type>::value
-                                                      && L != layout_type::dynamic;
+        static constexpr bool provides_simd_interface = has_simd_interface<xexpression_type>::value
+                                                        && L != layout_type::dynamic;
 
         template <class CTA, class SA>
         xstrided_view(CTA&& e, SA&& shape, strides_type&& strides, std::size_t offset, layout_type layout) noexcept;
@@ -259,11 +259,11 @@ namespace xt
 
         template <class align, class simd>
         void store_simd(size_type i, const simd& e)
-            requires providedSimdInterface;
+            requires provides_simd_interface;
 
         template <class align, class requested_type = value_type, std::size_t N = xt_simd::simd_traits<requested_type>::size>
         simd_return_type<requested_type> load_simd(size_type i) const
-            requires providedSimdInterface;
+            requires provides_simd_interface;
 
         reference data_element(size_type i);
         const_reference data_element(size_type i) const;
@@ -673,7 +673,7 @@ namespace xt
     template <class CT, class S, layout_type L, class FST>
     template <class alignment, class simd>
     inline void xstrided_view<CT, S, L, FST>::store_simd(size_type i, const simd& e)
-        requires providedSimdInterface
+        requires provides_simd_interface
     {
         using align_mode = driven_align_mode_t<alignment, data_alignment>;
         xt_simd::store_as(&(storage()[i]), e, align_mode());
@@ -682,7 +682,7 @@ namespace xt
     template <class CT, class S, layout_type L, class FST>
     template <class alignment, class requested_type, std::size_t N>
     inline auto xstrided_view<CT, S, L, FST>::load_simd(size_type i) const -> simd_return_type<requested_type>
-        requires providedSimdInterface
+        requires provides_simd_interface
     {
         using align_mode = driven_align_mode_t<alignment, data_alignment>;
         return xt_simd::load_as<requested_type>(&(storage()[i]), align_mode());
@@ -826,7 +826,7 @@ namespace xt
         template <class S>
         inline void recalculate_shape_impl(S& shape, size_t size)
         {
-            if constexpr (std::is_signed<get_value_type_t<typename std::decay<S>::type>>::value)
+            if constexpr (std::is_signed_v<get_value_type_t<typename std::decay<S>::type>>)
             {
                 using value_type = get_value_type_t<typename std::decay_t<S>>;
                 XTENSOR_ASSERT(std::count(shape.cbegin(), shape.cend(), -1) <= 1);

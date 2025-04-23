@@ -109,15 +109,13 @@ namespace xt
         xrange() = default;
         xrange(size_type start_val, size_type stop_val) noexcept;
 
-        template <class S>
-        operator xrange<S>() const noexcept
-            requires std::convertible_to<S, T>;
+        template <std::convertible_to<T> S>
+        operator xrange<S>() const noexcept;
 
         // Same as implicit conversion operator but more convenient to call
         // from a variant visitor
-        template <class S>
-        xrange<S> convert() const noexcept
-            requires std::convertible_to<S, T>;
+        template <std::convertible_to<T> S>
+        xrange<S> convert() const noexcept;
 
         size_type operator()(size_type i) const noexcept;
 
@@ -155,15 +153,13 @@ namespace xt
         xstepped_range() = default;
         xstepped_range(size_type start_val, size_type stop_val, size_type step) noexcept;
 
-        template <class S>
-        operator xstepped_range<S>() const noexcept
-            requires std::convertible_to<S, T>;
+        template <std::convertible_to<T> S>
+        operator xstepped_range<S>() const noexcept;
 
         // Same as implicit conversion operator but more convenient to call
         // from a variant visitor
-        template <class S>
-        xstepped_range<S> convert() const noexcept
-            requires std::convertible_to<S, T>;
+        template <std::convertible_to<T> S>
+        xstepped_range<S> convert() const noexcept;
 
         size_type operator()(size_type i) const noexcept;
 
@@ -202,15 +198,13 @@ namespace xt
         xall() = default;
         explicit xall(size_type size) noexcept;
 
-        template <class S>
-        operator xall<S>() const noexcept
-            requires std::convertible_to<S, T>;
+        template <std::convertible_to<T> S>
+        operator xall<S>() const noexcept;
 
         // Same as implicit conversion operator but more convenient to call
         // from a variant visitor
-        template <class S>
-        xall<S> convert() const noexcept
-            requires std::convertible_to<S, T>;
+        template <std::convertible_to<T> S>
+        xall<S> convert() const noexcept;
 
         size_type operator()(size_type i) const noexcept;
 
@@ -274,15 +268,13 @@ namespace xt
 
         xnewaxis() = default;
 
-        template <class S>
-        operator xnewaxis<S>() const noexcept
-            requires std::convertible_to<S, T>;
+        template <std::convertible_to<T> S>
+        operator xnewaxis<S>() const noexcept;
 
         // Same as implicit conversion operator but more convenient to call
         // from a variant visitor
-        template <class S>
-        xnewaxis<S> convert() const noexcept
-            requires std::convertible_to<S, T>;
+        template <std::convertible_to<T> S>
+        xnewaxis<S> convert() const noexcept;
 
         size_type operator()(size_type i) const noexcept;
 
@@ -344,15 +336,13 @@ namespace xt
         template <class S>
         xkeep_slice(std::initializer_list<S> t);
 
-        template <class S>
-        operator xkeep_slice<S>() const noexcept
-            requires std::convertible_to<S, T>;
+        template <std::convertible_to<T> S>
+        operator xkeep_slice<S>() const noexcept;
 
         // Same as implicit conversion operator but more convenient to call
         // from a variant visitor
-        template <class S>
-        xkeep_slice<S> convert() const noexcept
-            requires std::convertible_to<S, T>;
+        template <std::convertible_to<T> S>
+        xkeep_slice<S> convert() const noexcept;
 
         size_type operator()(size_type i) const noexcept;
         size_type size() const noexcept;
@@ -454,15 +444,13 @@ namespace xt
         template <class S>
         xdrop_slice(std::initializer_list<S> t);
 
-        template <class S>
-        operator xdrop_slice<S>() const noexcept
-            requires std::convertible_to<S, T>;
+        template <std::convertible_to<T> S>
+        operator xdrop_slice<S>() const noexcept;
 
         // Same as implicit conversion operator but more convenient to call
         // from a variant visitor
-        template <class S>
-        xdrop_slice<S> convert() const noexcept
-            requires std::convertible_to<S, T>;
+        template <std::convertible_to<T> S>
+        xdrop_slice<S> convert() const noexcept;
 
         size_type operator()(size_type i) const noexcept;
         size_type size() const noexcept;
@@ -1006,9 +994,8 @@ namespace xt
     }
 
     template <class T>
-    template <class S>
+    template <std::convertible_to<T> S>
     inline xrange<T>::operator xrange<S>() const noexcept
-        requires std::convertible_to<S, T>
     {
         xrange<S> ret;
         ret.m_start = static_cast<S>(m_start);
@@ -1017,9 +1004,8 @@ namespace xt
     }
 
     template <class T>
-    template <class S>
+    template <std::convertible_to<T> S>
     inline xrange<S> xrange<T>::convert() const noexcept
-        requires std::convertible_to<S, T>
     {
         return xrange<S>(*this);
     }
@@ -1087,9 +1073,8 @@ namespace xt
     }
 
     template <class T>
-    template <class S>
+    template <std::convertible_to<T> S>
     inline xstepped_range<T>::operator xstepped_range<S>() const noexcept
-        requires std::convertible_to<S, T>
     {
         xstepped_range<S> ret;
         ret.m_start = static_cast<S>(m_start);
@@ -1099,9 +1084,8 @@ namespace xt
     }
 
     template <class T>
-    template <class S>
+    template <std::convertible_to<T> S>
     inline xstepped_range<S> xstepped_range<T>::convert() const noexcept
-        requires std::convertible_to<S, T>
     {
         return xstepped_range<S>(*this);
     }
@@ -1165,17 +1149,15 @@ namespace xt
     }
 
     template <class T>
-    template <class S>
+    template <std::convertible_to<T> S>
     inline xall<T>::operator xall<S>() const noexcept
-        requires std::convertible_to<S, T>
     {
         return xall<S>(static_cast<S>(m_size));
     }
 
     template <class T>
-    template <class S>
+    template <std::convertible_to<T> S>
     inline xall<S> xall<T>::convert() const noexcept
-        requires std::convertible_to<S, T>
     {
         return xall<S>(*this);
     }
@@ -1233,17 +1215,15 @@ namespace xt
      ***************************/
 
     template <class T>
-    template <class S>
+    template <std::convertible_to<T> S>
     inline xnewaxis<T>::operator xnewaxis<S>() const noexcept
-        requires std::convertible_to<S, T>
     {
         return xnewaxis<S>();
     }
 
     template <class T>
-    template <class S>
+    template <std::convertible_to<T> S>
     inline xnewaxis<S> xnewaxis<T>::convert() const noexcept
-        requires std::convertible_to<S, T>
     {
         return xnewaxis<S>(*this);
     }
@@ -1331,9 +1311,8 @@ namespace xt
     }
 
     template <class T>
-    template <class S>
+    template <std::convertible_to<T> S>
     inline xkeep_slice<T>::operator xkeep_slice<S>() const noexcept
-        requires std::convertible_to<S, T>
     {
         xkeep_slice<S> ret;
         using us_type = typename container_type::size_type;
@@ -1362,9 +1341,8 @@ namespace xt
     }
 
     template <class T>
-    template <class S>
+    template <std::convertible_to<T> S>
     inline xkeep_slice<S> xkeep_slice<T>::convert() const noexcept
-        requires std::convertible_to<S, T>
     {
         return xkeep_slice<S>(*this);
     }
@@ -1477,9 +1455,8 @@ namespace xt
     }
 
     template <class T>
-    template <class S>
+    template <std::convertible_to<T> S>
     inline xdrop_slice<T>::operator xdrop_slice<S>() const noexcept
-        requires std::convertible_to<S, T>
     {
         xdrop_slice<S> ret;
         ret.m_raw_indices.resize(m_raw_indices.size());
@@ -1516,9 +1493,8 @@ namespace xt
     }
 
     template <class T>
-    template <class S>
+    template <std::convertible_to<T> S>
     inline xdrop_slice<S> xdrop_slice<T>::convert() const noexcept
-        requires std::convertible_to<S, T>
     {
         return xdrop_slice<S>(*this);
     }

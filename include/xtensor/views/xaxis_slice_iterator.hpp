@@ -98,7 +98,7 @@ namespace xt
     template <class T, class CTA>
     T xaxis_slice_iterator<CT>::get_storage_init(CTA&& e) const
     {
-        if constexpr (std::is_pointer<T>::value)
+        if constexpr (xtl::pointer_concept<T>)
         {
             return &e;
         }

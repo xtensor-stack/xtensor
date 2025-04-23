@@ -134,7 +134,7 @@ namespace xt
                                                   && xexpression_type::contiguous_layout;
 
         static constexpr bool
-            providedDataInterface = detail::provides_data_interface<xexpression_type, storage_type>::value;
+            provides_data_interface = detail::provides_data_interface<xexpression_type, storage_type>::value;
 
         template <class CTA, class SA>
         xstrided_view_base(CTA&& e, SA&& shape, strides_type&& strides, size_type offset, layout_type layout) noexcept;
@@ -175,9 +175,9 @@ namespace xt
         const storage_type& storage() const noexcept;
 
         pointer data() noexcept
-            requires(providedDataInterface);
+            requires(provides_data_interface);
         const_pointer data() const noexcept
-            requires(providedDataInterface);
+            requires(provides_data_interface);
 
         size_type data_offset() const noexcept;
 
@@ -583,7 +583,7 @@ namespace xt
      */
     template <class D>
     inline auto xstrided_view_base<D>::data() noexcept -> pointer
-        requires(providedDataInterface)
+        requires(provides_data_interface)
     {
         return m_e.data();
     }
@@ -594,7 +594,7 @@ namespace xt
      */
     template <class D>
     inline auto xstrided_view_base<D>::data() const noexcept -> const_pointer
-        requires(providedDataInterface)
+        requires(provides_data_interface)
     {
         return m_e.data();
     }
