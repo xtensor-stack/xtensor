@@ -12,13 +12,13 @@
 
 #include <benchmark/benchmark.h>
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xmanipulation.hpp"
-#include "xtensor/xnoalias.hpp"
-#include "xtensor/xstrided_view.hpp"
-#include "xtensor/xstrides.hpp"
-#include "xtensor/xtensor.hpp"
-#include "xtensor/xview.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/containers/xtensor.hpp"
+#include "xtensor/core/xnoalias.hpp"
+#include "xtensor/core/xstrides.hpp"
+#include "xtensor/misc/xmanipulation.hpp"
+#include "xtensor/views/xstrided_view.hpp"
+#include "xtensor/views/xview.hpp"
 
 namespace xt
 {

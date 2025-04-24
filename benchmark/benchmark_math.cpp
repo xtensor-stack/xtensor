@@ -13,9 +13,9 @@
 
 #include <benchmark/benchmark.h>
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xnoalias.hpp"
-#include "xtensor/xtensor.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/containers/xtensor.hpp"
+#include "xtensor/core/xnoalias.hpp"
 
 // For how many sizes should math functions be tested?
 #define MATH_RANGE 64, 64

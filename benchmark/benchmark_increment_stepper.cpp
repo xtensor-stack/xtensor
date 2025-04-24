@@ -8,8 +8,8 @@
 
 #include <benchmark/benchmark.h>
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xrandom.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/generators/xrandom.hpp"
 
 #define SHAPE 30, 30
 #define RANGE 3, 100

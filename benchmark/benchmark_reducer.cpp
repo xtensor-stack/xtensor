@@ -8,8 +8,8 @@
 
 #include <benchmark/benchmark.h>
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xreducer.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/reducers/xreducer.hpp"
 
 namespace xt
 {

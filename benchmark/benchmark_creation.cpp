@@ -8,10 +8,10 @@
 
 #include <benchmark/benchmark.h>
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xbuilder.hpp"
-#include "xtensor/xfixed.hpp"
-#include "xtensor/xtensor.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/containers/xfixed.hpp"
+#include "xtensor/containers/xtensor.hpp"
+#include "xtensor/generators/xbuilder.hpp"
 
 namespace xt
 {

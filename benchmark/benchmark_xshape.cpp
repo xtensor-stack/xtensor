@@ -12,8 +12,8 @@
 
 #include <benchmark/benchmark.h>
 
-#include "xtensor/xshape.hpp"
-#include "xtensor/xstorage.hpp"
+#include "xtensor/containers/xstorage.hpp"
+#include "xtensor/core/xshape.hpp"
 
 namespace xt
 {
