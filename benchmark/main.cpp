@@ -10,8 +10,8 @@
 
 #include <benchmark/benchmark.h>
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xtensor.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/containers/xtensor.hpp"
 
 #ifdef XTENSOR_USE_XSIMD
 #ifdef __GNUC__

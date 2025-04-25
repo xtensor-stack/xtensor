@@ -8,14 +8,14 @@
 
 #include <benchmark/benchmark.h>
 
-// #include "xtensor/xshape.hpp"
-#include "xtensor/xadapt.hpp"
-#include "xtensor/xbuilder.hpp"
-#include "xtensor/xnoalias.hpp"
-#include "xtensor/xrandom.hpp"
-#include "xtensor/xstorage.hpp"
-#include "xtensor/xutils.hpp"
-#include "xtensor/xview.hpp"
+// #include "xtensor/core/core/xshape.hpp"
+#include "xtensor/containers/xadapt.hpp"
+#include "xtensor/containers/xstorage.hpp"
+#include "xtensor/core/xnoalias.hpp"
+#include "xtensor/generators/xbuilder.hpp"
+#include "xtensor/generators/xrandom.hpp"
+#include "xtensor/utils/xutils.hpp"
+#include "xtensor/views/xview.hpp"
 
 namespace xt
 {

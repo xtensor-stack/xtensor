@@ -8,11 +8,11 @@
 
 #include <benchmark/benchmark.h>
 
-// #include "xtensor/xshape.hpp"
-#include "xtensor/xadapt.hpp"
-#include "xtensor/xnoalias.hpp"
-#include "xtensor/xstorage.hpp"
-#include "xtensor/xutils.hpp"
+// #include "xtensor/core/core/xshape.hpp"
+#include "xtensor/containers/xadapt.hpp"
+#include "xtensor/containers/xstorage.hpp"
+#include "xtensor/core/xnoalias.hpp"
+#include "xtensor/utils/xutils.hpp"
 
 namespace xt
 {
