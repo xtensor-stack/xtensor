@@ -69,10 +69,7 @@ namespace xt
         value_type m_sv;
 
         template <class T, class CTA>
-        std::enable_if_t<std::is_pointer<T>::value, T> get_storage_init(CTA&& e) const;
-
-        template <class T, class CTA>
-        std::enable_if_t<!std::is_pointer<T>::value, T> get_storage_init(CTA&& e) const;
+        T get_storage_init(CTA&& e) const;
     };
 
     template <class CT>
@@ -99,18 +96,16 @@ namespace xt
 
     template <class CT>
     template <class T, class CTA>
-    inline std::enable_if_t<std::is_pointer<T>::value, T>
-    xaxis_slice_iterator<CT>::get_storage_init(CTA&& e) const
+    T xaxis_slice_iterator<CT>::get_storage_init(CTA&& e) const
     {
-        return &e;
-    }
-
-    template <class CT>
-    template <class T, class CTA>
-    inline std::enable_if_t<!std::is_pointer<T>::value, T>
-    xaxis_slice_iterator<CT>::get_storage_init(CTA&& e) const
-    {
-        return e;
+        if constexpr (xtl::pointer_concept<T>)
+        {
+            return &e;
+        }
+        else
+        {
+            return e;
+        }
     }
 
     /**

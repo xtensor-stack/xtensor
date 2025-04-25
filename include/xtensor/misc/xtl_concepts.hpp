@@ -17,10 +17,15 @@ namespace xtl
 {
     template <typename T>
     concept integral_concept = xtl::is_integral<T>::value;
+
     template <typename T>
     concept non_integral_concept = !xtl::is_integral<T>::value;
+
     template <typename T>
     concept complex_concept = xtl::is_complex<typename std::decay<T>::type::value_type>::value;
+
+    template <typename T>
+    concept pointer_concept = std::is_pointer<T>::value;
 }
 
 #endif  // XTENSOR_CONCEPTS_HPP
