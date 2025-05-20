@@ -827,6 +827,6 @@ namespace xt
 
 // Backward compatibility: include xmime.hpp in xio.hpp by default.
 
-#ifdef __CLING__
+#if defined(__CLING__) || defined(__CLANG_REPL__)
 #include "xmime.hpp"
 #endif
