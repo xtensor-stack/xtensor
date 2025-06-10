@@ -1,0 +1,73 @@
+name: benchmarks
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches: [master]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.job }}-${{ github.ref }}
+  cancel-in-progress: true
+defaults:
+  run:
+    shell: bash -e -l {0}
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    name: ${{ matrix.sys.compiler }} ${{ matrix.sys.version }} - ${{ matrix.sys.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        sys:
+        - {compiler: clang, version: '20', name: xsimd, flags: -DXTENSOR_USE_XSIMD=ON}
+        - {compiler: clang, version: '20', name: xsimd-tbb, flags: -DXTENSOR_USE_XSIMD=ON -DXTENSOR_USE_TBB=ON}
+        - {compiler: gcc, version: '14', name: xsimd, flags: -DXTENSOR_USE_XSIMD=ON}
+        - {compiler: gcc, version: '14', name: xsimd-tbb, flags: -DXTENSOR_USE_XSIMD=ON -DXTENSOR_USE_TBB=ON}
+
+    steps:
+    - name: Install GCC
+      if: matrix.sys.compiler == 'gcc'
+      uses: egor-tensin/setup-gcc@v1
+      with:
+        version: ${{matrix.sys.version}}
+        platform: x64
+
+    - name: Install LLVM and Clang
+      if: matrix.sys.compiler == 'clang'
+      run: |
+        wget https://apt.llvm.org/llvm.sh
+        chmod +x llvm.sh
+        sudo ./llvm.sh ${{matrix.sys.version}}
+        sudo apt-get install -y clang-tools-${{matrix.sys.version}}
+        sudo update-alternatives --install /usr/bin/clang++                 clang++                     /usr/bin/clang++-${{matrix.sys.version}} 200
+        sudo update-alternatives --install /usr/bin/clang                       clang                         /usr/bin/clang-${{matrix.sys.version}} 200
+        sudo update-alternatives --install /usr/bin/clang-scan-deps   clang-scan-deps     /usr/bin/clang-scan-deps-${{matrix.sys.version}} 200
+        sudo update-alternatives --set clang /usr/bin/clang-${{matrix.sys.version}}
+        sudo update-alternatives --set clang++ /usr/bin/clang++-${{matrix.sys.version}}
+        sudo update-alternatives --set clang-scan-deps /usr/bin/clang-scan-deps-${{matrix.sys.version}}
+
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set conda environment
+      uses: mamba-org/setup-micromamba@main
+      with:
+        environment-name: myenv
+        environment-file: environment-dev.yml
+        init-shell: bash
+        cache-downloads: true
+        create-args: |
+          ${{ (matrix.sys.name == 'tbb' || matrix.sys.name == 'xsimd-tbb' ) && 'tbb-devel' || '' }}
+
+    - name: Configure using CMake
+      run: |
+        if [[ "${{matrix.sys.compiler}}" = "gcc" ]]; then export CC=gcc-${{matrix.sys.version}}; export CXX=g++-${{matrix.sys.version}}; else export CC=clang; export CXX=clang++; fi
+        cmake -G Ninja -Bbuild -DCMAKE_C_COMPILER=$CC -DCMAKE_CXX_COMPILER=$CXX -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_BENCHMARK=ON ${{ matrix.sys.flags }}
+
+    - name: Build
+      working-directory: build
+      run: cmake --build . --target benchmark_xtensor --parallel 8
+
+    - name: Run benchmark
+      timeout-minutes: 10 # Consider increasing timeout
+      working-directory: build/benchmark
+      run: ./benchmark_xtensor

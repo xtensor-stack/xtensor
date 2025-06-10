@@ -155,6 +155,6 @@ namespace xt
     //    BENCHMARK(assign_create_strided_view);
     BENCHMARK(assign_create_view);
     BENCHMARK(assign_create_manual_view);
-    BENCHMARK(data_offset);
+    // BENCHMARK(data_offset);
     BENCHMARK(data_offset_view);
 }
