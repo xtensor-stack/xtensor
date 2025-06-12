@@ -761,7 +761,7 @@ namespace xt
         }
 
         XTENSOR_GLOBAL_CONSTEXPR xtuph _{};
-        XTENSOR_GLOBAL_CONSTEXPR rangemaker<> _r = rangemaker<>({0, 0, 0});
+        XTENSOR_GLOBAL_CONSTEXPR rangemaker<> _r = rangemaker<>({{0, 0, 0}});
         XTENSOR_GLOBAL_CONSTEXPR xall_tag _a{};
         XTENSOR_GLOBAL_CONSTEXPR xnewaxis_tag _n{};
         XTENSOR_GLOBAL_CONSTEXPR xellipsis_tag _e{};
