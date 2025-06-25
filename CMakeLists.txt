@@ -192,6 +192,7 @@ add_library(xtensor INTERFACE)
 
 target_include_directories(xtensor INTERFACE
     $<BUILD_INTERFACE:${XTENSOR_INCLUDE_DIR}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
     $<INSTALL_INTERFACE:include>)
 
 target_compile_features(xtensor INTERFACE cxx_std_20)
@@ -321,7 +322,7 @@ POSTFIX(XTENSOR_SINGLE_INCLUDE ">" ${XTENSOR_SINGLE_INCLUDE})
 string(REPLACE ";" "\n" XTENSOR_SINGLE_INCLUDE "${XTENSOR_SINGLE_INCLUDE}")
 string(CONCAT XTENSOR_SINGLE_INCLUDE "#ifndef XTENSOR\n" "#define XTENSOR\n\n" "${XTENSOR_SINGLE_INCLUDE}" "\n\n#endif\n")
 
-file(WRITE "${CMAKE_BINARY_DIR}/xtensor.hpp" "${XTENSOR_SINGLE_INCLUDE}")
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/xtensor.hpp" "${XTENSOR_SINGLE_INCLUDE}")
 
-install(FILES "${CMAKE_BINARY_DIR}/xtensor.hpp"
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/xtensor.hpp"
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
