@@ -611,7 +611,7 @@ namespace xt
     template <class E, class Tag = check_policy::none>
     inline auto squeeze(E&& e, std::size_t axis, Tag check_policy = Tag())
     {
-        return squeeze(std::forward<E>(e), std::array<std::size_t, 1>{axis}, check_policy);
+        return squeeze(std::forward<E>(e), std::array<std::size_t, 1>{{axis}}, check_policy);
     }
 
     /// @endcond
