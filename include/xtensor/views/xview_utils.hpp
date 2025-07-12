@@ -48,15 +48,16 @@ namespace xt
     constexpr std::size_t newaxis_skip(std::size_t i);
 
     template <class S, class It>
-    inline disable_xslice<S, std::size_t> get_slice_value(const S& s, It&) noexcept
+    inline auto get_slice_value(const S& slice, It& it) noexcept
     {
-        return static_cast<std::size_t>(s);
-    }
-
-    template <class S, class It>
-    inline auto get_slice_value(const xslice<S>& slice, It& it) noexcept
-    {
-        return slice.derived_cast()(typename S::size_type(*it));
+        if constexpr (is_xslice<S>::value)
+        {
+            return slice(typename S::size_type(*it));
+        }
+        else
+        {
+            return static_cast<std::size_t>(slice);
+        }
     }
 
     /***********************

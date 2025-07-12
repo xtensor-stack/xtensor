@@ -38,16 +38,9 @@ namespace xt
                 return xtl::forward_offset<M, I>(std::forward<T>(t));
             }
 
-            template <
-                class align,
-                class requested_type,
-                std::size_t N,
-                class E,
-                class MF = M,
-                class = std::enable_if_t<
-                    (std::is_same<MF, double>::value || std::is_same<MF, float>::value) && I <= sizeof(MF),
-                    int>>
+            template <class align, class requested_type, std::size_t N, class E, class MF = M>
             auto proxy_simd_load(const E& expr, std::size_t n) const
+                requires((std::is_same<MF, double>::value || std::is_same<MF, float>::value) && I <= sizeof(MF))
             {
                 // TODO refactor using shuffle only
                 auto batch = expr.template load_simd<align, requested_type, N>(n);
@@ -61,15 +54,9 @@ namespace xt
                 }
             }
 
-            template <
-                class align,
-                class simd,
-                class E,
-                class MF = M,
-                class = std::enable_if_t<
-                    (std::is_same<MF, double>::value || std::is_same<MF, float>::value) && I <= sizeof(MF),
-                    int>>
+            template <class align, class simd, class E, class MF = M>
             auto proxy_simd_store(E& expr, std::size_t n, const simd& batch) const
+                requires((std::is_same<MF, double>::value || std::is_same<MF, float>::value) && I <= sizeof(MF))
             {
                 auto x = expr.template load_simd<align, double, simd::size>(n);
                 if (I == 0)

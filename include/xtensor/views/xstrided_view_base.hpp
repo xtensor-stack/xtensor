@@ -133,6 +133,9 @@ namespace xt
         static constexpr bool contiguous_layout = static_layout != layout_type::dynamic
                                                   && xexpression_type::contiguous_layout;
 
+        static constexpr bool
+            provides_data_interface = detail::provides_data_interface<xexpression_type, storage_type>::value;
+
         template <class CTA, class SA>
         xstrided_view_base(CTA&& e, SA&& shape, strides_type&& strides, size_type offset, layout_type layout) noexcept;
 
@@ -171,10 +174,11 @@ namespace xt
         storage_type& storage() noexcept;
         const storage_type& storage() const noexcept;
 
-        template <class E = xexpression_type, class ST = storage_type>
-        std::enable_if_t<detail::provides_data_interface<E, ST>::value, pointer> data() noexcept;
-        template <class E = xexpression_type, class ST = storage_type>
-        std::enable_if_t<detail::provides_data_interface<E, ST>::value, const_pointer> data() const noexcept;
+        pointer data() noexcept
+            requires(provides_data_interface);
+        const_pointer data() const noexcept
+            requires(provides_data_interface);
+
         size_type data_offset() const noexcept;
 
         xexpression_type& expression() noexcept;
@@ -578,9 +582,8 @@ namespace xt
      * The first element of the view is at data() + data_offset().
      */
     template <class D>
-    template <class E, class ST>
-    inline auto xstrided_view_base<D>::data() noexcept
-        -> std::enable_if_t<detail::provides_data_interface<E, ST>::value, pointer>
+    inline auto xstrided_view_base<D>::data() noexcept -> pointer
+        requires(provides_data_interface)
     {
         return m_e.data();
     }
@@ -590,9 +593,8 @@ namespace xt
      * The first element of the view is at data() + data_offset().
      */
     template <class D>
-    template <class E, class ST>
-    inline auto xstrided_view_base<D>::data() const noexcept
-        -> std::enable_if_t<detail::provides_data_interface<E, ST>::value, const_pointer>
+    inline auto xstrided_view_base<D>::data() const noexcept -> const_pointer
+        requires(provides_data_interface)
     {
         return m_e.data();
     }

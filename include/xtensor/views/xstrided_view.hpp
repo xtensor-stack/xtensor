@@ -180,6 +180,9 @@ namespace xt
         using simd_value_type = xt_simd::simd_type<value_type>;
         using bool_load_type = typename base_type::bool_load_type;
 
+        static constexpr bool provides_simd_interface = has_simd_interface<xexpression_type>::value
+                                                        && L != layout_type::dynamic;
+
         template <class CTA, class SA>
         xstrided_view(CTA&& e, SA&& shape, strides_type&& strides, std::size_t offset, layout_type layout) noexcept;
 
@@ -254,17 +257,13 @@ namespace xt
         template <class requested_type>
         using simd_return_type = xt_simd::simd_return_type<value_type, requested_type>;
 
-        template <class T, class R>
-        using enable_simd_interface = std::enable_if_t<has_simd_interface<T>::value && L != layout_type::dynamic, R>;
+        template <class align, class simd>
+        void store_simd(size_type i, const simd& e)
+            requires provides_simd_interface;
 
-        template <class align, class simd, class T = xexpression_type>
-        enable_simd_interface<T, void> store_simd(size_type i, const simd& e);
-        template <
-            class align,
-            class requested_type = value_type,
-            std::size_t N = xt_simd::simd_traits<requested_type>::size,
-            class T = xexpression_type>
-        enable_simd_interface<T, simd_return_type<requested_type>> load_simd(size_type i) const;
+        template <class align, class requested_type = value_type, std::size_t N = xt_simd::simd_traits<requested_type>::size>
+        simd_return_type<requested_type> load_simd(size_type i) const
+            requires provides_simd_interface;
 
         reference data_element(size_type i);
         const_reference data_element(size_type i) const;
@@ -672,18 +671,18 @@ namespace xt
     }
 
     template <class CT, class S, layout_type L, class FST>
-    template <class alignment, class simd, class T>
-    inline auto xstrided_view<CT, S, L, FST>::store_simd(size_type i, const simd& e)
-        -> enable_simd_interface<T, void>
+    template <class alignment, class simd>
+    inline void xstrided_view<CT, S, L, FST>::store_simd(size_type i, const simd& e)
+        requires provides_simd_interface
     {
         using align_mode = driven_align_mode_t<alignment, data_alignment>;
         xt_simd::store_as(&(storage()[i]), e, align_mode());
     }
 
     template <class CT, class S, layout_type L, class FST>
-    template <class alignment, class requested_type, std::size_t N, class T>
-    inline auto xstrided_view<CT, S, L, FST>::load_simd(size_type i) const
-        -> enable_simd_interface<T, simd_return_type<requested_type>>
+    template <class alignment, class requested_type, std::size_t N>
+    inline auto xstrided_view<CT, S, L, FST>::load_simd(size_type i) const -> simd_return_type<requested_type>
+        requires provides_simd_interface
     {
         using align_mode = driven_align_mode_t<alignment, data_alignment>;
         return xt_simd::load_as<requested_type>(&(storage()[i]), align_mode());
@@ -824,27 +823,21 @@ namespace xt
             using type = rebind_container_t<size_t, S>;
         };
 
-        template <
-            class S,
-            std::enable_if_t<std::is_signed<get_value_type_t<typename std::decay<S>::type>>::value, bool> = true>
+        template <class S>
         inline void recalculate_shape_impl(S& shape, size_t size)
         {
-            using value_type = get_value_type_t<typename std::decay_t<S>>;
-            XTENSOR_ASSERT(std::count(shape.cbegin(), shape.cend(), -1) <= 1);
-            auto iter = std::find(shape.begin(), shape.end(), -1);
-            if (iter != std::end(shape))
+            if constexpr (std::is_signed_v<get_value_type_t<typename std::decay<S>::type>>)
             {
-                const auto total = std::accumulate(shape.cbegin(), shape.cend(), -1, std::multiplies<int>{});
-                const auto missing_dimension = size / total;
-                (*iter) = static_cast<value_type>(missing_dimension);
+                using value_type = get_value_type_t<typename std::decay_t<S>>;
+                XTENSOR_ASSERT(std::count(shape.cbegin(), shape.cend(), -1) <= 1);
+                auto iter = std::find(shape.begin(), shape.end(), -1);
+                if (iter != std::end(shape))
+                {
+                    const auto total = std::accumulate(shape.cbegin(), shape.cend(), -1, std::multiplies<int>{});
+                    const auto missing_dimension = size / total;
+                    (*iter) = static_cast<value_type>(missing_dimension);
+                }
             }
-        }
-
-        template <
-            class S,
-            std::enable_if_t<!std::is_signed<get_value_type_t<typename std::decay<S>::type>>::value, bool> = true>
-        inline void recalculate_shape_impl(S&, size_t)
-        {
         }
 
         template <class S>

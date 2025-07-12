@@ -63,9 +63,6 @@ namespace xt
     template <class S>
     using is_xslice = std::is_base_of<xslice<S>, S>;
 
-    template <class E, class R = void>
-    using disable_xslice = typename std::enable_if<!is_xslice<E>::value, R>::type;
-
     template <class... E>
     using has_xslice = std::disjunction<is_xslice<E>...>;
 
@@ -112,12 +109,12 @@ namespace xt
         xrange() = default;
         xrange(size_type start_val, size_type stop_val) noexcept;
 
-        template <class S, typename = std::enable_if_t<std::is_convertible<S, T>::value, void>>
+        template <std::convertible_to<T> S>
         operator xrange<S>() const noexcept;
 
         // Same as implicit conversion operator but more convenient to call
         // from a variant visitor
-        template <class S, typename = std::enable_if_t<std::is_convertible<S, T>::value, void>>
+        template <std::convertible_to<T> S>
         xrange<S> convert() const noexcept;
 
         size_type operator()(size_type i) const noexcept;
@@ -156,12 +153,12 @@ namespace xt
         xstepped_range() = default;
         xstepped_range(size_type start_val, size_type stop_val, size_type step) noexcept;
 
-        template <class S, typename = std::enable_if_t<std::is_convertible<S, T>::value, void>>
+        template <std::convertible_to<T> S>
         operator xstepped_range<S>() const noexcept;
 
         // Same as implicit conversion operator but more convenient to call
         // from a variant visitor
-        template <class S, typename = std::enable_if_t<std::is_convertible<S, T>::value, void>>
+        template <std::convertible_to<T> S>
         xstepped_range<S> convert() const noexcept;
 
         size_type operator()(size_type i) const noexcept;
@@ -201,12 +198,12 @@ namespace xt
         xall() = default;
         explicit xall(size_type size) noexcept;
 
-        template <class S, typename = std::enable_if_t<std::is_convertible<S, T>::value, void>>
+        template <std::convertible_to<T> S>
         operator xall<S>() const noexcept;
 
         // Same as implicit conversion operator but more convenient to call
         // from a variant visitor
-        template <class S, typename = std::enable_if_t<std::is_convertible<S, T>::value, void>>
+        template <std::convertible_to<T> S>
         xall<S> convert() const noexcept;
 
         size_type operator()(size_type i) const noexcept;
@@ -271,12 +268,12 @@ namespace xt
 
         xnewaxis() = default;
 
-        template <class S, typename = std::enable_if_t<std::is_convertible<S, T>::value, void>>
+        template <std::convertible_to<T> S>
         operator xnewaxis<S>() const noexcept;
 
         // Same as implicit conversion operator but more convenient to call
         // from a variant visitor
-        template <class S, typename = std::enable_if_t<std::is_convertible<S, T>::value, void>>
+        template <std::convertible_to<T> S>
         xnewaxis<S> convert() const noexcept;
 
         size_type operator()(size_type i) const noexcept;
@@ -320,12 +317,6 @@ namespace xt
         struct is_xkeep_slice<xkeep_slice<T>> : std::true_type
         {
         };
-
-        template <class T>
-        using disable_xkeep_slice_t = std::enable_if_t<!is_xkeep_slice<std::decay_t<T>>::value, void>;
-
-        template <class T>
-        using enable_xkeep_slice_t = std::enable_if_t<is_xkeep_slice<std::decay_t<T>>::value, void>;
     }
 
     template <class T>
@@ -337,19 +328,20 @@ namespace xt
         using size_type = typename container_type::value_type;
         using self_type = xkeep_slice<T>;
 
-        template <class C, typename = detail::disable_xkeep_slice_t<C>>
-        explicit xkeep_slice(C& cont);
+        template <class C>
+        explicit xkeep_slice(C& cont)
+            requires(!detail::is_xkeep_slice<std::decay_t<C>>::value);
         explicit xkeep_slice(container_type&& cont);
 
         template <class S>
         xkeep_slice(std::initializer_list<S> t);
 
-        template <class S, typename = std::enable_if_t<std::is_convertible<S, T>::value, void>>
+        template <std::convertible_to<T> S>
         operator xkeep_slice<S>() const noexcept;
 
         // Same as implicit conversion operator but more convenient to call
         // from a variant visitor
-        template <class S, typename = std::enable_if_t<std::is_convertible<S, T>::value, void>>
+        template <std::convertible_to<T> S>
         xkeep_slice<S> convert() const noexcept;
 
         size_type operator()(size_type i) const noexcept;
@@ -376,17 +368,6 @@ namespace xt
         friend class xkeep_slice;
     };
 
-    namespace detail
-    {
-        template <class T>
-        using disable_integral_keep = std::enable_if_t<
-            !xtl::is_integral<std::decay_t<T>>::value,
-            xkeep_slice<typename std::decay_t<T>::value_type>>;
-
-        template <class T, class R>
-        using enable_integral_keep = std::enable_if_t<xtl::is_integral<T>::value, xkeep_slice<R>>;
-    }
-
     /**
      * Create a non-contigous slice from a container of indices to keep.
      * Note: this slice cannot be used in the xstrided_view!
@@ -401,19 +382,20 @@ namespace xt
      * @param indices The indices container
      * @return instance of xkeep_slice
      */
-    template <class T>
-    inline detail::disable_integral_keep<T> keep(T&& indices)
-    {
-        return xkeep_slice<typename std::decay_t<T>::value_type>(std::forward<T>(indices));
-    }
-
     template <class R = std::ptrdiff_t, class T>
-    inline detail::enable_integral_keep<T, R> keep(T i)
+    inline auto keep(T&& indices)
     {
-        using slice_type = xkeep_slice<R>;
-        using container_type = typename slice_type::container_type;
-        container_type tmp = {static_cast<R>(i)};
-        return slice_type(std::move(tmp));
+        if constexpr (xtl::is_integral<std::decay_t<T>>::value)
+        {
+            using slice_type = xkeep_slice<R>;
+            using container_type = typename slice_type::container_type;
+            container_type tmp = {static_cast<R>(std::forward<T>(indices))};
+            return slice_type(std::move(tmp));
+        }
+        else
+        {
+            return xkeep_slice<typename std::decay_t<T>::value_type>(std::forward<T>(indices));
+        }
     }
 
     template <class R = std::ptrdiff_t, class Arg0, class Arg1, class... Args>
@@ -443,12 +425,6 @@ namespace xt
         struct is_xdrop_slice<xdrop_slice<T>> : std::true_type
         {
         };
-
-        template <class T>
-        using disable_xdrop_slice_t = std::enable_if_t<!is_xdrop_slice<std::decay_t<T>>::value, void>;
-
-        template <class T>
-        using enable_xdrop_slice_t = std::enable_if_t<is_xdrop_slice<std::decay_t<T>>::value, void>;
     }
 
     template <class T>
@@ -460,19 +436,20 @@ namespace xt
         using size_type = typename container_type::value_type;
         using self_type = xdrop_slice<T>;
 
-        template <class C, typename = detail::disable_xdrop_slice_t<C>>
-        explicit xdrop_slice(C& cont);
+        template <class C>
+        explicit xdrop_slice(C& cont)
+            requires(!detail::is_xdrop_slice<std::decay_t<C>>::value);
         explicit xdrop_slice(container_type&& cont);
 
         template <class S>
         xdrop_slice(std::initializer_list<S> t);
 
-        template <class S, typename = std::enable_if_t<std::is_convertible<S, T>::value, void>>
+        template <std::convertible_to<T> S>
         operator xdrop_slice<S>() const noexcept;
 
         // Same as implicit conversion operator but more convenient to call
         // from a variant visitor
-        template <class S, typename = std::enable_if_t<std::is_convertible<S, T>::value, void>>
+        template <std::convertible_to<T> S>
         xdrop_slice<S> convert() const noexcept;
 
         size_type operator()(size_type i) const noexcept;
@@ -501,17 +478,6 @@ namespace xt
         friend class xdrop_slice;
     };
 
-    namespace detail
-    {
-        template <class T>
-        using disable_integral_drop = std::enable_if_t<
-            !xtl::is_integral<std::decay_t<T>>::value,
-            xdrop_slice<typename std::decay_t<T>::value_type>>;
-
-        template <class T, class R>
-        using enable_integral_drop = std::enable_if_t<xtl::is_integral<T>::value, xdrop_slice<R>>;
-    }
-
     /**
      * Create a non-contigous slice from a container of indices to drop.
      * Note: this slice cannot be used in the xstrided_view!
@@ -525,19 +491,20 @@ namespace xt
      * @param indices The container of indices to drop
      * @return instance of xdrop_slice
      */
-    template <class T>
-    inline detail::disable_integral_drop<T> drop(T&& indices)
-    {
-        return xdrop_slice<typename std::decay_t<T>::value_type>(std::forward<T>(indices));
-    }
-
     template <class R = std::ptrdiff_t, class T>
-    inline detail::enable_integral_drop<T, R> drop(T i)
+    inline auto drop(T&& indices)
     {
-        using slice_type = xdrop_slice<R>;
-        using container_type = typename slice_type::container_type;
-        container_type tmp = {static_cast<R>(i)};
-        return slice_type(std::move(tmp));
+        if constexpr (xtl::is_integral<T>::value)
+        {
+            using slice_type = xdrop_slice<R>;
+            using container_type = typename slice_type::container_type;
+            container_type tmp = {static_cast<R>(std::forward<T>(indices))};
+            return slice_type(std::move(tmp));
+        }
+        else
+        {
+            return xdrop_slice<typename std::decay_t<T>::value_type>(std::forward<T>(indices));
+        }
     }
 
     template <class R = std::ptrdiff_t, class Arg0, class Arg1, class... Args>
@@ -564,78 +531,48 @@ namespace xt
         }
 
         template <class MI = A, class MA = B, class STEP = C>
-        inline std::enable_if_t<
-            xtl::is_integral<MI>::value && xtl::is_integral<MA>::value && xtl::is_integral<STEP>::value,
-            xstepped_range<std::ptrdiff_t>>
-        get(std::size_t size) const
+        auto get(std::size_t size) const
         {
-            return get_stepped_range(m_start, m_stop, m_step, size);
-        }
-
-        template <class MI = A, class MA = B, class STEP = C>
-        inline std::enable_if_t<
-            !xtl::is_integral<MI>::value && xtl::is_integral<MA>::value && xtl::is_integral<STEP>::value,
-            xstepped_range<std::ptrdiff_t>>
-        get(std::size_t size) const
-        {
-            return get_stepped_range(m_step > 0 ? 0 : static_cast<std::ptrdiff_t>(size) - 1, m_stop, m_step, size);
-        }
-
-        template <class MI = A, class MA = B, class STEP = C>
-        inline std::enable_if_t<
-            xtl::is_integral<MI>::value && !xtl::is_integral<MA>::value && xtl::is_integral<STEP>::value,
-            xstepped_range<std::ptrdiff_t>>
-        get(std::size_t size) const
-        {
-            auto sz = static_cast<std::ptrdiff_t>(size);
-            return get_stepped_range(m_start, m_step > 0 ? sz : -(sz + 1), m_step, size);
-        }
-
-        template <class MI = A, class MA = B, class STEP = C>
-        inline std::enable_if_t<
-            xtl::is_integral<MI>::value && xtl::is_integral<MA>::value && !xtl::is_integral<STEP>::value,
-            xrange<std::ptrdiff_t>>
-        get(std::size_t size) const
-        {
-            return xrange<std::ptrdiff_t>(normalize(m_start, size), normalize(m_stop, size));
-        }
-
-        template <class MI = A, class MA = B, class STEP = C>
-        inline std::enable_if_t<
-            !xtl::is_integral<MI>::value && !xtl::is_integral<MA>::value && xtl::is_integral<STEP>::value,
-            xstepped_range<std::ptrdiff_t>>
-        get(std::size_t size) const
-        {
-            std::ptrdiff_t start = m_step >= 0 ? 0 : static_cast<std::ptrdiff_t>(size) - 1;
-            std::ptrdiff_t stop = m_step >= 0 ? static_cast<std::ptrdiff_t>(size) : -1;
-            return xstepped_range<std::ptrdiff_t>(start, stop, m_step);
-        }
-
-        template <class MI = A, class MA = B, class STEP = C>
-        inline std::enable_if_t<
-            xtl::is_integral<MI>::value && !xtl::is_integral<MA>::value && !xtl::is_integral<STEP>::value,
-            xrange<std::ptrdiff_t>>
-        get(std::size_t size) const
-        {
-            return xrange<std::ptrdiff_t>(normalize(m_start, size), static_cast<std::ptrdiff_t>(size));
-        }
-
-        template <class MI = A, class MA = B, class STEP = C>
-        inline std::enable_if_t<
-            !xtl::is_integral<MI>::value && xtl::is_integral<MA>::value && !xtl::is_integral<STEP>::value,
-            xrange<std::ptrdiff_t>>
-        get(std::size_t size) const
-        {
-            return xrange<std::ptrdiff_t>(0, normalize(m_stop, size));
-        }
-
-        template <class MI = A, class MA = B, class STEP = C>
-        inline std::enable_if_t<
-            !xtl::is_integral<MI>::value && !xtl::is_integral<MA>::value && !xtl::is_integral<STEP>::value,
-            xall<std::ptrdiff_t>>
-        get(std::size_t size) const
-        {
-            return xall<std::ptrdiff_t>(static_cast<std::ptrdiff_t>(size));
+            if constexpr (xtl::is_integral<MI>::value && xtl::is_integral<MA>::value && xtl::is_integral<STEP>::value)
+            {
+                return get_stepped_range(m_start, m_stop, m_step, size);
+            }
+            else if constexpr (!xtl::is_integral<MI>::value && xtl::is_integral<MA>::value && xtl::is_integral<STEP>::value)
+            {
+                return get_stepped_range(
+                    m_step > 0 ? 0 : static_cast<std::ptrdiff_t>(size) - 1,
+                    m_stop,
+                    m_step,
+                    size
+                );
+            }
+            else if constexpr (xtl::is_integral<MI>::value && !xtl::is_integral<MA>::value && xtl::is_integral<STEP>::value)
+            {
+                auto sz = static_cast<std::ptrdiff_t>(size);
+                return get_stepped_range(m_start, m_step > 0 ? sz : -(sz + 1), m_step, size);
+            }
+            else if constexpr (xtl::is_integral<MI>::value && xtl::is_integral<MA>::value && !xtl::is_integral<STEP>::value)
+            {
+                return xrange<std::ptrdiff_t>(normalize(m_start, size), normalize(m_stop, size));
+            }
+            else if constexpr (!xtl::is_integral<MI>::value && !xtl::is_integral<MA>::value && xtl::is_integral<STEP>::value)
+            {
+                std::ptrdiff_t start = m_step >= 0 ? 0 : static_cast<std::ptrdiff_t>(size) - 1;
+                std::ptrdiff_t stop = m_step >= 0 ? static_cast<std::ptrdiff_t>(size) : -1;
+                return xstepped_range<std::ptrdiff_t>(start, stop, m_step);
+            }
+            else if constexpr (xtl::is_integral<MI>::value && !xtl::is_integral<MA>::value && !xtl::is_integral<STEP>::value)
+            {
+                return xrange<std::ptrdiff_t>(normalize(m_start, size), static_cast<std::ptrdiff_t>(size));
+            }
+            else if constexpr (!xtl::is_integral<MI>::value && xtl::is_integral<MA>::value && !xtl::is_integral<STEP>::value)
+            {
+                return xrange<std::ptrdiff_t>(0, normalize(m_stop, size));
+            }
+            else if constexpr (!xtl::is_integral<MI>::value && !xtl::is_integral<MA>::value && !xtl::is_integral<STEP>::value)
+            {
+                return xall<std::ptrdiff_t>(static_cast<std::ptrdiff_t>(size));
+            }
         }
 
         A start() const
@@ -774,25 +711,14 @@ namespace xt
 
     namespace detail
     {
-        template <class T, class E = void>
+        template <class T>
         struct cast_if_integer
         {
-            using type = T;
+            using type = std::conditional_t<xtl::is_integral<T>::value, std::ptrdiff_t, T>;
 
             type operator()(T t)
             {
-                return t;
-            }
-        };
-
-        template <class T>
-        struct cast_if_integer<T, std::enable_if_t<xtl::is_integral<T>::value>>
-        {
-            using type = std::ptrdiff_t;
-
-            type operator()(T t)
-            {
-                return static_cast<type>(t);
+                return (xtl::is_integral<T>::value) ? static_cast<type>(t) : t;
             }
         };
 
@@ -850,15 +776,16 @@ namespace xt
      ******************************************************/
 
     template <class S>
-    inline disable_xslice<S, std::size_t> get_size(const S&) noexcept
+    inline std::size_t get_size(const S& slice) noexcept
     {
-        return 1;
-    }
-
-    template <class S>
-    inline auto get_size(const xslice<S>& slice) noexcept
-    {
-        return slice.derived_cast().size();
+        if constexpr (is_xslice<S>::value)
+        {
+            return slice.size();
+        }
+        else
+        {
+            return 1;
+        }
     }
 
     /*******************************************************
@@ -866,27 +793,29 @@ namespace xt
      *******************************************************/
 
     template <class S>
-    inline disable_xslice<S, std::size_t> step_size(const S&, std::size_t) noexcept
+    inline std::size_t step_size(const S& slice, std::size_t idx) noexcept
     {
-        return 0;
+        if constexpr (is_xslice<S>::value)
+        {
+            return slice.step_size(idx);
+        }
+        else
+        {
+            return 0;
+        }
     }
 
     template <class S>
-    inline disable_xslice<S, std::size_t> step_size(const S&, std::size_t, std::size_t) noexcept
+    inline std::size_t step_size(const S& slice, std::size_t idx, std::size_t n) noexcept
     {
-        return 0;
-    }
-
-    template <class S>
-    inline auto step_size(const xslice<S>& slice, std::size_t idx) noexcept
-    {
-        return slice.derived_cast().step_size(idx);
-    }
-
-    template <class S>
-    inline auto step_size(const xslice<S>& slice, std::size_t idx, std::size_t n) noexcept
-    {
-        return slice.derived_cast().step_size(idx, n);
+        if constexpr (is_xslice<S>::value)
+        {
+            return slice.step_size(idx, n);
+        }
+        else
+        {
+            return 0;
+        }
     }
 
     /*********************************************
@@ -894,16 +823,17 @@ namespace xt
      *********************************************/
 
     template <class S, class I>
-    inline disable_xslice<S, std::size_t> value(const S& s, I) noexcept
+    inline std::size_t value(const S& slice, I i) noexcept
     {
-        return static_cast<std::size_t>(s);
-    }
-
-    template <class S, class I>
-    inline auto value(const xslice<S>& slice, I i) noexcept
-    {
-        using ST = typename S::size_type;
-        return slice.derived_cast()(static_cast<ST>(i));
+        if constexpr (is_xslice<S>::value)
+        {
+            using ST = typename S::size_type;
+            return slice(static_cast<ST>(i));
+        }
+        else
+        {
+            return static_cast<std::size_t>(slice);
+        }
     }
 
     /****************************************
@@ -1064,7 +994,7 @@ namespace xt
     }
 
     template <class T>
-    template <class S, typename>
+    template <std::convertible_to<T> S>
     inline xrange<T>::operator xrange<S>() const noexcept
     {
         xrange<S> ret;
@@ -1074,7 +1004,7 @@ namespace xt
     }
 
     template <class T>
-    template <class S, typename>
+    template <std::convertible_to<T> S>
     inline xrange<S> xrange<T>::convert() const noexcept
     {
         return xrange<S>(*this);
@@ -1143,7 +1073,7 @@ namespace xt
     }
 
     template <class T>
-    template <class S, typename>
+    template <std::convertible_to<T> S>
     inline xstepped_range<T>::operator xstepped_range<S>() const noexcept
     {
         xstepped_range<S> ret;
@@ -1154,7 +1084,7 @@ namespace xt
     }
 
     template <class T>
-    template <class S, typename>
+    template <std::convertible_to<T> S>
     inline xstepped_range<S> xstepped_range<T>::convert() const noexcept
     {
         return xstepped_range<S>(*this);
@@ -1219,14 +1149,14 @@ namespace xt
     }
 
     template <class T>
-    template <class S, typename>
+    template <std::convertible_to<T> S>
     inline xall<T>::operator xall<S>() const noexcept
     {
         return xall<S>(static_cast<S>(m_size));
     }
 
     template <class T>
-    template <class S, typename>
+    template <std::convertible_to<T> S>
     inline xall<S> xall<T>::convert() const noexcept
     {
         return xall<S>(*this);
@@ -1285,14 +1215,14 @@ namespace xt
      ***************************/
 
     template <class T>
-    template <class S, typename>
+    template <std::convertible_to<T> S>
     inline xnewaxis<T>::operator xnewaxis<S>() const noexcept
     {
         return xnewaxis<S>();
     }
 
     template <class T>
-    template <class S, typename>
+    template <std::convertible_to<T> S>
     inline xnewaxis<S> xnewaxis<T>::convert() const noexcept
     {
         return xnewaxis<S>(*this);
@@ -1351,8 +1281,9 @@ namespace xt
      ******************************/
 
     template <class T>
-    template <class C, typename>
+    template <class C>
     inline xkeep_slice<T>::xkeep_slice(C& cont)
+        requires(!detail::is_xkeep_slice<std::decay_t<C>>::value)
         : m_raw_indices(cont.begin(), cont.end())
     {
     }
@@ -1380,7 +1311,7 @@ namespace xt
     }
 
     template <class T>
-    template <class S, typename>
+    template <std::convertible_to<T> S>
     inline xkeep_slice<T>::operator xkeep_slice<S>() const noexcept
     {
         xkeep_slice<S> ret;
@@ -1410,7 +1341,7 @@ namespace xt
     }
 
     template <class T>
-    template <class S, typename>
+    template <std::convertible_to<T> S>
     inline xkeep_slice<S> xkeep_slice<T>::convert() const noexcept
     {
         return xkeep_slice<S>(*this);
@@ -1494,8 +1425,9 @@ namespace xt
      ******************************/
 
     template <class T>
-    template <class C, typename>
+    template <class C>
     inline xdrop_slice<T>::xdrop_slice(C& cont)
+        requires(!detail::is_xdrop_slice<std::decay_t<C>>::value)
         : m_raw_indices(cont.begin(), cont.end())
     {
     }
@@ -1523,7 +1455,7 @@ namespace xt
     }
 
     template <class T>
-    template <class S, typename>
+    template <std::convertible_to<T> S>
     inline xdrop_slice<T>::operator xdrop_slice<S>() const noexcept
     {
         xdrop_slice<S> ret;
@@ -1561,7 +1493,7 @@ namespace xt
     }
 
     template <class T>
-    template <class S, typename>
+    template <std::convertible_to<T> S>
     inline xdrop_slice<S> xdrop_slice<T>::convert() const noexcept
     {
         return xdrop_slice<S>(*this);
