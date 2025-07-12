@@ -33,8 +33,8 @@ Julia and R bindings, check out the [xtensor-python](https://github.com/xtensor-
 [xtensor-r](https://github.com/xtensor-stack/xtensor-r) projects respectively.
 
 Up to version 0.26.0, `xtensor` requires a C++ compiler supporting C++14.
-
 `xtensor` 0.26.x requires a C++ compiler supporting C++17.
+`xtensor` 0.27.x requires a C++ compiler supporting C++20.
 
 
 ## Installation
@@ -97,6 +97,7 @@ library:
 | `xtensor` | `xtl`   |`xsimd` (optional) |
 |-----------|---------|-------------------|
 |  master   | ^0.8.0  |       ^13.2.0     |
+|  0.27.0   | ^0.8.0  |       ^13.2.0     |
 |  0.26.0   | ^0.8.0  |       ^13.2.0     |
 |  0.25.0   | ^0.7.5  |       ^11.0.0     |
 |  0.24.7   | ^0.7.0  |       ^10.0.0     |

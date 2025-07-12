@@ -7,6 +7,36 @@
 Changelog
 =========
 
+0.27.0
+------
+
+- Replaced apply_cv with xtl::apply_cv and deleted duplicated code
+  `# 2836 https://github.com/xtensor-stack/xtensor/pull/2836`
+- Implement apply with std 17
+  `# 2835 https://github.com/xtensor-stack/xtensor/pull/2835`
+- feat: Use cpp20 by default
+  `# 2839 https://github.com/xtensor-stack/xtensor/pull/2839`
+- Set C++20 in clang-format
+  `# 2843 https://github.com/xtensor-stack/xtensor/pull/2843`
+- Update docs to reflect new directory structure.
+  `# 2845 https://github.com/xtensor-stack/xtensor/pull/2845`
+- Adding concept to a part of the code
+  `# 2842 https://github.com/xtensor-stack/xtensor/pull/2842`
+- fix: update benchmarks
+  `# 2848 https://github.com/xtensor-stack/xtensor/pull/2848`
+- Revive benchmarks
+  `# 2854 https://github.com/xtensor-stack/xtensor/pull/2854`
+- Set cmake min version to represent used features. 
+  `# 2852 https://github.com/xtensor-stack/xtensor/pull/2852`
+- Enabling rich display for xeus-cpp-lite
+  `# 2853 https://github.com/xtensor-stack/xtensor/pull/2853`
+- Add braces around initializers
+  `# 2855 https://github.com/xtensor-stack/xtensor/pull/2855`
+- Adding concept to a part of the code (part 2)
+  `# 2846 https://github.com/xtensor-stack/xtensor/pull/2846`
+- cmake: write xtensor.hpp to local dir to keep global build dir clean
+  `# 2857 https://github.com/xtensor-stack/xtensor/pull/2857`
+
 0.26.0
 ------
 
