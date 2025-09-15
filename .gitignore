@@ -63,3 +63,6 @@ __pycache__
 # Generated files
 *.pc
 .vscode/settings.json
+
+# Allow tag JSONs under etc/xeus-cpp
+!etc/xeus-cpp/tags.d/
