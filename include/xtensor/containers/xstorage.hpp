@@ -1731,11 +1731,6 @@ namespace xt
         XTENSOR_CONSTEXPR_ENHANCED_STATIC cast_type m_array = cast_type({X...});
     };
 
-#ifdef XTENSOR_HAS_CONSTEXPR_ENHANCED
-    template <std::size_t... X>
-    constexpr typename fixed_shape<X...>::cast_type fixed_shape<X...>::m_array;
-#endif
-
 #undef XTENSOR_FIXED_SHAPE_CONSTEXPR
 
     template <class E, std::ptrdiff_t Start, std::ptrdiff_t End = -1>
