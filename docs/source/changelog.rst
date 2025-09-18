@@ -26,7 +26,7 @@ Changelog
   `# 2848 https://github.com/xtensor-stack/xtensor/pull/2848`
 - Revive benchmarks
   `# 2854 https://github.com/xtensor-stack/xtensor/pull/2854`
-- Set cmake min version to represent used features. 
+- Set cmake min version to represent used features.
   `# 2852 https://github.com/xtensor-stack/xtensor/pull/2852`
 - Enabling rich display for xeus-cpp-lite
   `# 2853 https://github.com/xtensor-stack/xtensor/pull/2853`
