@@ -12,6 +12,17 @@ project(xtensor CXX)
 
 set(XTENSOR_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+# xtensor tag files
+set(XTENSOR_DATA_DIR "share/xeus-cpp")
+set(XTENSOR_TAGFILES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/share/xeus-cpp/tagfiles)
+
+set(XTENSOR_CONF_DIR "etc/xeus-cpp")
+set(XTENSOR_TAGCONFS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/etc/xeus-cpp/tags.d)
+
+file(COPY "${XTENSOR_TAGFILES_DIR}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/share/xeus-cpp")
+file(COPY "${XTENSOR_TAGCONFS_DIR}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/etc/xeus-cpp")
+
+
 # Versionning
 # ===========
 
@@ -289,6 +300,12 @@ configure_file(${PROJECT_NAME}.pc.in
                 @ONLY)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc"
         DESTINATION "${CMAKE_INSTALL_DATADIR}/pkgconfig/")
+
+install(DIRECTORY ${XTENSOR_TAGFILES_DIR}
+        DESTINATION ${XTENSOR_DATA_DIR})
+
+install(DIRECTORY ${XTENSOR_TAGCONFS_DIR}
+        DESTINATION ${XTENSOR_CONF_DIR})
 
 # Write single include
 # ====================
