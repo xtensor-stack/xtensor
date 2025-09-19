@@ -7,6 +7,12 @@
 Changelog
 =========
 
+0.27.1
+------
+
+- Add tagfiles to support fetching documentation with xeus-cpp-lite
+  `# 2862 https://github.com/xtensor-stack/xtensor/pull/2862`
+
 0.27.0
 ------
 
