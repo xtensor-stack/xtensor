@@ -381,21 +381,6 @@ namespace xt
         friend class xcontainer<xfixed_container<ET, S, L, SH, Tag>>;
     };
 
-#ifdef XTENSOR_HAS_CONSTEXPR_ENHANCED
-    // Out of line definitions to prevent linker errors prior to C++17
-    template <class ET, class S, layout_type L, bool SH, class Tag>
-    constexpr
-        typename xfixed_container<ET, S, L, SH, Tag>::inner_shape_type xfixed_container<ET, S, L, SH, Tag>::m_shape;
-
-    template <class ET, class S, layout_type L, bool SH, class Tag>
-    constexpr
-        typename xfixed_container<ET, S, L, SH, Tag>::inner_strides_type xfixed_container<ET, S, L, SH, Tag>::m_strides;
-
-    template <class ET, class S, layout_type L, bool SH, class Tag>
-    constexpr typename xfixed_container<ET, S, L, SH, Tag>::inner_backstrides_type
-        xfixed_container<ET, S, L, SH, Tag>::m_backstrides;
-#endif
-
     /****************************************
      * xfixed_container_adaptor declaration *
      ****************************************/
@@ -517,21 +502,6 @@ namespace xt
 
         friend class xcontainer<xfixed_adaptor<EC, S, L, SH, Tag>>;
     };
-
-#ifdef XTENSOR_HAS_CONSTEXPR_ENHANCED
-    // Out of line definitions to prevent linker errors prior to C++17
-    template <class EC, class S, layout_type L, bool SH, class Tag>
-    constexpr
-        typename xfixed_adaptor<EC, S, L, SH, Tag>::inner_shape_type xfixed_adaptor<EC, S, L, SH, Tag>::m_shape;
-
-    template <class EC, class S, layout_type L, bool SH, class Tag>
-    constexpr
-        typename xfixed_adaptor<EC, S, L, SH, Tag>::inner_strides_type xfixed_adaptor<EC, S, L, SH, Tag>::m_strides;
-
-    template <class EC, class S, layout_type L, bool SH, class Tag>
-    constexpr typename xfixed_adaptor<EC, S, L, SH, Tag>::inner_backstrides_type
-        xfixed_adaptor<EC, S, L, SH, Tag>::m_backstrides;
-#endif
 
     /************************************
      * xfixed_container implementation *

@@ -67,18 +67,6 @@ namespace xt
             XTENSOR_CONSTEXPR_ENHANCED_STATIC bool is_initialized = true;
         };
 
-#ifdef XTENSOR_HAS_CONSTEXPR_ENHANCED
-        // Out of line definitions to prevent linker errors prior to C++17
-        template <std::size_t... N, class is_shape_trivial>
-        constexpr fixed_shape<N...> xfunction_cache_impl<fixed_shape<N...>, is_shape_trivial>::shape;
-
-        template <std::size_t... N, class is_shape_trivial>
-        constexpr bool xfunction_cache_impl<fixed_shape<N...>, is_shape_trivial>::is_trivial;
-
-        template <std::size_t... N, class is_shape_trivial>
-        constexpr bool xfunction_cache_impl<fixed_shape<N...>, is_shape_trivial>::is_initialized;
-#endif
-
         template <class... CT>
         struct xfunction_bool_load_type
         {
