@@ -713,11 +713,11 @@ namespace xt
         template <typename std::decay_t<CT>::size_type I, class... Args>
         size_type index(Args... args) const;
 
-        template <typename std::decay_t<CT>::size_type, class T>
-        size_type sliced_access(const xslice<T>& slice) const;
+        template <typename std::decay_t<CT>::size_type I, xslice_concept T>
+        size_type sliced_access(const T& slice) const;
 
-        template <typename std::decay_t<CT>::size_type I, class T, class Arg, class... Args>
-        size_type sliced_access(const xslice<T>& slice, Arg arg, Args... args) const;
+        template <typename std::decay_t<CT>::size_type I, xslice_concept T, class Arg, class... Args>
+        size_type sliced_access(const T& slice, Arg arg, Args... args) const;
 
         template <typename std::decay_t<CT>::size_type I, class T, class... Args>
         size_type sliced_access(const T& squeeze, Args...) const
@@ -1657,20 +1657,18 @@ namespace xt
     }
 
     template <class CT, class... S>
-    template <typename std::decay_t<CT>::size_type I, class T>
-    inline auto xview<CT, S...>::sliced_access(const xslice<T>& slice) const -> size_type
+    template <typename std::decay_t<CT>::size_type I, xslice_concept T>
+    inline auto xview<CT, S...>::sliced_access(const T& slice) const -> size_type
     {
-        return static_cast<size_type>(slice.derived_cast()(0));
+        return static_cast<size_type>(slice(0));
     }
 
     template <class CT, class... S>
-    template <typename std::decay_t<CT>::size_type I, class T, class Arg, class... Args>
-    inline auto xview<CT, S...>::sliced_access(const xslice<T>& slice, Arg arg, Args... args) const -> size_type
+    template <typename std::decay_t<CT>::size_type I, xslice_concept T, class Arg, class... Args>
+    inline auto xview<CT, S...>::sliced_access(const T& slice, Arg arg, Args... args) const -> size_type
     {
         using ST = typename T::size_type;
-        return static_cast<size_type>(
-            slice.derived_cast()(argument<I>(static_cast<ST>(arg), static_cast<ST>(args)...))
-        );
+        return static_cast<size_type>(slice(argument<I>(static_cast<ST>(arg), static_cast<ST>(args)...)));
     }
 
     template <class CT, class... S>

@@ -10,6 +10,7 @@
 #ifndef XTENSOR_SLICE_HPP
 #define XTENSOR_SLICE_HPP
 
+#include <concepts>
 #include <cstddef>
 #include <map>
 #include <type_traits>
@@ -35,33 +36,73 @@ namespace xt
 {
 
     /**********************
-     * xslice declaration *
+     * xslice type traits *
      **********************/
 
-    template <class D>
-    class xslice
+    // Forward declarations
+    template <class T>
+    class xrange;
+
+    template <class T>
+    class xstepped_range;
+
+    template <class T>
+    class xall;
+
+    template <class T>
+    class xnewaxis;
+
+    template <class T>
+    class xkeep_slice;
+
+    template <class T>
+    class xdrop_slice;
+
+    namespace detail
     {
-    public:
+        template <class S>
+        struct is_xslice_impl : std::false_type
+        {
+        };
 
-        using derived_type = D;
+        template <class T>
+        struct is_xslice_impl<xrange<T>> : std::true_type
+        {
+        };
 
-        derived_type& derived_cast() noexcept;
-        const derived_type& derived_cast() const noexcept;
+        template <class T>
+        struct is_xslice_impl<xstepped_range<T>> : std::true_type
+        {
+        };
 
-    protected:
+        template <class T>
+        struct is_xslice_impl<xall<T>> : std::true_type
+        {
+        };
 
-        xslice() = default;
-        ~xslice() = default;
+        template <class T>
+        struct is_xslice_impl<xnewaxis<T>> : std::true_type
+        {
+        };
 
-        xslice(const xslice&) = default;
-        xslice& operator=(const xslice&) = default;
+        template <class T>
+        struct is_xslice_impl<xkeep_slice<T>> : std::true_type
+        {
+        };
 
-        xslice(xslice&&) = default;
-        xslice& operator=(xslice&&) = default;
+        template <class T>
+        struct is_xslice_impl<xdrop_slice<T>> : std::true_type
+        {
+        };
+    }
+
+    template <class S>
+    struct is_xslice : detail::is_xslice_impl<S>
+    {
     };
 
     template <class S>
-    using is_xslice = std::is_base_of<xslice<S>, S>;
+    concept xslice_concept = is_xslice<S>::value;
 
     template <class... E>
     using has_xslice = std::disjunction<is_xslice<E>...>;
@@ -99,7 +140,7 @@ namespace xt
      **********************/
 
     template <class T>
-    class xrange : public xslice<xrange<T>>
+    class xrange
     {
     public:
 
@@ -143,7 +184,7 @@ namespace xt
      ******************************/
 
     template <class T>
-    class xstepped_range : public xslice<xstepped_range<T>>
+    class xstepped_range
     {
     public:
 
@@ -188,7 +229,7 @@ namespace xt
      ********************/
 
     template <class T>
-    class xall : public xslice<xall<T>>
+    class xall
     {
     public:
 
@@ -259,7 +300,7 @@ namespace xt
      ************************/
 
     template <class T>
-    class xnewaxis : public xslice<xnewaxis<T>>
+    class xnewaxis
     {
     public:
 
@@ -320,7 +361,7 @@ namespace xt
     }
 
     template <class T>
-    class xkeep_slice : public xslice<xkeep_slice<T>>
+    class xkeep_slice
     {
     public:
 
@@ -428,7 +469,7 @@ namespace xt
     }
 
     template <class T>
-    class xdrop_slice : public xslice<xdrop_slice<T>>
+    class xdrop_slice
     {
     public:
 
@@ -778,14 +819,11 @@ namespace xt
     template <class S>
     inline std::size_t get_size(const S& slice) noexcept
     {
-        if constexpr (is_xslice<S>::value)
+        if constexpr (xslice_concept<S>)
         {
             return slice.size();
         }
-        else
-        {
-            return 1;
-        }
+        return 1;
     }
 
     /*******************************************************
@@ -795,27 +833,21 @@ namespace xt
     template <class S>
     inline std::size_t step_size(const S& slice, std::size_t idx) noexcept
     {
-        if constexpr (is_xslice<S>::value)
+        if constexpr (xslice_concept<S>)
         {
             return slice.step_size(idx);
         }
-        else
-        {
-            return 0;
-        }
+        return 0;
     }
 
     template <class S>
     inline std::size_t step_size(const S& slice, std::size_t idx, std::size_t n) noexcept
     {
-        if constexpr (is_xslice<S>::value)
+        if constexpr (xslice_concept<S>)
         {
             return slice.step_size(idx, n);
         }
-        else
-        {
-            return 0;
-        }
+        return 0;
     }
 
     /*********************************************
@@ -823,9 +855,9 @@ namespace xt
      *********************************************/
 
     template <class S, class I>
-    inline std::size_t value(const S& slice, I i) noexcept
+    inline auto value(const S& slice, I i) noexcept
     {
-        if constexpr (is_xslice<S>::value)
+        if constexpr (xslice_concept<S>)
         {
             using ST = typename S::size_type;
             return slice(static_cast<ST>(i));
@@ -965,22 +997,6 @@ namespace xt
 
     template <class E, class SL>
     using get_slice_type = typename detail::get_slice_type_impl<E, std::remove_reference_t<SL>>::type;
-
-    /*************************
-     * xslice implementation *
-     *************************/
-
-    template <class D>
-    inline auto xslice<D>::derived_cast() noexcept -> derived_type&
-    {
-        return *static_cast<derived_type*>(this);
-    }
-
-    template <class D>
-    inline auto xslice<D>::derived_cast() const noexcept -> const derived_type&
-    {
-        return *static_cast<const derived_type*>(this);
-    }
 
     /*************************
      * xrange implementation *
