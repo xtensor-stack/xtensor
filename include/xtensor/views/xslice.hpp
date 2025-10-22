@@ -73,13 +73,12 @@ namespace xt
 
         template <class S>
         struct is_xslice_impl : std::disjunction<
-            is_specific_slice_impl<S, xrange>,
-            is_specific_slice_impl<S, xstepped_range>,
-            is_specific_slice_impl<S, xall>,
-            is_specific_slice_impl<S, xnewaxis>,
-            is_specific_slice_impl<S, xkeep_slice>,
-            is_specific_slice_impl<S, xdrop_slice>
-        >
+                                    is_specific_slice_impl<S, xrange>,
+                                    is_specific_slice_impl<S, xstepped_range>,
+                                    is_specific_slice_impl<S, xall>,
+                                    is_specific_slice_impl<S, xnewaxis>,
+                                    is_specific_slice_impl<S, xkeep_slice>,
+                                    is_specific_slice_impl<S, xdrop_slice>>
         {
         };
     }
