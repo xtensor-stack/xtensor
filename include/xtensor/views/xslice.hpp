@@ -61,38 +61,25 @@ namespace xt
 
     namespace detail
     {
+        template <class S, template <class> class SliceType>
+        struct is_specific_slice_impl : std::false_type
+        {
+        };
+
+        template <class T, template <class> class SliceType>
+        struct is_specific_slice_impl<SliceType<T>, SliceType> : std::true_type
+        {
+        };
+
         template <class S>
-        struct is_xslice_impl : std::false_type
-        {
-        };
-
-        template <class T>
-        struct is_xslice_impl<xrange<T>> : std::true_type
-        {
-        };
-
-        template <class T>
-        struct is_xslice_impl<xstepped_range<T>> : std::true_type
-        {
-        };
-
-        template <class T>
-        struct is_xslice_impl<xall<T>> : std::true_type
-        {
-        };
-
-        template <class T>
-        struct is_xslice_impl<xnewaxis<T>> : std::true_type
-        {
-        };
-
-        template <class T>
-        struct is_xslice_impl<xkeep_slice<T>> : std::true_type
-        {
-        };
-
-        template <class T>
-        struct is_xslice_impl<xdrop_slice<T>> : std::true_type
+        struct is_xslice_impl : std::disjunction<
+            is_specific_slice_impl<S, xrange>,
+            is_specific_slice_impl<S, xstepped_range>,
+            is_specific_slice_impl<S, xall>,
+            is_specific_slice_impl<S, xnewaxis>,
+            is_specific_slice_impl<S, xkeep_slice>,
+            is_specific_slice_impl<S, xdrop_slice>
+        >
         {
         };
     }
@@ -104,6 +91,36 @@ namespace xt
 
     template <class S>
     concept xslice_concept = is_xslice<S>::value;
+
+    template <class S>
+    concept xrange_concept = detail::is_specific_slice_impl<std::remove_cvref_t<S>, xrange>::value;
+
+    template <class S>
+    concept xstepped_range_concept = detail::is_specific_slice_impl<std::remove_cvref_t<S>, xstepped_range>::value;
+
+    template <class S>
+    concept xall_concept = detail::is_specific_slice_impl<std::remove_cvref_t<S>, xall>::value;
+
+    template <class S>
+    concept xnewaxis_concept = detail::is_specific_slice_impl<std::remove_cvref_t<S>, xnewaxis>::value;
+
+    template <class S>
+    concept xkeep_slice_concept = detail::is_specific_slice_impl<std::remove_cvref_t<S>, xkeep_slice>::value;
+
+    template <class S>
+    concept xdrop_slice_concept = detail::is_specific_slice_impl<std::remove_cvref_t<S>, xdrop_slice>::value;
+
+    template <class S>
+    concept nonstrided_slice_concept = xkeep_slice_concept<S> || xdrop_slice_concept<S>;
+
+    template <class S>
+    concept strided_slice_concept = xslice_concept<S> && !nonstrided_slice_concept<S>;
+
+    template <class S>
+    concept slice_or_scalar_concept = xslice_concept<S> || xtl::integral_concept<S>;
+
+    template <class S>
+    concept strided_compatible_concept = slice_or_scalar_concept<S> && !nonstrided_slice_concept<S>;
 
     template <class... E>
     using has_xslice = std::disjunction<is_xslice<E>...>;
@@ -348,19 +365,6 @@ namespace xt
     template <class T>
     class xkeep_slice;
 
-    namespace detail
-    {
-        template <class T>
-        struct is_xkeep_slice : std::false_type
-        {
-        };
-
-        template <class T>
-        struct is_xkeep_slice<xkeep_slice<T>> : std::true_type
-        {
-        };
-    }
-
     template <class T>
     class xkeep_slice
     {
@@ -372,7 +376,7 @@ namespace xt
 
         template <class C>
         explicit xkeep_slice(C& cont)
-            requires(!detail::is_xkeep_slice<std::decay_t<C>>::value);
+            requires(!xkeep_slice_concept<C>);
         explicit xkeep_slice(container_type&& cont);
 
         template <class S>
@@ -456,19 +460,6 @@ namespace xt
     template <class T>
     class xdrop_slice;
 
-    namespace detail
-    {
-        template <class T>
-        struct is_xdrop_slice : std::false_type
-        {
-        };
-
-        template <class T>
-        struct is_xdrop_slice<xdrop_slice<T>> : std::true_type
-        {
-        };
-    }
-
     template <class T>
     class xdrop_slice
     {
@@ -480,7 +471,7 @@ namespace xt
 
         template <class C>
         explicit xdrop_slice(C& cont)
-            requires(!detail::is_xdrop_slice<std::decay_t<C>>::value);
+            requires(!xdrop_slice_concept<C>);
         explicit xdrop_slice(container_type&& cont);
 
         template <class S>
@@ -1307,7 +1298,7 @@ namespace xt
     template <class T>
     template <class C>
     inline xkeep_slice<T>::xkeep_slice(C& cont)
-        requires(!detail::is_xkeep_slice<std::decay_t<C>>::value)
+        requires(!xkeep_slice_concept<C>)
         : m_raw_indices(cont.begin(), cont.end())
     {
     }
@@ -1451,7 +1442,7 @@ namespace xt
     template <class T>
     template <class C>
     inline xdrop_slice<T>::xdrop_slice(C& cont)
-        requires(!detail::is_xdrop_slice<std::decay_t<C>>::value)
+        requires(!xdrop_slice_concept<C>)
         : m_raw_indices(cont.begin(), cont.end())
     {
     }

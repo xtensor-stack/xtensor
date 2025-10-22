@@ -135,27 +135,12 @@ namespace xt
                                               : false;
         };
 
-        template <class S>
-        struct is_strided_slice_impl : std::true_type
-        {
-        };
-
-        template <class T>
-        struct is_strided_slice_impl<xkeep_slice<T>> : std::false_type
-        {
-        };
-
-        template <class T>
-        struct is_strided_slice_impl<xdrop_slice<T>> : std::false_type
-        {
-        };
-
         // If we have no discontiguous slices, we can calculate strides for this view.
         template <class E, class... S>
         struct is_strided_view
             : std::integral_constant<
                   bool,
-                  std::conjunction<has_data_interface<E>, is_strided_slice_impl<std::decay_t<S>>...>::value>
+                  has_data_interface<E>::value && (strided_compatible_concept<std::decay_t<S>> && ...)>
         {
         };
 
