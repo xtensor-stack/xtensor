@@ -122,7 +122,9 @@ namespace xt
     concept strided_compatible_concept = slice_or_scalar_concept<S> && !nonstrided_slice_concept<S>;
 
     template <class... E>
-    using has_xslice = std::disjunction<is_xslice<E>...>;
+    struct has_xslice : std::bool_constant<(xslice_concept<E> || ...)>
+    {
+    };
 
     /**************
      * slice tags *
@@ -821,7 +823,10 @@ namespace xt
         {
             return slice.size();
         }
-        return 1;
+        else
+        {
+            return 1;
+        }
     }
 
     /*******************************************************
@@ -835,7 +840,10 @@ namespace xt
         {
             return slice.step_size(idx);
         }
-        return 0;
+        else
+        {
+            return 0;
+        }
     }
 
     template <class S>
@@ -845,7 +853,10 @@ namespace xt
         {
             return slice.step_size(idx, n);
         }
-        return 0;
+        else
+        {
+            return 0;
+        }
     }
 
     /*********************************************
