@@ -761,9 +761,13 @@ namespace xt
             type operator()(T t)
             {
                 if constexpr (xtl::integral_concept<T>)
+                {
                     return static_cast<std::ptrdiff_t>(t);
+                }
                 else
+                {
                     return t;
+                }
             }
         };
 
