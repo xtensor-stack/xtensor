@@ -20,6 +20,7 @@
 
 #include "../containers/xstorage.hpp"
 #include "../core/xtensor_config.hpp"
+#include "../misc/xtl_concepts.hpp"
 #include "../utils/xutils.hpp"
 
 #ifndef XTENSOR_CONSTEXPR
@@ -426,7 +427,7 @@ namespace xt
     template <class R = std::ptrdiff_t, class T>
     inline auto keep(T&& indices)
     {
-        if constexpr (xtl::is_integral<std::decay_t<T>>::value)
+        if constexpr (xtl::integral_concept<std::decay_t<T>>)
         {
             using slice_type = xkeep_slice<R>;
             using container_type = typename slice_type::container_type;
@@ -535,7 +536,7 @@ namespace xt
     template <class R = std::ptrdiff_t, class T>
     inline auto drop(T&& indices)
     {
-        if constexpr (xtl::is_integral<T>::value)
+        if constexpr (xtl::integral_concept<T>)
         {
             using slice_type = xdrop_slice<R>;
             using container_type = typename slice_type::container_type;
@@ -574,11 +575,11 @@ namespace xt
         template <class MI = A, class MA = B, class STEP = C>
         auto get(std::size_t size) const
         {
-            if constexpr (xtl::is_integral<MI>::value && xtl::is_integral<MA>::value && xtl::is_integral<STEP>::value)
+            if constexpr (xtl::integral_concept<MI> && xtl::integral_concept<MA> && xtl::integral_concept<STEP>)
             {
                 return get_stepped_range(m_start, m_stop, m_step, size);
             }
-            else if constexpr (!xtl::is_integral<MI>::value && xtl::is_integral<MA>::value && xtl::is_integral<STEP>::value)
+            else if constexpr (!xtl::integral_concept<MI> && xtl::integral_concept<MA> && xtl::integral_concept<STEP>)
             {
                 return get_stepped_range(
                     m_step > 0 ? 0 : static_cast<std::ptrdiff_t>(size) - 1,
@@ -587,30 +588,30 @@ namespace xt
                     size
                 );
             }
-            else if constexpr (xtl::is_integral<MI>::value && !xtl::is_integral<MA>::value && xtl::is_integral<STEP>::value)
+            else if constexpr (xtl::integral_concept<MI> && !xtl::integral_concept<MA> && xtl::integral_concept<STEP>)
             {
                 auto sz = static_cast<std::ptrdiff_t>(size);
                 return get_stepped_range(m_start, m_step > 0 ? sz : -(sz + 1), m_step, size);
             }
-            else if constexpr (xtl::is_integral<MI>::value && xtl::is_integral<MA>::value && !xtl::is_integral<STEP>::value)
+            else if constexpr (xtl::integral_concept<MI> && xtl::integral_concept<MA> && !xtl::integral_concept<STEP>)
             {
                 return xrange<std::ptrdiff_t>(normalize(m_start, size), normalize(m_stop, size));
             }
-            else if constexpr (!xtl::is_integral<MI>::value && !xtl::is_integral<MA>::value && xtl::is_integral<STEP>::value)
+            else if constexpr (!xtl::integral_concept<MI> && !xtl::integral_concept<MA> && xtl::integral_concept<STEP>)
             {
                 std::ptrdiff_t start = m_step >= 0 ? 0 : static_cast<std::ptrdiff_t>(size) - 1;
                 std::ptrdiff_t stop = m_step >= 0 ? static_cast<std::ptrdiff_t>(size) : -1;
                 return xstepped_range<std::ptrdiff_t>(start, stop, m_step);
             }
-            else if constexpr (xtl::is_integral<MI>::value && !xtl::is_integral<MA>::value && !xtl::is_integral<STEP>::value)
+            else if constexpr (xtl::integral_concept<MI> && !xtl::integral_concept<MA> && !xtl::integral_concept<STEP>)
             {
                 return xrange<std::ptrdiff_t>(normalize(m_start, size), static_cast<std::ptrdiff_t>(size));
             }
-            else if constexpr (!xtl::is_integral<MI>::value && xtl::is_integral<MA>::value && !xtl::is_integral<STEP>::value)
+            else if constexpr (!xtl::integral_concept<MI> && xtl::integral_concept<MA> && !xtl::integral_concept<STEP>)
             {
                 return xrange<std::ptrdiff_t>(0, normalize(m_stop, size));
             }
-            else if constexpr (!xtl::is_integral<MI>::value && !xtl::is_integral<MA>::value && !xtl::is_integral<STEP>::value)
+            else if constexpr (!xtl::integral_concept<MI> && !xtl::integral_concept<MA> && !xtl::integral_concept<STEP>)
             {
                 return xall<std::ptrdiff_t>(static_cast<std::ptrdiff_t>(size));
             }
@@ -755,11 +756,14 @@ namespace xt
         template <class T>
         struct cast_if_integer
         {
-            using type = std::conditional_t<xtl::is_integral<T>::value, std::ptrdiff_t, T>;
+            using type = std::conditional_t<xtl::integral_concept<T>, std::ptrdiff_t, T>;
 
             type operator()(T t)
             {
-                return (xtl::is_integral<T>::value) ? static_cast<type>(t) : t;
+                if constexpr (xtl::integral_concept<T>)
+                    return static_cast<std::ptrdiff_t>(t);
+                else
+                    return t;
             }
         };
 
