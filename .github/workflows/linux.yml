@@ -22,6 +22,7 @@ jobs:
         - {compiler: clang, version: '18', name: column-major, flags: -DDEFAULT_COLUMN_MAJOR=ON}
         - {compiler: clang, version: '19', name: assert, flags: -DXTENSOR_ENABLE_ASSERT=ON}
         - {compiler: clang, version: '20', name: column-major, flags: -DDEFAULT_COLUMN_MAJOR=ON}
+        - {compiler: clang, version: '21', name: assert, flags: -DXTENSOR_ENABLE_ASSERT=ON}
         - {compiler: gcc, version: '11', name: openmp, flags: -DXTENSOR_USE_OPENMP=ON}
         - {compiler: gcc, version: '11', name: noexcept, flags: -DXTENSOR_DISABLE_EXCEPTIONS=ON}
         - {compiler: gcc, version: '12', name: xsimd, flags: -DXTENSOR_USE_XSIMD=ON}
@@ -29,6 +30,8 @@ jobs:
         - {compiler: gcc, version: '13', name: tbb, flags: -DXTENSOR_USE_TBB=ON -DTBB_INCLUDE_DIR=$CONDA_PREFIX/include -DTBB_LIBRARY=$CONDA_PREFIX/lib}
         - {compiler: gcc, version: '14', name: xsimd-tbb, flags: -DXTENSOR_USE_XSIMD=ON -DXTENSOR_USE_TBB=ON}
         - {compiler: gcc, version: '14', name: tbb, flags: -DXTENSOR_USE_TBB=ON -DTBB_INCLUDE_DIR=$CONDA_PREFIX/include -DTBB_LIBRARY=$CONDA_PREFIX/lib}
+        - {compiler: gcc, version: '15', name: xsimd-tbb, flags: -DXTENSOR_USE_XSIMD=ON -DXTENSOR_USE_TBB=ON}
+        - {compiler: gcc, version: '15', name: tbb, flags: -DXTENSOR_USE_TBB=ON -DTBB_INCLUDE_DIR=$CONDA_PREFIX/include -DTBB_LIBRARY=$CONDA_PREFIX/lib}
     steps:
     - name: Install GCC
       if: matrix.sys.compiler == 'gcc'
@@ -44,15 +47,15 @@ jobs:
         chmod +x llvm.sh
         sudo ./llvm.sh ${{matrix.sys.version}}
         sudo apt-get install -y clang-tools-${{matrix.sys.version}}
-        sudo update-alternatives --install /usr/bin/clang++                 clang++                     /usr/bin/clang++-${{matrix.sys.version}} 200
-        sudo update-alternatives --install /usr/bin/clang                       clang                         /usr/bin/clang-${{matrix.sys.version}} 200
-        sudo update-alternatives --install /usr/bin/clang-scan-deps   clang-scan-deps     /usr/bin/clang-scan-deps-${{matrix.sys.version}} 200
+        sudo update-alternatives --install /usr/bin/clang++         clang++             /usr/bin/clang++-${{matrix.sys.version}} 200
+        sudo update-alternatives --install /usr/bin/clang           clang               /usr/bin/clang-${{matrix.sys.version}} 200
+        sudo update-alternatives --install /usr/bin/clang-scan-deps clang-scan-deps     /usr/bin/clang-scan-deps-${{matrix.sys.version}} 200
         sudo update-alternatives --set clang /usr/bin/clang-${{matrix.sys.version}}
         sudo update-alternatives --set clang++ /usr/bin/clang++-${{matrix.sys.version}}
         sudo update-alternatives --set clang-scan-deps /usr/bin/clang-scan-deps-${{matrix.sys.version}}
 
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set conda environment
       uses: mamba-org/setup-micromamba@main
@@ -75,7 +78,7 @@ jobs:
 
     - name: Build
       working-directory: build
-      run: cmake --build . --target test_xtensor_lib --parallel 8
+      run: cmake --build . --target test_xtensor_lib
 
     - name: Run tests
       working-directory: build
