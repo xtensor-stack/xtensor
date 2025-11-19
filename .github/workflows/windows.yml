@@ -44,7 +44,7 @@ jobs:
         environment-name: myenv
         environment-file: environment-dev.yml
         init-shell: bash
-        cache-downloads: true
+        cache-downloads: false
         create-args: |
           ninja
 
