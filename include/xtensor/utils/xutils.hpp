@@ -163,52 +163,37 @@ namespace xt
 
     namespace detail
     {
-        template <std::size_t I, class F, class... T>
-        inline typename std::enable_if<I == sizeof...(T), void>::type
-        for_each_impl(F&& /*f*/, std::tuple<T...>& /*t*/) noexcept
+        template <class F, size_t... I, class... Ts>
+        void for_each(F&& f, std::tuple<Ts...>& t, std::index_sequence<I...>) noexcept(
+            (noexcept(f(std::get<I>(t))) && ...)
+        )
         {
+            (f(std::get<I>(t)), ...);
         }
 
-        template <std::size_t I, class F, class... T>
-            inline typename std::enable_if < I<sizeof...(T), void>::type
-            for_each_impl(F&& f, std::tuple<T...>& t) noexcept(noexcept(f(std::get<I>(t))))
+        template <class F, size_t... I, class... Ts>
+        void for_each(F&& f, const std::tuple<Ts...>& t, std::index_sequence<I...>) noexcept(
+            (noexcept(f(std::get<I>(t))) && ...)
+        )
         {
-            f(std::get<I>(t));
-            for_each_impl<I + 1, F, T...>(std::forward<F>(f), t);
+            (f(std::get<I>(t)), ...);
         }
     }
 
-    template <class F, class... T>
-    inline void for_each(F&& f, std::tuple<T...>& t) noexcept(
-        noexcept(detail::for_each_impl<0, F, T...>(std::forward<F>(f), t))
+    template <class F, class... Ts>
+    inline void for_each(F&& f, std::tuple<Ts...>& t) noexcept(
+        noexcept(detail::for_each(std::forward<F>(f), t, std::make_index_sequence<sizeof...(Ts)>{}))
     )
     {
-        detail::for_each_impl<0, F, T...>(std::forward<F>(f), t);
+        detail::for_each(std::forward<F>(f), t, std::make_index_sequence<sizeof...(Ts)>{});
     }
 
-    namespace detail
-    {
-        template <std::size_t I, class F, class... T>
-        inline typename std::enable_if<I == sizeof...(T), void>::type
-        for_each_impl(F&& /*f*/, const std::tuple<T...>& /*t*/) noexcept
-        {
-        }
-
-        template <std::size_t I, class F, class... T>
-            inline typename std::enable_if < I<sizeof...(T), void>::type
-            for_each_impl(F&& f, const std::tuple<T...>& t) noexcept(noexcept(f(std::get<I>(t))))
-        {
-            f(std::get<I>(t));
-            for_each_impl<I + 1, F, T...>(std::forward<F>(f), t);
-        }
-    }
-
-    template <class F, class... T>
-    inline void for_each(F&& f, const std::tuple<T...>& t) noexcept(
-        noexcept(detail::for_each_impl<0, F, T...>(std::forward<F>(f), t))
+    template <class F, class... Ts>
+    inline void for_each(F&& f, const std::tuple<Ts...>& t) noexcept(
+        noexcept(detail::for_each(std::forward<F>(f), t, std::make_index_sequence<sizeof...(Ts)>{}))
     )
     {
-        detail::for_each_impl<0, F, T...>(std::forward<F>(f), t);
+        detail::for_each(std::forward<F>(f), t, std::make_index_sequence<sizeof...(Ts)>{});
     }
 
     /*****************************
