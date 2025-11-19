@@ -84,6 +84,9 @@ namespace xt
         };
         EXPECT_EQ(8, accumulate(func_ne, 0, t));
         EXPECT_TRUE(noexcept(accumulate(func_ne, 0, t)));
+
+        const std::tuple<> t_empty{};
+        EXPECT_EQ(8, accumulate(func_ne, 8, t_empty));
     }
 
     template <class... T>

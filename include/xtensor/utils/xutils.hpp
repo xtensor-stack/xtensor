@@ -204,28 +204,27 @@ namespace xt
 
     namespace detail
     {
-        template <std::size_t I, class F, class R, class... T>
-        inline std::enable_if_t<I == sizeof...(T), R>
-        accumulate_impl(F&& /*f*/, R init, const std::tuple<T...>& /*t*/) noexcept
+        template <class F, class R, class... T, size_t... I>
+        R accumulate_impl(F&& f, R init, const std::tuple<T...>& t, std::index_sequence<I...> /*I*/) noexcept(
+            (noexcept(f(init, std::get<I>(t))) && ...)
+        )
         {
-            return init;
-        }
-
-        template <std::size_t I, class F, class R, class... T>
-            inline std::enable_if_t < I<sizeof...(T), R>
-            accumulate_impl(F&& f, R init, const std::tuple<T...>& t) noexcept(noexcept(f(init, std::get<I>(t))))
-        {
-            R res = f(init, std::get<I>(t));
-            return accumulate_impl<I + 1, F, R, T...>(std::forward<F>(f), res, t);
+            R res = init;
+            auto wrapper = [&](const auto& i, const auto& j)
+            {
+                res = f(i, j);
+            };
+            (wrapper(res, std::get<I>(t)), ...);
+            return res;
         }
     }
 
     template <class F, class R, class... T>
     inline R accumulate(F&& f, R init, const std::tuple<T...>& t) noexcept(
-        noexcept(detail::accumulate_impl<0, F, R, T...>(std::forward<F>(f), init, t))
+        noexcept(detail::accumulate_impl(std::forward<F>(f), init, t, std::make_index_sequence<sizeof...(T)>{}))
     )
     {
-        return detail::accumulate_impl<0, F, R, T...>(std::forward<F>(f), init, t);
+        return detail::accumulate_impl(std::forward<F>(f), init, t, std::make_index_sequence<sizeof...(T)>{});
     }
 
     /// @endcond
