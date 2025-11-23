@@ -669,7 +669,7 @@ namespace xt
     template <class It>
     inline auto xfunction<F, CT...>::element(It first, It last) const -> const_reference
     {
-        std::apply([&](auto&... e){
+        return std::apply([&](auto&... e){
             XTENSOR_TRY(check_element_index(shape(), first, last));
             return m_f(e.element(first, last)...);
         }, m_e);
