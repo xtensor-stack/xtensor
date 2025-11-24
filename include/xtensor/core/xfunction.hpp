@@ -478,6 +478,7 @@ namespace xt
         void step_leading();
 
     private:
+
         const xfunction_type* p_f;
         std::tuple<typename std::decay_t<CT>::const_stepper...> m_st;
     };
@@ -565,9 +566,13 @@ namespace xt
     template <class F, class... CT>
     inline layout_type xfunction<F, CT...>::layout() const noexcept
     {
-        return std::apply([&](auto&... e){
-            return compute_layout(e.layout()...);
-        }, m_e);
+        return std::apply(
+            [&](auto&... e)
+            {
+                return compute_layout(e.layout()...);
+            },
+            m_e
+        );
     }
 
     template <class F, class... CT>
@@ -603,12 +608,15 @@ namespace xt
         // The static cast prevents the compiler from instantiating the template methods with signed integers,
         // leading to warning about signed/unsigned conversions in the deeper layers of the access methods
 
-        return std::apply([&](auto&... e){
-            XTENSOR_TRY(check_index(shape(), args...));
-            XTENSOR_CHECK_DIMENSION(shape(), args...);
-            return m_f(e(args...)...);
-
-        }, m_e);
+        return std::apply(
+            [&](auto&... e)
+            {
+                XTENSOR_TRY(check_index(shape(), args...));
+                XTENSOR_CHECK_DIMENSION(shape(), args...);
+                return m_f(e(args...)...);
+            },
+            m_e
+        );
     }
 
     /**
@@ -623,9 +631,13 @@ namespace xt
     template <class F, class... CT>
     inline auto xfunction<F, CT...>::flat(size_type index) const -> const_reference
     {
-         return std::apply([&](auto&... e){        
-             return m_f(e.data_element(index)...);
-            }, m_e);
+        return std::apply(
+            [&](auto&... e)
+            {
+                return m_f(e.data_element(index)...);
+            },
+            m_e
+        );
     }
 
     /**
@@ -653,9 +665,13 @@ namespace xt
     {
         // The static cast prevents the compiler from instantiating the template methods with signed integers,
         // leading to warning about signed/unsigned conversions in the deeper layers of the access methods
-        return std::apply([&](const auto&... e){
-            return m_f(e.unchecked(static_cast<size_type>(args)...)...);        
-        }, m_e);
+        return std::apply(
+            [&](const auto&... e)
+            {
+                return m_f(e.unchecked(static_cast<size_type>(args)...)...);
+            },
+            m_e
+        );
     }
 
     /**
@@ -669,10 +685,14 @@ namespace xt
     template <class It>
     inline auto xfunction<F, CT...>::element(It first, It last) const -> const_reference
     {
-        return std::apply([&](auto&... e){
-            XTENSOR_TRY(check_element_index(shape(), first, last));
-            return m_f(e.element(first, last)...);
-        }, m_e);
+        return std::apply(
+            [&](auto&... e)
+            {
+                XTENSOR_TRY(check_element_index(shape(), first, last));
+                return m_f(e.element(first, last)...);
+            },
+            m_e
+        );
     }
 
     //@}
@@ -806,9 +826,13 @@ namespace xt
     template <class F, class... CT>
     inline auto xfunction<F, CT...>::data_element(size_type i) const -> const_reference
     {
-        return std::apply([&](auto&... e){        
-             return m_f(e.data_element(i)...);
-            }, m_e);
+        return std::apply(
+            [&](auto&... e)
+            {
+                return m_f(e.data_element(i)...);
+            },
+            m_e
+        );
     }
 
     template <class F, class... CT>
@@ -822,9 +846,13 @@ namespace xt
     template <class align, class requested_type, std::size_t N>
     inline auto xfunction<F, CT...>::load_simd(size_type i) const -> simd_return_type<requested_type>
     {
-        return std::apply([&](auto&... e){
-            return m_f.simd_apply((e.template load_simd<align, requested_type>(i))...);
-        },m_e);
+        return std::apply(
+            [&](auto&... e)
+            {
+                return m_f.simd_apply((e.template load_simd<align, requested_type>(i))...);
+            },
+            m_e
+        );
     }
 
     template <class F, class... CT>
@@ -929,9 +957,13 @@ namespace xt
     template <class F, class... CT>
     inline auto xfunction_iterator<F, CT...>::operator*() const -> reference
     {
-        return std::apply([&](auto&... it){
-            return (p_f->m_f)(*it...);
-        }, m_it);
+        return std::apply(
+            [&](auto&... it)
+            {
+                return (p_f->m_f)(*it...);
+            },
+            m_it
+        );
     }
 
     template <class F, class... CT>
@@ -1077,18 +1109,26 @@ namespace xt
     template <class F, class... CT>
     inline auto xfunction_stepper<F, CT...>::operator*() const -> reference
     {
-        return std::apply([&](auto&... e){
-            return (p_f->m_f)(*e...);
-        }, m_st);
+        return std::apply(
+            [&](auto&... e)
+            {
+                return (p_f->m_f)(*e...);
+            },
+            m_st
+        );
     }
 
     template <class F, class... CT>
     template <class T>
     inline auto xfunction_stepper<F, CT...>::step_simd() -> simd_return_type<T>
     {
-        return std::apply([&](auto&... st){
-            return (p_f->m_f.simd_apply)(st.template step_simd<T>()...);
-        }, m_st);
+        return std::apply(
+            [&](auto&... st)
+            {
+                return (p_f->m_f.simd_apply)(st.template step_simd<T>()...);
+            },
+            m_st
+        );
     }
 
     template <class F, class... CT>
