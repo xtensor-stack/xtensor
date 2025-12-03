@@ -66,6 +66,7 @@ roll
     xt::xarray<int> a = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
     auto t0 = xt::roll(a, 2);
     auto t1 = xt::roll(a, 2, 1);
+    auto t2 = xt::roll(a, {1, 2}, {0, 1});
 
 rot90
 -----
