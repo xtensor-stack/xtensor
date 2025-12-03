@@ -111,6 +111,7 @@ set(XTENSOR_BENCHMARK
     benchmark_math.cpp
     benchmark_random.cpp
     benchmark_reducer.cpp
+    benchmark_roll.cpp
     benchmark_views.cpp
     benchmark_xshape.cpp
     benchmark_view_access.cpp
