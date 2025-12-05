@@ -502,6 +502,18 @@ namespace xt
 
         xarray<double> expected8 = {{{3, 1, 2}}, {{6, 4, 5}}, {{9, 7, 8}}};
         ASSERT_EQ(expected8, xt::roll(e2, -2, /*axis*/ 2));
+
+        EXPECT_THROW(xt::roll(e2, 1, /*axis*/ 3), std::runtime_error);
+        EXPECT_THROW(xt::roll(e2, 1, /*axis*/ -4), std::runtime_error);
+
+        xarray<double> expected9 = {{{3, 1, 2}}, {{6, 4, 5}}, {{9, 7, 8}}};
+        ASSERT_EQ(expected9, xt::roll(e2, -2, /*axis*/ -1));
+
+        xarray<double> expected10 = {{{1, 2, 3}}, {{4, 5, 6}}, {{7, 8, 9}}};
+        ASSERT_EQ(expected10, xt::roll(e2, -2, /*axis*/ -2));
+
+        xarray<double> expected11 = {{{4, 5, 6}}, {{7, 8, 9}}, {{1, 2, 3}}};
+        ASSERT_EQ(expected11, xt::roll(e2, 2, /*axis*/ -3));
     }
 
     TEST(xmanipulation, repeat_all_elements_of_axis_0_of_int_array_2_times)
