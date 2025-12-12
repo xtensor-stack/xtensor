@@ -28,9 +28,9 @@
 #include "xtensor/generators/xbuilder.hpp"
 #include "xtensor/generators/xrandom.hpp"
 #include "xtensor/misc/xmanipulation.hpp"
+#include "xtensor/views/index_mapper.hpp"
 #include "xtensor/views/xstrided_view.hpp"
 #include "xtensor/views/xview.hpp"
-#include "xtensor/views/index_mapper.hpp"
 
 namespace xt
 {
@@ -152,42 +152,42 @@ namespace xt
         std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
 
         auto view1 = view(a, 1, range(1, 4));
-        
+
         index_mapper<decltype(view1)> mapper1;
-        
+
         EXPECT_EQ(a(1, 1), mapper1.map(a, view1, 0));
         EXPECT_EQ(a(1, 2), mapper1.map(a, view1, 1));
         EXPECT_EQ(size_t(1), mapper1.dimension());
         //~ XT_EXPECT_ANY_THROW(mapper1.map_at(a, view1, 10));
-        
+
         auto view0 = view(a, 0, range(0, 3));
         index_mapper<decltype(view0)> mapper0;
-        
+
         EXPECT_EQ(a(0, 0), mapper0.map(a, view0, 0));
         EXPECT_EQ(a(0, 1), mapper0.map(a, view0, 1));
         EXPECT_EQ(size_t(1), mapper0.dimension());
-        
+
         auto view2 = view(a, range(0, 2), 2);
         index_mapper<decltype(view2)> mapper2;
         EXPECT_EQ(a(0, 2), mapper2.map(a, view2, 0));
         EXPECT_EQ(a(1, 2), mapper2.map(a, view2, 1));
         EXPECT_EQ(size_t(1), mapper2.dimension());
-        
+
         //~ auto view4 = view(a, 1);
         //~ index_mapper<decltype(view4)> mapper4;
         //~ EXPECT_EQ(size_t(1), mapper4.dimension());
-        //~ 
+        //~
         //~ auto view5 = view(view4, 1);
         //~ index_mapper<decltype(view5)> mapper5;
         //~ EXPECT_EQ(size_t(0), mapper5.dimension());
-        
+
         auto view6 = view(a, 1, all());
         index_mapper<decltype(view6)> mapper6;
         EXPECT_EQ(a(1, 0), mapper6.map(a, view6, 0));
         EXPECT_EQ(a(1, 1), mapper6.map(a, view6, 1));
         EXPECT_EQ(a(1, 2), mapper6.map(a, view6, 2));
         EXPECT_EQ(a(1, 3), mapper6.map(a, view6, 3));
-        
+
         auto view7 = view(a, all(), 2);
         index_mapper<decltype(view7)> mapper7;
         EXPECT_EQ(a(0, 2), mapper7.map(a, view7, 0));
@@ -334,14 +334,13 @@ namespace xt
 
         auto view1 = view(a, 1, all(), all());
         index_mapper<decltype(view1)> mapper1;
-        
+
         EXPECT_EQ(size_t(2), mapper1.dimension());
-        std::cout << "===================================" << std::endl;
         EXPECT_EQ(a(1, 0, 0), mapper1.map(a, view1, 0, 0));
         EXPECT_EQ(a(1, 0, 1), mapper1.map(a, view1, 0, 1));
-        //~ EXPECT_EQ(a(1, 1, 0), mapper1.map(a, view1, 1, 0));
-        //~ EXPECT_EQ(a(1, 1, 1), mapper1.map(a, view1, 1, 1));
-        //~ XT_EXPECT_ANY_THROW(mapper1.map_at(a, view1, 10, 10));
+        EXPECT_EQ(a(1, 1, 0), mapper1.map(a, view1, 1, 0));
+        EXPECT_EQ(a(1, 1, 1), mapper1.map(a, view1, 1, 1));
+        XT_EXPECT_ANY_THROW(mapper1.map_at(a, view1, 10, 10));
     }
 
     TEST(xview, integral_count)
