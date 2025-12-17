@@ -45,19 +45,31 @@ namespace xt
     template <class UnderlyingContainer, class... Slices>
     class index_mapper<xt::xview<UnderlyingContainer, Slices...>>
     {
-        static constexpr size_t n_slices = sizeof...(Slices);  ///<  @brief Total number of slices in the view
-        static constexpr size_t n_free = ((!std::is_integral_v<Slices>) +...);  ///<  @brief Number of free
-                                                                                ///<  (non-integral) slices
+        /// @brief Total number of explicitly passed slices in the view
+        static constexpr size_t n_slices = sizeof...(Slices);
+
+        /// @brief Number of slices that are integral constants (fixed indices)
+        static constexpr size_t nb_integral_slices = (std::is_integral_v<Slices> + ...);
+
+        /// @brief Number of slices that are xt::newaxis (insert a  dimension)
+        static constexpr size_t nb_new_axis_slices = (xt::detail::is_newaxis<Slices>::value + ...);
+
+        /**
+         * Compute how many indices are needed to address the underlying container
+         * when given N indices in the view.
+         */
+        template <std::integral... Indices>
+        static constexpr size_t n_indices_full_v = size_t(
+            sizeof...(Indices) + nb_integral_slices - nb_new_axis_slices
+        );
 
     public:
 
-        using view_type = xt::xview<UnderlyingContainer, Slices...>;  ///<   @brief The view type this mapper
-                                                                      ///<   works with
+        /// @brief The view type this mapper works with
+        using view_type = xt::xview<UnderlyingContainer, Slices...>;
 
-        using value_type = typename xt::xview<UnderlyingContainer, Slices...>::value_type;  ///<  @brief Value
-                                                                                            ///<  type of the
-                                                                                            ///<  underlying
-                                                                                            ///<  container
+        ///<  @brief Value type of the underlying container
+        using value_type = typename xt::xview<UnderlyingContainer, Slices...>::value_type;
 
     private:
 
@@ -65,37 +77,44 @@ namespace xt
         template <size_t I>
         using ith_slice_type = std::tuple_element_t<I, std::tuple<Slices...>>;
 
+        /// @brief True if the I-th slice is an integral slice (fixed index)
+        template <size_t I>
+        static consteval bool is_ith_slice_integral();
+
+        /// @brief True if the I-th slice is a newaxis slice
+        template <size_t I>
+        static consteval bool is_ith_slice_new_axis();
+
         /**
-         * @brief Helper metafunction to generate an index sequence excluding newaxis slices.
+         * Helper metafunction to build an index_sequence that skips
+         * newaxis slices.
          *
-         * This recursive template builds an `std::index_sequence` containing indices of slices
-         * that are not `xt::newaxis`. Newaxis slices increase dimensionality but don't correspond
-         * to actual dimensions in the underlying container.
-         *
-         * @tparam first Current slice index being processed.
-         * @tparam indices... Accumulated indices of non-newaxis slices.
+         * The resulting sequence contains only the indices that
+         * correspond to real container dimensions.
          */
-        template <size_t first, size_t... indices>
+        template <size_t first, size_t bound, size_t... indices>
         struct indices_sequence_helper
         {
-            using not_new_axis_type = typename indices_sequence_helper<first + 1, indices..., first>::Type;  // we add the current axis
-            using new_axis_type = typename indices_sequence_helper<first + 1, indices...>::Type;  // we skip
-                                                                                                  // the
-                                                                                                  // current
-                                                                                                  // axis
+            // we add the current axis
+            using not_new_axis_type = typename indices_sequence_helper<first + 1, bound, indices..., first>::Type;
 
-            using Type = std::conditional_t<xt::detail::is_newaxis<ith_slice_type<first>>::value, new_axis_type, not_new_axis_type>;
+            // we skip the current axis
+            using new_axis_type = typename indices_sequence_helper<first + 1, bound, indices...>::Type;
+
+            // NOTE: is_ith_slice_new_axis works even if first >= sizeof...(Slices)
+            using Type = std::conditional_t<is_ith_slice_new_axis<first>(), new_axis_type, not_new_axis_type>;
         };
 
         /// @brief Base case: recursion termination
-        template <size_t... indices>
-        struct indices_sequence_helper<n_slices, indices...>
+        template <size_t bound, size_t... indices>
+        struct indices_sequence_helper<bound, bound, indices...>
         {
             using Type = std::index_sequence<indices...>;
         };
 
-        /// @brief Index sequence of non-newaxis
-        using indices_sequence = indices_sequence_helper<0>::Type;
+        ///<  @brief Index sequence of non-newaxis slices
+        template <size_t bound>
+        using indices_sequence = indices_sequence_helper<0, bound>::Type;
 
         /**
          * @brief Maps an index for a specific slice to the corresponding index in the underlying container.
@@ -124,12 +143,12 @@ namespace xt
          * @param indices Array of indices for all slices.
          * @return value_type The value at the mapped location in the container.
          */
-        template <size_t... Is>
+        template <size_t n_indices, size_t... Is>
         value_type map_all_indices(
             const UnderlyingContainer& container,
             const view_type& view,
             std::index_sequence<Is...>,
-            const std::array<size_t, n_slices>& indices
+            const std::array<size_t, n_indices>& indices
         ) const;
 
         /**
@@ -145,13 +164,17 @@ namespace xt
          *
          * @throws std::out_of_range if any index is out of bounds.
          */
-        template <size_t... Is>
+        template <size_t n_indices, size_t... Is>
         value_type map_at_all_indices(
             const UnderlyingContainer& container,
             const view_type& view,
             std::index_sequence<Is...>,
-            const std::array<size_t, n_slices>& indices
+            const std::array<size_t, n_indices>& indices
         ) const;
+
+        /// @brief Expand view indices into a full index array, inserting dummy indices for integral slices
+        template <std::integral... Indices>
+        std::array<size_t, n_indices_full_v<Indices...>> get_indices_full(const Indices... indices) const;
 
     public:
 
@@ -167,19 +190,15 @@ namespace xt
          * @param indices The indices for the free dimensions of the view.
          * @return value_type The value at the mapped location in the container.
          *
-         * @note The number of provided indices must equal `n_free` (number of non-integral slices).
-         *
          * @example
          * @code
          * // For view(a, 1, all(), all()):
-         * // n_free = 2 (two all() slices)
          * mapper.map(a, view, i, j);  // Maps to a(1, i, j)
          * @endcode
          */
         template <std::integral... Indices>
         value_type
-        map(const UnderlyingContainer& container, const view_type& view, const Indices... indices) const
-            requires(sizeof...(Indices) == n_free);
+        map(const UnderlyingContainer& container, const view_type& view, const Indices... indices) const;
 
         /**
          * @brief Maps view indices to container indices with bounds checking.
@@ -196,18 +215,66 @@ namespace xt
          */
         template <std::integral... Indices>
         value_type
-        map_at(const UnderlyingContainer& container, const view_type& view, const Indices... indices) const
-            requires(sizeof...(Indices) == n_free);
+        map_at(const UnderlyingContainer& container, const view_type& view, const Indices... indices) const;
 
-        constexpr size_t dimension() const
-        {
-            return n_free;
-        }
+        /// @brief Return the dimensionality of the view
+        size_t dimension(const UnderlyingContainer& container) const;
     };
 
     /*******************************
      * index_mapper implementation *
      *******************************/
+
+    template <class UnderlyingContainer, class... Slices>
+    template <size_t I>
+    consteval bool index_mapper<xt::xview<UnderlyingContainer, Slices...>>::is_ith_slice_integral()
+    {
+        if constexpr (I < sizeof...(Slices))
+        {
+            return std::is_integral_v<ith_slice_type<I>>;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    template <class UnderlyingContainer, class... Slices>
+    template <size_t I>
+    consteval bool index_mapper<xt::xview<UnderlyingContainer, Slices...>>::is_ith_slice_new_axis()
+    {
+        if constexpr (I < sizeof...(Slices))
+        {
+            return xt::detail::is_newaxis<ith_slice_type<I>>::value;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    template <class UnderlyingContainer, class... Slices>
+    template <std::integral... Indices>
+    auto
+    index_mapper<xt::xview<UnderlyingContainer, Slices...>>::get_indices_full(const Indices... indices) const
+        -> std::array<size_t, n_indices_full_v<Indices...>>
+    {
+        constexpr size_t n_indices_full = n_indices_full_v<Indices...>;
+
+        std::array<size_t, sizeof...(indices)> args{size_t(indices)...};
+        std::array<size_t, n_indices_full> args_full;
+
+        const auto fill_args_full = [&args_full, &args]<size_t... Is>(std::index_sequence<Is...>)
+        {
+            auto it = std::cbegin(args);
+
+            ((args_full[Is] = (is_ith_slice_integral<Is>()) ? size_t(0) : *it++), ...);
+        };
+
+        fill_args_full(std::make_index_sequence<n_indices_full>{});
+
+        return args_full;
+    }
 
     template <class UnderlyingContainer, class... Slices>
     template <std::integral... Indices>
@@ -216,14 +283,10 @@ namespace xt
         const view_type& view,
         const Indices... indices
     ) const -> value_type
-        requires(sizeof...(Indices) == n_free)
     {
-        std::array<size_t, sizeof...(indices)> args{size_t(indices)...};
+        constexpr size_t n_indices_full = n_indices_full_v<Indices...>;
 
-        auto it = std::cbegin(args);
-        std::array<size_t, n_slices> args_full{(std::is_integral_v<Slices> ? size_t(0) : *it++)...};
-
-        return map_all_indices(container, view, indices_sequence{}, args_full);
+        return map_all_indices(container, view, indices_sequence<n_indices_full>{}, get_indices_full(indices...));
     }
 
     template <class UnderlyingContainer, class... Slices>
@@ -233,35 +296,31 @@ namespace xt
         const view_type& view,
         const Indices... indices
     ) const -> value_type
-        requires(sizeof...(Indices) == n_free)
     {
-        std::array<size_t, sizeof...(indices)> args{size_t(indices)...};
+        constexpr size_t n_indices_full = n_indices_full_v<Indices...>;
 
-        auto it = std::cbegin(args);
-        std::array<size_t, n_slices> args_full{(std::is_integral_v<Slices> ? size_t(0) : *it++)...};
-
-        return map_at_all_indices(container, view, indices_sequence{}, args_full);
+        return map_at_all_indices(container, view, indices_sequence<n_indices_full>{}, get_indices_full(indices...));
     }
 
     template <class UnderlyingContainer, class... Slices>
-    template <size_t... Is>
+    template <size_t n_indices, size_t... Is>
     auto index_mapper<xt::xview<UnderlyingContainer, Slices...>>::map_all_indices(
         const UnderlyingContainer& container,
         const view_type& view,
         std::index_sequence<Is...>,
-        const std::array<size_t, n_slices>& indices
+        const std::array<size_t, n_indices>& indices
     ) const -> value_type
     {
         return container(map_ith_index<Is>(view, indices[Is])...);
     }
 
     template <class UnderlyingContainer, class... Slices>
-    template <size_t... Is>
+    template <size_t n_indices, size_t... Is>
     auto index_mapper<xt::xview<UnderlyingContainer, Slices...>>::map_at_all_indices(
         const UnderlyingContainer& container,
         const view_type& view,
         std::index_sequence<Is...>,
-        const std::array<size_t, n_slices>& indices
+        const std::array<size_t, n_indices>& indices
     ) const -> value_type
     {
         return container.at(map_ith_index<Is>(view, indices[Is])...);
@@ -273,22 +332,38 @@ namespace xt
     index_mapper<xt::xview<UnderlyingContainer, Slices...>>::map_ith_index(const view_type& view, const Index i) const
         -> size_t
     {
-        using current_slice = std::tuple_element_t<I, std::tuple<Slices...>>;
-
-        static_assert(not xt::detail::is_newaxis<current_slice>::value);
-
-        const auto& slice = std::get<I>(view.slices());
-
-        if constexpr (std::is_integral_v<current_slice>)
+        if constexpr (I < sizeof...(Slices))
         {
-            assert(i == 0);
-            return size_t(slice);
+            // if the slice is explicitly specified, use it
+            using current_slice = std::tuple_element_t<I, std::tuple<Slices...>>;
+
+            static_assert(not xt::detail::is_newaxis<current_slice>::value);
+
+            const auto& slice = std::get<I>(view.slices());
+
+            if constexpr (std::is_integral_v<current_slice>)
+            {
+                assert(i == 0);
+                return size_t(slice);
+            }
+            else
+            {
+                assert(i < slice.size());
+                return size_t(slice(i));
+            }
         }
         else
         {
-            assert(i < slice.size());
-            return size_t(slice(i));
+            // else assume xt::all
+            return i;
         }
+    }
+
+    template <class UnderlyingContainer, class... Slices>
+    auto index_mapper<xt::xview<UnderlyingContainer, Slices...>>::dimension(const UnderlyingContainer& container
+    ) const -> size_t
+    {
+        return container.dimension() - nb_integral_slices + nb_new_axis_slices;
     }
 
 }  // namespace xt

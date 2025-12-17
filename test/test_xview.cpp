@@ -157,29 +157,29 @@ namespace xt
 
         EXPECT_EQ(a(1, 1), mapper1.map(a, view1, 0));
         EXPECT_EQ(a(1, 2), mapper1.map(a, view1, 1));
-        EXPECT_EQ(size_t(1), mapper1.dimension());
-        //~ XT_EXPECT_ANY_THROW(mapper1.map_at(a, view1, 10));
+        EXPECT_EQ(size_t(1), mapper1.dimension(a));
+        XT_EXPECT_ANY_THROW(mapper1.map_at(a, view1, 10));
 
         auto view0 = view(a, 0, range(0, 3));
         index_mapper<decltype(view0)> mapper0;
 
         EXPECT_EQ(a(0, 0), mapper0.map(a, view0, 0));
         EXPECT_EQ(a(0, 1), mapper0.map(a, view0, 1));
-        EXPECT_EQ(size_t(1), mapper0.dimension());
+        EXPECT_EQ(size_t(1), mapper0.dimension(a));
 
         auto view2 = view(a, range(0, 2), 2);
         index_mapper<decltype(view2)> mapper2;
         EXPECT_EQ(a(0, 2), mapper2.map(a, view2, 0));
         EXPECT_EQ(a(1, 2), mapper2.map(a, view2, 1));
-        EXPECT_EQ(size_t(1), mapper2.dimension());
+        EXPECT_EQ(size_t(1), mapper2.dimension(a));
 
-        //~ auto view4 = view(a, 1);
-        //~ index_mapper<decltype(view4)> mapper4;
-        //~ EXPECT_EQ(size_t(1), mapper4.dimension());
-        //~
-        //~ auto view5 = view(view4, 1);
-        //~ index_mapper<decltype(view5)> mapper5;
-        //~ EXPECT_EQ(size_t(0), mapper5.dimension());
+        auto view4 = view(a, 1);
+        index_mapper<decltype(view4)> mapper4;
+        EXPECT_EQ(size_t(1), mapper4.dimension(a));
+
+        auto view5 = view(view4, 1);
+        index_mapper<decltype(view5)> mapper5;
+        EXPECT_EQ(size_t(0), mapper5.dimension(view4));
 
         auto view6 = view(a, 1, all());
         index_mapper<decltype(view6)> mapper6;
@@ -193,6 +193,25 @@ namespace xt
         EXPECT_EQ(a(0, 2), mapper7.map(a, view7, 0));
         EXPECT_EQ(a(1, 2), mapper7.map(a, view7, 1));
         EXPECT_EQ(a(2, 2), mapper7.map(a, view7, 2));
+    }
+
+    TEST(xview_mapping, indices)
+    {
+        xarray<double> a = {{1., 2., 3.}, {4., 5., 6.}};
+
+        auto view1 = view(a, all(), all());
+        index_mapper<decltype(view1)> mapper1;
+
+        EXPECT_EQ(a(0, 2), mapper1.map(a, view1, 0, 2));
+        EXPECT_EQ(a(0, 2), mapper1.map(a, view1, 2));
+        EXPECT_EQ(a(1, 2), mapper1.map(a, view1, 1, 1, 2));
+
+        auto view2 = view(a, all());
+        index_mapper<decltype(view2)> mapper2;
+
+        EXPECT_EQ(a(0, 2), mapper2.map(a, view2, 0, 2));
+        EXPECT_EQ(a(0, 2), mapper2.map(a, view2, 2));
+        EXPECT_EQ(a(1, 2), mapper2.map(a, view2, 1, 1, 2));
     }
 
     TEST(xview, negative_index)
@@ -335,7 +354,7 @@ namespace xt
         auto view1 = view(a, 1, all(), all());
         index_mapper<decltype(view1)> mapper1;
 
-        EXPECT_EQ(size_t(2), mapper1.dimension());
+        EXPECT_EQ(size_t(2), mapper1.dimension(a));
         EXPECT_EQ(a(1, 0, 0), mapper1.map(a, view1, 0, 0));
         EXPECT_EQ(a(1, 0, 1), mapper1.map(a, view1, 0, 1));
         EXPECT_EQ(a(1, 1, 0), mapper1.map(a, view1, 1, 0));
