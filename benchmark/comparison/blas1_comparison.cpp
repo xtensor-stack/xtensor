@@ -15,197 +15,183 @@ namespace xt::comparison
 {
 
     //========================================================================
+    // Helpers
+    //========================================================================
+
+    // Benchmark range configuration
+    constexpr std::size_t min_size = 8;
+    constexpr std::size_t max_size = 16384;
+    constexpr std::size_t multiplier = 4;
+
+    // Helper to create xtensor vectors
+    inline auto make_xtensor(std::size_t size, double val)
+    {
+        return xt::xtensor<double, 1>::from_shape({size}) * val;
+    }
+
+    inline auto make_xtensor_zeros(std::size_t size)
+    {
+        auto c = xt::xtensor<double, 1>::from_shape({size});
+        c.fill(0);
+        return c;
+    }
+
+    // Helper to create xarray
+    inline auto make_xarray(std::size_t size, double val)
+    {
+        return xt::xarray<double>::from_shape({size}) * val;
+    }
+
+    // Macro for benchmark loop (reduces boilerplate)
+    #define BENCHMARK_LOOP(state, container, ...) \
+        for (auto _ : state) { \
+            __VA_ARGS__; \
+            benchmark::DoNotOptimize(container.data()); \
+        }
+
+    // Macro for registering benchmarks with standard sizes
+    #define REGISTER_BENCHMARK(func) \
+        BENCHMARK(func)->Range(min_size, max_size)->RangeMultiplier(multiplier)
+
+    //========================================================================
     // Vector Addition: z = x + y
     //========================================================================
 
-    // Raw C++ implementation with std::vector
-    static void add_vector_raw_cpp(benchmark::State& state)
+    static void add_vector_std(benchmark::State& state)
     {
-        using value_type = double;
-        using size_type = std::size_t;
+        const std::size_t size = state.range(0);
+        std::vector<double> x(size, 1.0);
+        std::vector<double> y(size, 2.0);
+        std::vector<double> z(size);
 
-        const size_type size = state.range(0);
-        std::vector<value_type> x(size, 1.0);
-        std::vector<value_type> y(size, 2.0);
-        std::vector<value_type> z(size);
-
-        for (auto _ : state)
-        {
-            for (size_type i = 0; i < size; ++i)
-            {
+        BENCHMARK_LOOP(state, z,
+            for (std::size_t i = 0; i < size; ++i)
                 z[i] = x[i] + y[i];
-            }
-            benchmark::DoNotOptimize(z.data());
-        }
+        );
     }
 
-    // xtensor implementation with xarray
-    static void add_vector_xtensor_xarray(benchmark::State& state)
+    static void add_vector_xarray(benchmark::State& state)
     {
-        using size_type = std::size_t;
+        const std::size_t size = state.range(0);
+        auto x = make_xarray(size, 1.0);
+        auto y = make_xarray(size, 2.0);
+        xt::xarray<double> z;
 
-        const size_type size = state.range(0);
-        xarray<double> x = xt::ones<double>({size});
-        xarray<double> y = 2.0 * xt::ones<double>({size});
-        xarray<double> z;
-
-        for (auto _ : state)
-        {
+        BENCHMARK_LOOP(state, z,
             z = x + y;
-            benchmark::DoNotOptimize(z.data());
-        }
+        );
     }
 
-    // xtensor implementation with xtensor (fixed size)
-    static void add_vector_xtensor_xtensor(benchmark::State& state)
+    static void add_vector_xtensor(benchmark::State& state)
     {
-        using size_type = std::size_t;
+        const std::size_t size = state.range(0);
+        auto x = make_xtensor(size, 1.0);
+        auto y = make_xtensor(size, 2.0);
+        xt::xtensor<double, 1> z;
 
-        const size_type size = state.range(0);
-        xtensor<double, 1> x = xt::ones<double>({size});
-        xtensor<double, 1> y = 2.0 * xt::ones<double>({size});
-        xtensor<double, 1> z;
-
-        for (auto _ : state)
-        {
+        BENCHMARK_LOOP(state, z,
             z = x + y;
-            benchmark::DoNotOptimize(z.data());
-        }
+        );
     }
 
-    // xtensor with noalias (avoids temporary allocation)
-    static void add_vector_xtensor_noalias(benchmark::State& state)
+    static void add_vector_noalias(benchmark::State& state)
     {
-        using size_type = std::size_t;
+        const std::size_t size = state.range(0);
+        auto x = make_xtensor(size, 1.0);
+        auto y = make_xtensor(size, 2.0);
+        auto z = make_xtensor_zeros(size);
 
-        const size_type size = state.range(0);
-        xtensor<double, 1> x = xt::ones<double>({size});
-        xtensor<double, 1> y = 2.0 * xt::ones<double>({size});
-        xtensor<double, 1> z = xt::zeros<double>({size});
-
-        for (auto _ : state)
-        {
+        BENCHMARK_LOOP(state, z,
             xt::noalias(z) = x + y;
-            benchmark::DoNotOptimize(z.data());
-        }
+        );
     }
 
     //========================================================================
-    // Scalar Addition: z = x + a (add_scalar)
+    // Scalar Addition: z = x + a
     //========================================================================
 
-    // Raw C++
-    static void add_scalar_raw_cpp(benchmark::State& state)
+    static void add_scalar_std(benchmark::State& state)
     {
-        using value_type = double;
-        using size_type = std::size_t;
+        const std::size_t size = state.range(0);
+        constexpr double a = 5.0;
+        std::vector<double> x(size, 1.0);
+        std::vector<double> z(size);
 
-        const size_type size = state.range(0);
-        const value_type a = 5.0;
-        std::vector<value_type> x(size, 1.0);
-        std::vector<value_type> z(size);
-
-        for (auto _ : state)
-        {
-            for (size_type i = 0; i < size; ++i)
-            {
+        BENCHMARK_LOOP(state, z,
+            for (std::size_t i = 0; i < size; ++i)
                 z[i] = x[i] + a;
-            }
-            benchmark::DoNotOptimize(z.data());
-        }
+        );
     }
 
-    // xtensor
     static void add_scalar_xtensor(benchmark::State& state)
     {
-        using size_type = std::size_t;
+        const std::size_t size = state.range(0);
+        constexpr double a = 5.0;
+        auto x = make_xtensor(size, 1.0);
+        xt::xtensor<double, 1> z;
 
-        const size_type size = state.range(0);
-        const double a = 5.0;
-        xtensor<double, 1> x = xt::ones<double>({size});
-        xtensor<double, 1> z;
-
-        for (auto _ : state)
-        {
+        BENCHMARK_LOOP(state, z,
             z = x + a;
-            benchmark::DoNotOptimize(z.data());
-        }
+        );
     }
 
-    // xtensor with noalias
-    static void add_scalar_xtensor_noalias(benchmark::State& state)
+    static void add_scalar_noalias(benchmark::State& state)
     {
-        using size_type = std::size_t;
+        const std::size_t size = state.range(0);
+        constexpr double a = 5.0;
+        auto x = make_xtensor(size, 1.0);
+        auto z = make_xtensor_zeros(size);
 
-        const size_type size = state.range(0);
-        const double a = 5.0;
-        xtensor<double, 1> x = xt::ones<double>({size});
-        xtensor<double, 1> z = xt::zeros<double>({size});
-
-        for (auto _ : state)
-        {
+        BENCHMARK_LOOP(state, z,
             xt::noalias(z) = x + a;
-            benchmark::DoNotOptimize(z.data());
-        }
+        );
     }
 
     //========================================================================
     // Scalar Multiplication: y = a * x
     //========================================================================
 
-    // Raw C++
-    static void mul_scalar_raw_cpp(benchmark::State& state)
+    static void mul_scalar_std(benchmark::State& state)
     {
-        using value_type = double;
-        using size_type = std::size_t;
+        const std::size_t size = state.range(0);
+        constexpr double a = 2.5;
+        std::vector<double> x(size, 1.0);
+        std::vector<double> y(size);
 
-        const size_type size = state.range(0);
-        const value_type a = 2.5;
-        std::vector<value_type> x(size, 1.0);
-        std::vector<value_type> y(size);
-
-        for (auto _ : state)
-        {
-            for (size_type i = 0; i < size; ++i)
-            {
+        BENCHMARK_LOOP(state, y,
+            for (std::size_t i = 0; i < size; ++i)
                 y[i] = a * x[i];
-            }
-            benchmark::DoNotOptimize(y.data());
-        }
+        );
     }
 
-    // xtensor
     static void mul_scalar_xtensor(benchmark::State& state)
     {
-        using size_type = std::size_t;
+        const std::size_t size = state.range(0);
+        constexpr double a = 2.5;
+        auto x = make_xtensor(size, 1.0);
+        xt::xtensor<double, 1> y;
 
-        const size_type size = state.range(0);
-        const double a = 2.5;
-        xtensor<double, 1> x = xt::ones<double>({size});
-        xtensor<double, 1> y;
-
-        for (auto _ : state)
-        {
+        BENCHMARK_LOOP(state, y,
             y = a * x;
-            benchmark::DoNotOptimize(y.data());
-        }
+        );
     }
 
     //========================================================================
-    // Register benchmarks with different sizes
+    // Register benchmarks
     //========================================================================
 
-    // Vector sizes to test: 64, 256, 1024, 4096, 16384
-    BENCHMARK(add_vector_raw_cpp)->Range(64, 16384)->RangeMultiplier(4);
-    BENCHMARK(add_vector_xtensor_xarray)->Range(64, 16384)->RangeMultiplier(4);
-    BENCHMARK(add_vector_xtensor_xtensor)->Range(64, 16384)->RangeMultiplier(4);
-    BENCHMARK(add_vector_xtensor_noalias)->Range(64, 16384)->RangeMultiplier(4);
+    // Vector + Vector
+    REGISTER_BENCHMARK(add_vector_std);
+    REGISTER_BENCHMARK(add_vector_xarray);
+    REGISTER_BENCHMARK(add_vector_xtensor);
+    REGISTER_BENCHMARK(add_vector_noalias);
 
-    BENCHMARK(add_scalar_raw_cpp)->Range(64, 16384)->RangeMultiplier(4);
-    BENCHMARK(add_scalar_xtensor)->Range(64, 16384)->RangeMultiplier(4);
-    BENCHMARK(add_scalar_xtensor_noalias)->Range(64, 16384)->RangeMultiplier(4);
+    // Scalar operations
+    REGISTER_BENCHMARK(add_scalar_std);
+    REGISTER_BENCHMARK(add_scalar_xtensor);
+    REGISTER_BENCHMARK(add_scalar_noalias);
 
-    BENCHMARK(mul_scalar_raw_cpp)->Range(64, 16384)->RangeMultiplier(4);
-    BENCHMARK(mul_scalar_xtensor)->Range(64, 16384)->RangeMultiplier(4);
+    REGISTER_BENCHMARK(mul_scalar_std);
+    REGISTER_BENCHMARK(mul_scalar_xtensor);
 
 }
