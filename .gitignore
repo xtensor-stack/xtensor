@@ -66,4 +66,3 @@ __pycache__
 
 # Allow tag JSONs under etc/xeus-cpp
 !etc/xeus-cpp/tags.d/
-xbenchmark/
