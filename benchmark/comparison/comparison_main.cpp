@@ -3,6 +3,7 @@
  ****************************************************************************/
 
 #include <iostream>
+
 #include <benchmark/benchmark.h>
 
 // Custom main for comparison benchmarks

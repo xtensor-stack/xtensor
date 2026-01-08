@@ -5,6 +5,7 @@
 
 #include <cstddef>
 #include <vector>
+
 #include <benchmark/benchmark.h>
 
 #include "xtensor/containers/xarray.hpp"
@@ -42,16 +43,16 @@ namespace xt::comparison
         return xt::xarray<double>::from_shape({size}) * val;
     }
 
-    // Macro for benchmark loop (reduces boilerplate)
-    #define BENCHMARK_LOOP(state, container, ...) \
-        for (auto _ : state) { \
-            __VA_ARGS__; \
-            benchmark::DoNotOptimize(container.data()); \
-        }
+// Macro for benchmark loop (reduces boilerplate)
+#define BENCHMARK_LOOP(state, container, ...)       \
+    for (auto _ : state)                            \
+    {                                               \
+        __VA_ARGS__;                                \
+        benchmark::DoNotOptimize(container.data()); \
+    }
 
-    // Macro for registering benchmarks with standard sizes
-    #define REGISTER_BENCHMARK(func) \
-        BENCHMARK(func)->Range(min_size, max_size)->RangeMultiplier(multiplier)
+// Macro for registering benchmarks with standard sizes
+#define REGISTER_BENCHMARK(func) BENCHMARK(func)->Range(min_size, max_size)->RangeMultiplier(multiplier)
 
     //========================================================================
     // Vector Addition: z = x + y
@@ -64,10 +65,7 @@ namespace xt::comparison
         std::vector<double> y(size, 2.0);
         std::vector<double> z(size);
 
-        BENCHMARK_LOOP(state, z,
-            for (std::size_t i = 0; i < size; ++i)
-                z[i] = x[i] + y[i];
-        );
+        BENCHMARK_LOOP(state, z, for (std::size_t i = 0; i < size; ++i) z[i] = x[i] + y[i];);
     }
 
     static void add_vector_xarray(benchmark::State& state)
@@ -77,9 +75,7 @@ namespace xt::comparison
         auto y = make_xarray(size, 2.0);
         xt::xarray<double> z;
 
-        BENCHMARK_LOOP(state, z,
-            z = x + y;
-        );
+        BENCHMARK_LOOP(state, z, z = x + y;);
     }
 
     static void add_vector_xtensor(benchmark::State& state)
@@ -89,9 +85,7 @@ namespace xt::comparison
         auto y = make_xtensor(size, 2.0);
         xt::xtensor<double, 1> z;
 
-        BENCHMARK_LOOP(state, z,
-            z = x + y;
-        );
+        BENCHMARK_LOOP(state, z, z = x + y;);
     }
 
     static void add_vector_noalias(benchmark::State& state)
@@ -101,9 +95,7 @@ namespace xt::comparison
         auto y = make_xtensor(size, 2.0);
         auto z = make_xtensor_zeros(size);
 
-        BENCHMARK_LOOP(state, z,
-            xt::noalias(z) = x + y;
-        );
+        BENCHMARK_LOOP(state, z, xt::noalias(z) = x + y;);
     }
 
     //========================================================================
@@ -117,10 +109,7 @@ namespace xt::comparison
         std::vector<double> x(size, 1.0);
         std::vector<double> z(size);
 
-        BENCHMARK_LOOP(state, z,
-            for (std::size_t i = 0; i < size; ++i)
-                z[i] = x[i] + a;
-        );
+        BENCHMARK_LOOP(state, z, for (std::size_t i = 0; i < size; ++i) z[i] = x[i] + a;);
     }
 
     static void add_scalar_xtensor(benchmark::State& state)
@@ -130,9 +119,7 @@ namespace xt::comparison
         auto x = make_xtensor(size, 1.0);
         xt::xtensor<double, 1> z;
 
-        BENCHMARK_LOOP(state, z,
-            z = x + a;
-        );
+        BENCHMARK_LOOP(state, z, z = x + a;);
     }
 
     static void add_scalar_noalias(benchmark::State& state)
@@ -142,9 +129,7 @@ namespace xt::comparison
         auto x = make_xtensor(size, 1.0);
         auto z = make_xtensor_zeros(size);
 
-        BENCHMARK_LOOP(state, z,
-            xt::noalias(z) = x + a;
-        );
+        BENCHMARK_LOOP(state, z, xt::noalias(z) = x + a;);
     }
 
     //========================================================================
@@ -158,10 +143,7 @@ namespace xt::comparison
         std::vector<double> x(size, 1.0);
         std::vector<double> y(size);
 
-        BENCHMARK_LOOP(state, y,
-            for (std::size_t i = 0; i < size; ++i)
-                y[i] = a * x[i];
-        );
+        BENCHMARK_LOOP(state, y, for (std::size_t i = 0; i < size; ++i) y[i] = a * x[i];);
     }
 
     static void mul_scalar_xtensor(benchmark::State& state)
@@ -171,9 +153,7 @@ namespace xt::comparison
         auto x = make_xtensor(size, 1.0);
         xt::xtensor<double, 1> y;
 
-        BENCHMARK_LOOP(state, y,
-            y = a * x;
-        );
+        BENCHMARK_LOOP(state, y, y = a * x;);
     }
 
     //========================================================================
