@@ -7,10 +7,8 @@
  * The full license is in the file LICENSE, distributed with this software. *
  ****************************************************************************/
 
-#include <iostream>
 #include <sstream>
 
-#include "xtensor/core/xmath.hpp"
 #include "xtensor/io/xcsv.hpp"
 #include "xtensor/io/xio.hpp"
 
@@ -18,6 +16,19 @@
 
 namespace xt
 {
+    TEST(xcsv, load_1D)
+    {
+        const std::string source = "1, 2, 3, 4";
+
+        std::stringstream source_stream(source);
+
+        const xtensor<int, 2> res = load_csv<int>(source_stream);
+
+        const xtensor<int, 2> exp{{1, 2, 3, 4}};
+
+        ASSERT_TRUE(all(equal(res, exp)));
+    }
+
     TEST(xcsv, load_double)
     {
         std::string source = "1.0, 2.0, 3.0, 4.0\n"
@@ -47,6 +58,16 @@ namespace xt
         xtensor<double, 2> exp{{1.0, 2.0, 3.0, 4.0}, {10.0, 12.0, 15.0, 18.0}};
 
         ASSERT_TRUE(all(equal(res, exp)));
+    }
+
+    TEST(xcsv, dump_1D)
+    {
+        xtensor<double, 1> data{{1.0, 2.0, 3.0, 4.0}};
+
+        std::stringstream res;
+
+        dump_csv(res, data);
+        ASSERT_EQ("1,2,3,4\n", res.str());
     }
 
     TEST(xcsv, dump_double)

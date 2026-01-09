@@ -10,7 +10,6 @@
 #ifndef XTENSOR_CSV_HPP
 #define XTENSOR_CSV_HPP
 
-#include <exception>
 #include <istream>
 #include <iterator>
 #include <sstream>
@@ -211,29 +210,39 @@ namespace xt
     {
         using size_type = typename E::size_type;
         const E& ex = e.derived_cast();
-        if (ex.dimension() != 2)
+        if (ex.dimension() == 1)
         {
-            XTENSOR_THROW(std::runtime_error, "Only 2-D expressions can be serialized to CSV");
-        }
-        size_type nbrows = ex.shape()[0], nbcols = ex.shape()[1];
-        auto st = ex.stepper_begin(ex.shape());
-        for (size_type r = 0; r != nbrows; ++r)
-        {
-            for (size_type c = 0; c != nbcols; ++c)
+            const size_type n = ex.shape()[0];
+            for (size_type i = 0; i != n; ++i)
             {
-                stream << *st;
-                if (c != nbcols - 1)
+                stream << ex(i);
+                if (i != n - 1)
                 {
-                    st.step(1);
                     stream << ',';
                 }
-                else
-                {
-                    st.reset(1);
-                    st.step(0);
-                    stream << std::endl;
-                }
             }
+            stream << std::endl;
+        }
+        else if (ex.dimension() == 2)
+        {
+            const size_type nbrows = ex.shape()[0];
+            const size_type nbcols = ex.shape()[1];
+            for (size_type r = 0; r != nbrows; ++r)
+            {
+                for (size_type c = 0; c != nbcols; ++c)
+                {
+                    stream << ex(r, c);
+                    if (c != nbcols - 1)
+                    {
+                        stream << ',';
+                    }
+                }
+                stream << std::endl;
+            }
+        }
+        else
+        {
+            XTENSOR_THROW(std::runtime_error, "Only 1-D and 2-D expressions can be serialized to CSV");
         }
     }
 
