@@ -70,6 +70,54 @@ in the returned expression.
 Replacing ``auto tmp`` with ``xt::xarray<double> tmp`` does not change anything, ``tmp``
 is still an lvalue and thus captured by reference.
 
+.. warning::
+
+    This issue is particularly subtle with reducer functions like :cpp:func:`xt::amax`,
+    :cpp:func:`xt::sum`, etc. Consider the following function:
+
+    .. code::
+
+        template <typename T>
+        xt::xtensor<T, 2> logSoftmax(const xt::xtensor<T, 2> &matrix)
+        {
+            xt::xtensor<T, 2> maxVals = xt::amax(matrix, {1}, xt::keep_dims);
+            auto shifted = matrix - maxVals;
+            auto expVals = xt::exp(shifted);
+            auto sumExp = xt::sum(expVals, {1}, xt::keep_dims);
+            return shifted - xt::log(sumExp);
+        }
+
+    This function may produce incorrect results or crash, especially in optimized builds.
+    The issue is that ``shifted``, ``expVals``, and ``sumExp`` are all lazy expressions
+    that hold references to local variables. When the function returns, these local
+    variables are destroyed, and the returned expression contains dangling references.
+
+    The fix is to use explicit container types to force evaluation:
+
+    .. code::
+
+        template <typename T>
+        xt::xtensor<T, 2> logSoftmax(const xt::xtensor<T, 2> &matrix)
+        {
+            xt::xtensor<T, 2> maxVals = xt::amax(matrix, {1}, xt::keep_dims);
+            xt::xtensor<T, 2> shifted = matrix - maxVals;
+            xt::xtensor<T, 2> expVals = xt::exp(shifted);
+            xt::xtensor<T, 2> sumExp = xt::sum(expVals, {1}, xt::keep_dims);
+            return shifted - xt::log(sumExp);
+        }
+
+    Alternatively, you can use :cpp:func:`xt::eval` to force evaluation:
+
+    .. code::
+
+        auto shifted = xt::eval(matrix - maxVals);
+
+    Or use the immediate evaluation strategy for reducers:
+
+    .. code::
+
+        auto sumExp = xt::sum(expVals, {1}, xt::evaluation_strategy::immediate | xt::keep_dims);
+
 Random numbers not consistent
 -----------------------------
 
