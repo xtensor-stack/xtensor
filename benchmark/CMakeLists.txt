@@ -144,3 +144,10 @@ add_custom_target(xpowerbench
     COMMAND benchmark_xtensor --benchmark_out=results.csv --benchmark_out_format=csv
     COMMAND sudo cpupower frequency-set --governor powersave
     DEPENDS ${XTENSOR_BENCHMARK_TARGET})
+
+# Comparison benchmarks (xtensor vs raw C++)
+option(XTENSOR_BUILD_COMPARISON_BENCHMARKS "Build comparison benchmarks vs raw C++" OFF)
+
+if(XTENSOR_BUILD_COMPARISON_BENCHMARKS)
+    add_subdirectory(comparison)
+endif()
