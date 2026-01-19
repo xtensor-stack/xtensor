@@ -1033,6 +1033,77 @@ namespace xt
             }
             return to;
         }
+
+        /**
+         * Multi-axis roll using pointer arithmetic.
+         * Algorithm extended from single-axis roll above.
+         *
+         * @param to output iterator
+         * @param from input iterator
+         * @param shifts normalized shift values for each axis (size == shape.size())
+         * @param shape the shape of the tensor
+         * @param M current dimension being processed
+         */
+        template <class To, class From, class Shifts, class S>
+        To roll_multi(To to, From from, const Shifts& shifts, const S& shape, std::size_t M)
+        {
+            std::ptrdiff_t dim = static_cast<std::ptrdiff_t>(shape[M]);
+            std::ptrdiff_t offset = std::accumulate(
+                shape.begin() + M + 1,
+                shape.end(),
+                std::ptrdiff_t(1),
+                std::multiplies<std::ptrdiff_t>()
+            );
+            std::ptrdiff_t shift = shifts[M];
+
+            if (shape.size() == M + 1)
+            {
+                // Innermost dimension: direct copy
+                if (shift != 0)
+                {
+                    const auto split = from + (dim - shift) * offset;
+                    for (auto iter = split, end = from + dim * offset; iter != end; iter += offset, ++to)
+                    {
+                        *to = *iter;
+                    }
+                    for (auto iter = from, end = split; iter != end; iter += offset, ++to)
+                    {
+                        *to = *iter;
+                    }
+                }
+                else
+                {
+                    for (auto iter = from, end = from + dim * offset; iter != end; iter += offset, ++to)
+                    {
+                        *to = *iter;
+                    }
+                }
+            }
+            else
+            {
+                // Recursive case: process current dimension, then recurse
+                if (shift != 0)
+                {
+                    const auto split = from + (dim - shift) * offset;
+                    for (auto iter = split, end = from + dim * offset; iter != end; iter += offset)
+                    {
+                        to = roll_multi(to, iter, shifts, shape, M + 1);
+                    }
+                    for (auto iter = from, end = split; iter != end; iter += offset)
+                    {
+                        to = roll_multi(to, iter, shifts, shape, M + 1);
+                    }
+                }
+                else
+                {
+                    for (auto iter = from, end = from + dim * offset; iter != end; iter += offset)
+                    {
+                        to = roll_multi(to, iter, shifts, shape, M + 1);
+                    }
+                }
+            }
+            return to;
+        }
     }
 
     /**
@@ -1071,6 +1142,87 @@ namespace xt
 
         detail::roll(cpy.begin(), e.begin(), shift, saxis, shape, 0);
         return cpy;
+    }
+
+    /**
+     * Roll an expression along multiple axes.
+     *
+     * Elements that roll beyond the last position are re-introduced at the first.
+     * This function does not change the input expression.
+     *
+     * @ingroup xt_xmanipulation
+     * @param e the input xexpression
+     * @param shifts container of shift values for each axis
+     * @param axes container of axes along which elements are shifted
+     * @return a rolled copy of the input expression
+     *
+     * @note shifts and axes must have the same size. Each element in shifts
+     *       corresponds to the shift amount for the axis at the same position in axes.
+     * @note If the same axis appears multiple times, the shifts are accumulated.
+     * @note Negative axis indices are supported (e.g., -1 refers to the last axis).
+     *
+     * Example:
+     * @code
+     * xt::xarray<int> a = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+     * auto result = xt::roll(a, {1, 2}, {0, 1});  // roll 1 on axis 0, roll 2 on axis 1
+     * @endcode
+     */
+    template <class E, class S, class X, XTL_REQUIRES(std::negation<xtl::is_integral<std::decay_t<S>>>)>
+    inline auto roll(E&& e, S&& shifts, X&& axes)
+    {
+        XTENSOR_ASSERT(std::size(shifts) == std::size(axes));
+
+        if (std::size(shifts) == 0)
+        {
+            return empty_like(e) = e;
+        }
+
+        const auto dim = e.dimension();
+        auto cpy = empty_like(e);
+        const auto& shape = cpy.shape();
+
+        // Accumulate shifts per axis (like NumPy)
+        // and normalize to positive values in range [0, axis_size)
+        std::vector<std::ptrdiff_t> total_shifts(dim, 0);
+        auto shift_it = std::begin(shifts);
+        auto axis_it = std::begin(axes);
+        for (; shift_it != std::end(shifts); ++shift_it, ++axis_it)
+        {
+            auto ax = normalize_axis(dim, static_cast<std::ptrdiff_t>(*axis_it));
+            total_shifts[ax] += static_cast<std::ptrdiff_t>(*shift_it);
+        }
+
+        // Normalize shifts to positive values
+        for (std::size_t ax = 0; ax < dim; ++ax)
+        {
+            auto axis_size = static_cast<std::ptrdiff_t>(shape[ax]);
+            if (axis_size > 0)
+            {
+                total_shifts[ax] = ((total_shifts[ax] % axis_size) + axis_size) % axis_size;
+            }
+        }
+
+        detail::roll_multi(cpy.begin(), e.begin(), total_shifts, shape, 0);
+        return cpy;
+    }
+
+    /**
+     * Roll an expression along multiple axes (C-style array overload).
+     *
+     * @ingroup xt_xmanipulation
+     * @param e the input xexpression
+     * @param shifts C-style array of shift values
+     * @param axes C-style array of axes
+     * @return a roll of the input expression
+     */
+    template <class E, class S, std::size_t N, class I, std::size_t M>
+    inline auto roll(E&& e, const S (&shifts)[N], const I (&axes)[M])
+    {
+        return roll(
+            std::forward<E>(e),
+            xtl::forward_sequence<std::array<S, N>, decltype(shifts)>(shifts),
+            xtl::forward_sequence<std::array<I, M>, decltype(axes)>(axes)
+        );
     }
 
     /****************************
