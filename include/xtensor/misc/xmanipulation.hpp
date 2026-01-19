@@ -1052,16 +1052,14 @@ namespace xt
     {
         auto cpy = empty_like(e);
         const auto& shape = cpy.shape();
-        std::size_t saxis = static_cast<std::size_t>(axis);
-        if (axis < 0)
+        const auto dim = cpy.dimension();
+
+        if (axis < -static_cast<std::ptrdiff_t>(dim) || axis >= static_cast<std::ptrdiff_t>(dim))
         {
-            axis += std::ptrdiff_t(cpy.dimension());
+            XTENSOR_THROW(std::runtime_error, "axis is not within shape dimension.");
         }
 
-        if (saxis >= cpy.dimension() || axis < 0)
-        {
-            XTENSOR_THROW(std::runtime_error, "axis is no within shape dimension.");
-        }
+        std::size_t saxis = normalize_axis(dim, axis);
 
         const auto axis_dim = static_cast<std::ptrdiff_t>(shape[saxis]);
         while (shift < 0)
