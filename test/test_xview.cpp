@@ -360,6 +360,16 @@ namespace xt
         EXPECT_EQ(a(1, 1, 0), mapper1.map(a, view1, 1, 0));
         EXPECT_EQ(a(1, 1, 1), mapper1.map(a, view1, 1, 1));
         XT_EXPECT_ANY_THROW(mapper1.map_at(a, view1, 10, 10));
+
+        auto view2 = view(a, 1);
+        index_mapper<decltype(view2)> mapper2;
+
+        EXPECT_EQ(size_t(2), mapper2.dimension(a));
+        EXPECT_EQ(a(1, 0, 0), mapper2.map(a, view2, 0, 0));
+        EXPECT_EQ(a(1, 0, 1), mapper2.map(a, view2, 0, 1));
+        EXPECT_EQ(a(1, 1, 0), mapper2.map(a, view2, 1, 0));
+        EXPECT_EQ(a(1, 1, 1), mapper2.map(a, view2, 1, 1));
+        XT_EXPECT_ANY_THROW(mapper2.map_at(a, view2, 10, 10));
     }
 
     TEST(xview, integral_count)
@@ -424,6 +434,32 @@ namespace xt
         // EXPECT_EQ(v3(1), arr(0, 2));
         EXPECT_EQ(v3(1, 1), arr(1, 2));
         EXPECT_EQ(v3(2, 3, 1, 1), arr(1, 2));
+    }
+
+    TEST(xview_mapping, access)
+    {
+        xt::xarray<double> arr{{1.0, 2.0, 3.0}, {2.0, 5.0, 7.0}, {2.0, 5.0, 7.0}};
+
+        auto v1 = xt::view(arr, 1, xt::range(1, 3));
+        index_mapper<decltype(v1)> mapper1;
+
+        EXPECT_EQ(mapper1.map(arr, v1), arr(0, 1));
+        EXPECT_EQ(mapper1.map(arr, v1, 1), arr(1, 2));
+        EXPECT_EQ(mapper1.map(arr, v1, 1, 1), arr(1, 2));
+
+        auto v2 = xt::view(arr, all(), newaxis(), all());
+        index_mapper<decltype(v2)> mapper2;
+
+        // EXPECT_EQ(v2(1), arr(0, 1));
+        EXPECT_EQ(mapper2.map(arr, v2, 1, 0, 2), arr(1, 2));
+        EXPECT_EQ(mapper2.map(arr, v2, 2, 1, 0, 2), arr(1, 2));
+
+        auto v3 = xt::view(arr, xt::range(0, 2), xt::range(1, 3));
+        index_mapper<decltype(v3)> mapper3;
+
+        // EXPECT_EQ(v3(1), arr(0, 2));
+        EXPECT_EQ(mapper3.map(arr, v3, 1, 1), arr(1, 2));
+        EXPECT_EQ(mapper3.map(arr, v3, 2, 3, 1, 1), arr(1, 2));
     }
 
     TEST(xview, unchecked)
