@@ -149,6 +149,9 @@ namespace xt
         {
         };
 
+        template <class T>
+        constexpr bool is_newaxis_v = is_newaxis<T>::value;
+
         template <class T, class... S>
         struct newaxis_count_impl
         {
