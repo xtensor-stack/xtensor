@@ -134,6 +134,7 @@ namespace xt
         EXPECT_TRUE(allclose(cmplexpected_angle, cmplres_angle));
 
         using assign_t_angle = xassign_traits<xarray<double>, decltype(cmplres_angle)>;
+        (void) sizeof(assign_t_angle);  // to avoid unused warning
 
 #if XTENSOR_USE_XSIMD
         EXPECT_TRUE(assign_t_angle::simd_linear_assign());
@@ -148,6 +149,7 @@ namespace xt
         EXPECT_TRUE(allclose(cmplexpected_conj, cmplres_conj));
 
         using assign_t_conj = xassign_traits<xarray<std::complex<double>>, decltype(cmplres_conj)>;
+        (void) sizeof(assign_t_conj);  // to avoid unused warning
 
 #if XTENSOR_USE_XSIMD
         auto b1 = cmplres_angle.template load_simd<xsimd::aligned_mode>(0);
@@ -165,6 +167,7 @@ namespace xt
         };
 
         using assign_t_norm = xassign_traits<xarray<double>, decltype(cmplres_norm)>;
+        (void) sizeof(assign_t_norm);  // to avoid unused warning
 
 #if XTENSOR_USE_XSIMD
         EXPECT_TRUE(assign_t_norm::simd_linear_assign());
@@ -193,6 +196,7 @@ namespace xt
         }
 
         using assign_t_arg = xassign_traits<xarray<double>, decltype(cmplres)>;
+        (void) sizeof(assign_t_arg);  // to avoid unused warning
 
 #if XTENSOR_USE_XSIMD
         EXPECT_TRUE(assign_t_arg::simd_linear_assign());

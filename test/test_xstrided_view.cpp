@@ -688,6 +688,7 @@ namespace xt
             EXPECT_EQ(a, par);
         }
         using assign_traits = xassign_traits<xarray<double>, decltype(av)>;
+        (void) sizeof(assign_traits);  // to avoid unused warning
 
 #if XTENSOR_USE_XSIMD
         EXPECT_TRUE(assign_traits::simd_linear_assign());

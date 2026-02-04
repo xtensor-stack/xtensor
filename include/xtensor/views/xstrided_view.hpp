@@ -834,7 +834,7 @@ namespace xt
                 if (iter != std::end(shape))
                 {
                     const auto total = std::accumulate(shape.cbegin(), shape.cend(), -1, std::multiplies<int>{});
-                    const auto missing_dimension = size / total;
+                    const auto missing_dimension = size / static_cast<std::size_t>(total);
                     (*iter) = static_cast<value_type>(missing_dimension);
                 }
             }

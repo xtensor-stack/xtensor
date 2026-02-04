@@ -38,18 +38,18 @@ namespace xt
     template <class T = double>
     struct numeric_constants
     {
-        static constexpr T PI = 3.141592653589793238463;
-        static constexpr T PI_2 = 1.57079632679489661923;
-        static constexpr T PI_4 = 0.785398163397448309616;
-        static constexpr T D_1_PI = 0.318309886183790671538;
-        static constexpr T D_2_PI = 0.636619772367581343076;
-        static constexpr T D_2_SQRTPI = 1.12837916709551257390;
-        static constexpr T SQRT2 = 1.41421356237309504880;
-        static constexpr T SQRT1_2 = 0.707106781186547524401;
-        static constexpr T E = 2.71828182845904523536;
-        static constexpr T LOG2E = 1.44269504088896340736;
-        static constexpr T LOG10E = 0.434294481903251827651;
-        static constexpr T LN2 = 0.693147180559945309417;
+        static constexpr T PI = static_cast<T>(3.141592653589793238463);
+        static constexpr T PI_2 = static_cast<T>(1.57079632679489661923);
+        static constexpr T PI_4 = static_cast<T>(0.785398163397448309616);
+        static constexpr T D_1_PI = static_cast<T>(0.318309886183790671538);
+        static constexpr T D_2_PI = static_cast<T>(0.636619772367581343076);
+        static constexpr T D_2_SQRTPI = static_cast<T>(1.12837916709551257390);
+        static constexpr T SQRT2 = static_cast<T>(1.41421356237309504880);
+        static constexpr T SQRT1_2 = static_cast<T>(0.707106781186547524401);
+        static constexpr T E = static_cast<T>(2.71828182845904523536);
+        static constexpr T LOG2E = static_cast<T>(1.44269504088896340736);
+        static constexpr T LOG10E = static_cast<T>(0.434294481903251827651);
+        static constexpr T LN2 = static_cast<T>(0.693147180559945309417);
     };
 
     /***********
@@ -569,6 +569,10 @@ namespace xt
 
     namespace math
     {
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wimplicit-int-float-conversion"
+#endif
         template <class T = void>
         struct minimum
         {
@@ -2403,6 +2407,9 @@ namespace xt
                 return !math::isnan(rhs) ? lhs + rhs : lhs;
             }
         };
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
 
         struct nan_multiplies
         {

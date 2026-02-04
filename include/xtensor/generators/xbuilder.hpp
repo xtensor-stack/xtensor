@@ -498,8 +498,8 @@ namespace xt
             inline value_type access(const tuple_type& t, size_type axis, It first, It last) const
             {
                 // trim off extra indices if provided to match behavior of containers
-                auto dim_offset = std::distance(first, last) - std::get<0>(t).dimension();
-                size_t axis_dim = *(first + axis + dim_offset);
+                auto dim_offset = static_cast<size_t>(std::distance(first, last)) - std::get<0>(t).dimension();
+                size_t axis_dim = static_cast<size_t>(*(first + static_cast<std::ptrdiff_t>(axis + dim_offset)));
                 auto match = [&](auto& arr)
                 {
                     if (axis_dim >= arr.shape()[axis])
@@ -520,7 +520,7 @@ namespace xt
                         const size_t stride = std::accumulate(
                             shape.begin() + i + 1,
                             shape.end(),
-                            1,
+                            size_t(1),
                             std::multiplies<size_t>()
                         );
                         if (i == axis)
@@ -529,11 +529,13 @@ namespace xt
                         }
                         else
                         {
-                            const auto len = (*(first + i + dim_offset));
+                            const auto len = static_cast<size_t>(
+                                *(first + static_cast<std::ptrdiff_t>(i + dim_offset))
+                            );
                             offset += len * stride;
                         }
                     }
-                    const auto element = arr.begin() + offset;
+                    const auto element = arr.begin() + static_cast<std::ptrdiff_t>(offset);
                     return *element;
                 };
 
@@ -576,16 +578,18 @@ namespace xt
                         const size_t stride = std::accumulate(
                             shape.begin() + i + 1,
                             shape.end(),
-                            1,
+                            size_t(1),
                             std::multiplies<size_t>()
                         );
-                        const auto len = (*(first + i + after_axis));
+                        const auto len = static_cast<size_t>(
+                            *(first + static_cast<std::ptrdiff_t>(i + after_axis))
+                        );
                         offset += len * stride;
                     }
-                    const auto element = arr.begin() + offset;
+                    const auto element = arr.begin() + static_cast<std::ptrdiff_t>(offset);
                     return *element;
                 };
-                size_type i = *(first + axis);
+                size_type i = static_cast<size_type>(*(first + static_cast<std::ptrdiff_t>(axis)));
                 return apply<value_type>(i, get_item, t);
             }
         };
@@ -960,10 +964,12 @@ namespace xt
                 detail::make_xgenerator(detail::repeat_impl<xclosure_t<E>>(std::forward<E>(e), I), shape)...
             );
 #else
-            return std::make_tuple(detail::make_xgenerator(
-                detail::repeat_impl<xclosure_t<E>>(std::forward<E>(e), I),
-                {e.shape()[0]...}
-            )...);
+            return std::make_tuple(
+                detail::make_xgenerator(
+                    detail::repeat_impl<xclosure_t<E>>(std::forward<E>(e), I),
+                    {e.shape()[0]...}
+                )...
+            );
 #endif
         }
     }

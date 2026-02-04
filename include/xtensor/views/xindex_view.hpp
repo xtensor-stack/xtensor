@@ -511,7 +511,7 @@ namespace xt
     template <class It>
     inline auto xindex_view<CT, I>::element(It first, It /*last*/) -> reference
     {
-        return m_e[m_indices[(*first)]];
+        return m_e[m_indices[static_cast<std::size_t>(*first)]];
     }
 
     /**
@@ -523,7 +523,7 @@ namespace xt
     template <class It>
     inline auto xindex_view<CT, I>::element(It first, It /*last*/) const -> const_reference
     {
-        return m_e[m_indices[(*first)]];
+        return m_e[m_indices[static_cast<std::size_t>(*first)]];
     }
 
     /**

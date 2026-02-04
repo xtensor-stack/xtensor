@@ -106,7 +106,13 @@ namespace xt
         using strides_type = typename expr_type::strides_type;
         using inner_strides_type = typename expr_type::inner_strides_type;
         using backstrides_type = typename expr_type::backstrides_type;
-        using inner_strides_tybackstrides_typepe = typename expr_type::inner_backstrides_type;
+        using inner_backstrides_type = typename expr_type::inner_backstrides_type;
+        // Suppress unused typedef warnings
+        (void) sizeof(expr_type);
+        (void) sizeof(strides_type);
+        (void) sizeof(inner_strides_type);
+        (void) sizeof(backstrides_type);
+        (void) sizeof(inner_backstrides_type);
     }
 
     TEST(xexpression, shared_expr_return)

@@ -83,6 +83,10 @@ namespace xt
 
     namespace detail
     {
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wimplicit-int-float-conversion"
+#endif
         DEFINE_COMPLEX_OVERLOAD(+);
         DEFINE_COMPLEX_OVERLOAD(-);
         DEFINE_COMPLEX_OVERLOAD(*);
@@ -101,13 +105,23 @@ namespace xt
         DEFINE_COMPLEX_OVERLOAD(>=);
         DEFINE_COMPLEX_OVERLOAD(==);
         DEFINE_COMPLEX_OVERLOAD(!=);
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
 
         UNARY_OPERATOR_FUNCTOR(identity, +);
         UNARY_OPERATOR_FUNCTOR(negate, -);
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wimplicit-int-float-conversion"
+#endif
         BINARY_OPERATOR_FUNCTOR(plus, +);
         BINARY_OPERATOR_FUNCTOR(minus, -);
         BINARY_OPERATOR_FUNCTOR(multiplies, *);
         BINARY_OPERATOR_FUNCTOR(divides, /);
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
         BINARY_OPERATOR_FUNCTOR(modulus, %);
         BINARY_OPERATOR_FUNCTOR(logical_or, ||);
         BINARY_OPERATOR_FUNCTOR(logical_and, &&);
