@@ -1293,13 +1293,7 @@ namespace xt
         using xfix = xt::xtensor_fixed<double, xshape<3, 4, 2, 5>, layout_type::row_major>;
 
         using ctes = xt::xtensor<double, 4, layout_type::column_major>;
-        using carr = xt::xarray<double, layout_type::column_major>;
         using cfix = xt::xtensor_fixed<double, xshape<3, 4, 2, 5>, layout_type::column_major>;
-
-        // Suppress unused typedef warnings
-        (void) sizeof(ctes);
-        (void) sizeof(carr);
-        (void) sizeof(cfix);
 
         EXPECT_TRUE((detail::is_contiguous_view<xtes, xall<int>, xall<int>, xall<int>>()));
         EXPECT_TRUE((detail::is_contiguous_view<xarr, xall<int>, xall<int>, xall<int>>()));

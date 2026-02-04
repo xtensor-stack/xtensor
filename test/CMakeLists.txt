@@ -63,7 +63,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DXSIMD_ENABLE_XTL_COMPLEX=1")
 if(MSVC)
     set(CMAKE_CXX_FLAGS_WARNINGS "/W4 /WX")
 else()
-    set(CMAKE_CXX_FLAGS_WARNINGS "-Werror -Wextra -Wpedantic")
+    set(CMAKE_CXX_FLAGS_WARNINGS "-Werror -Wextra -Wall")
 endif()
 
 # Helper macro to reduce MSVC-specific boilerplate

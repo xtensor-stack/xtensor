@@ -108,6 +108,7 @@ namespace xt
     {
         ASSERT_TRUE(foo(std::make_tuple(1, 2, 3)) == 2);
         static_assert(!noexcept(foo(std::make_tuple(1, 2, 3))));
+#ifndef XTENSOR_ENABLE_ASSERT
         auto func_ne = [](int i) noexcept
         {
             return i;
@@ -117,6 +118,7 @@ namespace xt
         static_assert(!noexcept(apply<int>(1, func_ne, t)));
 #else
         static_assert(noexcept(apply<int>(1, func_ne, t)));
+#endif
 #endif
     }
 

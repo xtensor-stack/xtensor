@@ -33,7 +33,11 @@
 #if (defined(_MSC_VER) && _MSC_VER >= 1910)
 #define NOEXCEPT(T)
 #else
+#ifdef XTENSOR_ENABLE_ASSERT
+#define NOEXCEPT(T)
+#else
 #define NOEXCEPT(T) noexcept(T)
+#endif
 #endif
 
 namespace xt
@@ -268,8 +272,8 @@ namespace xt
      ************************/
 
     template <class R, class F, class... S>
-    inline R apply(std::size_t index, F&& func, const std::tuple<S...>& s)
-        NOEXCEPT(noexcept(func(std::get<0>(s))))
+    inline R
+    apply(std::size_t index, F&& func, const std::tuple<S...>& s) NOEXCEPT(noexcept(func(std::get<0>(s))))
     {
         XTENSOR_ASSERT(sizeof...(S) > index);
         return std::apply(
@@ -378,14 +382,16 @@ namespace xt
             res[i] = normalize_axis(expr.dimension(), axes[i]);
         }
 
-        XTENSOR_ASSERT(std::all_of(
-            res.begin(),
-            res.end(),
-            [&expr](auto ax_el)
-            {
-                return ax_el < expr.dimension();
-            }
-        ));
+        XTENSOR_ASSERT(
+            std::all_of(
+                res.begin(),
+                res.end(),
+                [&expr](auto ax_el)
+                {
+                    return ax_el < expr.dimension();
+                }
+            )
+        );
 
         return res;
     }
@@ -397,14 +403,16 @@ namespace xt
     normalize_axis(E& expr, C&& axes)
     {
         static_cast<void>(expr);
-        XTENSOR_ASSERT(std::all_of(
-            axes.begin(),
-            axes.end(),
-            [&expr](auto ax_el)
-            {
-                return ax_el < expr.dimension();
-            }
-        ));
+        XTENSOR_ASSERT(
+            std::all_of(
+                axes.begin(),
+                axes.end(),
+                [&expr](auto ax_el)
+                {
+                    return ax_el < expr.dimension();
+                }
+            )
+        );
         return std::forward<C>(axes);
     }
 
@@ -425,14 +433,16 @@ namespace xt
             }
         );
 
-        XTENSOR_ASSERT(std::all_of(
-            res.begin(),
-            res.end(),
-            [&expr](auto ax_el)
-            {
-                return ax_el < expr.dimension();
-            }
-        ));
+        XTENSOR_ASSERT(
+            std::all_of(
+                res.begin(),
+                res.end(),
+                [&expr](auto ax_el)
+                {
+                    return ax_el < expr.dimension();
+                }
+            )
+        );
 
         return res;
     }
@@ -447,14 +457,16 @@ namespace xt
         R res;
         xt::resize_container(res, std::size(axes));
         std::copy(std::begin(axes), std::end(axes), std::begin(res));
-        XTENSOR_ASSERT(std::all_of(
-            res.begin(),
-            res.end(),
-            [&expr](auto ax_el)
-            {
-                return ax_el < expr.dimension();
-            }
-        ));
+        XTENSOR_ASSERT(
+            std::all_of(
+                res.begin(),
+                res.end(),
+                [&expr](auto ax_el)
+                {
+                    return ax_el < expr.dimension();
+                }
+            )
+        );
         return res;
     }
 
@@ -464,14 +476,16 @@ namespace xt
         R&&>
     {
         static_cast<void>(expr);
-        XTENSOR_ASSERT(std::all_of(
-            std::begin(axes),
-            std::end(axes),
-            [&expr](auto ax_el)
-            {
-                return ax_el < expr.dimension();
-            }
-        ));
+        XTENSOR_ASSERT(
+            std::all_of(
+                std::begin(axes),
+                std::end(axes),
+                [&expr](auto ax_el)
+                {
+                    return ax_el < expr.dimension();
+                }
+            )
+        );
         return std::move(axes);
     }
 
@@ -905,18 +919,18 @@ namespace xt
     {
         explicit overlapping_memory_checker(const Dst& aDst)
             : overlapping_memory_checker_base(
-                [&]()
-                {
-                    if (aDst.size() == 0)
-                    {
-                        return memory_range();
-                    }
-                    else
-                    {
-                        return memory_range(std::addressof(*aDst.begin()), std::addressof(*aDst.rbegin()));
-                    }
-                }()
-            )
+                  [&]()
+                  {
+                      if (aDst.size() == 0)
+                      {
+                          return memory_range();
+                      }
+                      else
+                      {
+                          return memory_range(std::addressof(*aDst.begin()), std::addressof(*aDst.rbegin()));
+                      }
+                  }()
+              )
         {
         }
     };

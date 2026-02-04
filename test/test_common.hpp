@@ -459,7 +459,7 @@ namespace xt
     }
 
     template <class V>
-    void test_bound_check(V& vec)
+    void test_bound_check([[maybe_unused]] V& vec)
     {
 #if XTENSOR_ENABLE_ASSERT
         XT_EXPECT_ANY_THROW(vec(10, 10, 10));
@@ -469,7 +469,7 @@ namespace xt
     }
 
     template <class V>
-    void test_access_check(V& vec)
+    void test_access_check([[maybe_unused]] V& vec)
     {
         XT_EXPECT_ANY_THROW(vec.at(10, 10, 10));
         XT_EXPECT_ANY_THROW(vec.at(0, 0, 0, 0, 0, 0));
@@ -769,7 +769,7 @@ namespace xt
 
         {
             INFO("incompatible shapes");
-            shape_type s4 = {2, 1, 3, 2};
+            [[maybe_unused]] shape_type s4 = {2, 1, 3, 2};
             XT_EXPECT_THROW(vec.broadcast_shape(s4), broadcast_error);
         }
     }
@@ -980,8 +980,9 @@ namespace xt
         EXPECT_TRUE((std::is_same<rm_layout_iterator, exp_rm_layout_iterator>::value));
         EXPECT_TRUE((std::is_same<rm_const_layout_iterator, exp_rm_const_layout_iterator>::value));
         EXPECT_TRUE((std::is_same<rm_reverse_layout_iterator, exp_rm_reverse_layout_iterator>::value));
-        EXPECT_TRUE((std::is_same<rm_const_reverse_layout_iterator, exp_rm_const_reverse_layout_iterator>::value
-        ));
+        EXPECT_TRUE(
+            (std::is_same<rm_const_reverse_layout_iterator, exp_rm_const_reverse_layout_iterator>::value)
+        );
 
         using cm_layout_iterator = typename C::template layout_iterator<layout_type::column_major>;
         using cm_const_layout_iterator = typename C::template const_layout_iterator<layout_type::column_major>;
@@ -997,8 +998,9 @@ namespace xt
         EXPECT_TRUE((std::is_same<cm_layout_iterator, exp_cm_layout_iterator>::value));
         EXPECT_TRUE((std::is_same<cm_const_layout_iterator, exp_cm_const_layout_iterator>::value));
         EXPECT_TRUE((std::is_same<cm_reverse_layout_iterator, exp_cm_reverse_layout_iterator>::value));
-        EXPECT_TRUE((std::is_same<cm_const_reverse_layout_iterator, exp_cm_const_reverse_layout_iterator>::value
-        ));
+        EXPECT_TRUE(
+            (std::is_same<cm_const_reverse_layout_iterator, exp_cm_const_reverse_layout_iterator>::value)
+        );
 
         using linear_iterator = typename C::linear_iterator;
         using const_linear_iterator = typename C::const_linear_iterator;
