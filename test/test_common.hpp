@@ -980,9 +980,8 @@ namespace xt
         EXPECT_TRUE((std::is_same<rm_layout_iterator, exp_rm_layout_iterator>::value));
         EXPECT_TRUE((std::is_same<rm_const_layout_iterator, exp_rm_const_layout_iterator>::value));
         EXPECT_TRUE((std::is_same<rm_reverse_layout_iterator, exp_rm_reverse_layout_iterator>::value));
-        EXPECT_TRUE(
-            (std::is_same<rm_const_reverse_layout_iterator, exp_rm_const_reverse_layout_iterator>::value)
-        );
+        EXPECT_TRUE((std::is_same<rm_const_reverse_layout_iterator, exp_rm_const_reverse_layout_iterator>::value
+        ));
 
         using cm_layout_iterator = typename C::template layout_iterator<layout_type::column_major>;
         using cm_const_layout_iterator = typename C::template const_layout_iterator<layout_type::column_major>;
@@ -998,9 +997,8 @@ namespace xt
         EXPECT_TRUE((std::is_same<cm_layout_iterator, exp_cm_layout_iterator>::value));
         EXPECT_TRUE((std::is_same<cm_const_layout_iterator, exp_cm_const_layout_iterator>::value));
         EXPECT_TRUE((std::is_same<cm_reverse_layout_iterator, exp_cm_reverse_layout_iterator>::value));
-        EXPECT_TRUE(
-            (std::is_same<cm_const_reverse_layout_iterator, exp_cm_const_reverse_layout_iterator>::value)
-        );
+        EXPECT_TRUE((std::is_same<cm_const_reverse_layout_iterator, exp_cm_const_reverse_layout_iterator>::value
+        ));
 
         using linear_iterator = typename C::linear_iterator;
         using const_linear_iterator = typename C::const_linear_iterator;

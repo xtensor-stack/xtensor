@@ -529,9 +529,8 @@ namespace xt
     }
 
     template <class UnderlyingContainer, class... Slices>
-    auto
-    index_mapper<xt::xview<UnderlyingContainer, Slices...>>::dimension(const UnderlyingContainer& container) const
-        -> size_t
+    auto index_mapper<xt::xview<UnderlyingContainer, Slices...>>::dimension(const UnderlyingContainer& container
+    ) const -> size_t
     {
         return container.dimension() - nb_integral_slices + nb_new_axis_slices;
     }

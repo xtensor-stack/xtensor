@@ -964,12 +964,10 @@ namespace xt
                 detail::make_xgenerator(detail::repeat_impl<xclosure_t<E>>(std::forward<E>(e), I), shape)...
             );
 #else
-            return std::make_tuple(
-                detail::make_xgenerator(
-                    detail::repeat_impl<xclosure_t<E>>(std::forward<E>(e), I),
-                    {e.shape()[0]...}
-                )...
-            );
+            return std::make_tuple(detail::make_xgenerator(
+                detail::repeat_impl<xclosure_t<E>>(std::forward<E>(e), I),
+                {e.shape()[0]...}
+            )...);
 #endif
         }
     }

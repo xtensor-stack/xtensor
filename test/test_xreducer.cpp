@@ -882,11 +882,14 @@ namespace xt
         truth = std::is_same<std::decay_t<decltype(b_fx_3)>, xtensor_fixed<int, xshape<>>>::value;
         EXPECT_TRUE(truth);
 
-        truth = std::is_same<xshape<1, 3>, typename fixed_xreducer_shape_type<xshape<1, 5, 3>, xshape<1>>::type>();
+        truth = std::is_same<xshape<1, 3>, typename fixed_xreducer_shape_type<xshape<1, 5, 3>, xshape<1>>::type>(
+        );
         EXPECT_TRUE(truth);
-        truth = std::is_same<xshape<5>, typename fixed_xreducer_shape_type<xshape<1, 5, 3>, xshape<0, 2>>::type>();
+        truth = std::is_same<xshape<5>, typename fixed_xreducer_shape_type<xshape<1, 5, 3>, xshape<0, 2>>::type>(
+        );
         EXPECT_TRUE(truth);
-        truth = std::is_same<xshape<>, typename fixed_xreducer_shape_type<xshape<1, 5, 3>, xshape<0, 1, 2>>::type>();
+        truth = std::is_same<xshape<>, typename fixed_xreducer_shape_type<xshape<1, 5, 3>, xshape<0, 1, 2>>::type>(
+        );
         EXPECT_TRUE(truth);
         truth = std::is_same<xshape<1, 5>, typename fixed_xreducer_shape_type<xshape<1, 5>, xshape<2>>::type>();
         EXPECT_TRUE(truth);
