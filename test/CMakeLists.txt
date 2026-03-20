@@ -68,7 +68,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR (CMAKE_CXX_COMPILER_ID MATCHES "Intel"
     add_compile_options(-fno-exceptions)
   endif()
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-  add_compile_options(${_cxx_std_flag} /Zc:__cplusplus /EHsc /bigobj -fms-compatibility)
+  add_compile_options(${_cxx_std_flag} /Zc:__cplusplus /EHsc /bigobj)
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /MANIFEST:NO")
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
   add_definitions(-D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
