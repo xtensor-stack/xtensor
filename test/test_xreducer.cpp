@@ -34,8 +34,8 @@
 namespace xt
 {
 
-#define CHECK_RESULT_TYPE(EXPRESSION, EXPECTED_TYPE)                                 \
-    {                                                                                \
+#define CHECK_RESULT_TYPE(EXPRESSION, EXPECTED_TYPE)                              \
+    {                                                                             \
         using result_t = typename std::decay_t<decltype(EXPRESSION)>::value_type; \
         EXPECT_TRUE((std::is_same<result_t, EXPECTED_TYPE>::value));              \
     }

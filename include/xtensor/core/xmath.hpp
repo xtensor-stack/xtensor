@@ -40,13 +40,13 @@ namespace xt
     struct numeric_constants
     {
         static constexpr T PI = std::numbers::pi_v<T>;
-        static constexpr T PI_2 = 0.5*PI;
-        static constexpr T PI_4 = 0.25*PI;
+        static constexpr T PI_2 = 0.5 * PI;
+        static constexpr T PI_4 = 0.25 * PI;
         static constexpr T D_1_PI = std::numbers::inv_pi_v<T>;
-        static constexpr T D_2_PI = 2*std::numbers::inv_pi_v<T>;
-        static constexpr T D_2_SQRTPI = 2*std::numbers::inv_sqrtpi_v<T>;
+        static constexpr T D_2_PI = 2 * std::numbers::inv_pi_v<T>;
+        static constexpr T D_2_SQRTPI = 2 * std::numbers::inv_sqrtpi_v<T>;
         static constexpr T SQRT2 = std::numbers::sqrt2_v<T>;
-        static constexpr T SQRT1_2 = 0.5*std::numbers::sqrt2_v<T>;
+        static constexpr T SQRT1_2 = 0.5 * std::numbers::sqrt2_v<T>;
         static constexpr T E = std::numbers::e_v<T>;
         static constexpr T LOG2E = std::numbers::log2e_v<T>;
         static constexpr T LOG10E = std::numbers::log10e_v<T>;

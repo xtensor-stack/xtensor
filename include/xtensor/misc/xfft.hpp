@@ -10,10 +10,10 @@
 #include "../core/xnoalias.hpp"
 #include "../generators/xbuilder.hpp"
 #include "../misc/xcomplex.hpp"
+#include "../utils/xutils.hpp"
 #include "../views/xaxis_slice_iterator.hpp"
 #include "../views/xview.hpp"
 #include "./xtl_concepts.hpp"
-#include "../utils/xutils.hpp"
 
 namespace xt
 {
@@ -62,7 +62,7 @@ namespace xt
                     auto odd = radix2(xt::view(ev, xt::range(1, _, 2)));
 #endif
 
-                    auto range = xt::arange<double>(0.5*static_cast<double>(N));
+                    auto range = xt::arange<double>(0.5 * static_cast<double>(N));
                     auto exp = xt::exp(static_cast<value_type>(-2i) * pi * range / static_cast<precision>(N));
                     auto t = exp * odd;
                     auto first_half = even + t;
@@ -91,7 +91,10 @@ namespace xt
                 xt::xtensor<std::size_t, 1> i = xt::pow(xt::linspace<std::size_t>(0, n - 1, n), 2);
                 i %= (n * 2);
 
-                auto angles = xt::eval(static_cast<precision>(3.141592653589793238463) * xt::cast<precision>(i) / static_cast<precision>(n));
+                auto angles = xt::eval(
+                    static_cast<precision>(3.141592653589793238463) * xt::cast<precision>(i)
+                    / static_cast<precision>(n)
+                );
                 auto j = std::complex<precision>(0, 1);
                 exp_table = xt::exp(-angles * j);
 

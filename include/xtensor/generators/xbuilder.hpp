@@ -29,9 +29,8 @@
 #include "../core/xfunction.hpp"
 #include "../core/xoperation.hpp"
 #include "../generators/xgenerator.hpp"
-#include "../views/xbroadcast.hpp"
 #include "../utils/xutils.hpp"
-
+#include "../views/xbroadcast.hpp"
 
 namespace xt
 {

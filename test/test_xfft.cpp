@@ -11,7 +11,11 @@ namespace xt
         size_t n = 8192;
         float A = 10;
         auto x = xt::linspace<float>(0, static_cast<float>(n - 1), n);
-        xt::xarray<float> y = A * xt::sin(2 * xt::numeric_constants<float>::PI * x * static_cast<float>(k) / static_cast<float>(n));
+        xt::xarray<float> y = A
+                              * xt::sin(
+                                  2 * xt::numeric_constants<float>::PI * x * static_cast<float>(k)
+                                  / static_cast<float>(n)
+                              );
         auto res = xt::fft::fft(y) / (0.5 * static_cast<float>(n));
         REQUIRE(A == doctest::Approx(std::abs(res(k))).epsilon(.0001));
     }
@@ -22,7 +26,11 @@ namespace xt
         size_t n = 8;
         float A = 10;
         auto x = xt::linspace<float>(0, static_cast<float>(n - 1), n);
-        xt::xarray<float> y = A * xt::sin(2 * xt::numeric_constants<float>::PI * x * static_cast<float>(k) / static_cast<float>(n));
+        xt::xarray<float> y = A
+                              * xt::sin(
+                                  2 * xt::numeric_constants<float>::PI * x * static_cast<float>(k)
+                                  / static_cast<float>(n)
+                              );
         auto res = xt::fft::ifft(y) / (0.5 * static_cast<float>(n));
         REQUIRE(A == doctest::Approx(std::abs(res(k))).epsilon(.0001));
     }
@@ -48,7 +56,11 @@ namespace xt
         float A = 1;
         size_t dim = 10;
         auto x = xt::linspace<float>(0, static_cast<float>(n - 1), n) * xt::ones<float>({dim, n});
-        xt::xarray<float> y = A * xt::sin(2 * xt::numeric_constants<float>::PI * x * static_cast<float>(k) / static_cast<float>(n));
+        xt::xarray<float> y = A
+                              * xt::sin(
+                                  2 * xt::numeric_constants<float>::PI * x * static_cast<float>(k)
+                                  / static_cast<float>(n)
+                              );
         y = xt::transpose(y);
         auto res = xt::fft::fft(y, 0) / (0.5 * static_cast<float>(n));
         REQUIRE(A == doctest::Approx(std::abs(res(k, 0))).epsilon(.0001));
@@ -62,7 +74,11 @@ namespace xt
         float A = 1;
         size_t dim = 2;
         auto x = xt::linspace<float>(0, static_cast<float>(n - 1), n) * xt::ones<float>({dim, n});
-        xt::xarray<float> y = A * xt::sin(2 * xt::numeric_constants<float>::PI * x * static_cast<float>(k) / static_cast<float>(n));
+        xt::xarray<float> y = A
+                              * xt::sin(
+                                  2 * xt::numeric_constants<float>::PI * x * static_cast<float>(k)
+                                  / static_cast<float>(n)
+                              );
         auto res = xt::fft::fft(y) / (0.5 * static_cast<float>(n));
         REQUIRE(A == doctest::Approx(std::abs(res(0, k))).epsilon(.0001));
         REQUIRE(A == doctest::Approx(std::abs(res(1, k))).epsilon(.0001));

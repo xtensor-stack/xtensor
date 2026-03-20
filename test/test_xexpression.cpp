@@ -104,13 +104,25 @@ namespace xt
         auto sexpr1 = make_xshared(std::move(expr1));
         using expr_type = decltype(sexpr1);
         using strides_type = typename expr_type::strides_type;
-        static_assert(std::is_same_v<strides_type, xt::svector<long, 4>>, "strides_type should be svector<long, 4>");
+        static_assert(
+            std::is_same_v<strides_type, xt::svector<long, 4>>,
+            "strides_type should be svector<long, 4>"
+        );
         using inner_strides_type = typename expr_type::inner_strides_type;
-        static_assert(std::is_same_v<inner_strides_type, xt::svector<long, 4>>, "inner_strides_type should be svector<long, 4>");
+        static_assert(
+            std::is_same_v<inner_strides_type, xt::svector<long, 4>>,
+            "inner_strides_type should be svector<long, 4>"
+        );
         using backstrides_type = typename expr_type::backstrides_type;
-        static_assert(std::is_same_v<backstrides_type, xt::svector<long, 4>>, "backstrides_type should be svector<long, 4>");
+        static_assert(
+            std::is_same_v<backstrides_type, xt::svector<long, 4>>,
+            "backstrides_type should be svector<long, 4>"
+        );
         using inner_strides_tybackstrides_typepe = typename expr_type::inner_backstrides_type;
-        static_assert(std::is_same_v<inner_strides_tybackstrides_typepe, xt::svector<long, 4>>, "inner_backstrides_type should be svector<long, 4>");
+        static_assert(
+            std::is_same_v<inner_strides_tybackstrides_typepe, xt::svector<long, 4>>,
+            "inner_backstrides_type should be svector<long, 4>"
+        );
     }
 
     TEST(xexpression, shared_expr_return)
