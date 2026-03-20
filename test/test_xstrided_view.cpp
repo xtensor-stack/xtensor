@@ -687,9 +687,9 @@ namespace xt
             xtensor<double, 2> par = xt::reshape_view<XTENSOR_DEFAULT_LAYOUT>(xt::arange(9), {3, 3});
             EXPECT_EQ(a, par);
         }
-        using assign_traits = xassign_traits<xarray<double>, decltype(av)>;
 
 #if XTENSOR_USE_XSIMD
+        using assign_traits = xassign_traits<xarray<double>, decltype(av)>;
         EXPECT_TRUE(assign_traits::simd_linear_assign());
 #endif
 

@@ -17,7 +17,7 @@ namespace xt
 {
 
     template <class UndefinedView>
-    struct index_mapper;
+    class index_mapper;
 
     /**
      * @enum access_t

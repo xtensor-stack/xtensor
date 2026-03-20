@@ -219,7 +219,9 @@ namespace xt
             auto outvec = ifft(xv, axis);
 
             // Scaling (because this FFT implementation omits it)
-            outvec = outvec / static_cast<double>(n);
+            using outvec_type = typename decltype(outvec)::value_type::value_type;
+            outvec_type scale = static_cast<outvec_type>(1.0) / static_cast<outvec_type>(n);
+            outvec *= scale;
 
             return outvec;
         }
