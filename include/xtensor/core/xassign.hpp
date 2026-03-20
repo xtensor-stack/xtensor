@@ -601,7 +601,14 @@ namespace xt
             size_type size = e2.dimension();
             index_type shape = uninitialized_shape<index_type>(size);
             bool trivial_broadcast = e2.broadcast_shape(shape, true);
-            e1.resize(std::move(shape));
+            // Safety check: limit resize to shape size
+            if (shape.size() > e1.shape().size()) {
+                index_type safe_shape;
+                std::copy_n(shape.begin(), e1.shape().size(), safe_shape.begin());
+                e1.resize(std::move(safe_shape));
+            } else {
+                e1.resize(std::move(shape));
+            }
             return trivial_broadcast;
         }
     }
