@@ -128,7 +128,7 @@ namespace xt
      * @return a boolean array
      */
     template <class E, class T>
-    inline auto in1d(E&& element, std::initializer_list<T> test_elements) noexcept
+    inline auto in1d(E&& element, std::initializer_list<T> test_elements)
     {
         XTENSOR_ASSERT(element.dimension() == 1ul);
         return isin(std::forward<E>(element), std::forward<std::initializer_list<T>>(test_elements));
@@ -145,7 +145,7 @@ namespace xt
      * @return a boolean array
      */
     template <class E, class F>
-    inline auto in1d(E&& element, F&& test_elements) noexcept
+    inline auto in1d(E&& element, F&& test_elements)
         requires(has_iterator_interface_concept<F>)
     {
         XTENSOR_ASSERT(element.dimension() == 1ul);
@@ -165,7 +165,7 @@ namespace xt
      * @return a boolean array
      */
     template <class E, iterator_concept I>
-    inline auto in1d(E&& element, I&& test_elements_begin, I&& test_elements_end) noexcept
+    inline auto in1d(E&& element, I&& test_elements_begin, I&& test_elements_end)
     {
         XTENSOR_ASSERT(element.dimension() == 1ul);
         return isin(

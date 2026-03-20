@@ -55,7 +55,7 @@ namespace xt
     constexpr decltype(auto) argument(Args&&... args) noexcept;
 
     template <class R, class F, class... S>
-    R apply(std::size_t index, F&& func, const std::tuple<S...>& s) NOEXCEPT(noexcept(func(std::get<0>(s))));
+    R apply(std::size_t index, F&& func, const std::tuple<S...>& s);
 
     template <class T, class S>
     void nested_copy(T&& iter, const S& s);
@@ -269,7 +269,6 @@ namespace xt
 
     template <class R, class F, class... S>
     inline R apply(std::size_t index, F&& func, const std::tuple<S...>& s)
-        NOEXCEPT(noexcept(func(std::get<0>(s))))
     {
         XTENSOR_ASSERT(sizeof...(S) > index);
         return std::apply(
