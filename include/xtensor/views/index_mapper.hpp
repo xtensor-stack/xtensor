@@ -401,7 +401,7 @@ namespace xt
     {
         constexpr size_t n_indices_full = n_indices_full_v<FirstIndice, OtherIndices...>;
 
-        constexpr auto underlying_n_dimensions = as_unsigned(xt::static_dimension<
+        constexpr auto underlying_n_dimensions = static_cast<std::size_t>(xt::static_dimension<
             typename std::decay_t<UnderlyingContainer>::shape_type>::value);
 
         // If there is too many indices, we need to drop the first ones.
@@ -517,7 +517,7 @@ namespace xt
             else
             {
                 assert(i < slice.size());
-                return as_unsigned(slice(as_signed(i)));
+                return as_unsigned(slice(static_cast<typename current_slice::size_type>(i)));
             }
         }
         else

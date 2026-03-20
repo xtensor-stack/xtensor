@@ -835,7 +835,7 @@ namespace xt
         if constexpr (is_xslice<S>::value)
         {
             using ST = typename S::size_type;
-            return as_unsigned(slice(as_signed(i)));
+            return as_unsigned(slice(static_cast<ST>(i)));
         }
         else
         {
