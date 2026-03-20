@@ -104,7 +104,6 @@ namespace xt
         return 2 * i;
     }
 
-
     TEST(utils, conditional_cast)
     {
         EXPECT_TRUE((std::is_same<decltype(conditional_cast<false, double>(1)), int>::value));
