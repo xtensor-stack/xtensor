@@ -24,7 +24,7 @@ repos:
   - id: remove-tabs
     args: [--whitespaces-count, '4']
 - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-  rev: v2.11.0
+  rev: v2.16.0
   hooks:
   - id: pretty-format-yaml
     args: [--autofix, --indent, '2']
@@ -39,7 +39,7 @@ repos:
   hooks:
   - id: conda_envfile_parse
     files: environment.yaml
-# Externally provided executables (so we can use them with editors as well).
+    # Externally provided executables (so we can use them with editors as well).
 - repo: https://github.com/pre-commit/mirrors-clang-format
   rev: v17.0.6
   hooks:
