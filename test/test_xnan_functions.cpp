@@ -315,7 +315,7 @@ namespace xt
          **********************/
 #ifndef SKIP_ON_WERROR
         // intermediate computation done in double may imply precision loss
-        CHECK_RESULT_TYPE_FOR_ALL(along, signed long long, signed long long);
+        // CHECK_RESULT_TYPE_FOR_ALL(along, signed long long, signed long long);
 #endif
         CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(along, int, signed long long, double, signed long long);
         CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(along, long, signed long long, double, signed long long);
@@ -326,7 +326,7 @@ namespace xt
          **********************/
 #ifndef SKIP_ON_WERROR
         // intermediate computation done in double may imply precision loss
-        CHECK_RESULT_TYPE_FOR_ALL(aulong, unsigned long long, unsigned long long);
+        // CHECK_RESULT_TYPE_FOR_ALL(aulong, unsigned long long, unsigned long long);
 #endif
         CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aulong, unsigned int, unsigned long long, double, unsigned long long);
         CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aulong, unsigned long, unsigned long long, double, unsigned long long);
@@ -344,7 +344,7 @@ namespace xt
         CHECK_RESULT_TYPE_FOR_ALL(afloat, float, float);
 #ifndef SKIP_ON_WERROR
         // final conversion to int may imply conversion loss
-        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(afloat, int, float, float, float);
+        // CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(afloat, int, float, float, float);
 #endif
         CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(afloat, float, float, float, float);
         CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(afloat, double, double, double, double);

@@ -11,6 +11,7 @@
 #define XTENSOR_INDEX_MAPPER_HPP
 
 #include "xview.hpp"
+#include "../utils/xutils.hpp"
 
 namespace xt
 {
@@ -400,8 +401,8 @@ namespace xt
     {
         constexpr size_t n_indices_full = n_indices_full_v<FirstIndice, OtherIndices...>;
 
-        constexpr size_t underlying_n_dimensions = xt::static_dimension<
-            typename std::decay_t<UnderlyingContainer>::shape_type>::value;
+        constexpr auto underlying_n_dimensions = as_unsigned(xt::static_dimension<
+            typename std::decay_t<UnderlyingContainer>::shape_type>::value);
 
         // If there is too many indices, we need to drop the first ones.
         // If the number of dimensions of the underlying container is known at compile time we can drop them
@@ -511,12 +512,12 @@ namespace xt
             if constexpr (std::is_integral_v<current_slice>)
             {
                 assert(i == 0);
-                return size_t(slice);
+                return as_unsigned(slice);
             }
             else
             {
                 assert(i < slice.size());
-                return size_t(slice(i));
+                return as_unsigned(slice(as_signed(i)));
             }
         }
         else

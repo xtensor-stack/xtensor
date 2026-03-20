@@ -9,10 +9,10 @@ namespace xt
     {
         size_t k = 2;
         size_t n = 8192;
-        size_t A = 10;
+        float A = 10;
         auto x = xt::linspace<float>(0, static_cast<float>(n - 1), n);
-        xt::xarray<float> y = A * xt::sin(2 * xt::numeric_constants<float>::PI * x * k / n);
-        auto res = xt::fft::fft(y) / (n / 2);
+        xt::xarray<float> y = A * xt::sin(2 * xt::numeric_constants<float>::PI * x * static_cast<float>(k) / static_cast<float>(n));
+        auto res = xt::fft::fft(y) / (0.5 * static_cast<float>(n));
         REQUIRE(A == doctest::Approx(std::abs(res(k))).epsilon(.0001));
     }
 
@@ -20,10 +20,10 @@ namespace xt
     {
         size_t k = 2;
         size_t n = 8;
-        size_t A = 10;
+        float A = 10;
         auto x = xt::linspace<float>(0, static_cast<float>(n - 1), n);
-        xt::xarray<float> y = A * xt::sin(2 * xt::numeric_constants<float>::PI * x * k / n);
-        auto res = xt::fft::ifft(y) / (n / 2);
+        xt::xarray<float> y = A * xt::sin(2 * xt::numeric_constants<float>::PI * x * static_cast<float>(k) / static_cast<float>(n));
+        auto res = xt::fft::ifft(y) / (0.5 * static_cast<float>(n));
         REQUIRE(A == doctest::Approx(std::abs(res(k))).epsilon(.0001));
     }
 
@@ -45,12 +45,12 @@ namespace xt
     {
         size_t k = 2;
         size_t n = 10;
-        size_t A = 1;
+        float A = 1;
         size_t dim = 10;
-        auto x = xt::linspace<float>(0, n - 1, n) * xt::ones<float>({dim, n});
-        xt::xarray<float> y = A * xt::sin(2 * xt::numeric_constants<float>::PI * x * k / n);
+        auto x = xt::linspace<float>(0, static_cast<float>(n - 1), n) * xt::ones<float>({dim, n});
+        xt::xarray<float> y = A * xt::sin(2 * xt::numeric_constants<float>::PI * x * static_cast<float>(k) / static_cast<float>(n));
         y = xt::transpose(y);
-        auto res = xt::fft::fft(y, 0) / (n / 2.0);
+        auto res = xt::fft::fft(y, 0) / (0.5 * static_cast<float>(n));
         REQUIRE(A == doctest::Approx(std::abs(res(k, 0))).epsilon(.0001));
         REQUIRE(A == doctest::Approx(std::abs(res(k, 1))).epsilon(.0001));
     }
@@ -59,11 +59,11 @@ namespace xt
     {
         size_t k = 2;
         size_t n = 15;
-        size_t A = 1;
+        float A = 1;
         size_t dim = 2;
-        auto x = xt::linspace<float>(0, n - 1, n) * xt::ones<float>({dim, n});
-        xt::xarray<float> y = A * xt::sin(2 * xt::numeric_constants<float>::PI * x * k / n);
-        auto res = xt::fft::fft(y) / (n / 2.0);
+        auto x = xt::linspace<float>(0, static_cast<float>(n - 1), n) * xt::ones<float>({dim, n});
+        xt::xarray<float> y = A * xt::sin(2 * xt::numeric_constants<float>::PI * x * static_cast<float>(k) / static_cast<float>(n));
+        auto res = xt::fft::fft(y) / (0.5 * static_cast<float>(n));
         REQUIRE(A == doctest::Approx(std::abs(res(0, k))).epsilon(.0001));
         REQUIRE(A == doctest::Approx(std::abs(res(1, k))).epsilon(.0001));
     }

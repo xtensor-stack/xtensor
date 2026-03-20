@@ -30,6 +30,8 @@
 #include "../core/xoperation.hpp"
 #include "../generators/xgenerator.hpp"
 #include "../views/xbroadcast.hpp"
+#include "../utils/xutils.hpp"
+
 
 namespace xt
 {
@@ -498,8 +500,8 @@ namespace xt
             inline value_type access(const tuple_type& t, size_type axis, It first, It last) const
             {
                 // trim off extra indices if provided to match behavior of containers
-                auto dim_offset = std::distance(first, last) - std::get<0>(t).dimension();
-                size_t axis_dim = *(first + axis + dim_offset);
+                auto dim_offset = std::distance(first, last) - as_signed(std::get<0>(t).dimension());
+                size_t axis_dim = as_unsigned(*(first + as_signed(axis) + dim_offset));
                 auto match = [&](auto& arr)
                 {
                     if (axis_dim >= arr.shape()[axis])
@@ -520,7 +522,7 @@ namespace xt
                         const size_t stride = std::accumulate(
                             shape.begin() + i + 1,
                             shape.end(),
-                            1,
+                            1ul,
                             std::multiplies<size_t>()
                         );
                         if (i == axis)
@@ -529,11 +531,11 @@ namespace xt
                         }
                         else
                         {
-                            const auto len = (*(first + i + dim_offset));
+                            const auto len = as_unsigned(*(first + as_signed(i) + dim_offset));
                             offset += len * stride;
                         }
                     }
-                    const auto element = arr.begin() + offset;
+                    const auto element = arr.begin() + as_signed(offset);
                     return *element;
                 };
 
@@ -563,7 +565,7 @@ namespace xt
             {
                 auto get_item = [&](auto& arr)
                 {
-                    size_t offset = 0;
+                    std::ptrdiff_t offset = 0;
                     const size_t end = arr.dimension();
                     size_t after_axis = 0;
                     for (size_t i = 0; i < end; i++)
@@ -576,16 +578,16 @@ namespace xt
                         const size_t stride = std::accumulate(
                             shape.begin() + i + 1,
                             shape.end(),
-                            1,
+                            1ul,
                             std::multiplies<size_t>()
                         );
-                        const auto len = (*(first + i + after_axis));
-                        offset += len * stride;
+                        const auto len = as_unsigned(*(first + as_signed(i + after_axis)));
+                        offset += as_signed(len * stride);
                     }
                     const auto element = arr.begin() + offset;
                     return *element;
                 };
-                size_type i = *(first + axis);
+                auto i = as_unsigned((*(first + as_signed(axis))));
                 return apply<value_type>(i, get_item, t);
             }
         };

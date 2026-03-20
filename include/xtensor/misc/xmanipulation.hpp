@@ -296,8 +296,8 @@ namespace xt
             auto perm = xtl::make_sequence<S>(dim, 0);
             using id_t = typename S::value_type;
             std::iota(perm.begin(), perm.end(), id_t(0));
-            perm[ax1] = ax2;
-            perm[ax2] = ax1;
+            perm[ax1] = static_cast<id_t>(ax2);
+            perm[ax2] = static_cast<id_t>(ax1);
             return perm;
         }
     }
@@ -339,18 +339,18 @@ namespace xt
 
             // Initializing to src_norm handles case where `dest == -1` and the loop
             // does not go check `perm_idx == dest_norm` a `dim+1`th time.
-            auto perm = xtl::make_sequence<S>(dim, src_norm);
+            auto perm = xtl::make_sequence<S>(dim, static_cast<id_t>(src_norm));
             id_t perm_idx = 0;
             for (id_t i = 0; xtl::cmp_less(i, dim); ++i)
             {
-                if (xtl::cmp_equal(perm_idx, dest_norm))
+                if (xtl::cmp_equal(static_cast<std::size_t>(perm_idx), dest_norm))
                 {
-                    perm[perm_idx] = src_norm;
+                    perm[static_cast<std::size_t>(perm_idx)] = static_cast<id_t>(src_norm);
                     ++perm_idx;
                 }
-                if (xtl::cmp_not_equal(i, src_norm))
+                if (xtl::cmp_not_equal(static_cast<std::size_t>(i), src_norm))
                 {
-                    perm[perm_idx] = i;
+                    perm[static_cast<std::size_t>(perm_idx)] = i;
                     ++perm_idx;
                 }
             }

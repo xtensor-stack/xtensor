@@ -1050,6 +1050,25 @@ namespace xt
     template <class E, size_t N>
     using has_rank_t = typename has_rank<std::decay_t<E>, N>::type;
 
+    /*************
+     * as_signed *
+     *************/
+
+    template <class T>
+    std::make_signed_t<T> as_signed(T t)
+    {
+        return static_cast<std::make_signed_t<T>>(t);
+    }
+
+    /***************
+     * as_unsigned *
+     ***************/
+
+    template <class T>
+    std::make_unsigned_t<T> as_unsigned(T t)
+    {
+        return static_cast<std::make_unsigned_t<T>>(t);
+    }
 }
 
 #endif
