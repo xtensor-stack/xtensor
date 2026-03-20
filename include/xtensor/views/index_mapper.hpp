@@ -517,8 +517,9 @@ namespace xt
             }
             else
             {
-                assert(i < slice.size());
-                return as_unsigned(slice(static_cast<typename current_slice::size_type>(i)));
+                using size_type = typename current_slice::size_type;
+                assert(static_cast<size_type>(i) < slice.size());
+                return as_unsigned(slice(static_cast<size_type>(i)));
             }
         }
         else
