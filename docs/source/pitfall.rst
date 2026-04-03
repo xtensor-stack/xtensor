@@ -92,7 +92,8 @@ is still an lvalue and thus captured by reference.
     that hold references to local variables. When the function returns, these local
     variables are destroyed, and the returned expression contains dangling references.
 
-    The fix is to use explicit container types to force evaluation:
+    The fix is to force evaluation of only the returned expression — intermediate
+    lazy expressions are safe as long as they do not outlive the function:
 
     .. code::
 
@@ -100,23 +101,11 @@ is still an lvalue and thus captured by reference.
         xt::xtensor<T, 2> logSoftmax(const xt::xtensor<T, 2> &matrix)
         {
             xt::xtensor<T, 2> maxVals = xt::amax(matrix, {1}, xt::keep_dims);
-            xt::xtensor<T, 2> shifted = matrix - maxVals;
-            xt::xtensor<T, 2> expVals = xt::exp(shifted);
-            xt::xtensor<T, 2> sumExp = xt::sum(expVals, {1}, xt::keep_dims);
-            return shifted - xt::log(sumExp);
+            auto shifted = matrix - maxVals;
+            auto expVals = xt::exp(shifted);
+            auto sumExp = xt::sum(expVals, {1}, xt::keep_dims);
+            return xt::xtensor<T, 2>(shifted - xt::log(sumExp));
         }
-
-    Alternatively, you can use :cpp:func:`xt::eval` to force evaluation:
-
-    .. code::
-
-        auto shifted = xt::eval(matrix - maxVals);
-
-    Or use the immediate evaluation strategy for reducers:
-
-    .. code::
-
-        auto sumExp = xt::sum(expVals, {1}, xt::evaluation_strategy::immediate | xt::keep_dims);
 
 Random numbers not consistent
 -----------------------------
