@@ -482,7 +482,9 @@ namespace xt
             char header_len_le16[2];
             istream.read(header_len_le16, 2);
 
-            uint16_t header_length = uint16_t(header_len_le16[0] << 0) | uint16_t(header_len_le16[1] << 8);
+            uint16_t header_b0 = static_cast<uint16_t>(static_cast<uint8_t>(header_len_le16[0]));
+            uint16_t header_b1 = static_cast<uint16_t>(static_cast<uint8_t>(header_len_le16[1])) << 8;
+            uint16_t header_length = header_b0 | header_b1;
 
             if ((magic_string_length + 2 + 2 + header_length) % 16 != 0)
             {
@@ -502,8 +504,11 @@ namespace xt
             char header_len_le32[4];
             istream.read(header_len_le32, 4);
 
-            uint32_t header_length = uint32_t(header_len_le32[0] << 0) | uint32_t(header_len_le32[1] << 8)
-                                     | uint32_t(header_len_le32[2] << 16) | uint32_t(header_len_le32[3] << 24);
+            uint32_t header_b0 = static_cast<uint32_t>(static_cast<uint8_t>(header_len_le32[0]));
+            uint32_t header_b1 = static_cast<uint32_t>(static_cast<uint8_t>(header_len_le32[1])) << 8;
+            uint32_t header_b2 = static_cast<uint32_t>(static_cast<uint8_t>(header_len_le32[2])) << 16;
+            uint32_t header_b3 = static_cast<uint32_t>(static_cast<uint8_t>(header_len_le32[3])) << 24;
+            uint32_t header_length = header_b0 | header_b1 | header_b2 | header_b3;
 
             if ((magic_string_length + 2 + 4 + header_length) % 16 != 0)
             {
