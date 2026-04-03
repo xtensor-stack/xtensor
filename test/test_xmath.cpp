@@ -979,23 +979,24 @@ namespace xt
         // intermediate results. Returning a lazy expression from a function can lead
         // to dangling references — only the returned expression must be evaluated.
 
-        // The CORRECT way: use auto for intermediates, force evaluation only at return
+        // The CORRECT way: reducer results must be evaluated; element-wise lazy
+        // expressions are safe to leave as auto
         auto logSoftmax_correct = [](const xt::xtensor<double, 2>& matrix)
         {
             xt::xtensor<double, 2> maxVals = xt::amax(matrix, {1}, xt::keep_dims);
             auto shifted = matrix - maxVals;
             auto expVals = xt::exp(shifted);
-            auto sumExp = xt::sum(expVals, {1}, xt::keep_dims);
+            xt::xtensor<double, 2> sumExp = xt::sum(expVals, {1}, xt::keep_dims);
             return xt::xtensor<double, 2>(shifted - xt::log(sumExp));
         };
 
-        // Alternative CORRECT way: use xt::eval on the reducer result
+        // Alternative CORRECT way: use xt::eval for reducer results
         auto logSoftmax_eval = [](const xt::xtensor<double, 2>& matrix)
         {
             auto maxVals = xt::eval(xt::amax(matrix, {1}, xt::keep_dims));
             auto shifted = matrix - maxVals;
             auto expVals = xt::exp(shifted);
-            auto sumExp = xt::sum(expVals, {1}, xt::keep_dims);
+            auto sumExp = xt::eval(xt::sum(expVals, {1}, xt::keep_dims));
             return xt::xtensor<double, 2>(shifted - xt::log(sumExp));
         };
 

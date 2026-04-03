@@ -92,8 +92,10 @@ is still an lvalue and thus captured by reference.
     that hold references to local variables. When the function returns, these local
     variables are destroyed, and the returned expression contains dangling references.
 
-    The fix is to force evaluation of only the returned expression — intermediate
-    lazy expressions are safe as long as they do not outlive the function:
+    The fix is to evaluate reducer results and the returned expression explicitly.
+    Element-wise lazy expressions (like ``shifted`` and ``expVals``) are safe to
+    leave as ``auto``, but reducer results (like ``sumExp``) must be materialized
+    before being used in a subsequent element-wise expression:
 
     .. code::
 
@@ -103,7 +105,7 @@ is still an lvalue and thus captured by reference.
             xt::xtensor<T, 2> maxVals = xt::amax(matrix, {1}, xt::keep_dims);
             auto shifted = matrix - maxVals;
             auto expVals = xt::exp(shifted);
-            auto sumExp = xt::sum(expVals, {1}, xt::keep_dims);
+            xt::xtensor<T, 2> sumExp = xt::sum(expVals, {1}, xt::keep_dims);
             return xt::xtensor<T, 2>(shifted - xt::log(sumExp));
         }
 
