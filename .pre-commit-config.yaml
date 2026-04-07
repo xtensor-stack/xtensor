@@ -24,7 +24,7 @@ repos:
   - id: remove-tabs
     args: [--whitespaces-count, '4']
 - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-  rev: v2.11.0
+  rev: v2.16.0
   hooks:
   - id: pretty-format-yaml
     args: [--autofix, --indent, '2']
