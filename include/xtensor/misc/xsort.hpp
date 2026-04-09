@@ -77,7 +77,7 @@ namespace xt
         {
             XTENSOR_ASSERT(ev.dimension() >= 2);
 
-            const std::size_t n_iters = leading_axis_n_iters(ev);
+            const auto n_iters = as_signed(leading_axis_n_iters(ev));
             const std::ptrdiff_t secondary_stride = get_secondary_stride(ev);
 
             const auto begin = ev.data();
@@ -94,7 +94,7 @@ namespace xt
             XTENSOR_ASSERT(e1.dimension() >= 2);
             XTENSOR_ASSERT(e1.dimension() == e2.dimension());
 
-            const std::size_t n_iters = leading_axis_n_iters(e1);
+            const auto n_iters = as_signed(leading_axis_n_iters(e1));
             const std::ptrdiff_t secondary_stride1 = get_secondary_stride(e1);
             const std::ptrdiff_t secondary_stride2 = get_secondary_stride(e2);
             XTENSOR_ASSERT(secondary_stride1 == secondary_stride2);
@@ -294,7 +294,7 @@ namespace xt
         template <class ConstRandomIt, class RandomIt, class Compare, class Method>
         inline void argsort_iter(
             ConstRandomIt data_begin,
-            ConstRandomIt data_end,
+            [[maybe_unused]] ConstRandomIt data_end,
             RandomIt idx_begin,
             RandomIt idx_end,
             Compare comp,
@@ -315,7 +315,7 @@ namespace xt
                         idx_end,
                         [&](const auto i, const auto j)
                         {
-                            return comp(*(data_begin + i), *(data_begin + j));
+                            return comp(*(data_begin + as_signed(i)), *(data_begin + as_signed(j)));
                         }
                     );
                 }
@@ -326,7 +326,7 @@ namespace xt
                         idx_end,
                         [&](const auto i, const auto j)
                         {
-                            return comp(*(data_begin + i), *(data_begin + j));
+                            return comp(*(data_begin + as_signed(i)), *(data_begin + as_signed(j)));
                         }
                     );
                 }
@@ -784,7 +784,7 @@ namespace xt
                 for (auto i : indices)
                 {
                     auto idx = current_index;
-                    idx[current_dim] = i;
+                    idx[current_dim] = as_signed(i);
                     select_indices_impl(shape, indices, axis, current_dim + 1, idx, out);
                 }
             }
@@ -793,7 +793,7 @@ namespace xt
                 for (id_t i = 0; xtl::cmp_less(i, shape[current_dim]); ++i)
                 {
                     auto idx = current_index;
-                    idx[current_dim] = i;
+                    idx[current_dim] = as_signed(i);
                     select_indices_impl(shape, indices, axis, current_dim + 1, idx, out);
                 }
             }
@@ -802,7 +802,7 @@ namespace xt
                 for (auto i : indices)
                 {
                     auto idx = current_index;
-                    idx[current_dim] = i;
+                    idx[current_dim] = as_signed(i);
                     out.push_back(std::move(idx));
                 }
             }
@@ -811,7 +811,7 @@ namespace xt
                 for (id_t i = 0; xtl::cmp_less(i, shape[current_dim]); ++i)
                 {
                     auto idx = current_index;
-                    idx[current_dim] = i;
+                    idx[current_dim] = as_signed(i);
                     out.push_back(std::move(idx));
                 }
             }
@@ -834,7 +834,7 @@ namespace xt
             const std::size_t ax = normalize_axis(e.dimension(), axis);
             using shape_t = get_strides_t<typename std::decay_t<E>::shape_type>;
             auto shape = xtl::forward_sequence<shape_t, decltype(e.shape())>(e.shape());
-            shape[ax] = indices.size();
+            shape[ax] = as_signed(indices.size());
             return reshape_view(
                 index_view(std::forward<E>(e), select_indices(e.shape(), indices, ax)),
                 std::move(shape)
@@ -915,12 +915,12 @@ namespace xt
         auto kth_gamma = detail::quantile_kth_gamma<T, id_t, P>(n, probas, alpha, beta);
 
         // Select relevant values for computing interpolating quantiles
-        auto e_partition = xt::partition(std::forward<E>(e), kth_gamma.first, ax);
-        auto e_kth = detail::fancy_indexing(std::move(e_partition), std::move(kth_gamma.first), ax);
+        auto e_partition = xt::partition(std::forward<E>(e), kth_gamma.first, as_signed(ax));
+        auto e_kth = detail::fancy_indexing(std::move(e_partition), std::move(kth_gamma.first), as_signed(ax));
 
         // Reshape interpolation coefficients
         auto gm1_g_shape = xtl::make_sequence<tmp_shape_t>(e.dimension(), 1);
-        gm1_g_shape[ax] = kth_gamma.second.size();
+        gm1_g_shape[ax] = as_signed(kth_gamma.second.size());
         auto gm1_g_reshaped = reshape_view(std::move(kth_gamma.second), std::move(gm1_g_shape));
 
         // Compute interpolation
@@ -930,9 +930,9 @@ namespace xt
         auto e_kth_g_shape = detail::unsqueeze_shape(e_kth_g.shape(), ax);
         e_kth_g_shape[ax] = 2;
         e_kth_g_shape[ax + 1] /= 2;
-        auto quantiles = xt::sum(reshape_view(std::move(e_kth_g), std::move(e_kth_g_shape)), ax);
+        auto quantiles = xt::sum(reshape_view(std::move(e_kth_g), std::move(e_kth_g_shape)), as_signed(ax));
         // Cannot do a transpose on a non-strided expression so we have to eval
-        return moveaxis(eval(std::move(quantiles)), ax, 0);
+        return moveaxis(eval(std::move(quantiles)), as_signed(ax), 0);
     }
 
     // Static proba array overload
@@ -1237,7 +1237,6 @@ namespace xt
     template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E>
     inline auto argmin(const xexpression<E>& e)
     {
-        using value_type = typename E::value_type;
         auto&& ed = eval(e.derived_cast());
         auto begin = ed.template begin<L>();
         auto end = ed.template end<L>();
@@ -1267,7 +1266,6 @@ namespace xt
     template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E>
     inline auto argmax(const xexpression<E>& e)
     {
-        using value_type = typename E::value_type;
         auto&& ed = eval(e.derived_cast());
         auto begin = ed.template begin<L>();
         auto end = ed.template end<L>();

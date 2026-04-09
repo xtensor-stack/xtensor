@@ -10,6 +10,7 @@
 #include "../core/xnoalias.hpp"
 #include "../generators/xbuilder.hpp"
 #include "../misc/xcomplex.hpp"
+#include "../utils/xutils.hpp"
 #include "../views/xaxis_slice_iterator.hpp"
 #include "../views/xview.hpp"
 #include "./xtl_concepts.hpp"
@@ -61,15 +62,15 @@ namespace xt
                     auto odd = radix2(xt::view(ev, xt::range(1, _, 2)));
 #endif
 
-                    auto range = xt::arange<double>(N / 2);
-                    auto exp = xt::exp(static_cast<value_type>(-2i) * pi * range / N);
+                    auto range = xt::arange<double>(0.5 * static_cast<double>(N));
+                    auto exp = xt::exp(static_cast<value_type>(-2i) * pi * range / static_cast<precision>(N));
                     auto t = exp * odd;
                     auto first_half = even + t;
                     auto second_half = even - t;
                     // TODO: should be a call to stack if performance was improved
                     auto spectrum = xt::xtensor<value_type, 1>::from_shape({N});
-                    xt::view(spectrum, xt::range(0, N / 2)) = first_half;
-                    xt::view(spectrum, xt::range(N / 2, N)) = second_half;
+                    xt::view(spectrum, xt::range(0, static_cast<size_t>(N / 2))) = first_half;
+                    xt::view(spectrum, xt::range(static_cast<size_t>(N / 2), N)) = second_half;
                     return spectrum;
                 }
             }
@@ -82,15 +83,18 @@ namespace xt
 
                 // Find a power-of-2 convolution length m such that m >= n * 2 + 1
                 const std::size_t n = data.size();
-                size_t m = std::ceil(std::log2(n * 2 + 1));
-                m = std::pow(2, m);
+                auto m = static_cast<size_t>(std::ceil(std::log2(n * 2 + 1)));
+                m = 1 << m;
 
                 // Trignometric table
                 auto exp_table = xt::xtensor<std::complex<precision>, 1>::from_shape({n});
                 xt::xtensor<std::size_t, 1> i = xt::pow(xt::linspace<std::size_t>(0, n - 1, n), 2);
                 i %= (n * 2);
 
-                auto angles = xt::eval(precision{3.141592653589793238463} * i / n);
+                auto angles = xt::eval(
+                    static_cast<precision>(3.141592653589793238463) * xt::cast<precision>(i)
+                    / static_cast<precision>(n)
+                );
                 auto j = std::complex<precision>(0, 1);
                 exp_table = xt::exp(-angles * j);
 
@@ -112,7 +116,7 @@ namespace xt
                 auto spectrum_k = xv * yv;
                 auto complex_args = xt::conj(spectrum_k);
                 auto fft_res = radix2(complex_args);
-                auto cv = xt::conj(fft_res) / m;
+                auto cv = xt::conj(fft_res) / static_cast<precision>(m);
 
                 return xt::eval(xt::view(cv, xt::range(0, n)) * exp_table);
             }
@@ -162,7 +166,7 @@ namespace xt
             if constexpr (xtl::is_complex<typename std::decay<E>::type::value_type>::value)
             {
                 // check the length of the data on that axis
-                const std::size_t n = e.shape(axis);
+                const std::size_t n = e.shape(as_unsigned(axis));
                 if (n == 0)
                 {
                     XTENSOR_THROW(std::runtime_error, "Cannot take the iFFT along an empty dimention");
@@ -218,7 +222,9 @@ namespace xt
             auto outvec = ifft(xv, axis);
 
             // Scaling (because this FFT implementation omits it)
-            outvec = outvec / n;
+            using outvec_type = typename decltype(outvec)::value_type::value_type;
+            outvec_type scale = static_cast<outvec_type>(1.0) / static_cast<outvec_type>(n);
+            outvec *= scale;
 
             return outvec;
         }

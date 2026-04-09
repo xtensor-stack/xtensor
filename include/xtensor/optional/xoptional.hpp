@@ -199,7 +199,14 @@ namespace xt
             template <class U, class... Args>
             constexpr result_type apply_impl(const U& t, const Args&... args) const
             {
-                return t & apply_impl(args...);
+                if constexpr (std::is_same_v<T, bool>)
+                {
+                    return t && apply_impl(args...);
+                }
+                else
+                {
+                    return t & apply_impl(args...);
+                }
             }
 
             template <class B>

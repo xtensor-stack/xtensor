@@ -11,7 +11,7 @@
 #include "test_utils.hpp"
 
 #if defined(XTENSOR_DISABLE_EXCEPTIONS)
-#warning "XT_EXPECT_THROW, XT_ASSERT_THROW, XT_EXPECT_ANY_THROW and XT_ASSERT_ANY_THROW are disabled"
+// #warning "XT_EXPECT_THROW, XT_ASSERT_THROW, XT_EXPECT_ANY_THROW and XT_ASSERT_ANY_THROW are disabled"
 #define XT_EXPECT_THROW(x, y)
 #define XT_ASSERT_THROW(x, y)
 #define XT_EXPECT_ANY_THROW(x)

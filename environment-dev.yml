@@ -3,7 +3,7 @@ channels:
 - conda-forge
 dependencies:
 - cmake
-- xtl=0.8.0
+- xtl=0.8.2
 - xsimd=13.2.0
 - nlohmann_json
 - doctest

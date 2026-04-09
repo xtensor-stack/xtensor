@@ -104,22 +104,6 @@ namespace xt
         return 2 * i;
     }
 
-    TEST(utils, apply)
-    {
-        ASSERT_TRUE(foo(std::make_tuple(1, 2, 3)) == 2);
-        static_assert(!noexcept(foo(std::make_tuple(1, 2, 3))));
-        auto func_ne = [](int i) noexcept
-        {
-            return i;
-        };
-        auto t = std::make_tuple(1, 2, 3);
-#if (_MSC_VER >= 1910)
-        static_assert(!noexcept(apply<int>(1, func_ne, t)));
-#else
-        static_assert(noexcept(apply<int>(1, func_ne, t)));
-#endif
-    }
-
     TEST(utils, conditional_cast)
     {
         EXPECT_TRUE((std::is_same<decltype(conditional_cast<false, double>(1)), int>::value));

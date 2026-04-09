@@ -654,8 +654,13 @@ namespace xt
     template <class O>
     inline bool xstrided_view_base<D>::has_linear_assign(const O& str) const noexcept
     {
-        return has_data_interface<xexpression_type>::value && str.size() == strides().size()
-               && std::equal(str.cbegin(), str.cend(), strides().begin());
+        if (!has_data_interface<xexpression_type>::value)
+            return false;
+        if (str.size() == 0 || strides().size() == 0)
+            return false;
+        if (str.size() != strides().size())
+            return false;
+        return std::equal(str.cbegin(), str.cend(), strides().begin());
     }
 
     //@}

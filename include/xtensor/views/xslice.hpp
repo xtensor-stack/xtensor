@@ -714,11 +714,18 @@ namespace xt
         template <class T>
         struct cast_if_integer
         {
-            using type = std::conditional_t<xtl::is_integral<T>::value, std::ptrdiff_t, T>;
+            using type = std::conditional_t<std::is_integral_v<T>, std::ptrdiff_t, T>;
 
             type operator()(T t)
             {
-                return (xtl::is_integral<T>::value) ? static_cast<type>(t) : t;
+                if constexpr (std::is_integral_v<T>)
+                {
+                    return static_cast<type>(t);
+                }
+                else
+                {
+                    return t;
+                }
             }
         };
 
@@ -780,7 +787,7 @@ namespace xt
     {
         if constexpr (is_xslice<S>::value)
         {
-            return slice.size();
+            return static_cast<std::size_t>(slice.size());
         }
         else
         {
@@ -797,7 +804,7 @@ namespace xt
     {
         if constexpr (is_xslice<S>::value)
         {
-            return slice.step_size(idx);
+            return as_unsigned(slice.step_size(idx));
         }
         else
         {
@@ -810,7 +817,7 @@ namespace xt
     {
         if constexpr (is_xslice<S>::value)
         {
-            return slice.step_size(idx, n);
+            return as_unsigned(slice.step_size(idx, n));
         }
         else
         {
@@ -828,11 +835,11 @@ namespace xt
         if constexpr (is_xslice<S>::value)
         {
             using ST = typename S::size_type;
-            return slice(static_cast<ST>(i));
+            return as_unsigned(slice(static_cast<ST>(i)));
         }
         else
         {
-            return static_cast<std::size_t>(slice);
+            return as_unsigned(slice);
         }
     }
 
