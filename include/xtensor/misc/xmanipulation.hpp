@@ -659,7 +659,7 @@ namespace xt
     template <std::size_t N, class E>
     inline auto atleast_Nd(E&& e)
     {
-        xstrided_slice_vector sv((std::max)(e.dimension(), N), all());
+        xstrided_slice_vector sv((std::max) (e.dimension(), N), all());
         if (e.dimension() < N)
         {
             std::size_t i = 0;
@@ -1099,7 +1099,7 @@ namespace xt
      * @param repeats The number of repetition of each elements.
      *     @p repeats is broadcasted to fit the shape of the given @p axis.
      * @param axis the axis along which to repeat the value
-    * @return an expression with the same shape as ``e``, except along the given ``axis``
+     * @return an expression with the same shape as ``e``, except along the given ``axis``
      */
     template <class E>
     inline auto repeat(E&& e, std::size_t repeats, std::size_t axis)
@@ -1119,7 +1119,7 @@ namespace xt
      *     The size of @p repeats must match the shape of the given @p axis.
      * @param axis the axis along which to repeat the value
      *
-    * @return an expression with the same shape as ``e``, except along the given ``axis``
+     * @return an expression with the same shape as ``e``, except along the given ``axis``
      */
     template <class E>
     inline auto repeat(E&& e, const std::vector<std::size_t>& repeats, std::size_t axis)
@@ -1135,7 +1135,7 @@ namespace xt
      * @param repeats The number of repetition of each elements.
      *     The size of @p repeats must match the shape of the given @p axis.
      * @param axis the axis along which to repeat the value
-    * @return an expression with the same shape as ``e``, except along the given ``axis``
+     * @return an expression with the same shape as ``e``, except along the given ``axis``
      */
     template <class E>
     inline auto repeat(E&& e, std::vector<std::size_t>&& repeats, std::size_t axis)

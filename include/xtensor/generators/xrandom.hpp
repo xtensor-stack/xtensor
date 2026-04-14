@@ -914,9 +914,10 @@ namespace xt
          *
          * For weighted random sampling with replacement, binary search with cumulative weights alogrithm is
          * used. For weighted random sampling without replacement, the algorithm used is the exponential sort
-         * from [Efraimidis and Spirakis](https://linkinghub.elsevier.com/retrieve/pii/S002001900500298X) (2006) with the ``weight
-         * / randexp(1)`` [trick](https://web.archive.org/web/20201021162211/https://krlmlr.github.io/wrswoR/)
-         * from Kirill Müller.
+         * from [Efraimidis and Spirakis](https://linkinghub.elsevier.com/retrieve/pii/S002001900500298X)
+         * (2006) with the ``weight / randexp(1)``
+         * [trick](https://web.archive.org/web/20201021162211/https://krlmlr.github.io/wrswoR/) from Kirill
+         * Müller.
          *
          * Note: this function makes a copy of your data, and only 1D data is accepted.
          *
