@@ -9,68 +9,17 @@ Operators and related functions
 
 Defined in ``xtensor/core/xmath.hpp`` and ``xtensor/core/xoperation.hpp``
 
-.. doxygenfunction:: operator+(E&&)
+.. doxygengroup:: arithmetic_operators
+   :members:
 
-.. doxygenfunction:: operator-(E&&)
+.. doxygengroup:: logical_operators
+   :members:
 
-.. doxygenfunction:: operator+(E1&&, E2&&)
+.. doxygengroup:: comparison_operators
+   :members:
 
-.. doxygenfunction:: operator-(E1&&, E2&&)
+.. doxygengroup:: bitwise_operators
+   :members:
 
-.. doxygenfunction:: operator*(E1&&, E2&&)
-
-.. doxygenfunction:: operator/(E1&&, E2&&)
-
-.. doxygenfunction:: operator||(E1&&, E2&&)
-
-.. doxygenfunction:: operator&&(E1&&, E2&&)
-
-.. doxygenfunction:: operator!(E&&)
-
-.. doxygenfunction:: where(E1&&, E2&&, E3&&)
-
-.. doxygenfunction:: any(E&&)
-
-.. doxygenfunction:: all(E&&)
-
-.. doxygenfunction:: operator<(E1&&, E2&&)
-
-.. doxygenfunction:: operator<=(E1&&, E2&&)
-
-.. doxygenfunction:: operator>(E1&&, E2&&)
-
-.. doxygenfunction:: operator>=(E1&&, E2&&)
-
-.. doxygenfunction:: operator==(const xexpression<E1>&, const xexpression<E2>&)
-
-.. doxygenfunction:: operator!=(const xexpression<E1>&, const xexpression<E2>&)
-
-.. doxygenfunction:: equal(E1&&, E2&&)
-
-.. doxygenfunction:: not_equal(E1&&, E2&&)
-
-.. doxygenfunction:: less(E1&& e1, E2&& e2)
-
-.. doxygenfunction:: less_equal(E1&& e1, E2&& e2)
-
-.. doxygenfunction:: greater(E1&& e1, E2&& e2)
-
-.. doxygenfunction:: greater_equal(E1&& e1, E2&& e2)
-
-.. doxygenfunction:: operator&(E1&&, E2&&)
-
-.. doxygenfunction:: operator|(E1&&, E2&&)
-
-.. doxygenfunction:: operator^(E1&&, E2&&)
-
-.. doxygenfunction:: operator~(E&&)
-
-.. doxygenfunction:: left_shift(E1&&, E2&&)
-
-.. doxygenfunction:: right_shift(E1&&, E2&&)
-
-.. doxygenfunction:: operator<<(E1&&, E2&&)
-
-.. doxygenfunction:: operator>>(E1&&, E2&&)
-
-.. doxygenfunction:: cast(E&&)
+.. doxygengroup:: casting_operators
+   :members:

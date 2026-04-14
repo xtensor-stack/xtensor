@@ -9,6 +9,10 @@ xjson: serialize to/from JSON
 
 Defined in ``xtensor/io/xjson.hpp``
 
-.. doxygenfunction:: xt::to_json(nlohmann::json&, const E&);
+Available overload families
+---------------------------
 
-.. doxygenfunction:: xt::from_json(const nlohmann::json&, E&);
+- ``xt::to_json(nlohmann::basic_json<M>&, const E&)``
+- ``xt::from_json(const nlohmann::basic_json<M>&, E&)``
+
+``xt::from_json`` is provided for both container and view semantics.
