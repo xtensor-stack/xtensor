@@ -25,6 +25,11 @@
 
 namespace xt
 {
+    /**
+     * @defgroup searchsorted Searchsorted helpers
+     * @brief Helpers for locating insertion indices in sorted arrays.
+     */
+
 
     namespace detail
     {

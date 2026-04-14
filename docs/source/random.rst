@@ -67,8 +67,8 @@ where :math:`\alpha` is the shape (also known as :math:`k`) and :math:`\beta` th
 .. seealso::
 
     *   :any:`numpy.random.gamma`
-    *   `std::gamma_distribution <https://en.cppreference.com/w/cpp/numeric/random/gamma_distribution>`_
-    *   `Weisstein, Eric W. "Gamma Distribution." From MathWorld – A Wolfram Web Resource. <http://mathworld.wolfram.com/GammaDistribution.html>`_
+    *   `std::gamma_distribution <https://en.cppreference.com/w/cpp/numeric/random/gamma_distribution.html>`_
+    *   `Weisstein, Eric W. "Gamma Distribution." From MathWorld – A Wolfram Web Resource. <https://mathworld.wolfram.com/GammaDistribution.html>`_
     *   `Wikipedia, "Gamma distribution". <https://en.wikipedia.org/wiki/Gamma_distribution>`_
 
 :cpp:func:`xt::random::weibull`
@@ -100,7 +100,7 @@ Note that you can specify only :math:`a` while choosing the default for :math:`b
 .. seealso::
 
     *   :any:`numpy.random.weibull`
-    *   `std::weibull_distribution <https://en.cppreference.com/w/cpp/numeric/random/weibull_distribution>`_
+    *   `std::weibull_distribution <https://en.cppreference.com/w/cpp/numeric/random/weibull_distribution.html>`_
     *   `Wikipedia, "Weibull distribution". <https://en.wikipedia.org/wiki/Weibull_distribution>`_
 
 :cpp:func:`xt::random::extreme_value`

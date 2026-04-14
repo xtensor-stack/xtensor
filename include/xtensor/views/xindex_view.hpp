@@ -505,6 +505,7 @@ namespace xt
     /**
      * Returns a reference to the element at the specified position in the xindex_view.
      * @param first iterator starting the sequence of indices
+     * @param last iterator ending the sequence of indices (not used, only for compatibility with xexpression operator())
      * The number of indices in the sequence should be equal to or greater 1.
      */
     template <class CT, class I>
@@ -517,6 +518,7 @@ namespace xt
     /**
      * Returns a reference to the element at the specified position in the xindex_view.
      * @param first iterator starting the sequence of indices
+     * @param last iterator ending the sequence of indices (not used, only for compatibility with xexpression operator())
      * The number of indices in the sequence should be equal to or greater 1.
      */
     template <class CT, class I>

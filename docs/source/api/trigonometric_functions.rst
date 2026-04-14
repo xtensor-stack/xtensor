@@ -11,16 +11,5 @@ Trigonometric functions
 
 Defined in ``xtensor/core/xmath.hpp``
 
-.. doxygenfunction:: sin(E&&)
-
-.. doxygenfunction:: cos(E&&)
-
-.. doxygenfunction:: tan(E&&)
-
-.. doxygenfunction:: asin(E&&)
-
-.. doxygenfunction:: acos(E&&)
-
-.. doxygenfunction:: atan(E&&)
-
-.. doxygenfunction:: atan2(E1&&, E2&&)
+.. doxygengroup:: trigo_functions
+   :members:

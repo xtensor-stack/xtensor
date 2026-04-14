@@ -1400,6 +1400,7 @@ namespace xt
      * @param func the function to apply
      * @param e the expression to reduce
      * @param axes the axes along which the reduction is performed
+     * @param options reducer options controlling evaluation strategy and related settings
      */
     template <class F, class CT, class X, class O>
     template <class Func, class CTA, class AX, class OX>

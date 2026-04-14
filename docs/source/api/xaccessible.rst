@@ -4,12 +4,13 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-Accumulating functions
-======================
+xaccessible
+===========
 
-**xtensor** provides the following accumulating functions for xexpressions:
+Defined in ``xtensor/core/xaccessible.hpp``
 
-Defined in ``xtensor/core/xmath.hpp``
+.. doxygenclass:: xt::xconst_accessible
+   :members:
 
-.. doxygengroup:: acc_functions
+.. doxygenclass:: xt::xaccessible
    :members:

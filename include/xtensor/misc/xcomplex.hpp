@@ -23,7 +23,7 @@ namespace xt
 {
 
     /**
-     * @defgroup xt_xcomplex
+     * @defgroup xt_xcomplex Complex numbers
      *
      * Defined in ``xtensor/xcomplex.hpp``
      */

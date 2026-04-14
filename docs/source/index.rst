@@ -119,7 +119,7 @@ for details.
    related
    bindings
 
-.. _NumPy: http://www.numpy.org
+.. _NumPy: https://numpy.org/
 .. _Buffer Protocol: https://docs.python.org/3/c-api/buffer.html
 .. _libdynd: http://libdynd.org
 .. _xtensor-python: https://github.com/xtensor-stack/xtensor-python

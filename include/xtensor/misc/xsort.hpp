@@ -556,7 +556,7 @@ namespace xt
      * @ingroup xt_xsort
      * @param e input xexpression
      * @param kth_container a container of ``indices`` that should contain the correctly sorted value
-     * @param axis either integer (default = -1) to sort along last axis or ``xnone()`` to flatten before
+     * @param ax placeholder indicating that the input is flattened before sorting
      * sorting
      *
      * @return partially sorted xcontainer
@@ -647,7 +647,7 @@ namespace xt
      * @ingroup xt_xsort
      * @param e input xexpression
      * @param kth_container a container of ``indices`` that should contain the correctly sorted value
-     * @param axis either integer (default = -1) to sort along last axis or ``xnone()`` to flatten before
+     * @param axis placeholder indicating that the input is flattened before sorting
      * sorting
      *
      * @return xcontainer with indices of partial sort of input

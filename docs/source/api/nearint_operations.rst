@@ -11,14 +11,5 @@ Nearest integer floating point operations
 
 Defined in ``xtensor/core/xmath.hpp``
 
-.. doxygenfunction:: ceil(E&&)
-
-.. doxygenfunction:: floor(E&&)
-
-.. doxygenfunction:: trunc(E&&)
-
-.. doxygenfunction:: round(E&&)
-
-.. doxygenfunction:: nearbyint(E&&)
-
-.. doxygenfunction:: rint(E&&)
+.. doxygengroup:: nearint_functions
+   :members:

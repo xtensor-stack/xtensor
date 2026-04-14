@@ -19,7 +19,7 @@ Defined in ``xtensor/generators/xbuilder.hpp``
 
 .. doxygenfunction:: xt::empty(const S&)
 
-.. doxygenfunction:: xt::full_like(const xexpression<E>&)
+.. doxygenfunction:: xt::full_like(const xexpression<E>&, typename E::value_type)
 
 .. doxygenfunction:: xt::empty_like(const xexpression<E>&)
 

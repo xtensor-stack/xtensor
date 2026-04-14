@@ -100,4 +100,4 @@ You can then build the documentation:
 Type ``make help`` to see the list of available documentation targets.
 
 .. _xsimd: https://github.com/xtensor-stack/xsimd
-.. _tbb: https://www.threadingbuildingblocks.org
+.. _tbb: https://github.com/uxlfoundation/oneTBB

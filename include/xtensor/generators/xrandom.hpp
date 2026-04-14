@@ -914,7 +914,7 @@ namespace xt
          *
          * For weighted random sampling with replacement, binary search with cumulative weights alogrithm is
          * used. For weighted random sampling without replacement, the algorithm used is the exponential sort
-         * from [Efraimidis and Spirakis](https://doi.org/10.1016/j.ipl.2005.11.003) (2006) with the ``weight
+         * from [Efraimidis and Spirakis](https://linkinghub.elsevier.com/retrieve/pii/S002001900500298X) (2006) with the ``weight
          * / randexp(1)`` [trick](https://web.archive.org/web/20201021162211/https://krlmlr.github.io/wrswoR/)
          * from Kirill Müller.
          *
@@ -922,7 +922,7 @@ namespace xt
          *
          * @param e expression to sample from
          * @param n number of elements to sample
-         * @param w expression for the weight distribution.
+         * @param weights expression for the weight distribution.
          *          Weights must be positive and real-valued but need not sum to 1.
          * @param replace set true to sample with replacement
          * @param engine random number engine

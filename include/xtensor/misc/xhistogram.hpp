@@ -24,6 +24,11 @@ using namespace xt::placeholders;
 namespace xt
 {
     /**
+     * @defgroup digitize Digitize helpers
+     * @brief Helpers for assigning values to histogram bins.
+     */
+
+    /**
      * @ingroup digitize
      * @brief Return the indices of the bins to which each value in input array belongs.
      *
@@ -127,6 +132,11 @@ namespace xt
         }
 
     }  // detail
+
+    /**
+     * @defgroup histogram Histogram functions
+     * @brief Helpers for computing histograms and histogram bin edges.
+     */
 
     /**
      * @ingroup histogram

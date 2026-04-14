@@ -11,10 +11,5 @@ Error and gamma functions
 
 Defined in ``xtensor/core/xmath.hpp``
 
-.. doxygenfunction:: erf(E&&)
-
-.. doxygenfunction:: erfc(E&&)
-
-.. doxygenfunction:: tgamma(E&&)
-
-.. doxygenfunction:: lgamma(E&&)
+.. doxygengroup:: err_functions
+   :members:
