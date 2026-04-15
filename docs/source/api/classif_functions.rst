@@ -11,12 +11,5 @@ Classification functions
 
 Defined in ``xtensor/core/xmath.hpp``
 
-.. doxygenfunction:: isfinite(E&&)
-
-.. doxygenfunction:: isinf(E&&)
-
-.. doxygenfunction:: isnan(E&&)
-
-.. doxygenfunction:: isclose(E1&&, E2&&, double, double, bool)
-
-.. doxygenfunction:: allclose(E1&&, E2&, double, double)
+.. doxygengroup:: classif_functions
+   :members:

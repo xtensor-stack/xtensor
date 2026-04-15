@@ -29,7 +29,7 @@
 namespace xt
 {
     /**
-     * @defgroup xt_xfunctor_view
+     * @defgroup xt_xfunctor_view Functor view
      *
      * Chunked array container.
      * Defined in ``xtensor/xfunctor_view.hpp``

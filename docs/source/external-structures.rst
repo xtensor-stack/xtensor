@@ -47,7 +47,7 @@ Adapting a pointer
 ------------------
 
 Suppose that you want to use the *xtensor* machinery on a small contiguous subset of a large tensor.
-You can, of course, use :ref:`Views`, but for efficiency you can also use pointers to the right bit of memory.
+You can, of course, use :ref:`view-description`, but for efficiency you can also use pointers to the right bit of memory.
 Consider an example of an ``[M, 2, 2]`` tensor ``A``,
 for which you want to operate on ``A[i, :, :]`` for different ``i``.
 In this case the most efficient *xtensor* has to offer is:

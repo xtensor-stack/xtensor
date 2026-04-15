@@ -11,20 +11,5 @@ Hyperbolic functions
 
 Defined in ``xtensor/core/xmath.hpp``
 
-.. _sinh-function-reference:
-.. doxygenfunction:: sinh(E&&)
-
-.. _cosh-function-reference:
-.. doxygenfunction:: cosh(E&&)
-
-.. _tanh-function-reference:
-.. doxygenfunction:: tanh(E&&)
-
-.. _asinh-func-ref:
-.. doxygenfunction:: asinh(E&&)
-
-.. _acosh-func-ref:
-.. doxygenfunction:: acosh(E&&)
-
-.. _atanh-func-ref:
-.. doxygenfunction:: atanh(E&&)
+.. doxygengroup:: hyper_functions
+   :members:

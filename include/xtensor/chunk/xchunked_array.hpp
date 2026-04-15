@@ -19,7 +19,7 @@
 namespace xt
 {
     /**
-     * @defgroup xt_xchunked_array
+     * @defgroup xt_xchunked_array Chunked array
      *
      * Chunked array container.
      * Defined in ``xtensor/xchunked_array.hpp``.

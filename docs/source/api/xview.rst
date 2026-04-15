@@ -10,7 +10,6 @@ xview
 Defined in ``xtensor/views/xview.hpp``
 
 .. doxygenclass:: xt::xview
-   :members:
 
 .. doxygenfunction:: xt::view
 

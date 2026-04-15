@@ -120,4 +120,4 @@ Notice that this option prevents building on a machine and distributing the resu
 a different architecture (i.e. not supporting the same instruction set).
 
 .. _xsimd: https://github.com/xtensor-stack/xsimd
-.. _tbb: https://www.threadingbuildingblocks.org
+.. _tbb: https://github.com/uxlfoundation/oneTBB

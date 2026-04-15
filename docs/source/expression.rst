@@ -232,5 +232,5 @@ Iterators
   :cpp:func:`begin(shape) <xt::xiterator xt::xexpression::begin(xt::xshape)>` and
   :cpp:func:`end(shape) <xiterator xt::xexpression::end(xt::xshape)>`.
 
-.. _NumPy: http://www.numpy.org
+.. _NumPy: https://numpy.org/
 .. _libdynd: http://libdynd.org

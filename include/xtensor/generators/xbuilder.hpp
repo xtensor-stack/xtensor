@@ -146,7 +146,7 @@ namespace xt
      * the same shape, value type and layout as the input xexpression *e*.
      *
      * Note: contrary to zeros(shape), this function returns a non-lazy, allocated container!
-     * Use ``xt::zeros<double>(e.shape());` for a lazy version.
+     * Use ``xt::zeros<double>(e.shape());`` for a lazy version.
      *
      * @param e the xexpression from which to extract shape, value type and layout.
      */

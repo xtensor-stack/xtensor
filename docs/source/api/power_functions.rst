@@ -12,16 +12,5 @@ Power functions
 
 Defined in ``xtensor/core/xmath.hpp``
 
-.. doxygenfunction:: pow(E1&&, E2&&)
-
-.. doxygenfunction:: pow(E&&)
-
-.. doxygenfunction:: square(E1&&)
-
-.. doxygenfunction:: cube(E1&&)
-
-.. doxygenfunction:: sqrt(E&&)
-
-.. doxygenfunction:: cbrt(E&&)
-
-.. doxygenfunction:: hypot(E1&&, E2&&)
+.. doxygengroup:: pow_functions
+   :members:

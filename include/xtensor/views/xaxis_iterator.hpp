@@ -235,7 +235,7 @@ namespace xt
     /**
      * Checks equality of the xaxis_slice_iterator and \c rhs.
      *
-     * @param
+     * @param rhs iterator to compare with
      * @return true if the iterators are equivalent, false otherwise
      */
     template <class CT>

@@ -700,7 +700,7 @@ namespace xt
     /**
      * Returns a reference to the element at the specified position
      * of the underlying storage in the optional assembly.
-     * @param index index to underlying flat storage.
+     * @param i index to underlying flat storage.
      */
     template <class D>
     inline auto xoptional_assembly_base<D>::flat(size_type i) -> reference
@@ -711,7 +711,7 @@ namespace xt
     /**
      * Returns a constant reference to the element at the specified position
      * of the underlying storage in the optional assembly.
-     * @param index index to underlying flat storage.
+     * @param i index to underlying flat storage.
      */
     template <class D>
     inline auto xoptional_assembly_base<D>::flat(size_type i) const -> const_reference

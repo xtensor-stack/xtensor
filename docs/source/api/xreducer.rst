@@ -12,4 +12,9 @@ Defined in ``xtensor/reducers/xreducer.hpp``
 .. doxygenclass:: xt::xreducer
    :members:
 
-.. doxygenfunction:: xt::reduce(F&&, E&&, X&&, EVS&&)
+Available overload families
+---------------------------
+
+- ``xt::reduce(f, e, axes, options)``
+- ``xt::reduce(f, e, options)``
+- ``xt::reduce(f, e, const I (&axes)[N], options)``

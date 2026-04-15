@@ -9,35 +9,14 @@ xhistogram
 
 Defined in ``xtensor/misc/xhistogram.hpp``
 
-.. doxygenenum:: xt::histogram_algorithm
+.. doxygengroup:: digitize
+   :members:
 
-.. doxygenfunction:: xt::histogram(E1&&, E2&&, E3&&, bool)
+.. doxygengroup:: histogram
+   :members:
 
 .. doxygenfunction:: xt::bincount(E1&&, E2&&, std::size_t)
 
-.. doxygenfunction:: xt::histogram_bin_edges(E1&&, E2&&, E3, E3, std::size_t, histogram_algorithm)
-
-.. doxygenfunction:: xt::digitize(E1&&, E2&&, E3&&, bool, bool)
-
 .. doxygenfunction:: xt::bin_items(size_t, E&&)
-
-Further overloads
------------------
-
-.. doxygenfunction:: xt::histogram(E1&&, E2&&, bool)
-
-.. doxygenfunction:: xt::histogram(E1&&, std::size_t, bool)
-
-.. doxygenfunction:: xt::histogram(E1&&, std::size_t, E2, E2, bool)
-
-.. doxygenfunction:: xt::histogram(E1&&, std::size_t, E2&&, bool)
-
-.. doxygenfunction:: xt::histogram(E1&&, std::size_t, E2&&, E3, E3, bool)
-
-.. doxygenfunction:: xt::histogram_bin_edges(E1&&, E2, E2, std::size_t, histogram_algorithm)
-
-.. doxygenfunction:: xt::histogram_bin_edges(E1&&, E2&&, std::size_t, histogram_algorithm)
-
-.. doxygenfunction:: xt::histogram_bin_edges(E1&&, std::size_t, histogram_algorithm)
 
 .. doxygenfunction:: xt::bin_items(size_t, size_t)

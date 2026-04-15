@@ -17,7 +17,7 @@ the chunks fit comfortably in memory, but this also allows to process them in
 parallel, including in a distributed environment (although this is not supported
 yet).
 
-Formats for the storage of arrays such as `Zarr <https://zarr.readthedocs.io>`_
+Formats for the storage of arrays such as `Zarr <https://zarr.readthedocs.io/en/stable/>`_
 specifically target chunked arrays. Such formats are becoming increasingly
 popular in the field of big data, since the chunks can be stored in the cloud.
 
@@ -66,4 +66,4 @@ persistence of data. In particular, they are used as a building block for the
 `xtensor-zarr <https://github.com/xtensor-stack/xtensor-zarr>`_ library.
 
 For further details, please refer to the documentation
-of `xtensor-io <https://xtensor-io.readthedocs.io>`_.
+of `xtensor-io <https://xtensor-io.readthedocs.io/en/latest/>`_.

@@ -18,7 +18,7 @@ namespace xt
 {
 
     /**
-     * @defgroup xt_xeval
+     * @defgroup xt_xeval Evaluation
      *
      * Evaluation functions.
      * Defined in ``xtensor/xeval.hpp``

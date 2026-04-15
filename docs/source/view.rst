@@ -159,9 +159,9 @@ Since ``xtensor 0.16.3``, a new range syntax can be used with strided views:
     // The previous line is equivalent to
     auto v2 = xt::strided_view(a, {xt::range(0, 1), 1, xt::range(_, 2), xt::range(_, _, -1)});
 
-The :cpp:type:`xt::xstrided_view` is very efficient on contigous memory
-(e.g. :cpp:type:`xt::xtensor` or :cpp:type:`xt::xarray`) but less efficient on\
-:cpp:type:`xt::xexpression`s.
+The :cpp:type:`xt::xstrided_view` type is very efficient on contigous memory
+(e.g. :cpp:type:`xt::xtensor` or :cpp:type:`xt::xarray`) but less efficient on
+generic :cpp:type:`xt::xexpression` objects.
 
 Transposed views
 ----------------
