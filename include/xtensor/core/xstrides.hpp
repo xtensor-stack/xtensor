@@ -493,7 +493,7 @@ namespace xt
     {
         using difference_type = typename std::iterator_traits<It>::difference_type;
         auto size = static_cast<difference_type>(
-            (std::min) (static_cast<typename S::size_type>(std::distance(first, last)), strides.size())
+            (std::min)(static_cast<typename S::size_type>(std::distance(first, last)), strides.size())
         );
         return std::inner_product(last - size, last, strides.cend() - size, offset_type(0));
     }
