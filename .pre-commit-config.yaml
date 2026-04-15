@@ -30,6 +30,7 @@ repos:
     args: [--autofix, --indent, '2']
     types: [file]
     files: \.(yaml|yml|clang-format)
+    additional_dependencies: [setuptools]
 - repo: https://github.com/tdegeus/cpp_comment_format
   rev: v0.2.1
   hooks:

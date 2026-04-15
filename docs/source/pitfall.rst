@@ -70,6 +70,45 @@ in the returned expression.
 Replacing ``auto tmp`` with ``xt::xarray<double> tmp`` does not change anything, ``tmp``
 is still an lvalue and thus captured by reference.
 
+.. warning::
+
+    This issue is particularly subtle with reducer functions like :cpp:func:`xt::amax`,
+    :cpp:func:`xt::sum`, etc. Consider the following function:
+
+    .. code::
+
+        template <typename T>
+        xt::xtensor<T, 2> logSoftmax(const xt::xtensor<T, 2> &matrix)
+        {
+            xt::xtensor<T, 2> maxVals = xt::amax(matrix, {1}, xt::keep_dims);
+            auto shifted = matrix - maxVals;
+            auto expVals = xt::exp(shifted);
+            auto sumExp = xt::sum(expVals, {1}, xt::keep_dims);
+            return shifted - xt::log(sumExp);
+        }
+
+    This function may produce incorrect results or crash, especially in optimized builds.
+    The issue is that ``shifted``, ``expVals``, and ``sumExp`` are all lazy expressions
+    that hold references to local variables. When the function returns, these local
+    variables are destroyed, and the returned expression contains dangling references.
+
+    The fix is to evaluate reducer results and the returned expression explicitly.
+    Element-wise lazy expressions (like ``shifted`` and ``expVals``) are safe to
+    leave as ``auto``, but reducer results (like ``sumExp``) must be materialized
+    before being used in a subsequent element-wise expression:
+
+    .. code::
+
+        template <typename T>
+        xt::xtensor<T, 2> logSoftmax(const xt::xtensor<T, 2> &matrix)
+        {
+            xt::xtensor<T, 2> maxVals = xt::amax(matrix, {1}, xt::keep_dims);
+            auto shifted = matrix - maxVals;
+            auto expVals = xt::exp(shifted);
+            xt::xtensor<T, 2> sumExp = xt::sum(expVals, {1}, xt::keep_dims);
+            return xt::xtensor<T, 2>(shifted - xt::log(sumExp));
+        }
+
 Random numbers not consistent
 -----------------------------
 

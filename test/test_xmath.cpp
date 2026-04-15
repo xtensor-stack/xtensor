@@ -969,4 +969,51 @@ namespace xt
             EXPECT_TRUE(xt::allclose(expected, unwrapped));
         }
     }
+
+    // Test for GitHub issue #2871: Proper handling of intermediate results
+    // This test documents the correct way to use reducers with keep_dims
+    // when intermediate expressions are needed.
+    TEST(xmath, issue_2871_intermediate_result_handling)
+    {
+        // This test verifies the correct pattern for using reducers with
+        // intermediate results. Returning a lazy expression from a function can lead
+        // to dangling references — only the returned expression must be evaluated.
+
+        // The CORRECT way: reducer results must be evaluated; element-wise lazy
+        // expressions are safe to leave as auto
+        auto logSoftmax_correct = [](const xt::xtensor<double, 2>& matrix)
+        {
+            xt::xtensor<double, 2> maxVals = xt::amax(matrix, {1}, xt::keep_dims);
+            auto shifted = matrix - maxVals;
+            auto expVals = xt::exp(shifted);
+            xt::xtensor<double, 2> sumExp = xt::sum(expVals, {1}, xt::keep_dims);
+            return xt::xtensor<double, 2>(shifted - xt::log(sumExp));
+        };
+
+        // Alternative CORRECT way: use xt::eval for reducer results
+        auto logSoftmax_eval = [](const xt::xtensor<double, 2>& matrix)
+        {
+            auto maxVals = xt::eval(xt::amax(matrix, {1}, xt::keep_dims));
+            auto shifted = matrix - maxVals;
+            auto expVals = xt::exp(shifted);
+            auto sumExp = xt::eval(xt::sum(expVals, {1}, xt::keep_dims));
+            return xt::xtensor<double, 2>(shifted - xt::log(sumExp));
+        };
+
+        // Test data
+        xt::xtensor<double, 2> input = {{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}};
+
+        // Both implementations should produce the same result
+        auto result1 = logSoftmax_correct(input);
+        auto result2 = logSoftmax_eval(input);
+
+        EXPECT_TRUE(xt::allclose(result1, result2));
+
+        // Verify the result is a valid log-softmax (rows sum to 0 in log space)
+        // exp(log_softmax).sum(axis=1) should equal 1
+        auto exp_result = xt::exp(result1);
+        auto row_sums = xt::sum(exp_result, {1});
+        xt::xtensor<double, 1> expected_sums = {1.0, 1.0};
+        EXPECT_TRUE(xt::allclose(row_sums, expected_sums));
+    }
 }
