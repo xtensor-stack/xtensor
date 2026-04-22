@@ -11,13 +11,10 @@
 #define XTENSOR_XSHAPE_HPP
 
 #include <algorithm>
-#include <cassert>
 #include <cstddef>
 #include <cstdlib>
-#include <cstring>
 #include <initializer_list>
 #include <iterator>
-#include <memory>
 
 #include "../containers/xstorage.hpp"
 #include "../core/xlayout.hpp"

@@ -15,7 +15,6 @@
 #include <cstddef>
 #include <iterator>
 #include <numeric>
-#include <vector>
 
 #include <xtl/xcompare.hpp>
 #include <xtl/xiterator_base.hpp>

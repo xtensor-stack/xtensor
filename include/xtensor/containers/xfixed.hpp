@@ -14,7 +14,6 @@
 #include <array>
 #include <cstddef>
 #include <utility>
-#include <vector>
 
 #include <xtl/xsequence.hpp>
 

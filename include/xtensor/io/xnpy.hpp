@@ -17,15 +17,12 @@
 #include <algorithm>
 #include <complex>
 #include <cstdint>
-#include <cstring>
 #include <fstream>
-#include <iostream>
 #include <memory>
 #include <regex>
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#include <typeinfo>
 #include <vector>
 
 #include <xtl/xplatform.hpp>

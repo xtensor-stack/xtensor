@@ -12,7 +12,6 @@
 
 #include <array>
 #include <cstddef>
-#include <utility>
 
 #include <xtl/xtype_traits.hpp>
 

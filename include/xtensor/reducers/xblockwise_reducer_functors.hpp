@@ -2,10 +2,7 @@
 #define XTENSOR_XBLOCKWISE_REDUCER_FUNCTORS_HPP
 
 
-#include <sstream>
-#include <string>
 #include <tuple>
-#include <typeinfo>
 
 #include "../chunk/xchunked_array.hpp"
 #include "../chunk/xchunked_assign.hpp"
