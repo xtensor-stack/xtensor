@@ -12,3 +12,11 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: pre-commit/action@v3.0.0
+
+  include-check:
+    runs-on: ubuntu-latest
+    name: Check unused standard includes
+    steps:
+    - uses: actions/checkout@v6
+    - run: pip install diskarzhan
+    - run: diskarzhan `find include -name '*.hpp'`

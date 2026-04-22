@@ -13,7 +13,6 @@
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
-#include <numeric>
 #include <tuple>
 #include <type_traits>
 #include <utility>

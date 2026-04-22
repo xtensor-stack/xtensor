@@ -11,7 +11,6 @@
 #define XTENSOR_OPERATION_HPP
 
 #include <algorithm>
-#include <functional>
 #include <type_traits>
 
 #include <xtl/xsequence.hpp>

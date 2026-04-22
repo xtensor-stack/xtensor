@@ -10,9 +10,7 @@
 #ifndef XTENSOR_EXPRESSION_HPP
 #define XTENSOR_EXPRESSION_HPP
 
-#include <cstddef>
 #include <type_traits>
-#include <vector>
 
 #include <xtl/xclosure.hpp>
 #include <xtl/xmeta_utils.hpp>

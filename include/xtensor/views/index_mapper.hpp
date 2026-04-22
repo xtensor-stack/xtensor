@@ -10,6 +10,8 @@
 #ifndef XTENSOR_INDEX_MAPPER_HPP
 #define XTENSOR_INDEX_MAPPER_HPP
 
+#include <cassert>
+
 #include "xview.hpp"
 
 namespace xt

@@ -11,7 +11,6 @@
 #define XTENSOR_ARRAY_HPP
 
 #include <algorithm>
-#include <initializer_list>
 #include <utility>
 
 #include <xtl/xsequence.hpp>

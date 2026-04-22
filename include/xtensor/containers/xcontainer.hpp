@@ -11,9 +11,7 @@
 #define XTENSOR_CONTAINER_HPP
 
 #include <algorithm>
-#include <functional>
 #include <memory>
-#include <numeric>
 #include <stdexcept>
 
 #include <xtl/xmeta_utils.hpp>

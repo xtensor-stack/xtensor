@@ -12,7 +12,6 @@
 
 #include <algorithm>
 #include <cstddef>
-#include <initializer_list>
 #include <iterator>
 #include <stdexcept>
 #include <tuple>
