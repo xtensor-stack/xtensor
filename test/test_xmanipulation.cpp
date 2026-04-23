@@ -504,6 +504,80 @@ namespace xt
         ASSERT_EQ(expected8, xt::roll(e2, -2, /*axis*/ 2));
     }
 
+    TEST(xmanipulation, roll_multi_axis)
+    {
+        // Test 1: Basic 2D multi-axis roll
+        xarray<double> e1 = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+
+        // Roll 1 on axis 0, 2 on axis 1
+        xarray<double> expected1 = {{8, 9, 7}, {2, 3, 1}, {5, 6, 4}};
+        ASSERT_EQ(expected1, xt::roll(e1, {1, 2}, {0, 1}));
+
+        // Verify equivalence with sequential single-axis rolls
+        auto sequential_result = xt::roll(xt::roll(e1, 1, 0), 2, 1);
+        ASSERT_EQ(expected1, sequential_result);
+
+        // Test 2: std::array as input
+        std::array<int, 2> shifts = {1, 2};
+        std::array<int, 2> axes = {0, 1};
+        ASSERT_EQ(expected1, xt::roll(e1, shifts, axes));
+
+        // Test 3: std::vector as input
+        std::vector<int> shifts_v = {1, 2};
+        std::vector<int> axes_v = {0, 1};
+        ASSERT_EQ(expected1, xt::roll(e1, shifts_v, axes_v));
+
+        // Test 4: Negative shifts
+        xarray<double> expected4 = {{6, 4, 5}, {9, 7, 8}, {3, 1, 2}};
+        ASSERT_EQ(expected4, xt::roll(e1, {-1, -2}, {0, 1}));
+
+        // Test 5: Negative axis indices
+        ASSERT_EQ(expected1, xt::roll(e1, {1, 2}, {-2, -1}));
+
+        // Test 6: 3D array
+        xarray<double> e3 = {{{1, 2}, {3, 4}}, {{5, 6}, {7, 8}}};
+        xarray<double> expected6 = {{{8, 7}, {6, 5}}, {{4, 3}, {2, 1}}};
+        ASSERT_EQ(expected6, xt::roll(e3, {1, 1, 1}, {0, 1, 2}));
+
+        // Test 7: Single axis via multi-axis interface (should match single-axis version)
+        xarray<double> expected7 = {{7, 8, 9}, {1, 2, 3}, {4, 5, 6}};
+        ASSERT_EQ(expected7, xt::roll(e1, {1}, {0}));
+        ASSERT_EQ(expected7, xt::roll(e1, 1, 0));
+
+        // Test 8: Empty shifts (should return copy of original)
+        std::vector<int> empty_shifts;
+        std::vector<int> empty_axes;
+        ASSERT_EQ(e1, xt::roll(e1, empty_shifts, empty_axes));
+
+        // Test 9: Large shift values (should wrap around)
+        // shift of 10 on axis 0 (size 3) is equivalent to shift of 1
+        ASSERT_EQ(xt::roll(e1, {1}, {0}), xt::roll(e1, {10}, {0}));
+
+        // Test 10: Same axis appears multiple times (shifts accumulate)
+        // NumPy: np.roll(a, (1, 2), axis=(0, 0)) equals np.roll(a, 3, axis=0)
+        xarray<double> expected10 = xt::roll(e1, 3, 0);
+        ASSERT_EQ(expected10, xt::roll(e1, {1, 2}, {0, 0}));
+
+        // Test 11: xtensor (fixed dimension) instead of xarray
+        xt::xtensor<double, 2> t1 = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+        xt::xtensor<double, 2> t_expected = {{8, 9, 7}, {2, 3, 1}, {5, 6, 4}};
+        ASSERT_EQ(t_expected, xt::roll(t1, {1, 2}, {0, 1}));
+
+        // Test 12: 1D array multi-axis operation (only one axis)
+        xarray<double> e1d = {1, 2, 3, 4, 5};
+        xarray<double> expected1d = {4, 5, 1, 2, 3};
+        ASSERT_EQ(expected1d, xt::roll(e1d, {2}, {0}));
+
+        // Test 13: Column-major layout (result should be layout-independent)
+        xarray<double, layout_type::column_major> cm = {{1, 2, 3}, {4, 5, 6}};
+        xarray<double> expected_cm = {{3, 1, 2}, {6, 4, 5}};
+        ASSERT_EQ(expected_cm, xt::roll(cm, {1}, {1}));
+
+        // Test 14: Column-major with multi-axis roll
+        xarray<double> expected_cm2 = {{6, 4, 5}, {3, 1, 2}};
+        ASSERT_EQ(expected_cm2, xt::roll(cm, {1, 1}, {0, 1}));
+    }
+
     TEST(xmanipulation, repeat_all_elements_of_axis_0_of_int_array_2_times)
     {
         xarray<int> array = {
