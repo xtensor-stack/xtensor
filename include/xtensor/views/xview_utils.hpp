@@ -50,7 +50,7 @@ namespace xt
     template <class S, class It>
     inline auto get_slice_value(const S& slice, It& it) noexcept
     {
-        if constexpr (is_xslice<S>::value)
+        if constexpr (xslice_concept<S>)
         {
             return slice(typename S::size_type(*it));
         }
