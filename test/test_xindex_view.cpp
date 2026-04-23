@@ -42,8 +42,8 @@ namespace xt
         EXPECT_EQ(expected, e(1, 1));
 
         auto t = v + 3;
-        EXPECT_DOUBLE_EQ((e_copy(1, 1) + 6), t(0));
-        EXPECT_EQ((e(1, 1) + 3), t(0));
+        EXPECT_DOUBLE_EQ((e_copy(1, 1) + 6), t(0ul));
+        EXPECT_EQ((e(1, 1) + 3), t(0ul));
 
         v = broadcast(123, v.shape());
         EXPECT_EQ(123, e(1, 1));

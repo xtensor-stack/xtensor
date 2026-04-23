@@ -198,7 +198,7 @@ namespace xt
         double* data1 = new double[size1];
         buffer_adaptor adapt(data1, size1);
 
-        size_t size2 = 50;
+        [[maybe_unused]] size_t size2 = 50;
         XT_EXPECT_THROW(adapt.resize(size2), std::runtime_error);
         EXPECT_EQ(adapt.size(), size1);
     }

@@ -718,7 +718,14 @@ namespace xt
 
             type operator()(T t)
             {
-                return (xtl::is_integral<T>::value) ? static_cast<type>(t) : t;
+                if constexpr (xtl::is_integral<T>::value)
+                {
+                    return static_cast<type>(t);
+                }
+                else
+                {
+                    return t;
+                }
             }
         };
 
@@ -780,7 +787,7 @@ namespace xt
     {
         if constexpr (is_xslice<S>::value)
         {
-            return slice.size();
+            return static_cast<std::size_t>(slice.size());
         }
         else
         {
@@ -797,7 +804,7 @@ namespace xt
     {
         if constexpr (is_xslice<S>::value)
         {
-            return slice.step_size(idx);
+            return static_cast<std::size_t>(slice.step_size(idx));
         }
         else
         {
@@ -810,7 +817,7 @@ namespace xt
     {
         if constexpr (is_xslice<S>::value)
         {
-            return slice.step_size(idx, n);
+            return static_cast<std::size_t>(slice.step_size(idx, n));
         }
         else
         {
@@ -828,7 +835,7 @@ namespace xt
         if constexpr (is_xslice<S>::value)
         {
             using ST = typename S::size_type;
-            return slice(static_cast<ST>(i));
+            return static_cast<std::size_t>(slice(static_cast<ST>(i)));
         }
         else
         {

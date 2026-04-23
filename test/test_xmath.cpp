@@ -43,9 +43,9 @@ namespace xt
         xarray<double> res2 = xt::abs(b);
 
         auto f = abs(b);
-        using assign_traits = xassign_traits<xarray<double>, decltype(f)>;
 
 #if XTENSOR_USE_XSIMD
+        using assign_traits = xassign_traits<xarray<double>, decltype(f)>;
         EXPECT_TRUE(assign_traits::simd_linear_assign());
 #endif
     }

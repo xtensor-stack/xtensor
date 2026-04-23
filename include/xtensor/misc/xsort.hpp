@@ -81,7 +81,7 @@ namespace xt
             const std::ptrdiff_t secondary_stride = get_secondary_stride(ev);
 
             const auto begin = ev.data();
-            const auto end = begin + n_iters * secondary_stride;
+            const auto end = begin + static_cast<std::ptrdiff_t>(n_iters) * secondary_stride;
             for (auto iter = begin; iter != end; iter += secondary_stride)
             {
                 fct(iter, iter + secondary_stride);
@@ -100,9 +100,9 @@ namespace xt
             XTENSOR_ASSERT(secondary_stride1 == secondary_stride2);
 
             const auto begin1 = e1.data();
-            const auto end1 = begin1 + n_iters * secondary_stride1;
+            const auto end1 = begin1 + static_cast<std::ptrdiff_t>(n_iters) * secondary_stride1;
             const auto begin2 = e2.data();
-            const auto end2 = begin2 + n_iters * secondary_stride2;
+            const auto end2 = begin2 + static_cast<std::ptrdiff_t>(n_iters) * secondary_stride2;
             auto iter1 = begin1;
             auto iter2 = begin2;
             for (; (iter1 != end1) && (iter2 != end2); iter1 += secondary_stride1, iter2 += secondary_stride2)
@@ -304,6 +304,7 @@ namespace xt
             XTENSOR_ASSERT(std::distance(data_begin, data_end) >= 0);
             XTENSOR_ASSERT(std::distance(idx_begin, idx_end) == std::distance(data_begin, data_end));
             (void) idx_end;  // TODO(C++17) [[maybe_unused]] only used in assertion.
+            (void) data_end;
 
             std::iota(idx_begin, idx_end, 0);
             switch (method)
@@ -315,7 +316,10 @@ namespace xt
                         idx_end,
                         [&](const auto i, const auto j)
                         {
-                            return comp(*(data_begin + i), *(data_begin + j));
+                            return comp(
+                                *(data_begin + static_cast<std::ptrdiff_t>(i)),
+                                *(data_begin + static_cast<std::ptrdiff_t>(j))
+                            );
                         }
                     );
                 }
@@ -326,7 +330,10 @@ namespace xt
                         idx_end,
                         [&](const auto i, const auto j)
                         {
-                            return comp(*(data_begin + i), *(data_begin + j));
+                            return comp(
+                                *(data_begin + static_cast<std::ptrdiff_t>(i)),
+                                *(data_begin + static_cast<std::ptrdiff_t>(j))
+                            );
                         }
                     );
                 }
@@ -722,7 +729,7 @@ namespace xt
                 res_end,
                 kth_container.rbegin(),
                 kth_container.rend(),
-                [&ev_begin](auto const& i, auto const& j)
+                [&ev_begin](const auto& i, const auto& j)
                 {
                     return *(ev_begin + i) < *(ev_begin + j);
                 }
@@ -784,7 +791,7 @@ namespace xt
                 for (auto i : indices)
                 {
                     auto idx = current_index;
-                    idx[current_dim] = i;
+                    idx[current_dim] = static_cast<id_t>(i);
                     select_indices_impl(shape, indices, axis, current_dim + 1, idx, out);
                 }
             }
@@ -793,7 +800,7 @@ namespace xt
                 for (id_t i = 0; xtl::cmp_less(i, shape[current_dim]); ++i)
                 {
                     auto idx = current_index;
-                    idx[current_dim] = i;
+                    idx[current_dim] = static_cast<id_t>(i);
                     select_indices_impl(shape, indices, axis, current_dim + 1, idx, out);
                 }
             }
@@ -802,7 +809,7 @@ namespace xt
                 for (auto i : indices)
                 {
                     auto idx = current_index;
-                    idx[current_dim] = i;
+                    idx[current_dim] = static_cast<id_t>(i);
                     out.push_back(std::move(idx));
                 }
             }
@@ -811,7 +818,7 @@ namespace xt
                 for (id_t i = 0; xtl::cmp_less(i, shape[current_dim]); ++i)
                 {
                     auto idx = current_index;
-                    idx[current_dim] = i;
+                    idx[current_dim] = static_cast<id_t>(i);
                     out.push_back(std::move(idx));
                 }
             }
@@ -834,7 +841,7 @@ namespace xt
             const std::size_t ax = normalize_axis(e.dimension(), axis);
             using shape_t = get_strides_t<typename std::decay_t<E>::shape_type>;
             auto shape = xtl::forward_sequence<shape_t, decltype(e.shape())>(e.shape());
-            shape[ax] = indices.size();
+            shape[ax] = static_cast<typename shape_t::value_type>(indices.size());
             return reshape_view(
                 index_view(std::forward<E>(e), select_indices(e.shape(), indices, ax)),
                 std::move(shape)
@@ -915,12 +922,16 @@ namespace xt
         auto kth_gamma = detail::quantile_kth_gamma<T, id_t, P>(n, probas, alpha, beta);
 
         // Select relevant values for computing interpolating quantiles
-        auto e_partition = xt::partition(std::forward<E>(e), kth_gamma.first, ax);
-        auto e_kth = detail::fancy_indexing(std::move(e_partition), std::move(kth_gamma.first), ax);
+        auto e_partition = xt::partition(std::forward<E>(e), kth_gamma.first, static_cast<std::ptrdiff_t>(ax));
+        auto e_kth = detail::fancy_indexing(
+            std::move(e_partition),
+            std::move(kth_gamma.first),
+            static_cast<std::ptrdiff_t>(ax)
+        );
 
         // Reshape interpolation coefficients
         auto gm1_g_shape = xtl::make_sequence<tmp_shape_t>(e.dimension(), 1);
-        gm1_g_shape[ax] = kth_gamma.second.size();
+        gm1_g_shape[ax] = static_cast<id_t>(kth_gamma.second.size());
         auto gm1_g_reshaped = reshape_view(std::move(kth_gamma.second), std::move(gm1_g_shape));
 
         // Compute interpolation
@@ -932,7 +943,7 @@ namespace xt
         e_kth_g_shape[ax + 1] /= 2;
         auto quantiles = xt::sum(reshape_view(std::move(e_kth_g), std::move(e_kth_g_shape)), ax);
         // Cannot do a transpose on a non-strided expression so we have to eval
-        return moveaxis(eval(std::move(quantiles)), ax, 0);
+        return moveaxis(eval(std::move(quantiles)), static_cast<std::ptrdiff_t>(ax), 0);
     }
 
     // Static proba array overload
@@ -1237,7 +1248,6 @@ namespace xt
     template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E>
     inline auto argmin(const xexpression<E>& e)
     {
-        using value_type = typename E::value_type;
         auto&& ed = eval(e.derived_cast());
         auto begin = ed.template begin<L>();
         auto end = ed.template end<L>();
@@ -1267,7 +1277,6 @@ namespace xt
     template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E>
     inline auto argmax(const xexpression<E>& e)
     {
-        using value_type = typename E::value_type;
         auto&& ed = eval(e.derived_cast());
         auto begin = ed.template begin<L>();
         auto end = ed.template end<L>();

@@ -34,22 +34,22 @@
 namespace xt
 {
 
-#define CHECK_RESULT_TYPE(EXPRESSION, EXPECTED_TYPE)                                 \
-    {                                                                                \
-        using result_type = typename std::decay_t<decltype(EXPRESSION)>::value_type; \
-        EXPECT_TRUE((std::is_same<result_type, EXPECTED_TYPE>::value));              \
+#define CHECK_RESULT_TYPE(EXPRESSION, EXPECTED_TYPE)                                  \
+    {                                                                                 \
+        using result_type_ = typename std::decay_t<decltype(EXPRESSION)>::value_type; \
+        EXPECT_TRUE((std::is_same<result_type_, EXPECTED_TYPE>::value));              \
     }
 
-#define CHECK_TAG_TYPE(EXPRESSION, EXPECTED_TYPE)                                        \
-    {                                                                                    \
-        using result_type = typename std::decay_t<decltype(EXPRESSION)>::expression_tag; \
-        EXPECT_TRUE((std::is_same<result_type, EXPECTED_TYPE>::value));                  \
+#define CHECK_TAG_TYPE(EXPRESSION, EXPECTED_TYPE)                                         \
+    {                                                                                     \
+        using result_type_ = typename std::decay_t<decltype(EXPRESSION)>::expression_tag; \
+        EXPECT_TRUE((std::is_same<result_type_, EXPECTED_TYPE>::value));                  \
     }
 
-#define CHECK_TYPE(VALUE, EXPECTED_TYPE)                                \
-    {                                                                   \
-        using result_type = typename std::decay_t<decltype(VALUE)>;     \
-        EXPECT_TRUE((std::is_same<result_type, EXPECTED_TYPE>::value)); \
+#define CHECK_TYPE(VALUE, EXPECTED_TYPE)                                 \
+    {                                                                    \
+        using result_type_ = typename std::decay_t<decltype(VALUE)>;     \
+        EXPECT_TRUE((std::is_same<result_type_, EXPECTED_TYPE>::value)); \
     }
 
     struct xreducer_features
@@ -157,7 +157,6 @@ namespace xt
 
 #define TEST_VALUE_HAS_VALUE(INPUT, V_TYPE, OPTIONAL)                                 \
     using result_type = std::conditional_t<OPTIONAL, xtl::xoptional<double>, double>; \
-                                                                                      \
     auto res = xt::sum(INPUT, feats.m_axes);                                          \
     CHECK_RESULT_TYPE(res, result_type);                                              \
     CHECK_TYPE(xt::value(res)(1, 1, 1), V_TYPE);                                      \

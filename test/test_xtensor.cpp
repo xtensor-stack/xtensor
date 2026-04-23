@@ -217,7 +217,7 @@ namespace xt
 #ifdef XTENSOR_ENABLE_ASSERT
         xtensor_dynamic b;
         std::vector<size_t> s = {2u, 2u};
-        xtensor_dynamic::strides_type strides = {2u, 1u};
+        [[maybe_unused]] xtensor_dynamic::strides_type strides = {2u, 1u};
         EXPECT_THROW(b.resize(s), std::runtime_error);
         EXPECT_THROW(b.resize(s, layout_type::dynamic), std::runtime_error);
         EXPECT_THROW(b.resize(s, strides), std::runtime_error);

@@ -31,7 +31,11 @@
 #if (defined(_MSC_VER) && _MSC_VER >= 1910)
 #define NOEXCEPT(T)
 #else
+#ifdef XTENSOR_ENABLE_ASSERT
+#define NOEXCEPT(T)
+#else
 #define NOEXCEPT(T) noexcept(T)
+#endif
 #endif
 
 namespace xt

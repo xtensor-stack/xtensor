@@ -1293,7 +1293,6 @@ namespace xt
         using xfix = xt::xtensor_fixed<double, xshape<3, 4, 2, 5>, layout_type::row_major>;
 
         using ctes = xt::xtensor<double, 4, layout_type::column_major>;
-        using carr = xt::xarray<double, layout_type::column_major>;
         using cfix = xt::xtensor_fixed<double, xshape<3, 4, 2, 5>, layout_type::column_major>;
 
         EXPECT_TRUE((detail::is_contiguous_view<xtes, xall<int>, xall<int>, xall<int>>()));
@@ -1430,12 +1429,14 @@ namespace xt
             auto vxa = view(xt::arange<double>(100), range(0, 10));
 
             using assign_traits = xassign_traits<decltype(vxt), decltype(b)>;
+            (void) sizeof(assign_traits);  // suppress unused typedef warning
 
 #if XTENSOR_USE_XSIMD
             EXPECT_TRUE(assign_traits::simd_linear_assign());
 #endif
 
             using assign_traits2 = xassign_traits<decltype(b), decltype(vxa)>;
+            (void) sizeof(assign_traits2);  // suppress unused typedef warning
 
 #if XTENSOR_USE_XSIMD
             EXPECT_FALSE(assign_traits2::simd_linear_assign());
