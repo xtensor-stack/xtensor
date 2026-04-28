@@ -1658,13 +1658,7 @@ namespace xt
     {
     public:
 
-#if defined(_MSC_VER)
-        using cast_type = std::array<std::size_t, sizeof...(X)>;
-#define XTENSOR_FIXED_SHAPE_CONSTEXPR inline
-#else
         using cast_type = const_array<std::size_t, sizeof...(X)>;
-#define XTENSOR_FIXED_SHAPE_CONSTEXPR constexpr
-#endif
         using value_type = std::size_t;
         using size_type = std::size_t;
         using const_iterator = typename cast_type::const_iterator;
@@ -1681,17 +1675,17 @@ namespace xt
             return std::get<idx>(tmp_cast_type{X...});
         }
 
-        XTENSOR_FIXED_SHAPE_CONSTEXPR operator cast_type() const
+        constexpr operator cast_type() const
         {
             return cast_type({X...});
         }
 
-        XTENSOR_FIXED_SHAPE_CONSTEXPR auto begin() const
+        constexpr auto begin() const
         {
             return m_array.begin();
         }
 
-        XTENSOR_FIXED_SHAPE_CONSTEXPR auto end() const
+        constexpr auto end() const
         {
             return m_array.end();
         }
@@ -1706,22 +1700,22 @@ namespace xt
             return m_array.rend();
         }
 
-        XTENSOR_FIXED_SHAPE_CONSTEXPR auto cbegin() const
+        constexpr auto cbegin() const
         {
             return m_array.cbegin();
         }
 
-        XTENSOR_FIXED_SHAPE_CONSTEXPR auto cend() const
+        constexpr auto cend() const
         {
             return m_array.cend();
         }
 
-        XTENSOR_FIXED_SHAPE_CONSTEXPR std::size_t operator[](std::size_t idx) const
+        constexpr std::size_t operator[](std::size_t idx) const
         {
             return m_array[idx];
         }
 
-        XTENSOR_FIXED_SHAPE_CONSTEXPR bool empty() const
+        constexpr bool empty() const
         {
             return sizeof...(X) == 0;
         }
@@ -1730,8 +1724,6 @@ namespace xt
 
         XTENSOR_CONSTEXPR_ENHANCED_STATIC cast_type m_array = cast_type({X...});
     };
-
-#undef XTENSOR_FIXED_SHAPE_CONSTEXPR
 
     template <class E, std::ptrdiff_t Start, std::ptrdiff_t End = -1>
     class sequence_view
