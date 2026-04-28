@@ -114,11 +114,11 @@ namespace xt
 
         size_type size() const noexcept;
 
-        XTENSOR_CONSTEXPR_RETURN size_type dimension() const noexcept;
+        constexpr size_type dimension() const noexcept;
 
-        XTENSOR_CONSTEXPR_RETURN const inner_shape_type& shape() const noexcept;
-        XTENSOR_CONSTEXPR_RETURN const inner_strides_type& strides() const noexcept;
-        XTENSOR_CONSTEXPR_RETURN const inner_backstrides_type& backstrides() const noexcept;
+        constexpr const inner_shape_type& shape() const noexcept;
+        constexpr const inner_strides_type& strides() const noexcept;
+        constexpr const inner_backstrides_type& backstrides() const noexcept;
 
         template <class T>
         void fill(const T& value);
@@ -373,7 +373,7 @@ namespace xt
      * Returns the number of dimensions of the container.
      */
     template <class D>
-    XTENSOR_CONSTEXPR_RETURN auto xcontainer<D>::dimension() const noexcept -> size_type
+    constexpr auto xcontainer<D>::dimension() const noexcept -> size_type
     {
         return shape().size();
     }
@@ -382,7 +382,7 @@ namespace xt
      * Returns the shape of the container.
      */
     template <class D>
-    XTENSOR_CONSTEXPR_RETURN auto xcontainer<D>::shape() const noexcept -> const inner_shape_type&
+    constexpr auto xcontainer<D>::shape() const noexcept -> const inner_shape_type&
     {
         return derived_cast().shape_impl();
     }
@@ -391,7 +391,7 @@ namespace xt
      * Returns the strides of the container.
      */
     template <class D>
-    XTENSOR_CONSTEXPR_RETURN auto xcontainer<D>::strides() const noexcept -> const inner_strides_type&
+    constexpr auto xcontainer<D>::strides() const noexcept -> const inner_strides_type&
     {
         return derived_cast().strides_impl();
     }
@@ -400,7 +400,7 @@ namespace xt
      * Returns the backstrides of the container.
      */
     template <class D>
-    XTENSOR_CONSTEXPR_RETURN auto xcontainer<D>::backstrides() const noexcept -> const inner_backstrides_type&
+    constexpr auto xcontainer<D>::backstrides() const noexcept -> const inner_backstrides_type&
     {
         return derived_cast().backstrides_impl();
     }

@@ -35,17 +35,12 @@
 
 // Workaround for some missing constexpr functionality in MSVC 2015 and MSVC 2017 x86
 #if defined(_MSC_VER)
-#define XTENSOR_CONSTEXPR_ENHANCED const
 // The following must not be defined to const, otherwise
 // it prevents generation of copy operators of classes
 // containing XTENSOR_CONSTEXPR_ENHANCED_STATIC members
 #define XTENSOR_CONSTEXPR_ENHANCED_STATIC
-#define XTENSOR_CONSTEXPR_RETURN inline
 #else
-#define XTENSOR_CONSTEXPR_ENHANCED constexpr
-#define XTENSOR_CONSTEXPR_RETURN constexpr
 #define XTENSOR_CONSTEXPR_ENHANCED_STATIC constexpr static
-#define XTENSOR_HAS_CONSTEXPR_ENHANCED
 #endif
 
 #ifndef XTENSOR_DEFAULT_DATA_CONTAINER
