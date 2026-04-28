@@ -1645,8 +1645,9 @@ namespace xt
     {
         if constexpr (lesser_condition<I>::value)
         {
-            return sliced_access<I - integral_count_before<S...>(I) + newaxis_count_before<S...>(I + 1)>(
-                std::get<I + newaxis_count_before<S...>(I + 1)>(m_slices),
+            constexpr size_type slice_index = newaxis_skip<S...>(I);
+            return sliced_access<slice_index - integral_count_before<S...>(slice_index)>(
+                std::get<slice_index>(m_slices),
                 args...
             );
         }

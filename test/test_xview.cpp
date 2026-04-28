@@ -1591,6 +1591,45 @@ namespace xt
         EXPECT_EQ(a, b);
     }
 
+    TEST(xview, assign_through_multiple_leading_newaxis)
+    {
+        SUBCASE("updates the underlying tensor for every element")
+        {
+            xt::xtensor<uint8_t, 2> tensor = xt::zeros<uint8_t>({4, 3});
+            auto view = xt::view(tensor, xt::newaxis(), xt::newaxis(), xt::newaxis(), xt::all(), xt::all());
+
+            uint8_t value = 0;
+            for (std::size_t row = 0; row < 4; ++row)
+            {
+                for (std::size_t col = 0; col < 3; ++col)
+                {
+                    view(std::size_t{0}, std::size_t{0}, std::size_t{0}, row, col) = value;
+                    EXPECT_EQ(tensor(row, col), value);
+                    ++value;
+                }
+            }
+
+            EXPECT_EQ(tensor, xt::arange<uint8_t>(12).reshape({4, 3}));
+        }
+
+        SUBCASE("preserves bool assignment semantics")
+        {
+            xt::xtensor<bool, 2> tensor = xt::zeros<bool>({4, 3});
+            auto view = xt::view(tensor, xt::newaxis(), xt::newaxis(), xt::newaxis(), xt::all(), xt::all());
+
+            for (std::size_t row = 0; row < 4; ++row)
+            {
+                for (std::size_t col = 0; col < 3; ++col)
+                {
+                    view(std::size_t{0}, std::size_t{0}, std::size_t{0}, row, col) = true;
+                    EXPECT_TRUE(tensor(row, col));
+                }
+            }
+
+            EXPECT_EQ(tensor, xt::ones<bool>({4, 3}));
+        }
+    }
+
     TEST(xview, in_bounds)
     {
         xt::xtensor<size_t, 2> a = {{0, 1, 2}, {3, 4, 5}};
