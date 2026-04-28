@@ -966,6 +966,14 @@ namespace xt
         return detail::make_xgenerator(detail::vstack_impl<CT...>(std::move(t), size_t(0)), new_shape);
     }
 
+    /**
+     * @brief Stack fixed-shape xexpressions in sequence vertically (row wise).
+     * This overload preserves the result shape at compile time by treating
+     * 1-D fixed shapes as ``(1, N)`` row vectors before concatenation.
+     *
+     * @param t \ref xtuple of fixed-shape xexpressions to stack
+     * @return xgenerator evaluating to stacked elements with a fixed compile-time shape
+     */
     template <fixed_shape_container_concept... CT>
     inline auto vstack(std::tuple<CT...>&& t)
     {
