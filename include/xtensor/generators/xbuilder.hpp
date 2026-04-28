@@ -926,7 +926,9 @@ namespace xt
         };
 
         template <class... CT>
-        using vstack_fixed_shape_t = concat_fixed_shape_t<0, typename vstack_fixed_shape<typename std::decay_t<CT>::shape_type>::type...>;
+        using vstack_fixed_shape_t = concat_fixed_shape_t<
+            0,
+            typename vstack_fixed_shape<typename std::decay_t<CT>::shape_type>::type...>;
 
         template <class S, class... CT>
         inline auto vstack_shape(std::tuple<CT...>& t, const S& shape)
