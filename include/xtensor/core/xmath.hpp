@@ -21,6 +21,7 @@
 #include <type_traits>
 
 #include <xtl/xcomplex.hpp>
+#include <xtl/xmasked_value.hpp>
 #include <xtl/xsequence.hpp>
 #include <xtl/xtype_traits.hpp>
 
@@ -569,13 +570,64 @@ namespace xt
 
     namespace math
     {
+        namespace detail
+        {
+            template <typename T>
+            constexpr decltype(auto) masked_data(const T& value) noexcept
+            {
+                return value;
+            }
+
+            template <typename T, typename B>
+            constexpr decltype(auto) masked_data(const xtl::xmasked_value<T, B>& value) noexcept
+            {
+                return value.value();
+            }
+
+            template <typename T>
+            constexpr bool masked_visible(const T&) noexcept
+            {
+                return true;
+            }
+
+            template <typename T, typename B>
+            constexpr bool masked_visible(const xtl::xmasked_value<T, B>& value) noexcept
+            {
+                return static_cast<bool>(value.visible());
+            }
+        }
+
         template <class T = void>
         struct minimum
         {
             template <class A1, class A2>
             constexpr auto operator()(const A1& t1, const A2& t2) const noexcept
             {
-                return xtl::select(t1 < t2, t1, t2);
+                if constexpr (xtl::is_xmasked_value<std::decay_t<A1>>::value || xtl::is_xmasked_value<std::decay_t<A2>>::value)
+                {
+                    using value_type = xtl::promote_type_t<
+                        std::decay_t<decltype(detail::masked_data(t1))>,
+                        std::decay_t<decltype(detail::masked_data(t2))>>;
+                    using return_type = xtl::xmasked_value<value_type, bool>;
+
+                    if (detail::masked_visible(t1) && detail::masked_visible(t2))
+                    {
+                        return return_type(
+                            static_cast<value_type>(
+                                detail::masked_data(t1) < detail::masked_data(t2)
+                                    ? detail::masked_data(t1)
+                                    : detail::masked_data(t2)
+                            ),
+                            true
+                        );
+                    }
+
+                    return return_type(value_type(0), false);
+                }
+                else
+                {
+                    return xtl::select(t1 < t2, t1, t2);
+                }
             }
 
             template <class A1, class A2>
@@ -591,7 +643,31 @@ namespace xt
             template <class A1, class A2>
             constexpr auto operator()(const A1& t1, const A2& t2) const noexcept
             {
-                return xtl::select(t1 > t2, t1, t2);
+                if constexpr (xtl::is_xmasked_value<std::decay_t<A1>>::value || xtl::is_xmasked_value<std::decay_t<A2>>::value)
+                {
+                    using value_type = xtl::promote_type_t<
+                        std::decay_t<decltype(detail::masked_data(t1))>,
+                        std::decay_t<decltype(detail::masked_data(t2))>>;
+                    using return_type = xtl::xmasked_value<value_type, bool>;
+
+                    if (detail::masked_visible(t1) && detail::masked_visible(t2))
+                    {
+                        return return_type(
+                            static_cast<value_type>(
+                                detail::masked_data(t1) > detail::masked_data(t2)
+                                    ? detail::masked_data(t1)
+                                    : detail::masked_data(t2)
+                            ),
+                            true
+                        );
+                    }
+
+                    return return_type(value_type(0), false);
+                }
+                else
+                {
+                    return xtl::select(t1 > t2, t1, t2);
+                }
             }
 
             template <class A1, class A2>

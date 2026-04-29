@@ -7,6 +7,9 @@
  * The full license is in the file LICENSE, distributed with this software. *
  ****************************************************************************/
 
+#include <sstream>
+
+#include "xtensor/core/xmath.hpp"
 #include "xtensor/io/xio.hpp"
 #include "xtensor/optional/xoptional_assembly.hpp"
 #include "xtensor/views/xmasked_view.hpp"
@@ -37,6 +40,42 @@ namespace xt
 
         return masked_view(data, std::move(mask));
     }
+
+    template <class A, class B, class M, class = void>
+    struct is_masked_minimum_streamable : std::false_type
+    {
+    };
+
+    template <class A, class B, class M>
+    struct is_masked_minimum_streamable<
+        A,
+        B,
+        M,
+        std::void_t<decltype(
+            std::declval<std::ostream&>()
+            << minimum(
+                masked_view(std::declval<const A&>(), std::declval<const M&>()),
+                masked_view(std::declval<const B&>(), std::declval<const M&>())
+            ))>> : std::true_type
+    {
+    };
+
+    template <class A, class B, class M, class = void>
+    struct is_masked_view_of_minimum_streamable : std::false_type
+    {
+    };
+
+    template <class A, class B, class M>
+    struct is_masked_view_of_minimum_streamable<
+        A,
+        B,
+        M,
+        std::void_t<decltype(
+            std::declval<std::ostream&>()
+            << masked_view(minimum(std::declval<const A&>(), std::declval<const B&>()), std::declval<const M&>()))>>
+        : std::true_type
+    {
+    };
 
     TEST(xmasked_view, dimension)
     {
@@ -210,6 +249,27 @@ namespace xt
         EXPECT_EQ(data, expected2);
     }
 
+    TEST(xmasked_view, lazy_expression_stream)
+    {
+        using array_type = xarray<double>;
+        const array_type a = {1., 1., 1., 1.};
+        const array_type b = {0.1, 0.7, 0.3, 0.9};
+
+        const auto mask = b < 0.5;
+        const auto expected = eval(masked_view(minimum(a, b), mask));
+
+        std::stringstream expected_out;
+        expected_out << expected;
+
+        std::stringstream masked_min_out;
+        masked_min_out << minimum(masked_view(a, mask), masked_view(b, mask));
+        EXPECT_EQ(masked_min_out.str(), expected_out.str());
+
+        std::stringstream masked_expr_out;
+        masked_expr_out << masked_view(minimum(a, b), mask);
+        EXPECT_EQ(masked_expr_out.str(), expected_out.str());
+    }
+
     TEST(xmasked_view, assign)
     {
         xarray<double> data = {{1., -2., 3.}, {4., 5., -6.}, {7., 8., -9.}};
@@ -221,6 +281,21 @@ namespace xt
         masked_data = data2;
         xarray<double> expected1 = {{0.1, 0.2, 0.3}, {0.4, 5., -6.}, {0.7, 8., 0.9}};
         EXPECT_EQ(data, expected1);
+    }
+
+    TEST(xmasked_view, assign_const_masked_view_rhs)
+    {
+        xarray<double> data = {{1., -2., 3.}, {4., 5., -6.}, {7., 8., -9.}};
+        const xarray<double> data2 = {{0.1, 0.2, 0.3}, {0.4, 0.5, 0.6}, {0.7, 0.8, 0.9}};
+        xarray<bool> mask = {{true, true, true}, {true, false, false}, {true, false, true}};
+
+        auto masked_data = masked_view(data, mask);
+        const auto masked_data2 = masked_view(data2, mask);
+
+        masked_data = masked_data2;
+
+        xarray<double> expected = {{0.1, 0.2, 0.3}, {0.4, 5., -6.}, {0.7, 8., 0.9}};
+        EXPECT_EQ(data, expected);
     }
 
     TEST(xmasked_view, view)

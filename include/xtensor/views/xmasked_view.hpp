@@ -118,14 +118,15 @@ namespace xt
         using bool_load_type = xtl::xmasked_value<typename data_type::bool_load_type, mask_type>;
 
         using shape_type = typename data_type::shape_type;
-        using strides_type = typename data_type::strides_type;
+        using strides_type = xtl::mpl::eval_if_t<has_strides<data_type>, detail::expr_strides_type<data_type>, get_strides_type<shape_type>>;
+        using backstrides_type = xtl::mpl::eval_if_t<has_strides<data_type>, detail::expr_backstrides_type<data_type>, get_strides_type<shape_type>>;
 
         static constexpr layout_type static_layout = data_type::static_layout;
         static constexpr bool contiguous_layout = false;
 
         using inner_shape_type = typename data_type::inner_shape_type;
-        using inner_strides_type = typename data_type::inner_strides_type;
-        using inner_backstrides_type = typename data_type::inner_backstrides_type;
+        using inner_strides_type = xtl::mpl::eval_if_t<has_strides<data_type>, detail::expr_inner_strides_type<data_type>, get_strides_type<shape_type>>;
+        using inner_backstrides_type = xtl::mpl::eval_if_t<has_strides<data_type>, detail::expr_inner_backstrides_type<data_type>, get_strides_type<shape_type>>;
 
         using expression_tag = xtensor_expression_tag;
 
@@ -163,7 +164,12 @@ namespace xt
 
         size_type size() const noexcept;
         const inner_shape_type& shape() const noexcept;
+        template <typename DT = data_type>
+            requires has_strides<DT>::value
         const inner_strides_type& strides() const noexcept;
+
+        template <typename DT = data_type>
+            requires has_strides<DT>::value
         const inner_backstrides_type& backstrides() const noexcept;
         using accessible_base::dimension;
         using accessible_base::shape;
@@ -201,6 +207,9 @@ namespace xt
 
         template <class S>
         bool has_linear_assign(const S& strides) const noexcept;
+
+        template <typename S>
+        bool broadcast_shape(S& shape, bool reuse_cache = false) const;
 
         data_type& value() noexcept;
         const data_type& value() const noexcept;
@@ -338,6 +347,8 @@ namespace xt
      * Returns the strides of the xmasked_view.
      */
     template <class CTD, class CTM>
+    template <typename DT>
+        requires has_strides<DT>::value
     inline auto xmasked_view<CTD, CTM>::strides() const noexcept -> const inner_strides_type&
     {
         return m_data.strides();
@@ -347,6 +358,8 @@ namespace xt
      * Returns the backstrides of the xmasked_view.
      */
     template <class CTD, class CTM>
+    template <typename DT>
+        requires has_strides<DT>::value
     inline auto xmasked_view<CTD, CTM>::backstrides() const noexcept -> const inner_backstrides_type&
     {
         return m_data.backstrides();
@@ -368,6 +381,13 @@ namespace xt
     inline bool xmasked_view<CTD, CTM>::is_contiguous() const noexcept
     {
         return false;
+    }
+
+    template <typename CTD, typename CTM>
+    template <typename S>
+    inline bool xmasked_view<CTD, CTM>::broadcast_shape(S& shape, bool) const
+    {
+        return xt::broadcast_shape(m_data.shape(), shape);
     }
 
     /**
