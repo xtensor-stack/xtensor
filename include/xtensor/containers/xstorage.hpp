@@ -649,13 +649,9 @@ namespace xt
         using reverse_iterator = std::reverse_iterator<iterator>;
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-#if defined(_MSC_VER) && _MSC_VER < 1910
-        static constexpr std::size_t alignment = detail::allocator_alignment<A>::value;
-#else
         static constexpr std::size_t alignment = detail::allocator_alignment<A>::value != 0
                                                      ? detail::allocator_alignment<A>::value
                                                      : alignof(T);
-#endif
 
         svector() noexcept;
         ~svector();

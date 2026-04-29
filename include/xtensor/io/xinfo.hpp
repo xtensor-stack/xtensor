@@ -14,49 +14,21 @@
 
 #include "../core/xlayout.hpp"
 
-#ifndef _MSC_VER
-#if __cplusplus < 201103
-#define CONSTEXPR11_TN
-#define CONSTEXPR14_TN
-#define NOEXCEPT_TN
-#elif __cplusplus < 201402
-#define CONSTEXPR11_TN constexpr
-#define CONSTEXPR14_TN
-#define NOEXCEPT_TN noexcept
-#else
-#define CONSTEXPR11_TN constexpr
-#define CONSTEXPR14_TN constexpr
-#define NOEXCEPT_TN noexcept
-#endif
-#else  // _MSC_VER
-#if _MSC_VER < 1900
-#define CONSTEXPR11_TN
-#define CONSTEXPR14_TN
-#define NOEXCEPT_TN
-#elif _MSC_VER < 2000
-#define CONSTEXPR11_TN constexpr
-#define CONSTEXPR14_TN
-#define NOEXCEPT_TN noexcept
-#else
-#define CONSTEXPR11_TN constexpr
-#define CONSTEXPR14_TN constexpr
-#define NOEXCEPT_TN noexcept
-#endif
-#endif
-
 namespace xt
 {
     // see http://stackoverflow.com/a/20170989
     struct static_string
     {
         template <std::size_t N>
-        explicit CONSTEXPR11_TN static_string(const char (&a)[N]) NOEXCEPT_TN : data(a),
-                                                                                size(N - 1)
+        explicit constexpr static_string(const char (&a)[N]) noexcept
+            : data(a)
+            , size(N - 1)
         {
         }
 
-        CONSTEXPR11_TN static_string(const char* a, const std::size_t sz) NOEXCEPT_TN : data(a),
-                                                                                        size(sz)
+        constexpr static_string(const char* a, const std::size_t sz) noexcept
+            : data(a)
+            , size(sz)
         {
         }
 
@@ -65,18 +37,14 @@ namespace xt
     };
 
     template <class T>
-    CONSTEXPR14_TN static_string type_name()
+    constexpr static_string type_name()
     {
 #ifdef __clang__
         static_string p(__PRETTY_FUNCTION__);
         return static_string(p.data + 39, p.size - 39 - 1);
 #elif defined(__GNUC__)
         static_string p(__PRETTY_FUNCTION__);
-#if __cplusplus < 201402
-        return static_string(p.data + 36, p.size - 36 - 1);
-#else
         return static_string(p.data + 54, p.size - 54 - 1);
-#endif
 #elif defined(_MSC_VER)
         static const static_string p(__FUNCSIG__);
         return static_string(p.data + 47, p.size - 47 - 7);
