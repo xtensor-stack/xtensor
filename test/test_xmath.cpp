@@ -46,14 +46,16 @@ namespace xt
     }
 
     template <class F, class D1, class D2, class D3, class M>
-    void expect_masked_ternary_stream(F&& function, const D1& arg1, const D2& arg2, const D3& arg3, const M& mask)
+    void
+    expect_masked_ternary_stream(F&& function, const D1& arg1, const D2& arg2, const D3& arg3, const M& mask)
     {
         expect_streamable(function(masked_view(arg1, mask), masked_view(arg2, mask), masked_view(arg3, mask)));
         expect_streamable(masked_view(function(arg1, arg2, arg3), mask));
     }
 
     template <class F, class D, class T1, class T2, class M>
-    void expect_masked_ternary_scalar_stream(F&& function, const D& data, const T1& arg2, const T2& arg3, const M& mask)
+    void
+    expect_masked_ternary_scalar_stream(F&& function, const D& data, const T1& arg2, const T2& arg3, const M& mask)
     {
         expect_streamable(function(masked_view(data, mask), arg2, arg3));
         expect_streamable(masked_view(function(data, arg2, arg3), mask));
@@ -288,50 +290,358 @@ namespace xt
             -std::numeric_limits<double>::infinity()
         };
 
-        expect_masked_unary_stream([](const auto& e) { return abs(e); }, positive, mask);
-        expect_masked_unary_stream([](const auto& e) { return fabs(e); }, positive, mask);
-        expect_masked_unary_stream([](const auto& e) { return exp(e); }, positive, mask);
-        expect_masked_unary_stream([](const auto& e) { return exp2(e); }, positive, mask);
-        expect_masked_unary_stream([](const auto& e) { return expm1(e); }, positive, mask);
-        expect_masked_unary_stream([](const auto& e) { return log(e); }, positive, mask);
-        expect_masked_unary_stream([](const auto& e) { return log10(e); }, positive, mask);
-        expect_masked_unary_stream([](const auto& e) { return log2(e); }, positive, mask);
-        expect_masked_unary_stream([](const auto& e) { return log1p(e); }, positive, mask);
-        expect_masked_unary_stream([](const auto& e) { return sqrt(e); }, positive, mask);
-        expect_masked_unary_stream([](const auto& e) { return cbrt(e); }, positive, mask);
-        expect_masked_unary_stream([](const auto& e) { return sin(e); }, positive, mask);
-        expect_masked_unary_stream([](const auto& e) { return cos(e); }, positive, mask);
-        expect_masked_unary_stream([](const auto& e) { return tan(e); }, positive, mask);
-        expect_masked_unary_stream([](const auto& e) { return asin(e); }, unit, mask);
-        expect_masked_unary_stream([](const auto& e) { return acos(e); }, unit, mask);
-        expect_masked_unary_stream([](const auto& e) { return atan(e); }, positive, mask);
-        expect_masked_unary_stream([](const auto& e) { return sinh(e); }, positive, mask);
-        expect_masked_unary_stream([](const auto& e) { return cosh(e); }, positive, mask);
-        expect_masked_unary_stream([](const auto& e) { return tanh(e); }, positive, mask);
-        expect_masked_unary_stream([](const auto& e) { return asinh(e); }, signed_values, mask);
-        expect_masked_unary_stream([](const auto& e) { return acosh(e); }, positive, mask);
-        expect_masked_unary_stream([](const auto& e) { return atanh(e); }, unit, mask);
-        expect_masked_unary_stream([](const auto& e) { return erf(e); }, positive, mask);
-        expect_masked_unary_stream([](const auto& e) { return erfc(e); }, positive, mask);
-        expect_masked_unary_stream([](const auto& e) { return tgamma(e); }, positive, mask);
-        expect_masked_unary_stream([](const auto& e) { return lgamma(e); }, positive, mask);
-        expect_masked_unary_stream([](const auto& e) { return ceil(e); }, signed_values, mask);
-        expect_masked_unary_stream([](const auto& e) { return floor(e); }, signed_values, mask);
-        expect_masked_unary_stream([](const auto& e) { return trunc(e); }, signed_values, mask);
-        expect_masked_unary_stream([](const auto& e) { return round(e); }, signed_values, mask);
-        expect_masked_unary_stream([](const auto& e) { return nearbyint(e); }, signed_values, mask);
-        expect_masked_unary_stream([](const auto& e) { return rint(e); }, signed_values, mask);
-        expect_masked_unary_stream([](const auto& e) { return isfinite(e); }, special, mask);
-        expect_masked_unary_stream([](const auto& e) { return isinf(e); }, special, mask);
-        expect_masked_unary_stream([](const auto& e) { return isnan(e); }, special, mask);
-        expect_masked_unary_stream([](const auto& e) { return sign(e); }, signed_values, mask);
-        expect_masked_unary_stream([](const auto& e) { return deg2rad(e); }, positive, mask);
-        expect_masked_unary_stream([](const auto& e) { return radians(e); }, positive, mask);
-        expect_masked_unary_stream([](const auto& e) { return rad2deg(e); }, positive, mask);
-        expect_masked_unary_stream([](const auto& e) { return degrees(e); }, positive, mask);
-        expect_masked_unary_stream([](const auto& e) { return square(e); }, positive, mask);
-        expect_masked_unary_stream([](const auto& e) { return cube(e); }, positive, mask);
-        expect_masked_unary_stream([](const auto& e) { return pow<3>(e); }, positive, mask);
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return abs(e);
+            },
+            positive,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return fabs(e);
+            },
+            positive,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return exp(e);
+            },
+            positive,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return exp2(e);
+            },
+            positive,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return expm1(e);
+            },
+            positive,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return log(e);
+            },
+            positive,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return log10(e);
+            },
+            positive,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return log2(e);
+            },
+            positive,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return log1p(e);
+            },
+            positive,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return sqrt(e);
+            },
+            positive,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return cbrt(e);
+            },
+            positive,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return sin(e);
+            },
+            positive,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return cos(e);
+            },
+            positive,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return tan(e);
+            },
+            positive,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return asin(e);
+            },
+            unit,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return acos(e);
+            },
+            unit,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return atan(e);
+            },
+            positive,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return sinh(e);
+            },
+            positive,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return cosh(e);
+            },
+            positive,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return tanh(e);
+            },
+            positive,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return asinh(e);
+            },
+            signed_values,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return acosh(e);
+            },
+            positive,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return atanh(e);
+            },
+            unit,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return erf(e);
+            },
+            positive,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return erfc(e);
+            },
+            positive,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return tgamma(e);
+            },
+            positive,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return lgamma(e);
+            },
+            positive,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return ceil(e);
+            },
+            signed_values,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return floor(e);
+            },
+            signed_values,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return trunc(e);
+            },
+            signed_values,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return round(e);
+            },
+            signed_values,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return nearbyint(e);
+            },
+            signed_values,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return rint(e);
+            },
+            signed_values,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return isfinite(e);
+            },
+            special,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return isinf(e);
+            },
+            special,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return isnan(e);
+            },
+            special,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return sign(e);
+            },
+            signed_values,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return deg2rad(e);
+            },
+            positive,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return radians(e);
+            },
+            positive,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return rad2deg(e);
+            },
+            positive,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return degrees(e);
+            },
+            positive,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return square(e);
+            },
+            positive,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return cube(e);
+            },
+            positive,
+            mask
+        );
+        expect_masked_unary_stream(
+            [](const auto& e)
+            {
+                return pow<3>(e);
+            },
+            positive,
+            mask
+        );
     }
 
     TEST(xmath, masked_view_lazy_binary_math_functions)
@@ -340,16 +650,96 @@ namespace xt
         const xarray<double> lhs = {1.25, 1.5, 1.75, 2.0};
         const xarray<double> rhs = {0.5, 0.75, 1.25, 1.5};
 
-        expect_masked_binary_stream([](const auto& lhs_expr, const auto& rhs_expr) { return fmod(lhs_expr, rhs_expr); }, lhs, rhs, mask);
-        expect_masked_binary_stream([](const auto& lhs_expr, const auto& rhs_expr) { return remainder(lhs_expr, rhs_expr); }, lhs, rhs, mask);
-        expect_masked_binary_stream([](const auto& lhs_expr, const auto& rhs_expr) { return fmax(lhs_expr, rhs_expr); }, lhs, rhs, mask);
-        expect_masked_binary_stream([](const auto& lhs_expr, const auto& rhs_expr) { return fmin(lhs_expr, rhs_expr); }, lhs, rhs, mask);
-        expect_masked_binary_stream([](const auto& lhs_expr, const auto& rhs_expr) { return fdim(lhs_expr, rhs_expr); }, lhs, rhs, mask);
-        expect_masked_binary_stream([](const auto& lhs_expr, const auto& rhs_expr) { return pow(lhs_expr, rhs_expr); }, lhs, rhs, mask);
-        expect_masked_binary_stream([](const auto& lhs_expr, const auto& rhs_expr) { return hypot(lhs_expr, rhs_expr); }, lhs, rhs, mask);
-        expect_masked_binary_stream([](const auto& lhs_expr, const auto& rhs_expr) { return atan2(lhs_expr, rhs_expr); }, lhs, rhs, mask);
-        expect_masked_binary_stream([](const auto& lhs_expr, const auto& rhs_expr) { return minimum(lhs_expr, rhs_expr); }, lhs, rhs, mask);
-        expect_masked_binary_stream([](const auto& lhs_expr, const auto& rhs_expr) { return maximum(lhs_expr, rhs_expr); }, lhs, rhs, mask);
+        expect_masked_binary_stream(
+            [](const auto& lhs_expr, const auto& rhs_expr)
+            {
+                return fmod(lhs_expr, rhs_expr);
+            },
+            lhs,
+            rhs,
+            mask
+        );
+        expect_masked_binary_stream(
+            [](const auto& lhs_expr, const auto& rhs_expr)
+            {
+                return remainder(lhs_expr, rhs_expr);
+            },
+            lhs,
+            rhs,
+            mask
+        );
+        expect_masked_binary_stream(
+            [](const auto& lhs_expr, const auto& rhs_expr)
+            {
+                return fmax(lhs_expr, rhs_expr);
+            },
+            lhs,
+            rhs,
+            mask
+        );
+        expect_masked_binary_stream(
+            [](const auto& lhs_expr, const auto& rhs_expr)
+            {
+                return fmin(lhs_expr, rhs_expr);
+            },
+            lhs,
+            rhs,
+            mask
+        );
+        expect_masked_binary_stream(
+            [](const auto& lhs_expr, const auto& rhs_expr)
+            {
+                return fdim(lhs_expr, rhs_expr);
+            },
+            lhs,
+            rhs,
+            mask
+        );
+        expect_masked_binary_stream(
+            [](const auto& lhs_expr, const auto& rhs_expr)
+            {
+                return pow(lhs_expr, rhs_expr);
+            },
+            lhs,
+            rhs,
+            mask
+        );
+        expect_masked_binary_stream(
+            [](const auto& lhs_expr, const auto& rhs_expr)
+            {
+                return hypot(lhs_expr, rhs_expr);
+            },
+            lhs,
+            rhs,
+            mask
+        );
+        expect_masked_binary_stream(
+            [](const auto& lhs_expr, const auto& rhs_expr)
+            {
+                return atan2(lhs_expr, rhs_expr);
+            },
+            lhs,
+            rhs,
+            mask
+        );
+        expect_masked_binary_stream(
+            [](const auto& lhs_expr, const auto& rhs_expr)
+            {
+                return minimum(lhs_expr, rhs_expr);
+            },
+            lhs,
+            rhs,
+            mask
+        );
+        expect_masked_binary_stream(
+            [](const auto& lhs_expr, const auto& rhs_expr)
+            {
+                return maximum(lhs_expr, rhs_expr);
+            },
+            lhs,
+            rhs,
+            mask
+        );
     }
 
     TEST(xmath, masked_view_lazy_ternary_math_functions)
