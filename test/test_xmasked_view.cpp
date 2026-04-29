@@ -51,12 +51,9 @@ namespace xt
         A,
         B,
         M,
-        std::void_t<decltype(
-            std::declval<std::ostream&>()
-            << minimum(
-                masked_view(std::declval<const A&>(), std::declval<const M&>()),
-                masked_view(std::declval<const B&>(), std::declval<const M&>())
-            ))>> : std::true_type
+        std::void_t<
+            decltype(std::declval<std::ostream&>() << minimum(masked_view(std::declval<const A&>(), std::declval<const M&>()), masked_view(std::declval<const B&>(), std::declval<const M&>())))>>
+        : std::true_type
     {
     };
 
@@ -70,9 +67,8 @@ namespace xt
         A,
         B,
         M,
-        std::void_t<decltype(
-            std::declval<std::ostream&>()
-            << masked_view(minimum(std::declval<const A&>(), std::declval<const B&>()), std::declval<const M&>()))>>
+        std::void_t<
+            decltype(std::declval<std::ostream&>() << masked_view(minimum(std::declval<const A&>(), std::declval<const B&>()), std::declval<const M&>()))>>
         : std::true_type
     {
     };

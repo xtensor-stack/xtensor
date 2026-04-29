@@ -614,9 +614,8 @@ namespace xt
                     {
                         return return_type(
                             static_cast<value_type>(
-                                detail::masked_data(t1) < detail::masked_data(t2)
-                                    ? detail::masked_data(t1)
-                                    : detail::masked_data(t2)
+                                detail::masked_data(t1) < detail::masked_data(t2) ? detail::masked_data(t1)
+                                                                                  : detail::masked_data(t2)
                             ),
                             true
                         );
@@ -654,9 +653,8 @@ namespace xt
                     {
                         return return_type(
                             static_cast<value_type>(
-                                detail::masked_data(t1) > detail::masked_data(t2)
-                                    ? detail::masked_data(t1)
-                                    : detail::masked_data(t2)
+                                detail::masked_data(t1) > detail::masked_data(t2) ? detail::masked_data(t1)
+                                                                                  : detail::masked_data(t2)
                             ),
                             true
                         );
