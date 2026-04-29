@@ -21,6 +21,19 @@
 
 namespace xt
 {
+    namespace detail
+    {
+        template <class D, class S>
+        struct xmasked_view_strides
+        {
+            using fallback_type = get_strides_type<S>;
+            using strides_type = xtl::mpl::eval_if_t<has_strides<D>, expr_strides_type<D>, fallback_type>;
+            using backstrides_type = xtl::mpl::eval_if_t<has_strides<D>, expr_backstrides_type<D>, fallback_type>;
+            using inner_strides_type = xtl::mpl::eval_if_t<has_strides<D>, expr_inner_strides_type<D>, fallback_type>;
+            using inner_backstrides_type = xtl::mpl::eval_if_t<has_strides<D>, expr_inner_backstrides_type<D>, fallback_type>;
+        };
+    }
+
     /****************************
      * xmasked_view declaration  *
      *****************************/
@@ -118,21 +131,16 @@ namespace xt
         using bool_load_type = xtl::xmasked_value<typename data_type::bool_load_type, mask_type>;
 
         using shape_type = typename data_type::shape_type;
-        using strides_type = xtl::mpl::
-            eval_if_t<has_strides<data_type>, detail::expr_strides_type<data_type>, get_strides_type<shape_type>>;
-        using backstrides_type = xtl::mpl::
-            eval_if_t<has_strides<data_type>, detail::expr_backstrides_type<data_type>, get_strides_type<shape_type>>;
+        using strides_helper = detail::xmasked_view_strides<data_type, shape_type>;
+        using strides_type = typename strides_helper::strides_type;
+        using backstrides_type = typename strides_helper::backstrides_type;
 
         static constexpr layout_type static_layout = data_type::static_layout;
         static constexpr bool contiguous_layout = false;
 
         using inner_shape_type = typename data_type::inner_shape_type;
-        using inner_strides_type = xtl::mpl::
-            eval_if_t<has_strides<data_type>, detail::expr_inner_strides_type<data_type>, get_strides_type<shape_type>>;
-        using inner_backstrides_type = xtl::mpl::eval_if_t<
-            has_strides<data_type>,
-            detail::expr_inner_backstrides_type<data_type>,
-            get_strides_type<shape_type>>;
+        using inner_strides_type = typename strides_helper::inner_strides_type;
+        using inner_backstrides_type = typename strides_helper::inner_backstrides_type;
 
         using expression_tag = xtensor_expression_tag;
 
