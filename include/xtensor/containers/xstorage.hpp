@@ -1431,12 +1431,6 @@ namespace xt
         using allocator_type = std::conditional_t<Align != 0, xt_simd::aligned_allocator<T, Align>, std::allocator<T>>;
     };
 
-#if defined(_MSC_VER)
-#define XTENSOR_CONST
-#else
-#define XTENSOR_CONST const
-#endif
-
     /**
      * A std::array like class with all member function (except reverse iterators)
      * as constexpr. The data is immutable once set.
@@ -1528,7 +1522,7 @@ namespace xt
             return N;
         }
 
-        XTENSOR_CONST T m_data[N > 0 ? N : 1];
+        const T m_data[N > 0 ? N : 1];
     };
 
     template <class T, std::size_t N>
@@ -1895,7 +1889,5 @@ namespace std
  # pragma clang diagnostic pop
 #endif
 // clang-format on
-
-#undef XTENSOR_CONST
 
 #endif
