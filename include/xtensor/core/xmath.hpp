@@ -19,6 +19,7 @@
 #include <cmath>
 #include <complex>
 #include <type_traits>
+#include <utility>
 
 #include <xtl/xcomplex.hpp>
 #include <xtl/xmasked_value.hpp>
@@ -595,6 +596,44 @@ namespace xt
             {
                 return static_cast<bool>(value.visible());
             }
+
+            template <class... Args>
+            inline constexpr bool has_masked_value_v = (xtl::is_xmasked_value<std::decay_t<Args>>::value || ...);
+
+            template <class T>
+            using masked_data_type_t = std::decay_t<decltype(masked_data(std::declval<const T&>()))>;
+
+            template <class... Args>
+            using masked_common_value_type_t = xtl::promote_type_t<masked_data_type_t<Args>...>;
+
+            template <class T>
+            using masked_return_type_t = xtl::xmasked_value<T, bool>;
+
+            template <class... Args>
+            constexpr bool all_masked_visible(const Args&... args) noexcept
+            {
+                return (masked_visible(args) && ...);
+            }
+
+            template <class T>
+            constexpr auto hidden_masked_value() noexcept -> masked_return_type_t<T>
+            {
+                return masked_return_type_t<T>(T(0), false);
+            }
+
+            template <class Result, class F, class... Args>
+            constexpr auto masked_map(F&& function, const Args&... args) -> masked_return_type_t<Result>
+            {
+                if (all_masked_visible(args...))
+                {
+                    return masked_return_type_t<Result>(
+                        static_cast<Result>(std::forward<F>(function)(masked_data(args)...)),
+                        true
+                    );
+                }
+
+                return hidden_masked_value<Result>();
+            }
         }
 
         template <class T = void>
@@ -603,25 +642,17 @@ namespace xt
             template <class A1, class A2>
             constexpr auto operator()(const A1& t1, const A2& t2) const noexcept
             {
-                if constexpr (xtl::is_xmasked_value<std::decay_t<A1>>::value || xtl::is_xmasked_value<std::decay_t<A2>>::value)
+                if constexpr (detail::has_masked_value_v<A1, A2>)
                 {
-                    using value_type = xtl::promote_type_t<
-                        std::decay_t<decltype(detail::masked_data(t1))>,
-                        std::decay_t<decltype(detail::masked_data(t2))>>;
-                    using return_type = xtl::xmasked_value<value_type, bool>;
-
-                    if (detail::masked_visible(t1) && detail::masked_visible(t2))
-                    {
-                        return return_type(
-                            static_cast<value_type>(
-                                detail::masked_data(t1) < detail::masked_data(t2) ? detail::masked_data(t1)
-                                                                                  : detail::masked_data(t2)
-                            ),
-                            true
-                        );
-                    }
-
-                    return return_type(value_type(0), false);
+                    using value_type = detail::masked_common_value_type_t<A1, A2>;
+                    return detail::masked_map<value_type>(
+                        [](const auto& lhs, const auto& rhs)
+                        {
+                            return lhs < rhs ? lhs : rhs;
+                        },
+                        t1,
+                        t2
+                    );
                 }
                 else
                 {
@@ -642,25 +673,17 @@ namespace xt
             template <class A1, class A2>
             constexpr auto operator()(const A1& t1, const A2& t2) const noexcept
             {
-                if constexpr (xtl::is_xmasked_value<std::decay_t<A1>>::value || xtl::is_xmasked_value<std::decay_t<A2>>::value)
+                if constexpr (detail::has_masked_value_v<A1, A2>)
                 {
-                    using value_type = xtl::promote_type_t<
-                        std::decay_t<decltype(detail::masked_data(t1))>,
-                        std::decay_t<decltype(detail::masked_data(t2))>>;
-                    using return_type = xtl::xmasked_value<value_type, bool>;
-
-                    if (detail::masked_visible(t1) && detail::masked_visible(t2))
-                    {
-                        return return_type(
-                            static_cast<value_type>(
-                                detail::masked_data(t1) > detail::masked_data(t2) ? detail::masked_data(t1)
-                                                                                  : detail::masked_data(t2)
-                            ),
-                            true
-                        );
-                    }
-
-                    return return_type(value_type(0), false);
+                    using value_type = detail::masked_common_value_type_t<A1, A2>;
+                    return detail::masked_map<value_type>(
+                        [](const auto& lhs, const auto& rhs)
+                        {
+                            return lhs > rhs ? lhs : rhs;
+                        },
+                        t1,
+                        t2
+                    );
                 }
                 else
                 {
@@ -680,7 +703,23 @@ namespace xt
             template <class A1, class A2, class A3>
             constexpr auto operator()(const A1& v, const A2& lo, const A3& hi) const
             {
-                return xtl::select(v < lo, lo, xtl::select(hi < v, hi, v));
+                if constexpr (detail::has_masked_value_v<A1, A2, A3>)
+                {
+                    using value_type = detail::masked_common_value_type_t<A1, A2, A3>;
+                    return detail::masked_map<value_type>(
+                        [](const auto& value, const auto& lower, const auto& upper)
+                        {
+                            return value < lower ? lower : (upper < value ? upper : value);
+                        },
+                        v,
+                        lo,
+                        hi
+                    );
+                }
+                else
+                {
+                    return xtl::select(v < lo, lo, xtl::select(hi < v, hi, v));
+                }
             }
 
             template <class A1, class A2, class A3>
@@ -692,16 +731,29 @@ namespace xt
 
         struct deg2rad
         {
-            template <class A, std::enable_if_t<xtl::is_integral<A>::value, int> = 0>
-            constexpr double operator()(const A& a) const noexcept
-            {
-                return a * xt::numeric_constants<double>::PI / 180.0;
-            }
-
-            template <class A, std::enable_if_t<std::is_floating_point<A>::value, int> = 0>
+            template <class A>
             constexpr auto operator()(const A& a) const noexcept
             {
-                return a * xt::numeric_constants<A>::PI / A(180.0);
+                if constexpr (detail::has_masked_value_v<A>)
+                {
+                    using data_type = detail::masked_data_type_t<A>;
+                    using result_type = std::conditional_t<xtl::is_integral<data_type>::value, double, data_type>;
+                    return detail::masked_map<result_type>(
+                        [](const auto& value)
+                        {
+                            return value * xt::numeric_constants<result_type>::PI / result_type(180.0);
+                        },
+                        a
+                    );
+                }
+                else if constexpr (xtl::is_integral<A>::value)
+                {
+                    return a * xt::numeric_constants<double>::PI / 180.0;
+                }
+                else
+                {
+                    return a * xt::numeric_constants<A>::PI / A(180.0);
+                }
             }
 
             template <class A, std::enable_if_t<xtl::is_integral<A>::value, int> = 0>
@@ -719,16 +771,29 @@ namespace xt
 
         struct rad2deg
         {
-            template <class A, std::enable_if_t<xtl::is_integral<A>::value, int> = 0>
-            constexpr double operator()(const A& a) const noexcept
-            {
-                return a * 180.0 / xt::numeric_constants<double>::PI;
-            }
-
-            template <class A, std::enable_if_t<std::is_floating_point<A>::value, int> = 0>
+            template <class A>
             constexpr auto operator()(const A& a) const noexcept
             {
-                return a * A(180.0) / xt::numeric_constants<A>::PI;
+                if constexpr (detail::has_masked_value_v<A>)
+                {
+                    using data_type = detail::masked_data_type_t<A>;
+                    using result_type = std::conditional_t<xtl::is_integral<data_type>::value, double, data_type>;
+                    return detail::masked_map<result_type>(
+                        [](const auto& value)
+                        {
+                            return value * result_type(180.0) / xt::numeric_constants<result_type>::PI;
+                        },
+                        a
+                    );
+                }
+                else if constexpr (xtl::is_integral<A>::value)
+                {
+                    return a * 180.0 / xt::numeric_constants<double>::PI;
+                }
+                else
+                {
+                    return a * A(180.0) / xt::numeric_constants<A>::PI;
+                }
             }
 
             template <class A, std::enable_if_t<xtl::is_integral<A>::value, int> = 0>
@@ -932,7 +997,22 @@ namespace xt
             template <class T>
             constexpr auto operator()(const T& x) const
             {
-                return sign_impl<T>::run(x);
+                if constexpr (detail::has_masked_value_v<T>)
+                {
+                    using data_type = detail::masked_data_type_t<T>;
+                    using result_type = std::decay_t<decltype(sign_impl<data_type>::run(detail::masked_data(x)))>;
+                    return detail::masked_map<result_type>(
+                        [](const auto& value)
+                        {
+                            return sign_impl<data_type>::run(value);
+                        },
+                        x
+                    );
+                }
+                else
+                {
+                    return sign_impl<T>::run(x);
+                }
             }
         };
     }

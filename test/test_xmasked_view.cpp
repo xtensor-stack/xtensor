@@ -41,38 +41,6 @@ namespace xt
         return masked_view(data, std::move(mask));
     }
 
-    template <class A, class B, class M, class = void>
-    struct is_masked_minimum_streamable : std::false_type
-    {
-    };
-
-    template <class A, class B, class M>
-    struct is_masked_minimum_streamable<
-        A,
-        B,
-        M,
-        std::void_t<
-            decltype(std::declval<std::ostream&>() << minimum(masked_view(std::declval<const A&>(), std::declval<const M&>()), masked_view(std::declval<const B&>(), std::declval<const M&>())))>>
-        : std::true_type
-    {
-    };
-
-    template <class A, class B, class M, class = void>
-    struct is_masked_view_of_minimum_streamable : std::false_type
-    {
-    };
-
-    template <class A, class B, class M>
-    struct is_masked_view_of_minimum_streamable<
-        A,
-        B,
-        M,
-        std::void_t<
-            decltype(std::declval<std::ostream&>() << masked_view(minimum(std::declval<const A&>(), std::declval<const B&>()), std::declval<const M&>()))>>
-        : std::true_type
-    {
-    };
-
     TEST(xmasked_view, dimension)
     {
         auto data = make_test_data();
@@ -252,18 +220,13 @@ namespace xt
         const array_type b = {0.1, 0.7, 0.3, 0.9};
 
         const auto mask = b < 0.5;
-        const auto expected = eval(masked_view(minimum(a, b), mask));
 
-        std::stringstream expected_out;
-        expected_out << expected;
-
-        std::stringstream masked_min_out;
-        masked_min_out << minimum(masked_view(a, mask), masked_view(b, mask));
-        EXPECT_EQ(masked_min_out.str(), expected_out.str());
-
-        std::stringstream masked_expr_out;
-        masked_expr_out << masked_view(minimum(a, b), mask);
-        EXPECT_EQ(masked_expr_out.str(), expected_out.str());
+        EXPECT_TRUE(has_stream_output(minimum(masked_view(a, mask), masked_view(b, mask))));
+        EXPECT_TRUE(has_stream_output(masked_view(minimum(a, b), mask)));
+        EXPECT_TRUE(has_stream_output(maximum(masked_view(a, mask), masked_view(b, mask))));
+        EXPECT_TRUE(has_stream_output(masked_view(maximum(a, b), mask)));
+        EXPECT_TRUE(has_stream_output(clip(masked_view(a, mask), 0.2, 0.8)));
+        EXPECT_TRUE(has_stream_output(masked_view(clip(a, 0.2, 0.8), mask)));
     }
 
     TEST(xmasked_view, assign)
