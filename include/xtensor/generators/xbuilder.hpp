@@ -954,17 +954,10 @@ namespace xt
         template <std::size_t... I, class... E>
         inline auto meshgrid_impl(std::index_sequence<I...>, E&&... e) noexcept
         {
-#if defined _MSC_VER
-            const std::array<std::size_t, sizeof...(E)> shape = {e.shape()[0]...};
-            return std::make_tuple(
-                detail::make_xgenerator(detail::repeat_impl<xclosure_t<E>>(std::forward<E>(e), I), shape)...
-            );
-#else
             return std::make_tuple(detail::make_xgenerator(
                 detail::repeat_impl<xclosure_t<E>>(std::forward<E>(e), I),
                 {e.shape()[0]...}
             )...);
-#endif
         }
     }
 

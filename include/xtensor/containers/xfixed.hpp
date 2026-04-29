@@ -256,12 +256,7 @@ namespace xt
         using inner_backstrides_type = backstrides_type;
 
         // NOTE: 0D (S::size() == 0) results in storage for 1 element (scalar)
-#if defined(_MSC_VER) && _MSC_VER < 1910 && !defined(_WIN64)
-        // WORKAROUND FOR MSVC 2015 32 bit, fallback to unaligned container for 0D scalar case
-        using storage_type = std::array<ET, detail::fixed_compute_size<S>::value>;
-#else
         using storage_type = aligned_array<ET, detail::fixed_compute_size<S>::value>;
-#endif
 
         using reference = typename storage_type::reference;
         using const_reference = typename storage_type::const_reference;

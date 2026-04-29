@@ -28,12 +28,6 @@
 
 #include "../core/xtensor_config.hpp"
 
-#if (defined(_MSC_VER) && _MSC_VER >= 1910)
-#define NOEXCEPT(T)
-#else
-#define NOEXCEPT(T) noexcept(T)
-#endif
-
 namespace xt
 {
     /****************
@@ -53,7 +47,7 @@ namespace xt
     constexpr decltype(auto) argument(Args&&... args) noexcept;
 
     template <class R, class F, class... S>
-    R apply(std::size_t index, F&& func, const std::tuple<S...>& s) NOEXCEPT(noexcept(func(std::get<0>(s))));
+    R apply(std::size_t index, F&& func, const std::tuple<S...>& s) noexcept(noexcept(func(std::get<0>(s))));
 
     template <class T, class S>
     void nested_copy(T&& iter, const S& s);
@@ -198,7 +192,7 @@ namespace xt
      * accumulate implementation *
      *****************************/
 
-    /// @cond DOXYGEN_INCLUDE_NOEXCEPT
+    /// @cond DOXYGEN_INCLUDE_noexcept
 
     namespace detail
     {
@@ -266,8 +260,8 @@ namespace xt
      ************************/
 
     template <class R, class F, class... S>
-    inline R apply(std::size_t index, F&& func, const std::tuple<S...>& s)
-        NOEXCEPT(noexcept(func(std::get<0>(s))))
+    inline R
+    apply(std::size_t index, F&& func, const std::tuple<S...>& s) noexcept(noexcept(func(std::get<0>(s))))
     {
         XTENSOR_ASSERT(sizeof...(S) > index);
         return std::apply(

@@ -55,8 +55,6 @@ namespace xt
         EXPECT_EQ((result < result2), expected);
     }
 
-// need to wait until the system clock on Windows catches up with Linux
-#ifndef _MSC_VER
     TEST(xdate, date_arange)
     {
         xarray<tp> tarr = xt::arange<tp>(
@@ -66,7 +64,6 @@ namespace xt
         );
         EXPECT_TRUE(tarr.storage().back() > tarr.storage().front());
     }
-#endif
 
     TEST(xdate, xfunction)
     {
