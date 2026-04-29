@@ -17,11 +17,10 @@
 #include <sstream>
 #include <string>
 
-#include "xtl/xmasked_value_meta.hpp"
-
 #include "../core/xexpression.hpp"
 #include "../core/xmath.hpp"
 #include "../views/xstrided_view.hpp"
+#include "xtl/xmasked_value_meta.hpp"
 
 namespace xt
 {
@@ -617,8 +616,7 @@ namespace xt
         struct printer<
             T,
             std::enable_if_t<
-                !xtl::is_fundamental<typename T::value_type>::value
-                && !xtl::is_complex<typename T::value_type>::value>>
+                !xtl::is_fundamental<typename T::value_type>::value && !xtl::is_complex<typename T::value_type>::value>>
         {
             using const_reference = typename T::const_reference;
             using value_type = std::decay_t<typename T::value_type>;
