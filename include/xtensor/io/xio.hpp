@@ -17,6 +17,8 @@
 #include <sstream>
 #include <string>
 
+#include "xtl/xmasked_value_meta.hpp"
+
 #include "../core/xexpression.hpp"
 #include "../core/xmath.hpp"
 #include "../views/xstrided_view.hpp"
@@ -615,7 +617,8 @@ namespace xt
         struct printer<
             T,
             std::enable_if_t<
-                !xtl::is_fundamental<typename T::value_type>::value && !xtl::is_complex<typename T::value_type>::value>>
+                !xtl::is_fundamental<typename T::value_type>::value
+                && !xtl::is_complex<typename T::value_type>::value>>
         {
             using const_reference = typename T::const_reference;
             using value_type = std::decay_t<typename T::value_type>;
@@ -646,7 +649,14 @@ namespace xt
             void update(const_reference val)
             {
                 std::stringstream buf;
-                buf << val;
+                if constexpr (xtl::is_xmasked_value<value_type>::value)
+                {
+                    buf << +val;
+                }
+                else
+                {
+                    buf << val;
+                }
                 std::string s = buf.str();
                 if (int(s.size()) > m_width)
                 {
