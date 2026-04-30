@@ -167,7 +167,7 @@ namespace xt
             using pointer = typename traits::pointer;
             using value_type = typename traits::value_type;
             pointer res = alloc.allocate(size);
-            if (!xtrivially_default_constructible<value_type>::value)
+            if (!std::is_trivially_default_constructible<value_type>::value)
             {
                 for (pointer p = res; p != res + size; ++p)
                 {
@@ -189,7 +189,7 @@ namespace xt
             using value_type = typename traits::value_type;
             if (ptr != nullptr)
             {
-                if (!xtrivially_default_constructible<value_type>::value)
+                if (!std::is_trivially_default_constructible<value_type>::value)
                 {
                     for (pointer p = ptr; p != ptr + size; ++p)
                     {
@@ -325,7 +325,7 @@ namespace xt
                 rhs.get_allocator()
             );
             resize_impl(rhs.size());
-            if (xtrivially_default_constructible<value_type>::value)
+            if (std::is_trivially_default_constructible<value_type>::value)
             {
                 std::uninitialized_copy(rhs.p_begin, rhs.p_end, p_begin);
             }
@@ -1255,7 +1255,7 @@ namespace xt
     template <class T, std::size_t N, class A, bool Init>
     inline void svector<T, N, A, Init>::destroy_range(T* begin, T* end)
     {
-        if (!xtrivially_default_constructible<T>::value)
+        if (!std::is_trivially_default_constructible<T>::value)
         {
             while (begin != end)
             {

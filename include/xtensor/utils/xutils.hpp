@@ -609,34 +609,6 @@ namespace xt
     template <typename E>
     concept iterator_concept = is_iterator<E>::value;
 
-    /********************************************
-     * xtrivial_default_construct implemenation *
-     ********************************************/
-
-#if defined(_GLIBCXX_RELEASE) && _GLIBCXX_RELEASE >= 7
-// has_trivial_default_constructor has not been available since libstdc++-7.
-#define XTENSOR_GLIBCXX_USE_CXX11_ABI 1
-#else
-#if defined(_GLIBCXX_USE_CXX11_ABI)
-#if _GLIBCXX_USE_CXX11_ABI || (defined(_GLIBCXX_USE_DUAL_ABI) && !_GLIBCXX_USE_DUAL_ABI)
-#define XTENSOR_GLIBCXX_USE_CXX11_ABI 1
-#endif
-#endif
-#endif
-
-#if !defined(__GNUG__) || defined(_LIBCPP_VERSION) || defined(XTENSOR_GLIBCXX_USE_CXX11_ABI)
-
-    template <class T>
-    using xtrivially_default_constructible = std::is_trivially_default_constructible<T>;
-
-#else
-
-    template <class T>
-    using xtrivially_default_constructible = std::has_trivial_default_constructor<T>;
-
-#endif
-#undef XTENSOR_GLIBCXX_USE_CXX11_ABI
-
     /*************************
      * conditional type cast *
      *************************/
