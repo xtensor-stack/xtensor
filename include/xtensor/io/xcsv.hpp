@@ -66,7 +66,7 @@ namespace xt
             }
 
             size_t last = cell.find_last_not_of(' ');
-            return cell.substr(first, last == std::string::npos ? cell.size() : last + 1);
+            return cell.substr(first, last == std::string::npos ? cell.size() : last - first + 1);
         }
 
         template <>
@@ -91,6 +91,18 @@ namespace xt
         inline int lexical_cast<int>(const std::string& cell)
         {
             return std::stoi(cell);
+        }
+
+        template <>
+        inline signed char lexical_cast<signed char>(const std::string& cell)
+        {
+            return static_cast<signed char>(std::stoi(cell));
+        }
+
+        template <>
+        inline unsigned char lexical_cast<unsigned char>(const std::string& cell)
+        {
+            return static_cast<unsigned char>(std::stoul(cell));
         }
 
         template <>
