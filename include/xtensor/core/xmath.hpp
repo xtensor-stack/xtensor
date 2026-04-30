@@ -1185,6 +1185,19 @@ namespace xt
         {
         };
 
+        template <typename T>
+        inline decltype(auto) lambda_argument(T&& value)
+        {
+            if constexpr (xtl::is_xmasked_value<std::decay_t<T>>::value)
+            {
+                return +value;
+            }
+            else
+            {
+                return std::forward<T>(value);
+            }
+        }
+
         template <class F>
         struct lambda_adapt
         {
@@ -1194,15 +1207,15 @@ namespace xt
             }
 
             template <class... T>
-            auto operator()(T... args) const
+            auto operator()(T&&... args) const
             {
-                return m_lambda(args...);
+                return m_lambda(lambda_argument(std::forward<T>(args))...);
             }
 
             template <class... T, XTL_REQUIRES(detail::supports<F(T...)>)>
-            auto simd_apply(T... args) const
+            auto simd_apply(T&&... args) const
             {
-                return m_lambda(args...);
+                return m_lambda(lambda_argument(std::forward<T>(args))...);
             }
 
             F m_lambda;
@@ -1325,10 +1338,11 @@ namespace xt
         struct pow_impl
         {
             template <class T>
-            auto operator()(T v) const -> decltype(v * v)
+            auto operator()(T&& v) const
             {
-                T temp = pow_impl<N / 2>{}(v);
-                return temp * temp * pow_impl<N & 1>{}(v);
+                auto value = lambda_argument(std::forward<T>(v));
+                auto temp = pow_impl<N / 2>{}(value);
+                return temp * temp * pow_impl<N & 1>{}(value);
             }
         };
 
@@ -1336,9 +1350,9 @@ namespace xt
         struct pow_impl<1>
         {
             template <class T>
-            auto operator()(T v) const -> T
+            decltype(auto) operator()(T&& v) const
             {
-                return v;
+                return lambda_argument(std::forward<T>(v));
             }
         };
 
@@ -1346,9 +1360,10 @@ namespace xt
         struct pow_impl<0>
         {
             template <class T>
-            auto operator()(T /*v*/) const -> T
+            auto operator()(T&& v) const
             {
-                return T(1);
+                using value_type = std::decay_t<decltype(lambda_argument(std::forward<T>(v)))>;
+                return value_type(1);
             }
         };
     }
