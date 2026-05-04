@@ -403,7 +403,8 @@ namespace xt
         constexpr size_t n_indices_full = n_indices_full_v<FirstIndice, OtherIndices...>;
 
         constexpr size_t underlying_n_dimensions = static_cast<size_t>(
-            xt::static_dimension<typename std::decay_t<UnderlyingContainer>::shape_type>::value);
+            xt::static_dimension<typename std::decay_t<UnderlyingContainer>::shape_type>::value
+        );
 
         // If there is too many indices, we need to drop the first ones.
         // If the number of dimensions of the underlying container is known at compile time we can drop them
