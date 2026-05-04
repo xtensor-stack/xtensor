@@ -402,8 +402,8 @@ namespace xt
     {
         constexpr size_t n_indices_full = n_indices_full_v<FirstIndice, OtherIndices...>;
 
-        constexpr size_t underlying_n_dimensions = xt::static_dimension<
-            typename std::decay_t<UnderlyingContainer>::shape_type>::value;
+        constexpr size_t underlying_n_dimensions = static_cast<size_t>(
+            xt::static_dimension<typename std::decay_t<UnderlyingContainer>::shape_type>::value);
 
         // If there is too many indices, we need to drop the first ones.
         // If the number of dimensions of the underlying container is known at compile time we can drop them
@@ -462,7 +462,7 @@ namespace xt
         const view_type& view
     ) const -> conditional_reference<IS_CONST>
     {
-        constexpr size_t n_indices_full = n_indices_full_v<>;
+        constexpr size_t n_indices_full = nb_integral_slices;
 
         return map_all_indices(
             is_const,
@@ -517,8 +517,9 @@ namespace xt
             }
             else
             {
+                using slice_size_type = typename current_slice::size_type;
                 assert(i < slice.size());
-                return size_t(slice(i));
+                return size_t(slice(static_cast<slice_size_type>(i)));
             }
         }
         else

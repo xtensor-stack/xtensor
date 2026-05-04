@@ -574,18 +574,18 @@ namespace xt
                         }
                         const auto& shape = arr.shape();
                         const size_t stride = std::accumulate(
-                            shape.begin() + i + 1,
+                            shape.begin() + static_cast<std::ptrdiff_t>(i) + 1,
                             shape.end(),
-                            1,
+                            size_t(1),
                             std::multiplies<size_t>()
                         );
-                        const auto len = (*(first + i + after_axis));
+                        const auto len = (*(first + static_cast<std::ptrdiff_t>(i + after_axis)));
                         offset += len * stride;
                     }
-                    const auto element = arr.begin() + offset;
+                    const auto element = arr.begin() + static_cast<std::ptrdiff_t>(offset);
                     return *element;
                 };
-                size_type i = *(first + axis);
+                size_type i = *(first + static_cast<std::ptrdiff_t>(axis));
                 return apply<value_type>(i, get_item, t);
             }
         };
