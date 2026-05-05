@@ -463,6 +463,7 @@ namespace xt
         const view_type& view
     ) const -> conditional_reference<IS_CONST>
     {
+        // Work around compilers failing to deduce nb_integral_slices as a non-type template argument inline (error: use of variable template 'n_indices_full_v' requires template arguments)
         constexpr size_t n_indices_full = nb_integral_slices;
 
         return map_all_indices(
