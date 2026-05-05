@@ -997,10 +997,10 @@ namespace xt
     template <class S>
     inline void xstrided_container<D>::resize(S&& shape, bool force)
     {
-        XTENSOR_ASSERT_MSG(
+        XTENSOR_PRECONDITION(
             detail::check_resize_dimension(m_shape, shape),
             "cannot change the number of dimensions of xtensor"
-        )
+        );
         std::size_t dim = shape.size();
         if (m_shape.size() != dim || !std::equal(std::begin(shape), std::end(shape), std::begin(m_shape))
             || force)
