@@ -28,12 +28,6 @@
 
 #include "../core/xtensor_config.hpp"
 
-#if (defined(_MSC_VER) && _MSC_VER >= 1910)
-#define NOEXCEPT(T)
-#else
-#define NOEXCEPT(T) noexcept(T)
-#endif
-
 namespace xt
 {
     /****************
@@ -53,7 +47,7 @@ namespace xt
     constexpr decltype(auto) argument(Args&&... args) noexcept;
 
     template <class R, class F, class... S>
-    R apply(std::size_t index, F&& func, const std::tuple<S...>& s) NOEXCEPT(noexcept(func(std::get<0>(s))));
+    R apply(std::size_t index, F&& func, const std::tuple<S...>& s) noexcept(noexcept(func(std::get<0>(s))));
 
     template <class T, class S>
     void nested_copy(T&& iter, const S& s);
@@ -198,7 +192,7 @@ namespace xt
      * accumulate implementation *
      *****************************/
 
-    /// @cond DOXYGEN_INCLUDE_NOEXCEPT
+    /// @cond DOXYGEN_INCLUDE_noexcept
 
     namespace detail
     {
@@ -266,8 +260,8 @@ namespace xt
      ************************/
 
     template <class R, class F, class... S>
-    inline R apply(std::size_t index, F&& func, const std::tuple<S...>& s)
-        NOEXCEPT(noexcept(func(std::get<0>(s))))
+    inline R
+    apply(std::size_t index, F&& func, const std::tuple<S...>& s) noexcept(noexcept(func(std::get<0>(s))))
     {
         XTENSOR_ASSERT(sizeof...(S) > index);
         return std::apply(
@@ -614,34 +608,6 @@ namespace xt
 
     template <typename E>
     concept iterator_concept = is_iterator<E>::value;
-
-    /********************************************
-     * xtrivial_default_construct implemenation *
-     ********************************************/
-
-#if defined(_GLIBCXX_RELEASE) && _GLIBCXX_RELEASE >= 7
-// has_trivial_default_constructor has not been available since libstdc++-7.
-#define XTENSOR_GLIBCXX_USE_CXX11_ABI 1
-#else
-#if defined(_GLIBCXX_USE_CXX11_ABI)
-#if _GLIBCXX_USE_CXX11_ABI || (defined(_GLIBCXX_USE_DUAL_ABI) && !_GLIBCXX_USE_DUAL_ABI)
-#define XTENSOR_GLIBCXX_USE_CXX11_ABI 1
-#endif
-#endif
-#endif
-
-#if !defined(__GNUG__) || defined(_LIBCPP_VERSION) || defined(XTENSOR_GLIBCXX_USE_CXX11_ABI)
-
-    template <class T>
-    using xtrivially_default_constructible = std::is_trivially_default_constructible<T>;
-
-#else
-
-    template <class T>
-    using xtrivially_default_constructible = std::has_trivial_default_constructor<T>;
-
-#endif
-#undef XTENSOR_GLIBCXX_USE_CXX11_ABI
 
     /*************************
      * conditional type cast *

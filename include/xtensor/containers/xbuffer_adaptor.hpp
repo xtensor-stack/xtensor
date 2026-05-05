@@ -709,7 +709,7 @@ namespace xt
                     rhs.get_allocator()
                 );
                 pointer tmp = safe_init_allocate(al, rhs.m_size);
-                if (xtrivially_default_constructible<value_type>::value)
+                if (std::is_trivially_default_constructible<value_type>::value)
                 {
                     std::uninitialized_copy(rhs.m_data.get(), rhs.m_data.get() + rhs.m_size, tmp);
                 }

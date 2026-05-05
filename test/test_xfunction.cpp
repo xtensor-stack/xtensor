@@ -480,21 +480,13 @@ namespace xt
         auto f1 = 2.0 * x;
         auto f2 = x * 2.0 * x;
         iterator_tester(f1);
-// For an unknown reason, MSVC cannot correctly generate
-// linear_cbegin() for a function of function. Moreover,
-// a simple SFINAE deduction like has_linear_iterator
-// harcoded and tested here fails (while it builds fine in any
-// empty project)
-#ifndef _MSC_VER
         iterator_tester(f2);
         iterator_tester(x * y * 3.0);
         iterator_tester(5.0 + x * y * 3.0);
         iterator_tester(x * y * z);
         iterator_tester(x / y / z);
-#endif
     }
 
-#ifndef _MSC_VER
     TEST(xfunction, xfunction_in_xfunction)
     {
         using Point3 = xt::xtensor_fixed<double, xshape<3>>;
@@ -507,5 +499,4 @@ namespace xt
         xtensor<Point3, 1> res{r1, r2, r3};
         EXPECT_EQ(c, res);
     }
-#endif
 }

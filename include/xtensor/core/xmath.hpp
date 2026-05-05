@@ -1088,31 +1088,6 @@ namespace xt
         return xfunction_type(detail::lambda_adapt<F>(std::forward<F>(lambda)), std::forward<E>(args)...);
     }
 
-// Workaround for MSVC 2015 & GCC 4.9
-#if (defined(_MSC_VER) && _MSC_VER < 1910) || (defined(__GNUC__) && __GNUC__ < 5)
-#define XTENSOR_DISABLE_LAMBDA_FCT
-#endif
-
-#ifdef XTENSOR_DISABLE_LAMBDA_FCT
-    struct square_fct
-    {
-        template <class T>
-        auto operator()(T x) const -> decltype(x * x)
-        {
-            return x * x;
-        }
-    };
-
-    struct cube_fct
-    {
-        template <class T>
-        auto operator()(T x) const -> decltype(x * x * x)
-        {
-            return x * x * x;
-        }
-    };
-#endif
-
     /**
      * @ingroup pow_functions
      * @brief Square power function, equivalent to e1 * e1.
@@ -1125,15 +1100,11 @@ namespace xt
     template <class E1>
     inline auto square(E1&& e1) noexcept
     {
-#ifdef XTENSOR_DISABLE_LAMBDA_FCT
-        return make_lambda_xfunction(square_fct{}, std::forward<E1>(e1));
-#else
         auto fnct = [](auto x) -> decltype(x * x)
         {
             return x * x;
         };
         return make_lambda_xfunction(std::move(fnct), std::forward<E1>(e1));
-#endif
     }
 
     /**
@@ -1148,18 +1119,12 @@ namespace xt
     template <class E1>
     inline auto cube(E1&& e1) noexcept
     {
-#ifdef XTENSOR_DISABLE_LAMBDA_FCT
-        return make_lambda_xfunction(cube_fct{}, std::forward<E1>(e1));
-#else
         auto fnct = [](auto x) -> decltype(x * x * x)
         {
             return x * x * x;
         };
         return make_lambda_xfunction(std::move(fnct), std::forward<E1>(e1));
-#endif
     }
-
-#undef XTENSOR_DISABLE_LAMBDA_FCT
 
     namespace detail
     {
