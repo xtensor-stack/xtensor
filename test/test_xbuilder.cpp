@@ -424,6 +424,21 @@ namespace xt
         ASSERT_TRUE(arange(8) == w1);
         ASSERT_TRUE(w1 == w2);
     }
+
+    TEST(xbuilder, vstack_fixed)
+    {
+        xtensor_fixed<float, fixed_shape<1, 2>> a = {{1.f, 2.f}};
+        xtensor_fixed<float, fixed_shape<2, 2>> b = {{3.f, 4.f}, {5.f, 6.f}};
+
+        auto c = vstack(xtuple(a, b));
+
+        using expected_shape_t = fixed_shape<3, 2>;
+        ASSERT_EQ(expected_shape_t{}, c.shape());
+        EXPECT_EQ(1.f, c(0, 0));
+        EXPECT_EQ(2.f, c(0, 1));
+        EXPECT_EQ(3.f, c(1, 0));
+        EXPECT_EQ(6.f, c(2, 1));
+    }
 #endif
 
     TEST(xbuilder, access)

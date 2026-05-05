@@ -910,6 +910,26 @@ namespace xt
 
     namespace detail
     {
+        template <class S>
+        struct vstack_fixed_shape;
+
+        template <std::size_t N>
+        struct vstack_fixed_shape<fixed_shape<N>>
+        {
+            using type = fixed_shape<1, N>;
+        };
+
+        template <std::size_t I, std::size_t... J>
+        struct vstack_fixed_shape<fixed_shape<I, J...>>
+        {
+            using type = fixed_shape<I, J...>;
+        };
+
+        template <class... CT>
+        using vstack_fixed_shape_t = concat_fixed_shape_t<
+            0,
+            typename vstack_fixed_shape<typename std::decay_t<CT>::shape_type>::type...>;
+
         template <class S, class... CT>
         inline auto vstack_shape(std::tuple<CT...>& t, const S& shape)
         {
@@ -946,6 +966,21 @@ namespace xt
             xtl::forward_sequence<shape_type, source_shape_type>(std::get<0>(t).shape())
         );
         return detail::make_xgenerator(detail::vstack_impl<CT...>(std::move(t), size_t(0)), new_shape);
+    }
+
+    /**
+     * @brief Stack fixed-shape xexpressions in sequence vertically (row wise).
+     * This overload preserves the result shape at compile time by treating
+     * 1-D fixed shapes as ``(1, N)`` row vectors before concatenation.
+     *
+     * @param t \ref xtuple of fixed-shape xexpressions to stack
+     * @return xgenerator evaluating to stacked elements with a fixed compile-time shape
+     */
+    template <fixed_shape_container_concept... CT>
+    inline auto vstack(std::tuple<CT...>&& t)
+    {
+        using shape_type = detail::vstack_fixed_shape_t<CT...>;
+        return detail::make_xgenerator(detail::vstack_impl<CT...>(std::move(t), size_t(0)), shape_type{});
     }
 
     namespace detail
