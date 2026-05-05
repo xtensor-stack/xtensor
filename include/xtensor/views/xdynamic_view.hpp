@@ -324,7 +324,7 @@ namespace xt
     namespace detail
     {
         template <class T>
-        class xfake_slice : public xslice<xfake_slice<T>>
+        class xfake_slice
         {
         public:
 
