@@ -1640,6 +1640,16 @@ namespace xt
             return m_array.cend();
         }
 
+        auto crbegin() const
+        {
+            return m_array.crbegin();
+        }
+
+        auto crend() const
+        {
+            return m_array.crend();
+        }
+
         constexpr std::size_t operator[](std::size_t idx) const
         {
             return m_array[idx];

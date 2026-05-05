@@ -22,6 +22,7 @@
 #include "xtensor/core/xnoalias.hpp"
 #include "xtensor/io/xio.hpp"
 #include "xtensor/misc/xmanipulation.hpp"
+#include "xtensor/views/xview.hpp"
 
 #include "test_common_macros.hpp"
 
@@ -305,6 +306,13 @@ namespace xt
         using fixed_tensor = xtensor_fixed<double, xshape<2>, layout_type::row_major, true>;
         using tiny_tensor = xtensor_fixed<double, xshape<2>, layout_type::row_major, false>;
         EXPECT_GT(sizeof(fixed_tensor), sizeof(tiny_tensor));
+    }
+
+    TEST(xtensor_fixed, iterators)
+    {
+        auto arr = xt::xtensor<double, 1>({5, 5, 5, 5, 5});
+        auto fixed_arr = xt::xtensor_fixed<double, xt::xshape<3>>{1, 2, 3};
+        xt::view(arr, xt::range(0, 3)) = fixed_arr + 1;
     }
 }
 
