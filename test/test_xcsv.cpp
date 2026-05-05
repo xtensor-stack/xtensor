@@ -162,4 +162,28 @@ namespace xt
 
         XT_EXPECT_THROW(dump_csv(res, data), std::runtime_error);
     }
+
+    TEST(xcsv, dump_with_config)
+    {
+        xtensor<double, 2> data{{1.0, 2.0, 3.0, 4.0}, {10.0, 12.0, 15.0, 18.0}};
+
+        std::stringstream res;
+
+        xcsv_config config;
+        config.delimiter = ' ';
+        dump_csv(res, data, config);
+        ASSERT_EQ("1 2 3 4\n10 12 15 18\n", res.str());
+    }
+
+    TEST(xcsv, dump_file_with_config)
+    {
+        xtensor<double, 2> data{{1.0, 2.0, 3.0, 4.0}, {10.0, 12.0, 15.0, 18.0}};
+
+        std::stringstream res;
+
+        xcsv_config config;
+        config.delimiter = ';';
+        dump_file(res, data, config);
+        ASSERT_EQ("1;2;3;4\n10;12;15;18\n", res.str());
+    }
 }
