@@ -12,11 +12,12 @@ defaults:
     shell: bash -e -l {0}
 jobs:
   build:
-    runs-on: ubuntu-24.04
-    name: ${{ matrix.sys.compiler }} ${{ matrix.sys.version }} - ${{ matrix.sys.name }}
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }} ${{ matrix.sys.compiler }} ${{ matrix.sys.version }} - ${{ matrix.sys.name }}
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
         sys:
         - {compiler: clang, version: '17', name: assert, flags: -DXTENSOR_ENABLE_ASSERT=ON}
         - {compiler: clang, version: '18', name: column-major, flags: -DDEFAULT_COLUMN_MAJOR=ON}
