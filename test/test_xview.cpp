@@ -1861,4 +1861,16 @@ namespace xt
 
         XT_ASSERT_THROW(const auto col = xt::col(arr, 0), std::invalid_argument);
     }
+
+    TEST(xview, drop_on_1dim_array)
+    {
+        const auto my_array = xt::xtensor<double, 1>({1, 2, 3});
+
+        xt::view(my_array, xt::drop(1));
+        EXPECT_EQ(my_array, (xt::xtensor<double, 1>{1, 3}));
+
+        const size_t index = 1;
+        xt::view(my_array, xt::drop(index));
+        EXPECT_EQ(my_array, (xt::xtensor<double, 1>{1}));
+    }
 }

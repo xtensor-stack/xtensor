@@ -484,7 +484,7 @@ namespace xt
     template <class R = std::ptrdiff_t, class T>
     inline auto drop(T&& indices)
     {
-        if constexpr (xtl::is_integral<T>::value)
+        if constexpr (xtl::is_integral<std::decay_t<T>>::value)
         {
             using slice_type = xdrop_slice<R>;
             using container_type = typename slice_type::container_type;
