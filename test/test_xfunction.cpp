@@ -10,6 +10,7 @@
 #include "xtensor/containers/xarray.hpp"
 #include "xtensor/containers/xfixed.hpp"
 #include "xtensor/containers/xtensor.hpp"
+#include "xtensor/core/xvectorize.hpp"
 #include "xtensor/generators/xrandom.hpp"
 #include "xtensor/views/xview.hpp"
 
@@ -190,6 +191,21 @@ namespace xt
             int a = (f.m_a + f.m_c)(1, i, j, k);
             int b = f.m_a(i, j, k) + f.m_c(1, i, j, k);
             EXPECT_EQ(a, b);
+        }
+    }
+
+    TEST(xfunction, access_dangling_reference)
+    {
+        auto values_original = xt::xtensor<double, 1>{1., 2., 3.};
+        auto indexes = xt::arange<size_t>(values_original.size());
+        auto map = [&](const size_t& index) -> auto&
+        {
+            return values_original[index];
+        };
+        auto values_mapped = xt::vectorize(map)(indexes);
+        for (size_t i = 0; i < values_original.size(); ++i)
+        {
+            EXPECT_TRUE(&(values_mapped[i]) == &(values_original[i]));
         }
     }
 
