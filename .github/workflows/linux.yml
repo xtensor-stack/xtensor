@@ -44,6 +44,10 @@ jobs:
           sys:
             compiler: gcc
             version: '12'
+        - os: ubuntu-24.04-arm
+          sys:
+            compiler: gcc
+            version: '11'
 
     steps:
     - name: Install GCC
