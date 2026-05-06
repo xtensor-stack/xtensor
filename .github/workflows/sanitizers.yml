@@ -57,7 +57,7 @@ jobs:
         export CXX=clang++
         cmake -G Ninja \
           -Bbuild \
-          -DCMAKE_BUILD_TYPE:STRING=${{matrix.config.name}} \
+          -DCMAKE_BUILD_TYPE=${{matrix.config.name}} \
           -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX \
           -DBUILD_TESTS=ON \
           -DUSE_SANITIZER=address
