@@ -1,0 +1,98 @@
+name: Sanitizers
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches: [master]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.job }}-${{ github.ref }}
+  cancel-in-progress: true
+defaults:
+  run:
+    shell: bash -e -l {0}
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    name: sanitizer / ${{ matrix.sys.compiler }} ${{ matrix.sys.version }} / ${{ matrix.config.name }} / ${{ matrix.sys.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04]
+        sys:
+        - {compiler: clang, version: '19', name: asan}
+        - {compiler: clang, version: '21', name: asan}
+        config:
+        - {name: Debug}
+
+    steps:
+
+    - name: Install LLVM and Clang
+      if: matrix.sys.compiler == 'clang'
+      run: |
+        wget https://apt.llvm.org/llvm.sh
+        chmod +x llvm.sh
+        sudo ./llvm.sh ${{matrix.sys.version}}
+        sudo apt-get install -y clang-tools-${{matrix.sys.version}}
+        sudo update-alternatives --install /usr/bin/clang++         clang++             /usr/bin/clang++-${{matrix.sys.version}} 200
+        sudo update-alternatives --install /usr/bin/clang           clang               /usr/bin/clang-${{matrix.sys.version}} 200
+        sudo update-alternatives --install /usr/bin/clang-scan-deps clang-scan-deps     /usr/bin/clang-scan-deps-${{matrix.sys.version}} 200
+        sudo update-alternatives --set clang /usr/bin/clang-${{matrix.sys.version}}
+        sudo update-alternatives --set clang++ /usr/bin/clang++-${{matrix.sys.version}}
+        sudo update-alternatives --set clang-scan-deps /usr/bin/clang-scan-deps-${{matrix.sys.version}}
+
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Set conda environment
+      uses: mamba-org/setup-micromamba@main
+      with:
+        environment-name: myenv
+        environment-file: environment-dev.yml
+        init-shell: bash
+        cache-downloads: true
+
+    - name: Configure using CMake
+      run: |
+        export CC=clang
+        export CXX=clang++
+        cmake -G Ninja \
+          -Bbuild \
+          -DCMAKE_BUILD_TYPE:STRING=${{matrix.config.name}} \
+          -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX \
+          -DBUILD_TESTS=ON \
+          -DUSE_SANITIZER=address
+
+    - name: Build tests
+      working-directory: build
+      run: cmake --build . --config ${{matrix.config.name}} --target test_xtensor_lib --parallel 8
+
+    - name: Run tests
+      working-directory: build
+      run: |
+        export ASAN_OPTIONS=log_path=asan_log_:alloc_dealloc_mismatch=0:halt_on_error=0:handle_abort=0
+        export ASAN_SAVE_DUMPS=AsanDump.dmp
+        ctest -R ^xtest$ --output-on-failure
+
+    - name: Upload ASAN log
+      if: always()
+      uses: actions/upload-artifact@v6
+      with:
+        name: asan-log-${{ matrix.sys.compiler }}-${{ matrix.sys.version }}-${{ matrix.config.name }}-${{ runner.os }}
+        path: '**/asan_log_*'
+        if-no-files-found: ignore
+
+    - name: Upload ASAN dump
+      if: always()
+      uses: actions/upload-artifact@v6
+      with:
+        name: asan-dump-${{ matrix.sys.compiler }}-${{ matrix.sys.version }}-${{ matrix.config.name }}-${{ runner.os }}
+        path: '**/AsanDump.dmp'
+        if-no-files-found: ignore
+
+    - name: Return errors if ASAN log content is not empty
+      if: always()
+      run: |
+        if [ -n "$(find build/test -name 'asan_log_*' -type f -size +0 2>/dev/null)" ]; then
+          echo "ASAN detected errors. See the log for details."
+          exit 1
+        fi
