@@ -606,13 +606,13 @@ namespace xt
             template <class A1, class A2, class A3>
             constexpr auto operator()(const A1& v, const A2& lo, const A3& hi) const
             {
-                return xtl::select(v < lo, lo, xtl::select(hi < v, hi, v));
+                return xtl::select(lo < hi, xtl::select(v < lo, lo, xtl::select(hi < v, hi, v)), hi);
             }
 
             template <class A1, class A2, class A3>
             constexpr auto simd_apply(const A1& v, const A2& lo, const A3& hi) const
             {
-                return xt_simd::select(v < lo, lo, xt_simd::select(hi < v, hi, v));
+                return xt_simd::select(lo < hi, xt_simd::select(v < lo, lo, xt_simd::select(hi < v, hi, v)), hi);
             }
         };
 
