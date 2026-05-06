@@ -1864,13 +1864,20 @@ namespace xt
 
     TEST(xview, drop_on_1dim_array)
     {
-        const auto my_array = xt::xtensor<double, 1>({1, 2, 3});
+        auto my_array = xt::xtensor<double, 1>({1, 2, 3});
 
-        xt::view(my_array, xt::drop(1));
-        EXPECT_EQ(my_array, (xt::xtensor<double, 1>{1, 3}));
+        // drop(1) creates a view excluding index 1
+        auto v1 = xt::view(my_array, xt::drop(1));
+        EXPECT_EQ(v1, (xt::xtensor<double, 1>{1, 3}));
 
+        // Assign through the drop view
+        xt::view(my_array, xt::drop(1)) = 0.;
+        EXPECT_EQ(my_array, (xt::xtensor<double, 1>{0, 2, 0}));
+
+        // Reset, then test drop with a variable (the original compilation issue)
+        my_array = xt::xtensor<double, 1>({1, 2, 3});
         const size_t index = 1;
-        xt::view(my_array, xt::drop(index));
-        EXPECT_EQ(my_array, (xt::xtensor<double, 1>{1}));
+        auto v2 = xt::view(my_array, xt::drop(index));
+        EXPECT_EQ(v2, (xt::xtensor<double, 1>{1, 3}));
     }
 }
