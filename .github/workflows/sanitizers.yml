@@ -19,8 +19,10 @@ jobs:
       matrix:
         os: [ubuntu-24.04]
         sys:
-        - {compiler: clang, version: '19', name: asan}
-        - {compiler: clang, version: '21', name: asan}
+        - {compiler: clang, version: '21', name: asan, sanitizer: address}
+        - {compiler: clang, version: '21', name: msan, sanitizer: memory}
+        - {compiler: clang, version: '21', name: lsan, sanitizer: leak}
+        - {compiler: clang, version: '21', name: ubsan, sanitizer: undefined}
         config:
         - {name: Debug}
 
@@ -60,7 +62,7 @@ jobs:
           -DCMAKE_BUILD_TYPE=${{matrix.config.name}} \
           -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX \
           -DBUILD_TESTS=ON \
-          -DUSE_SANITIZER=address
+          -DUSE_SANITIZER=${{ matrix.sys.sanitizer }}
 
     - name: Build tests
       working-directory: build
@@ -69,30 +71,44 @@ jobs:
     - name: Run tests
       working-directory: build
       run: |
-        export ASAN_OPTIONS=log_path=asan_log_:alloc_dealloc_mismatch=0:halt_on_error=0:handle_abort=0
-        export ASAN_SAVE_DUMPS=AsanDump.dmp
+        SAN=${{ matrix.sys.sanitizer }}
+        case "$SAN" in
+          address)
+            export ASAN_OPTIONS=log_path=asan_log_:alloc_dealloc_mismatch=0:halt_on_error=0:handle_abort=0
+            export ASAN_SAVE_DUMPS=AsanDump.dmp
+            ;;
+          memory)
+            export MSAN_OPTIONS=log_path=msan_log_:halt_on_error=0
+            ;;
+          leak)
+            export LSAN_OPTIONS=log_path=lsan_log_:halt_on_error=0
+            ;;
+          undefined)
+            export UBSAN_OPTIONS=log_path=ubsan_log_:halt_on_error=0:print_stacktrace=1
+            ;;
+        esac
         ctest -R ^xtest$ --output-on-failure
 
-    - name: Upload ASAN log
+    - name: Upload sanitizer log
       if: always()
       uses: actions/upload-artifact@v6
       with:
-        name: asan-log-${{ matrix.sys.compiler }}-${{ matrix.sys.version }}-${{ matrix.config.name }}-${{ runner.os }}
-        path: '**/asan_log_*'
+        name: sanitizer-log-${{ matrix.sys.sanitizer }}-${{ matrix.sys.compiler }}-${{ matrix.sys.version }}-${{ matrix.config.name }}-${{ runner.os }}
+        path: '**/*san_log_*'
         if-no-files-found: ignore
 
-    - name: Upload ASAN dump
+    - name: Upload sanitizer dump
       if: always()
       uses: actions/upload-artifact@v6
       with:
-        name: asan-dump-${{ matrix.sys.compiler }}-${{ matrix.sys.version }}-${{ matrix.config.name }}-${{ runner.os }}
+        name: sanitizer-dump-${{ matrix.sys.sanitizer }}-${{ matrix.sys.compiler }}-${{ matrix.sys.version }}-${{ matrix.config.name }}-${{ runner.os }}
         path: '**/AsanDump.dmp'
         if-no-files-found: ignore
 
-    - name: Return errors if ASAN log content is not empty
+    - name: Return errors if sanitizer log content is not empty
       if: always()
       run: |
-        if [ -n "$(find build/test -name 'asan_log_*' -type f -size +0 2>/dev/null)" ]; then
-          echo "ASAN detected errors. See the log for details."
+        if [ -n "$(find build/test -name '*san_log_*' -type f -size +0 2>/dev/null)" ]; then
+          echo "Sanitizer detected errors. See the log for details."
           exit 1
         fi
