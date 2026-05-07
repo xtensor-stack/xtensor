@@ -261,6 +261,8 @@ foreach(filename IN LISTS COMMON_BASE XTENSOR_TESTS)
     endif()
     target_include_directories(${targetname} PRIVATE ${XTENSOR_INCLUDE_DIR})
     target_link_libraries(${targetname} PRIVATE xtensor doctest::doctest ${CMAKE_THREAD_LIBS_INIT})
+    target_compile_options(${targetname} PRIVATE  $<$<BOOL:USE_SANITIZER>:${SANITIZER_COMPILE_OPTIONS}>)
+    target_link_options(${targetname} PRIVATE  $<$<BOOL:USE_SANITIZER>:${SANITIZER_LINK_OPTIONS}>)
     add_custom_target(
         x${targetname}
         COMMAND ${targetname}
@@ -284,6 +286,9 @@ endif()
 if(XTENSOR_USE_OPENMP)
     target_compile_definitions(test_xtensor_lib PRIVATE XTENSOR_USE_OPENMP)
 endif()
+
+target_compile_options(test_xtensor_lib PRIVATE  $<$<BOOL:USE_SANITIZER>:${SANITIZER_COMPILE_OPTIONS}>)
+target_link_options(test_xtensor_lib PRIVATE  $<$<BOOL:USE_SANITIZER>:${SANITIZER_LINK_OPTIONS}>)
 
 target_include_directories(test_xtensor_lib PRIVATE ${XTENSOR_INCLUDE_DIR})
 target_link_libraries(test_xtensor_lib PRIVATE xtensor  doctest::doctest ${CMAKE_THREAD_LIBS_INIT})

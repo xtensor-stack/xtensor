@@ -132,6 +132,8 @@ namespace xt
             a1(1, 0) = static_cast<int>(i);
             EXPECT_EQ(i, data[i * size + st]);
         }
+
+        delete[] data;
     }
 
     TEST(xarray_adaptor, pointer_acquire_ownership)
@@ -300,6 +302,8 @@ namespace xt
             a1(1, 0) = static_cast<int>(i);
             EXPECT_EQ(i, data[i * size + st]);
         }
+
+        delete[] data;
     }
 
     TEST(xtensor_adaptor, pointer_const_no_ownership)
