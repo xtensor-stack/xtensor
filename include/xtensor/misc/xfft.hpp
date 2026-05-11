@@ -61,7 +61,7 @@ namespace xt
                     auto odd = radix2(xt::view(ev, xt::range(1, _, 2)));
 #endif
 
-                    auto range = xt::arange<double>(N / 2);
+                    auto range = xt::arange<double>(static_cast<double>(N) / 2);
                     auto exp = xt::exp(static_cast<value_type>(-2i) * pi * range / N);
                     auto t = exp * odd;
                     auto first_half = even + t;
@@ -82,8 +82,8 @@ namespace xt
 
                 // Find a power-of-2 convolution length m such that m >= n * 2 + 1
                 const std::size_t n = data.size();
-                size_t m = std::ceil(std::log2(n * 2 + 1));
-                m = std::pow(2, m);
+                size_t m = static_cast<size_t>(std::ceil(std::log2(n * 2 + 1)));
+                m = static_cast<size_t>(std::pow(2, m));
 
                 // Trignometric table
                 auto exp_table = xt::xtensor<std::complex<precision>, 1>::from_shape({n});
@@ -162,7 +162,7 @@ namespace xt
             if constexpr (xtl::is_complex<typename std::decay<E>::type::value_type>::value)
             {
                 // check the length of the data on that axis
-                const std::size_t n = e.shape(axis);
+                const std::size_t n = e.shape(xt::normalize_axis(e.dimension(), axis));
                 if (n == 0)
                 {
                     XTENSOR_THROW(std::runtime_error, "Cannot take the iFFT along an empty dimention");
