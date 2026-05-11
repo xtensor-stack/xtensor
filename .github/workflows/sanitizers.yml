@@ -78,7 +78,7 @@ jobs:
             export ASAN_SAVE_DUMPS=AsanDump.dmp
             ;;
           memory)
-            export MSAN_OPTIONS=log_path=msan_log_:halt_on_error=0
+            export MSAN_OPTIONS=log_path=msan_log_:halt_on_error=0:suppressions=${GITHUB_WORKSPACE}/test/msan_suppressions.txt
             ;;
           leak)
             export LSAN_OPTIONS=log_path=lsan_log_:halt_on_error=0
