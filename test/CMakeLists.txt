@@ -289,12 +289,32 @@ endif()
 
 target_compile_options(test_xtensor_lib PRIVATE  $<$<BOOL:USE_SANITIZER>:${SANITIZER_COMPILE_OPTIONS}>)
 target_link_options(test_xtensor_lib PRIVATE  $<$<BOOL:USE_SANITIZER>:${SANITIZER_LINK_OPTIONS}>)
+# if(USE_SANITIZER MATCHES "memory" AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+#   target_compile_options(test_xtensor_lib PRIVATE -ftrivial-auto-var-init=zero)
+# endif()
+# if(USE_SANITIZER MATCHES "memory")
+#   target_compile_options(test_xtensor_lib PRIVATE -fno-sanitize=memory)
+#   target_link_options(test_xtensor_lib PRIVATE -fno-sanitize=memory)
+# endif()
 
 target_include_directories(test_xtensor_lib PRIVATE ${XTENSOR_INCLUDE_DIR})
 target_link_libraries(test_xtensor_lib PRIVATE xtensor  doctest::doctest ${CMAKE_THREAD_LIBS_INIT})
 
-add_custom_target(xtest COMMAND test_xtensor_lib DEPENDS test_xtensor_lib)
+set(XTENSOR_TEST_ENV)
+if(USE_SANITIZER MATCHES "memory")
+  set(XTENSOR_MSAN_SUPPRESSIONS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/msan_suppressions.txt")
+  set(XTENSOR_TEST_ENV "MSAN_OPTIONS=suppressions=${XTENSOR_MSAN_SUPPRESSIONS_FILE}")
+endif()
+
+add_custom_target(
+  xtest
+  COMMAND ${CMAKE_COMMAND} -E env ${XTENSOR_TEST_ENV} $<TARGET_FILE:test_xtensor_lib>
+  DEPENDS test_xtensor_lib
+)
 add_test(NAME xtest COMMAND test_xtensor_lib)
+if(XTENSOR_TEST_ENV)
+  set_tests_properties(xtest PROPERTIES ENVIRONMENT "${XTENSOR_TEST_ENV}")
+endif()
 
 # Some files will be compiled twice, however compiling common files in a static
 # library and linking test_xtensor_lib with it removes half of the tests at
