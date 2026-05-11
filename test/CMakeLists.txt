@@ -234,6 +234,15 @@ file(GLOB XTENSOR_PREPROCESS_FILES files/cppy_source/*.cppy)
 # Sanitizer support
 include(${CMAKE_SOURCE_DIR}/cmake/sanitizers.cmake)
 
+if(USE_SANITIZER MATCHES "memory" AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  set(XTENSOR_MSAN_IGNORELIST_FILE "${CMAKE_CURRENT_SOURCE_DIR}/msan_ignorelist.txt")
+  set_source_files_properties(
+    main.cpp
+    PROPERTIES
+      COMPILE_OPTIONS "-fsanitize-ignorelist=${XTENSOR_MSAN_IGNORELIST_FILE}"
+  )
+endif()
+
 # This target should only be run when the test source files have been changed.
 add_custom_target(
     preprocess_cppy
@@ -289,13 +298,6 @@ endif()
 
 target_compile_options(test_xtensor_lib PRIVATE  $<$<BOOL:USE_SANITIZER>:${SANITIZER_COMPILE_OPTIONS}>)
 target_link_options(test_xtensor_lib PRIVATE  $<$<BOOL:USE_SANITIZER>:${SANITIZER_LINK_OPTIONS}>)
-# if(USE_SANITIZER MATCHES "memory" AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-#   target_compile_options(test_xtensor_lib PRIVATE -ftrivial-auto-var-init=zero)
-# endif()
-# if(USE_SANITIZER MATCHES "memory")
-#   target_compile_options(test_xtensor_lib PRIVATE -fno-sanitize=memory)
-#   target_link_options(test_xtensor_lib PRIVATE -fno-sanitize=memory)
-# endif()
 
 target_include_directories(test_xtensor_lib PRIVATE ${XTENSOR_INCLUDE_DIR})
 target_link_libraries(test_xtensor_lib PRIVATE xtensor  doctest::doctest ${CMAKE_THREAD_LIBS_INIT})
