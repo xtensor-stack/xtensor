@@ -171,7 +171,11 @@ namespace xt
     It strided_data_end(const C& c, It begin, layout_type l, size_type offset)
     {
         using difference_type = typename std::iterator_traits<It>::difference_type;
-        if (c.dimension() == 0 || c.size() == 0)
+        if (c.size() == 0)
+        {
+            return begin;
+        }
+        if (c.dimension() == 0)
         {
             ++begin;
         }
