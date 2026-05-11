@@ -20,6 +20,7 @@
 #include "../core/xexpression.hpp"
 #include "../core/xmath.hpp"
 #include "../views/xstrided_view.hpp"
+#include "xtl/xmasked_value_meta.hpp"
 
 namespace xt
 {
@@ -646,7 +647,14 @@ namespace xt
             void update(const_reference val)
             {
                 std::stringstream buf;
-                buf << val;
+                if constexpr (xtl::is_xmasked_value<value_type>::value)
+                {
+                    buf << +val;
+                }
+                else
+                {
+                    buf << val;
+                }
                 std::string s = buf.str();
                 if (int(s.size()) > m_width)
                 {

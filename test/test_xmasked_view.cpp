@@ -7,6 +7,8 @@
  * The full license is in the file LICENSE, distributed with this software. *
  ****************************************************************************/
 
+#include <sstream>
+
 #include "xtensor/io/xio.hpp"
 #include "xtensor/optional/xoptional_assembly.hpp"
 #include "xtensor/views/xmasked_view.hpp"
@@ -208,6 +210,21 @@ namespace xt
         masked_data += 3.;
         xarray<double> expected2 = {{6.65, 6.65, 6.65}, {6.65, 5., -6.}, {6.65, 8., 6.65}};
         EXPECT_EQ(data, expected2);
+    }
+
+    TEST(xmasked_view, non_optional_data_stream)
+    {
+        const xarray<double> data = {{1., 5., 3.}, {4., 5., 6.}};
+        const xarray<bool> mask = {{true, false, false}, {false, true, false}};
+
+        const auto masked_data = masked_view(data, mask);
+
+        std::stringstream out;
+        out << masked_data;
+
+        const std::string expected = "{{     1, masked, masked},\n"
+                                     " {masked,      5, masked}}";
+        EXPECT_EQ(out.str(), expected);
     }
 
     TEST(xmasked_view, assign)
