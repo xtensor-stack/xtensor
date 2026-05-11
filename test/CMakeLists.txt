@@ -235,12 +235,9 @@ file(GLOB XTENSOR_PREPROCESS_FILES files/cppy_source/*.cppy)
 include(${CMAKE_SOURCE_DIR}/cmake/sanitizers.cmake)
 
 if(USE_SANITIZER MATCHES "memory" AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  set(XTENSOR_MSAN_IGNORELIST_FILE "${CMAKE_CURRENT_SOURCE_DIR}/msan_ignorelist.txt")
-  set_source_files_properties(
-    main.cpp
-    PROPERTIES
-      COMPILE_OPTIONS "-fsanitize-ignorelist=${XTENSOR_MSAN_IGNORELIST_FILE}"
-  )
+  # doctest's String union triggers MSan false positives during
+  # static-init reporter registration. Fixed in main.cpp with
+  # __attribute__((no_sanitize("memory"))) on doctest functions.
 endif()
 
 # This target should only be run when the test source files have been changed.
