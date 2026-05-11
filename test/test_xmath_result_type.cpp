@@ -115,7 +115,7 @@ namespace xt
     TEST(xmath, uchar_result_type)
     {
         shape_type shape = {3, 2};
-        xarray<unsigned char> auchar(shape);
+        auto auchar = xt::zeros<unsigned char>(shape);
 
         CHECK_RESULT_TYPE(auchar + auchar, int);
         CHECK_RESULT_TYPE(2 * auchar, int);
@@ -131,7 +131,7 @@ namespace xt
     TEST(xmath, short_result_type)
     {
         shape_type shape = {3, 2};
-        xarray<short> ashort(shape);
+        auto ashort = xt::zeros<short>(shape);
 
         CHECK_RESULT_TYPE(ashort + ashort, int);
         CHECK_RESULT_TYPE(2 * ashort, int);
@@ -147,7 +147,7 @@ namespace xt
     TEST(xmath, ushort_result_type)
     {
         shape_type shape = {3, 2};
-        xarray<unsigned short> aushort(shape);
+        auto aushort = xt::zeros<unsigned short>(shape);
 
         CHECK_RESULT_TYPE(aushort + aushort, int);
         CHECK_RESULT_TYPE(2u * aushort, unsigned int);
@@ -163,7 +163,7 @@ namespace xt
     TEST(xmath, int_result_type)
     {
         shape_type shape = {3, 2};
-        xarray<int> aint(shape);
+        auto aint = xt::zeros<int>(shape);
 
         CHECK_RESULT_TYPE(aint + aint, int);
         CHECK_RESULT_TYPE(2 * aint, int);
@@ -179,7 +179,7 @@ namespace xt
     TEST(xmath, uint_result_type)
     {
         shape_type shape = {3, 2};
-        xarray<unsigned int> auint(shape);
+        auto auint = xt::zeros<unsigned int>(shape);
 
         CHECK_RESULT_TYPE(auint + auint, unsigned int);
         CHECK_RESULT_TYPE(2u * auint, unsigned int);
@@ -195,7 +195,7 @@ namespace xt
     TEST(xmath, long_result_type)
     {
         shape_type shape = {3, 2};
-        xarray<long long> along(shape);
+        auto along = xt::zeros<long long>(shape);
 
         CHECK_RESULT_TYPE(along + along, signed long long);
         CHECK_RESULT_TYPE(2 * along, signed long long);
@@ -211,7 +211,7 @@ namespace xt
     TEST(xmath, ulong_result_type)
     {
         shape_type shape = {3, 2};
-        xarray<unsigned long long> aulong(shape);
+        auto aulong = xt::zeros<unsigned long long>(shape);
 
         CHECK_RESULT_TYPE(aulong + aulong, unsigned long long);
         CHECK_RESULT_TYPE(2ul * aulong, unsigned long long);
@@ -227,7 +227,7 @@ namespace xt
     TEST(xmath, float_result_type)
     {
         shape_type shape = {3, 2};
-        xarray<float> afloat(shape);
+        auto afloat = xt::zeros<float>(shape);
 
         CHECK_RESULT_TYPE(afloat + afloat, float);
         CHECK_RESULT_TYPE(2.0f * afloat, float);
@@ -243,7 +243,7 @@ namespace xt
     TEST(xmath, double_result_type)
     {
         shape_type shape = {3, 2};
-        xarray<double> adouble(shape);
+        auto adouble = xt::zeros<double>(shape);
 
         CHECK_RESULT_TYPE(adouble + adouble, double);
         CHECK_RESULT_TYPE(2.0 * adouble, double);

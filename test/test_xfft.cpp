@@ -27,6 +27,15 @@ namespace xt
         REQUIRE(A == doctest::Approx(std::abs(res(k))).epsilon(.0001));
     }
 
+    TEST(xfft, scalar_input_throws)
+    {
+        auto scalar = xt::xarray<float>::from_shape({});
+        scalar() = 1.0f;
+
+        XT_EXPECT_THROW(xt::fft::fft(scalar), std::runtime_error);
+        XT_EXPECT_THROW(xt::fft::ifft(scalar), std::runtime_error);
+    }
+
     TEST(xfft, convolve_power_2)
     {
         xt::xarray<float> x = {1.0, 1.0, 1.0, 5.0};

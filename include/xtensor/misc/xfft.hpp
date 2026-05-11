@@ -128,6 +128,10 @@ namespace xt
         inline auto fft(E&& e, std::ptrdiff_t axis = -1)
         {
             using value_type = typename std::decay<E>::type::value_type;
+            if (e.dimension() == 0)
+            {
+                XTENSOR_THROW(std::runtime_error, "Cannot take the FFT of a scalar expression");
+            }
             if constexpr (xtl::is_complex<typename std::decay<E>::type::value_type>::value)
             {
                 using precision = typename value_type::value_type;
@@ -159,6 +163,10 @@ namespace xt
         template <class E>
         inline auto ifft(E&& e, std::ptrdiff_t axis = -1)
         {
+            if (e.dimension() == 0)
+            {
+                XTENSOR_THROW(std::runtime_error, "Cannot take the iFFT of a scalar expression");
+            }
             if constexpr (xtl::is_complex<typename std::decay<E>::type::value_type>::value)
             {
                 // check the length of the data on that axis
