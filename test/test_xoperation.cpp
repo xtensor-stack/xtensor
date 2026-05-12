@@ -858,6 +858,29 @@ namespace xt
             EXPECT_EQ(expected1, res3);
             EXPECT_EQ(expected2, res4);
         }
+
+        TEST_CASE("divide_4d")
+        {
+            using T4 = xt::xtensor<float, 4, xt::layout_type::row_major>;
+            using shape_type = typename T4::shape_type;
+
+            shape_type shape = {2, 3, 2, 2};
+            T4 a(shape, 4.5f);
+            T4 b(shape, 1.3f);
+
+            EXPECT_EQ((a / b)(0, 0, 0, 0), a(0, 0, 0, 0) / b(0, 0, 0, 0));
+
+            float sb = 1.2f;
+            EXPECT_EQ((a / sb)(0, 0, 0, 0), a(0, 0, 0, 0) / sb);
+
+            float sa = 4.6f;
+            EXPECT_EQ((sa / b)(0, 0, 0, 0), sa / b(0, 0, 0, 0));
+
+            // self-divide assignment: a = a / b (no zeros in b)
+            auto a_before = a(1, 2, 1, 1);
+            a = a / b;
+            EXPECT_EQ(a(1, 2, 1, 1), a_before / b(1, 2, 1, 1));
+        }
     }
 
 #undef XOPERATION_TEST_TYPES
