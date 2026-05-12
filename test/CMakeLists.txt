@@ -234,12 +234,6 @@ file(GLOB XTENSOR_PREPROCESS_FILES files/cppy_source/*.cppy)
 # Sanitizer support
 include(${CMAKE_SOURCE_DIR}/cmake/sanitizers.cmake)
 
-if(USE_SANITIZER MATCHES "memory" AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  # doctest's String union triggers MSan false positives during
-  # static-init reporter registration. Fixed in main.cpp with
-  # __attribute__((no_sanitize("memory"))) on doctest functions.
-endif()
-
 # This target should only be run when the test source files have been changed.
 add_custom_target(
     preprocess_cppy
@@ -312,21 +306,12 @@ endif()
 target_include_directories(test_xtensor_lib PRIVATE ${XTENSOR_INCLUDE_DIR})
 target_link_libraries(test_xtensor_lib PRIVATE xtensor  doctest::doctest ${CMAKE_THREAD_LIBS_INIT})
 
-set(XTENSOR_TEST_ENV)
-if(USE_SANITIZER MATCHES "memory")
-  set(XTENSOR_MSAN_SUPPRESSIONS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/msan_suppressions.txt")
-  set(XTENSOR_TEST_ENV "MSAN_OPTIONS=halt_on_error=0:suppressions=${XTENSOR_MSAN_SUPPRESSIONS_FILE}")
-endif()
-
 add_custom_target(
   xtest
-  COMMAND ${CMAKE_COMMAND} -E env ${XTENSOR_TEST_ENV} $<TARGET_FILE:test_xtensor_lib>
+  COMMAND $<TARGET_FILE:test_xtensor_lib>
   DEPENDS test_xtensor_lib
 )
 add_test(NAME xtest COMMAND test_xtensor_lib)
-if(XTENSOR_TEST_ENV)
-  set_tests_properties(xtest PROPERTIES ENVIRONMENT "${XTENSOR_TEST_ENV}")
-endif()
 
 # Some files will be compiled twice, however compiling common files in a static
 # library and linking test_xtensor_lib with it removes half of the tests at

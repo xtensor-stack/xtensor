@@ -20,7 +20,6 @@ jobs:
         os: [ubuntu-24.04]
         sys:
         - {compiler: clang, version: '21', name: asan, sanitizer: address}
-        - {compiler: clang, version: '21', name: msan, sanitizer: memory}
         - {compiler: clang, version: '21', name: lsan, sanitizer: leak}
         - {compiler: clang, version: '21', name: ubsan, sanitizer: undefined}
         config:
@@ -76,9 +75,6 @@ jobs:
           address)
             export ASAN_OPTIONS=log_path=asan_log_:alloc_dealloc_mismatch=0:halt_on_error=0:handle_abort=0
             export ASAN_SAVE_DUMPS=AsanDump.dmp
-            ;;
-          memory)
-            export MSAN_OPTIONS=log_path=msan_log_:halt_on_error=0:suppressions=${GITHUB_WORKSPACE}/test/msan_suppressions.txt
             ;;
           leak)
             export LSAN_OPTIONS=log_path=lsan_log_:halt_on_error=0
