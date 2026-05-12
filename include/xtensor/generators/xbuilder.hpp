@@ -911,24 +911,28 @@ namespace xt
     namespace detail
     {
         template <class S>
-        struct vstack_fixed_shape;
+        struct vstack_fixed_shape_impl;
 
         template <std::size_t N>
-        struct vstack_fixed_shape<fixed_shape<N>>
+        struct vstack_fixed_shape_impl<fixed_shape<N>>
         {
             using type = fixed_shape<1, N>;
         };
 
         template <std::size_t I, std::size_t... J>
-        struct vstack_fixed_shape<fixed_shape<I, J...>>
+        struct vstack_fixed_shape_impl<fixed_shape<I, J...>>
         {
             using type = fixed_shape<I, J...>;
         };
 
         template <class... CT>
-        using vstack_fixed_shape_t = concat_fixed_shape_t<
-            0,
-            typename vstack_fixed_shape<typename std::decay_t<CT>::shape_type>::type...>;
+        struct vstack_fixed_shape
+        {
+            using type = concat_fixed_shape_t<0, typename vstack_fixed_shape_impl<typename std::decay_t<CT>::shape_type>::type...>;
+        };
+
+        template <class... CT>
+        using vstack_fixed_shape_t = typename vstack_fixed_shape<CT...>::type;
 
         template <class S, class... CT>
         inline auto vstack_shape(std::tuple<CT...>& t, const S& shape)
