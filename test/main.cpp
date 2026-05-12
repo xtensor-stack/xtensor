@@ -2,4 +2,4 @@
 #if defined(XTENSOR_DISABLE_EXCEPTIONS)
 #define DOCTEST_CONFIG_NO_EXCEPTIONS_BUT_WITH_ALL_ASSERTS
 #endif
-#include "doctest_wrapper.hpp"
+#include "doctest/doctest.h"
