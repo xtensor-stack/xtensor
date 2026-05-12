@@ -608,7 +608,7 @@ namespace xt
         // leading to warning about signed/unsigned conversions in the deeper layers of the access methods
 
         return std::apply(
-            [&](auto&... e)
+            [&](auto&... e) -> const_reference
             {
                 XTENSOR_TRY(check_index(shape(), args...));
                 XTENSOR_CHECK_DIMENSION(shape(), args...);
@@ -631,7 +631,7 @@ namespace xt
     inline auto xfunction<F, CT...>::flat(size_type index) const -> const_reference
     {
         return std::apply(
-            [&](auto&... e)
+            [&](auto&... e) -> const_reference
             {
                 return m_f(e.data_element(index)...);
             },
@@ -665,7 +665,7 @@ namespace xt
         // The static cast prevents the compiler from instantiating the template methods with signed integers,
         // leading to warning about signed/unsigned conversions in the deeper layers of the access methods
         return std::apply(
-            [&](const auto&... e)
+            [&](const auto&... e) -> const_reference
             {
                 return m_f(e.unchecked(static_cast<size_type>(args)...)...);
             },
@@ -685,7 +685,7 @@ namespace xt
     inline auto xfunction<F, CT...>::element(It first, It last) const -> const_reference
     {
         return std::apply(
-            [&](auto&... e)
+            [&](auto&... e) -> const_reference
             {
                 XTENSOR_TRY(check_element_index(shape(), first, last));
                 return m_f(e.element(first, last)...);
@@ -826,7 +826,7 @@ namespace xt
     inline auto xfunction<F, CT...>::data_element(size_type i) const -> const_reference
     {
         return std::apply(
-            [&](auto&... e)
+            [&](auto&... e) -> const_reference
             {
                 return m_f(e.data_element(i)...);
             },
@@ -957,7 +957,7 @@ namespace xt
     inline auto xfunction_iterator<F, CT...>::operator*() const -> reference
     {
         return std::apply(
-            [&](auto&... it)
+            [&](auto&... it) -> reference
             {
                 return (p_f->m_f)(*it...);
             },
@@ -1109,7 +1109,7 @@ namespace xt
     inline auto xfunction_stepper<F, CT...>::operator*() const -> reference
     {
         return std::apply(
-            [&](auto&... e)
+            [&](auto&... e) -> reference
             {
                 return (p_f->m_f)(*e...);
             },

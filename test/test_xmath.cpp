@@ -222,6 +222,15 @@ namespace xt
         EXPECT_EQ(res1, clip(opt_a, 2.0, 4.0));
     }
 
+    TEST(xmath, clip_amin_greater_than_amax)
+    {
+        // NumPy-compatible behavior: when a_min > a_max, all values
+        // are set to a_max (the hi bound).
+        const xarray<int> arr = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+        const xarray<int> expected = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+        EXPECT_EQ(expected, clip(arr, 8, 1));
+    }
+
     TEST(xmath, sign)
     {
         shape_type shape = {3, 2};

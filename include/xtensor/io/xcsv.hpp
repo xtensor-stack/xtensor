@@ -275,6 +275,47 @@ namespace xt
     };
 
     template <class E>
+    void dump_csv(std::ostream& stream, const xexpression<E>& e, const xcsv_config& config)
+    {
+        using size_type = typename E::size_type;
+        const E& ex = e.derived_cast();
+        if (ex.dimension() == 1)
+        {
+            const size_type n = ex.shape()[0];
+            for (size_type i = 0; i != n; ++i)
+            {
+                stream << ex(i);
+                if (i != n - 1)
+                {
+                    stream << config.delimiter;
+                }
+            }
+            stream << std::endl;
+        }
+        else if (ex.dimension() == 2)
+        {
+            const size_type nbrows = ex.shape()[0];
+            const size_type nbcols = ex.shape()[1];
+            for (size_type r = 0; r != nbrows; ++r)
+            {
+                for (size_type c = 0; c != nbcols; ++c)
+                {
+                    stream << ex(r, c);
+                    if (c != nbcols - 1)
+                    {
+                        stream << config.delimiter;
+                    }
+                }
+                stream << std::endl;
+            }
+        }
+        else
+        {
+            XTENSOR_THROW(std::runtime_error, "Only 1-D and 2-D expressions can be serialized to CSV");
+        }
+    }
+
+    template <class E>
     void load_file(std::istream& stream, xexpression<E>& e, const xcsv_config& config)
     {
         e.derived_cast() = load_csv<typename E::value_type>(
@@ -287,9 +328,9 @@ namespace xt
     }
 
     template <class E>
-    void dump_file(std::ostream& stream, const xexpression<E>& e, const xcsv_config&)
+    void dump_file(std::ostream& stream, const xexpression<E>& e, const xcsv_config& config)
     {
-        dump_csv(stream, e);
+        dump_csv(stream, e, config);
     }
 }
 
