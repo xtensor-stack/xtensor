@@ -7,7 +7,7 @@
 
 #include "xtensor/core/xtensor_config.hpp"
 
-#include "doctest/doctest.h"
+#include "doctest_wrapper.hpp"
 #include "test_utils.hpp"
 
 #if defined(XTENSOR_DISABLE_EXCEPTIONS)

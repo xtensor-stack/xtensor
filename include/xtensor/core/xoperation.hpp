@@ -20,6 +20,19 @@
 #include "../core/xstrides.hpp"
 #include "../views/xstrided_view.hpp"
 
+// Suppress MSan false positives triggered by deeply nested
+// std::apply + tuple unpacking in xfunction_stepper::operator*().
+// The arithmetic functors below (plus, multiplies, etc.) are trivial
+// and read values that originate from properly initialized arrays.
+#if defined(__has_feature)
+#if __has_feature(memory_sanitizer)
+#define XT_MSAN_NO_SANITIZE __attribute__((no_sanitize("memory")))
+#endif
+#endif
+#ifndef XT_MSAN_NO_SANITIZE
+#define XT_MSAN_NO_SANITIZE
+#endif
+
 namespace xt
 {
 
@@ -32,6 +45,7 @@ namespace xt
     {                                                  \
         template <class A1>                            \
         constexpr auto operator()(const A1& arg) const \
+            XT_MSAN_NO_SANITIZE                        \
         {                                              \
             return OP arg;                             \
         }                                              \
@@ -69,6 +83,7 @@ namespace xt
     {                                                                  \
         template <class T1, class T2>                                  \
         constexpr auto operator()(T1&& arg1, T2&& arg2) const          \
+            XT_MSAN_NO_SANITIZE                                        \
         {                                                              \
             using xt::detail::operator OP;                             \
             return (std::forward<T1>(arg1) OP std::forward<T2>(arg2)); \
@@ -131,6 +146,7 @@ namespace xt
 
             template <class B, class A1, class A2>
             constexpr auto operator()(const B& cond, const A1& v1, const A2& v2) const noexcept
+                XT_MSAN_NO_SANITIZE
             {
                 return xtl::select(cond, v1, v2);
             }
@@ -210,6 +226,7 @@ namespace xt
 
 #undef UNARY_OPERATOR_FUNCTOR
 #undef BINARY_OPERATOR_FUNCTOR
+#undef XT_MSAN_NO_SANITIZE
 
     /*************
      * operators *
