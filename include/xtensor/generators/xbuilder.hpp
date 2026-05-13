@@ -928,7 +928,9 @@ namespace xt
         template <class... CT>
         struct vstack_fixed_shape
         {
-            using type = concat_fixed_shape_t<0, typename vstack_fixed_shape_impl<typename std::decay_t<CT>::shape_type>::type...>;
+            using type = concat_fixed_shape_t<
+                0,
+                typename vstack_fixed_shape_impl<typename std::decay_t<CT>::shape_type>::type...>;
         };
 
         template <class... CT>
