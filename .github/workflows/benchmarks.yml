@@ -71,3 +71,43 @@ jobs:
       timeout-minutes: 10 # Consider increasing timeout
       working-directory: build/benchmark
       run: ./benchmark_xtensor
+
+  numpy:
+    runs-on: ubuntu-24.04
+    name: gcc 14 - numpy-xsimd
+    steps:
+    - name: Install GCC
+      uses: egor-tensin/setup-gcc@v1
+      with:
+        version: '14'
+        platform: x64
+
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set conda environment
+      uses: mamba-org/setup-micromamba@main
+      with:
+        environment-name: myenv
+        environment-file: environment-dev.yml
+        init-shell: bash
+        cache-downloads: true
+
+    - name: Configure using CMake
+      run: |
+        export CC=gcc-14
+        export CXX=g++-14
+        cmake -G Ninja -Bbuild -DCMAKE_C_COMPILER=$CC -DCMAKE_CXX_COMPILER=$CXX -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DBUILD_BENCHMARK=ON -DBUILD_NUMPY_BENCHMARKS=ON -DXTENSOR_USE_XSIMD=ON
+
+    - name: Build NumPy from source
+      working-directory: build
+      run: cmake --build . --target xbenchmark_numpy_env
+
+    - name: Build benchmark target
+      working-directory: build
+      run: cmake --build . --target benchmark_xtensor --parallel 8
+
+    - name: Run NumPy comparison benchmark
+      timeout-minutes: 20
+      working-directory: build/benchmark
+      run: ./benchmark_xtensor --benchmark_filter='(add_|multiply_|sin_|exp_|sum_axis[01]_)'
