@@ -193,7 +193,7 @@ namespace xt
          * @throws Assertion failure if `i != 0` for integral slices.
          * @throws Assertion failure if `i >= slice.size()` for non-integral slices.
          */
-        template <size_t I, std::integral Index>
+        template <access_t ACCESS, size_t I, std::integral Index>
         size_t map_ith_index(const view_type& view, const Index i) const;
 
         /**
@@ -490,16 +490,16 @@ namespace xt
     {
         if constexpr (ACCESS == access_t::SAFE)
         {
-            return container.at(map_ith_index<Is>(view, indices[Is])...);
+            return container.at(map_ith_index<ACCESS, Is>(view, indices[Is])...);
         }
         else
         {
-            return container(map_ith_index<Is>(view, indices[Is])...);
+            return container(map_ith_index<ACCESS, Is>(view, indices[Is])...);
         }
     }
 
     template <class UnderlyingContainer, class... Slices>
-    template <size_t I, std::integral Index>
+    template <access_t ACCESS, size_t I, std::integral Index>
     auto
     index_mapper<xt::xview<UnderlyingContainer, Slices...>>::map_ith_index(const view_type& view, const Index i) const
         -> size_t
@@ -518,10 +518,17 @@ namespace xt
                 assert(i == 0);
                 return size_t(slice);
             }
+            else if constexpr (xt::detail::is_xall_slice<std::decay_t<current_slice>>::value)
+            {
+                return size_t(i);
+            }
             else
             {
                 using slice_size_type = typename current_slice::size_type;
-                assert(i < slice.size());
+                if constexpr (ACCESS == access_t::UNSAFE)
+                {
+                    assert(static_cast<slice_size_type>(i) < slice.size());
+                }
                 return size_t(slice(static_cast<slice_size_type>(i)));
             }
         }
