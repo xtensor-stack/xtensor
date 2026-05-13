@@ -6,14 +6,14 @@
  * The full license is in the file LICENSE, distributed with this software. *
  ****************************************************************************/
 
-#include <cstdlib>
 #include <cstddef>
+#include <cstdlib>
 #include <iostream>
 #include <stdexcept>
 #include <string>
 
-#include <Python.h>
 #include <benchmark/benchmark.h>
+#include <Python.h>
 
 #include "xtensor/containers/xtensor.hpp"
 #include "xtensor/core/xmath.hpp"
@@ -127,7 +127,8 @@ namespace
         return PyDict_GetItemString(dict, key);
     }
 
-    std::string get_nested_config_string(PyObject* dict, std::initializer_list<const char*> keys, const std::string& fallback)
+    std::string
+    get_nested_config_string(PyObject* dict, std::initializer_list<const char*> keys, const std::string& fallback)
     {
         PyObject* current = dict;
         for (const char* key : keys)
@@ -150,7 +151,7 @@ namespace
             for (std::size_t j = 0; j < cols; ++j)
             {
                 lhs(i, j) = value_type(0.5) * value_type(j) / value_type(j + 1)
-                          + std::sqrt(value_type(i)) * value_type(9.) / value_type(cols);
+                            + std::sqrt(value_type(i)) * value_type(9.) / value_type(cols);
                 rhs(i, j) = value_type(10.2) / value_type(i + 2) + value_type(0.25) * value_type(j);
             }
         }
@@ -215,14 +216,10 @@ namespace
 
         void print_stats() const
         {
-            std::cout << "USING NUMPY\nNUMPY VERSION: " << m_version
-                      << "\nNUMPY THREADS: 1"
-                      << "\nNUMPY BLAS: " << m_blas_name
-                      << "\nNUMPY LAPACK: " << m_lapack_name
-                      << "\nNUMPY C COMPILER: " << m_c_compiler
-                      << "\nNUMPY CFLAGS: " << m_cflags
-                      << "\nNUMPY C++ COMPILER: " << m_cxx_compiler
-                      << "\nNUMPY CXXFLAGS: " << m_cxxflags
+            std::cout << "USING NUMPY\nNUMPY VERSION: " << m_version << "\nNUMPY THREADS: 1"
+                      << "\nNUMPY BLAS: " << m_blas_name << "\nNUMPY LAPACK: " << m_lapack_name
+                      << "\nNUMPY C COMPILER: " << m_c_compiler << "\nNUMPY CFLAGS: " << m_cflags
+                      << "\nNUMPY C++ COMPILER: " << m_cxx_compiler << "\nNUMPY CXXFLAGS: " << m_cxxflags
                       << "\n\n";
         }
 
@@ -440,10 +437,19 @@ namespace
 
             m_numpy = steal_reference(PyImport_ImportModule("numpy"), "importing numpy");
             m_float64 = steal_reference(PyObject_GetAttrString(m_numpy.get(), "float64"), "loading numpy.float64");
-            m_frombuffer = steal_reference(PyObject_GetAttrString(m_numpy.get(), "frombuffer"), "loading numpy.frombuffer");
+            m_frombuffer = steal_reference(
+                PyObject_GetAttrString(m_numpy.get(), "frombuffer"),
+                "loading numpy.frombuffer"
+            );
             m_add = steal_reference(PyObject_GetAttrString(m_numpy.get(), "add"), "loading numpy.add");
-            m_multiply = steal_reference(PyObject_GetAttrString(m_numpy.get(), "multiply"), "loading numpy.multiply");
-            m_subtract = steal_reference(PyObject_GetAttrString(m_numpy.get(), "subtract"), "loading numpy.subtract");
+            m_multiply = steal_reference(
+                PyObject_GetAttrString(m_numpy.get(), "multiply"),
+                "loading numpy.multiply"
+            );
+            m_subtract = steal_reference(
+                PyObject_GetAttrString(m_numpy.get(), "subtract"),
+                "loading numpy.subtract"
+            );
             m_divide = steal_reference(PyObject_GetAttrString(m_numpy.get(), "divide"), "loading numpy.divide");
             m_power = steal_reference(PyObject_GetAttrString(m_numpy.get(), "power"), "loading numpy.power");
             m_hypot = steal_reference(PyObject_GetAttrString(m_numpy.get(), "hypot"), "loading numpy.hypot");
@@ -478,13 +484,26 @@ namespace
             m_prod = steal_reference(PyObject_GetAttrString(m_numpy.get(), "prod"), "loading numpy.prod");
             m_sum = steal_reference(PyObject_GetAttrString(m_numpy.get(), "sum"), "loading numpy.sum");
 
-            auto version = steal_reference(PyObject_GetAttrString(m_numpy.get(), "__version__"), "loading numpy version");
+            auto version = steal_reference(
+                PyObject_GetAttrString(m_numpy.get(), "__version__"),
+                "loading numpy version"
+            );
             m_version = py_unicode_to_string(version.get(), "reading numpy version");
 
-            auto config_module = steal_reference(PyObject_GetAttrString(m_numpy.get(), "__config__"), "loading numpy.__config__");
-            auto config = steal_reference(PyObject_GetAttrString(config_module.get(), "CONFIG"), "loading numpy build config");
+            auto config_module = steal_reference(
+                PyObject_GetAttrString(m_numpy.get(), "__config__"),
+                "loading numpy.__config__"
+            );
+            auto config = steal_reference(
+                PyObject_GetAttrString(config_module.get(), "CONFIG"),
+                "loading numpy build config"
+            );
             m_blas_name = get_nested_config_string(config.get(), {"Build Dependencies", "blas", "name"}, "unknown");
-            m_lapack_name = get_nested_config_string(config.get(), {"Build Dependencies", "lapack", "name"}, "unknown");
+            m_lapack_name = get_nested_config_string(
+                config.get(),
+                {"Build Dependencies", "lapack", "name"},
+                "unknown"
+            );
             m_c_compiler = get_nested_config_string(config.get(), {"Compilers", "c", "commands"}, "unknown");
             m_cflags = get_nested_config_string(config.get(), {"Compilers", "c", "args"}, "unknown");
             m_cxx_compiler = get_nested_config_string(config.get(), {"Compilers", "c++", "commands"}, "unknown");
@@ -691,7 +710,8 @@ namespace
     }
 
     template <class Prepare>
-    void run_axis_reduce_numpy(benchmark::State& state, PyObject* function, const char* context, long axis, Prepare&& prepare)
+    void
+    run_axis_reduce_numpy(benchmark::State& state, PyObject* function, const char* context, long axis, Prepare&& prepare)
     {
         numpy_reduce_fixture fixture(static_cast<std::size_t>(state.range(0)));
         prepare(fixture);
@@ -716,7 +736,8 @@ namespace
     }
 
     template <class Prepare>
-    void run_all_reduce_numpy(benchmark::State& state, PyObject* function, const char* context, Prepare&& prepare)
+    void
+    run_all_reduce_numpy(benchmark::State& state, PyObject* function, const char* context, Prepare&& prepare)
     {
         numpy_reduce_fixture fixture(static_cast<std::size_t>(state.range(0)));
         prepare(fixture);
@@ -742,7 +763,13 @@ namespace xt::numpy
 
     void add_xtensor(benchmark::State& state)
     {
-        run_binary_xtensor(state, [](const auto& lhs, const auto& rhs) { return lhs + rhs; });
+        run_binary_xtensor(
+            state,
+            [](const auto& lhs, const auto& rhs)
+            {
+                return lhs + rhs;
+            }
+        );
     }
 
     void add_numpy(benchmark::State& state)
@@ -753,7 +780,13 @@ namespace xt::numpy
 
     void multiply_xtensor(benchmark::State& state)
     {
-        run_binary_xtensor(state, [](const auto& lhs, const auto& rhs) { return lhs * rhs; });
+        run_binary_xtensor(
+            state,
+            [](const auto& lhs, const auto& rhs)
+            {
+                return lhs * rhs;
+            }
+        );
     }
 
     void multiply_numpy(benchmark::State& state)
@@ -764,7 +797,13 @@ namespace xt::numpy
 
     void subtract_xtensor(benchmark::State& state)
     {
-        run_binary_xtensor(state, [](const auto& lhs, const auto& rhs) { return lhs - rhs; });
+        run_binary_xtensor(
+            state,
+            [](const auto& lhs, const auto& rhs)
+            {
+                return lhs - rhs;
+            }
+        );
     }
 
     void subtract_numpy(benchmark::State& state)
@@ -775,7 +814,13 @@ namespace xt::numpy
 
     void divide_xtensor(benchmark::State& state)
     {
-        run_binary_xtensor(state, [](const auto& lhs, const auto& rhs) { return lhs / rhs; });
+        run_binary_xtensor(
+            state,
+            [](const auto& lhs, const auto& rhs)
+            {
+                return lhs / rhs;
+            }
+        );
     }
 
     void divide_numpy(benchmark::State& state)
@@ -786,7 +831,13 @@ namespace xt::numpy
 
     void power_xtensor(benchmark::State& state)
     {
-        run_binary_xtensor(state, [](const auto& lhs, const auto& rhs) { return xt::pow(lhs, rhs); });
+        run_binary_xtensor(
+            state,
+            [](const auto& lhs, const auto& rhs)
+            {
+                return xt::pow(lhs, rhs);
+            }
+        );
     }
 
     void power_numpy(benchmark::State& state)
@@ -797,7 +848,13 @@ namespace xt::numpy
 
     void hypot_xtensor(benchmark::State& state)
     {
-        run_binary_xtensor(state, [](const auto& lhs, const auto& rhs) { return xt::hypot(lhs, rhs); });
+        run_binary_xtensor(
+            state,
+            [](const auto& lhs, const auto& rhs)
+            {
+                return xt::hypot(lhs, rhs);
+            }
+        );
     }
 
     void hypot_numpy(benchmark::State& state)
@@ -843,7 +900,10 @@ namespace xt::numpy
     {
         run_unary_xtensor(
             state,
-            [](const auto& lhs) { return xt::asin(lhs); },
+            [](const auto& lhs)
+            {
+                return xt::asin(lhs);
+            },
             [](auto& fixture)
             {
                 clamp_benchmark_data(fixture.lhs, -1.0, 1.0);
@@ -869,7 +929,10 @@ namespace xt::numpy
     {
         run_unary_xtensor(
             state,
-            [](const auto& lhs) { return xt::acos(lhs); },
+            [](const auto& lhs)
+            {
+                return xt::acos(lhs);
+            },
             [](auto& fixture)
             {
                 clamp_benchmark_data(fixture.lhs, -1.0, 1.0);
@@ -950,7 +1013,10 @@ namespace xt::numpy
     {
         run_unary_xtensor(
             state,
-            [](const auto& lhs) { return xt::acosh(lhs); },
+            [](const auto& lhs)
+            {
+                return xt::acosh(lhs);
+            },
             [](auto& fixture)
             {
                 shift_benchmark_data(fixture.lhs, 1.0);
@@ -978,7 +1044,10 @@ namespace xt::numpy
     {
         run_unary_xtensor(
             state,
-            [](const auto& lhs) { return xt::atanh(lhs); },
+            [](const auto& lhs)
+            {
+                return xt::atanh(lhs);
+            },
             [](auto& fixture)
             {
                 clamp_benchmark_data(fixture.lhs, -0.999, 0.999);
@@ -1037,7 +1106,10 @@ namespace xt::numpy
     {
         run_unary_xtensor(
             state,
-            [](const auto& lhs) { return xt::log(lhs); },
+            [](const auto& lhs)
+            {
+                return xt::log(lhs);
+            },
             [](auto& fixture)
             {
                 shift_benchmark_data(fixture.lhs, 1.0);
@@ -1063,7 +1135,10 @@ namespace xt::numpy
     {
         run_unary_xtensor(
             state,
-            [](const auto& lhs) { return xt::log10(lhs); },
+            [](const auto& lhs)
+            {
+                return xt::log10(lhs);
+            },
             [](auto& fixture)
             {
                 shift_benchmark_data(fixture.lhs, 1.0);
@@ -1089,7 +1164,10 @@ namespace xt::numpy
     {
         run_unary_xtensor(
             state,
-            [](const auto& lhs) { return xt::log2(lhs); },
+            [](const auto& lhs)
+            {
+                return xt::log2(lhs);
+            },
             [](auto& fixture)
             {
                 shift_benchmark_data(fixture.lhs, 1.0);
@@ -1115,7 +1193,10 @@ namespace xt::numpy
     {
         run_unary_xtensor(
             state,
-            [](const auto& lhs) { return xt::log1p(lhs); },
+            [](const auto& lhs)
+            {
+                return xt::log1p(lhs);
+            },
             [](auto& fixture)
             {
                 clamp_benchmark_data(fixture.lhs, -0.999);
@@ -1339,7 +1420,10 @@ namespace xt::numpy
     {
         run_axis_reduce_xtensor(
             state,
-            [](const auto& lhs, std::size_t axis) { return xt::prod(lhs, {axis}); },
+            [](const auto& lhs, std::size_t axis)
+            {
+                return xt::prod(lhs, {axis});
+            },
             0,
             [](auto& fixture)
             {
@@ -1367,7 +1451,10 @@ namespace xt::numpy
     {
         run_axis_reduce_xtensor(
             state,
-            [](const auto& lhs, std::size_t axis) { return xt::prod(lhs, {axis}); },
+            [](const auto& lhs, std::size_t axis)
+            {
+                return xt::prod(lhs, {axis});
+            },
             1,
             [](auto& fixture)
             {
@@ -1395,7 +1482,10 @@ namespace xt::numpy
     {
         run_all_reduce_xtensor(
             state,
-            [](const auto& lhs) { return xt::prod(lhs); },
+            [](const auto& lhs)
+            {
+                return xt::prod(lhs);
+            },
             [](auto& fixture)
             {
                 prepare_prod_benchmark_data(fixture.lhs);
