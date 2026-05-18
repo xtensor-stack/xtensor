@@ -126,3 +126,10 @@ jobs:
         name: xtensor-numpy-benchmark-report
         path: build/xtensor_numpy_report.md
         if-no-files-found: error
+
+    - name: Upload NumPy benchmark JSON
+      uses: actions/upload-artifact@v4
+      with:
+        name: xtensor-numpy-benchmark-report-json
+        path: build/xtensor_numpy_report.json
+        if-no-files-found: error
