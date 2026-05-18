@@ -483,6 +483,14 @@ namespace xt
     template <class C>
     inline auto xstepper<C>::operator*() const -> reference
     {
+        if constexpr (std::is_pointer<subiterator_type>::value)
+        {
+            if (m_it == nullptr)
+            {
+                static std::remove_reference_t<reference> sentinel{};
+                return sentinel;
+            }
+        }
         return *m_it;
     }
 

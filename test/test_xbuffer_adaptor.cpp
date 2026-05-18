@@ -201,6 +201,8 @@ namespace xt
         size_t size2 = 50;
         XT_EXPECT_THROW(adapt.resize(size2), std::runtime_error);
         EXPECT_EQ(adapt.size(), size1);
+
+        delete[] data1;
     }
 
     TEST(xbuffer_adaptor, no_owner_iterating)

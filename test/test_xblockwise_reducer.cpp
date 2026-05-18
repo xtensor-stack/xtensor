@@ -111,14 +111,24 @@ namespace xt
             dynamic_shape<std::size_t> chunk_shape({5, 4, 2});
             xarray<int> input_exp(shape);
 
-            // just iota is a bit boring since it will
-            // lead to an uniform variance
-            std::iota(input_exp.begin(), input_exp.end(), -5);
-            for (std::size_t i = 0; i < input_exp.size(); ++i)
+            if (std::is_same<tester_type, prod_tester>::value)
             {
-                if (i % 2)
+                for (std::size_t i = 0; i < input_exp.size(); ++i)
                 {
-                    input_exp.flat(i) += 10;
+                    input_exp.flat(i) = (i % 2 == 0) ? 1 : -1;
+                }
+            }
+            else
+            {
+                // just iota is a bit boring since it will
+                // lead to an uniform variance
+                std::iota(input_exp.begin(), input_exp.end(), -5);
+                for (std::size_t i = 0; i < input_exp.size(); ++i)
+                {
+                    if (i % 2)
+                    {
+                        input_exp.flat(i) += 10;
+                    }
                 }
             }
 
