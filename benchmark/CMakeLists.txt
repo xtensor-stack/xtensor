@@ -21,12 +21,17 @@ set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
 
 include(CheckCXXCompilerFlag)
 
+set(_xtensor_numpy_benchmark_cflags "-O3")
+
 string(TOUPPER "${CMAKE_BUILD_TYPE}" U_CMAKE_BUILD_TYPE)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
     CHECK_CXX_COMPILER_FLAG(-march=native arch_native_supported)
     if(arch_native_supported AND NOT CMAKE_CXX_FLAGS MATCHES "-march")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+    endif()
+    if(arch_native_supported)
+        string(APPEND _xtensor_numpy_benchmark_cflags " -march=native")
     endif()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -Wunused-parameter -Wextra -Wreorder")
 
@@ -62,6 +67,14 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU"
         endif()
     endif()
 endif()
+
+set(XTENSOR_NUMPY_BENCHMARK_CFLAGS "${_xtensor_numpy_benchmark_cflags}" CACHE STRING "CFLAGS used to build NumPy from source for comparison benchmarks")
+set(XTENSOR_NUMPY_BENCHMARK_BLAS "openblas" CACHE STRING "BLAS backend requested when building NumPy from source for comparison benchmarks")
+set(XTENSOR_NUMPY_BENCHMARK_LAPACK "openblas" CACHE STRING "LAPACK backend requested when building NumPy from source for comparison benchmarks")
+set(XTENSOR_NUMPY_BENCHMARK_REPORT "${CMAKE_BINARY_DIR}/xtensor_numpy_report.md" CACHE FILEPATH "Output path for the xtensor vs NumPy benchmark report")
+set(XTENSOR_NUMPY_BENCHMARK_REPORT_JSON "${CMAKE_BINARY_DIR}/xtensor_numpy_report.json" CACHE FILEPATH "Output path for the raw Google Benchmark JSON used by the xtensor vs NumPy benchmark report")
+set(XTENSOR_NUMPY_BENCHMARK_REPORT_FILTER ".*_(xtensor|numpy)/.*" CACHE STRING "Google Benchmark filter used when generating the xtensor vs NumPy report")
+set(XTENSOR_NUMPY_BENCHMARK_REPORT_MIN_TIME "0.05s" CACHE STRING "Minimum benchmark runtime used when generating the xtensor vs NumPy report")
 
 if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /MP /bigobj")
@@ -120,10 +133,45 @@ set(XTENSOR_BENCHMARK
     main.cpp
 )
 
+if(BUILD_NUMPY_BENCHMARKS)
+    list(APPEND XTENSOR_BENCHMARK benchmark_numpy.cpp)
+    find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Embed)
+endif()
+
 
 set(XTENSOR_BENCHMARK_TARGET benchmark_xtensor)
 add_executable(${XTENSOR_BENCHMARK_TARGET} EXCLUDE_FROM_ALL ${XTENSOR_BENCHMARK} ${XTENSOR_HEADERS})
 target_link_libraries(${XTENSOR_BENCHMARK_TARGET} PUBLIC xtensor ${GBENCHMARK_LIBRARIES})
+
+if(BUILD_NUMPY_BENCHMARKS)
+    target_compile_definitions(${XTENSOR_BENCHMARK_TARGET} PUBLIC XTENSOR_ENABLE_NUMPY_BENCHMARKS=1)
+    target_link_libraries(${XTENSOR_BENCHMARK_TARGET} PUBLIC Python3::Python)
+
+    add_custom_target(xbenchmark_numpy_env
+        COMMAND ${CMAKE_COMMAND} -E env
+            "CC=${CMAKE_C_COMPILER}"
+            "CXX=${CMAKE_CXX_COMPILER}"
+            "CFLAGS=${XTENSOR_NUMPY_BENCHMARK_CFLAGS}"
+            "CXXFLAGS=${XTENSOR_NUMPY_BENCHMARK_CFLAGS}"
+            ${Python3_EXECUTABLE} -m pip install --upgrade --force-reinstall --no-cache-dir --no-binary=numpy
+            --config-settings=setup-args=-Dblas=${XTENSOR_NUMPY_BENCHMARK_BLAS}
+            --config-settings=setup-args=-Dlapack=${XTENSOR_NUMPY_BENCHMARK_LAPACK}
+            numpy
+        USES_TERMINAL
+        COMMENT "Installing NumPy from source with benchmark flags: ${XTENSOR_NUMPY_BENCHMARK_CFLAGS}, BLAS=${XTENSOR_NUMPY_BENCHMARK_BLAS}, LAPACK=${XTENSOR_NUMPY_BENCHMARK_LAPACK}")
+
+    add_custom_target(xbenchmark_numpy_report
+        COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/../tools/report_numpy_benchmarks.py
+            --benchmark-exe $<TARGET_FILE:${XTENSOR_BENCHMARK_TARGET}>
+            --benchmark-filter=${XTENSOR_NUMPY_BENCHMARK_REPORT_FILTER}
+            --benchmark-min-time=${XTENSOR_NUMPY_BENCHMARK_REPORT_MIN_TIME}
+            --output-json ${XTENSOR_NUMPY_BENCHMARK_REPORT_JSON}
+            --output ${XTENSOR_NUMPY_BENCHMARK_REPORT}
+        DEPENDS xbenchmark_numpy_env ${XTENSOR_BENCHMARK_TARGET}
+        USES_TERMINAL
+        VERBATIM
+        COMMENT "Generating xtensor vs NumPy benchmark report at ${XTENSOR_NUMPY_BENCHMARK_REPORT}")
+endif()
 
 if(XTENSOR_USE_TBB)
     target_compile_definitions(${XTENSOR_BENCHMARK_TARGET} PUBLIC XTENSOR_USE_TBB)

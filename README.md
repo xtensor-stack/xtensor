@@ -58,6 +58,58 @@ cmake -DCMAKE_INSTALL_PREFIX=your_install_prefix
 make install
 ```
 
+### Benchmarking xtensor against NumPy
+
+The benchmark target can optionally compare xtensor and NumPy on matching
+elementwise operations and reductions. The current comparison set includes
+elementwise math functions together with reducers such as `sum`, `mean`,
+`amin`, `amax`, and `prod`. The NumPy comparison path embeds Python and calls
+the public NumPy API from the same benchmark executable.
+
+To keep the comparison fair, build the benchmarks in release mode and rebuild
+NumPy from source with the same optimization policy used by the xtensor
+benchmark target:
+
+```bash
+cmake -G Ninja -Bbuild -DBUILD_BENCHMARK=ON -DBUILD_NUMPY_BENCHMARKS=ON -DXTENSOR_USE_XSIMD=ON
+cmake --build build --target xbenchmark_numpy_env
+cmake --build build --target benchmark_xtensor
+./build/benchmark/benchmark_xtensor --benchmark_filter='(add_|multiply_|sin_|exp_|sum_|mean_|amin_|amax_|prod_)'
+```
+
+`xbenchmark_numpy_env` reinstalls NumPy from source with
+`XTENSOR_NUMPY_BENCHMARK_CFLAGS`, which defaults to `-O3` and adds
+`-march=native` when supported by the current compiler. It also exports
+`CC` and `CXX` from the active CMake configuration so NumPy is built with the
+same compiler toolchain as the xtensor benchmark target. The install uses
+`--no-cache-dir --no-binary=numpy` so the target recompiles NumPy instead of
+reusing a cached wheel. The requested BLAS and LAPACK backends are controlled
+with `XTENSOR_NUMPY_BENCHMARK_BLAS` and `XTENSOR_NUMPY_BENCHMARK_LAPACK`,
+which default to `openblas`, and the benchmark startup banner reports the
+backend and compiler arguments NumPy actually used.
+
+To generate a Markdown comparison report from the benchmark output, use:
+
+```bash
+python tools/report_numpy_benchmarks.py \
+  --benchmark-exe build/benchmark/benchmark_xtensor \
+  --benchmark-filter='(add_|multiply_|sin_|exp_|sum_|mean_|amin_|amax_|prod_)' \
+  --output build/xtensor_numpy_report.md
+```
+
+The script can also analyze an existing Google Benchmark JSON file via
+`--input-json`.
+
+For a one-command workflow from CMake, use:
+
+```bash
+cmake --build build --target xbenchmark_numpy_report
+```
+
+The report target rebuilds NumPy from source through `xbenchmark_numpy_env`,
+runs the benchmark executable, and writes the Markdown report to
+`XTENSOR_NUMPY_BENCHMARK_REPORT`.
+
 ### Installing xtensor using vcpkg
 
 You can download and install xtensor using the [vcpkg](https://github.com/Microsoft/vcpkg) dependency manager:

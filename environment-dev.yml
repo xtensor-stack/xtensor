@@ -3,6 +3,11 @@ channels:
 - conda-forge
 dependencies:
 - cmake
+- python
+- pip
+- numpy
+- libblas=*=*openblas
+- liblapack=*=*openblas
 - xtl=0.8.0
 - xsimd=13.2.0
 - nlohmann_json
