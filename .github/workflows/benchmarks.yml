@@ -111,3 +111,18 @@ jobs:
       timeout-minutes: 20
       working-directory: build/benchmark
       run: ./benchmark_xtensor --benchmark_filter='(add_|multiply_|sin_|exp_|sum_axis[01]_)'
+
+    - name: Generate NumPy benchmark markdown report
+      timeout-minutes: 20
+      working-directory: build
+      run: cmake --build . --target xbenchmark_numpy_report
+
+    - name: Publish NumPy benchmark markdown summary
+      run: cat build/xtensor_numpy_report.md >> "$GITHUB_STEP_SUMMARY"
+
+    - name: Upload NumPy benchmark markdown
+      uses: actions/upload-artifact@v4
+      with:
+        name: xtensor-numpy-benchmark-report
+        path: build/xtensor_numpy_report.md
+        if-no-files-found: error
