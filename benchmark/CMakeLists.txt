@@ -72,6 +72,7 @@ set(XTENSOR_NUMPY_BENCHMARK_CFLAGS "${_xtensor_numpy_benchmark_cflags}" CACHE ST
 set(XTENSOR_NUMPY_BENCHMARK_BLAS "openblas" CACHE STRING "BLAS backend requested when building NumPy from source for comparison benchmarks")
 set(XTENSOR_NUMPY_BENCHMARK_LAPACK "openblas" CACHE STRING "LAPACK backend requested when building NumPy from source for comparison benchmarks")
 set(XTENSOR_NUMPY_BENCHMARK_REPORT "${CMAKE_BINARY_DIR}/xtensor_numpy_report.md" CACHE FILEPATH "Output path for the xtensor vs NumPy benchmark report")
+set(XTENSOR_NUMPY_BENCHMARK_REPORT_JSON "${CMAKE_BINARY_DIR}/xtensor_numpy_report.json" CACHE FILEPATH "Output path for the raw Google Benchmark JSON used by the xtensor vs NumPy benchmark report")
 set(XTENSOR_NUMPY_BENCHMARK_REPORT_FILTER ".*_(xtensor|numpy)/.*" CACHE STRING "Google Benchmark filter used when generating the xtensor vs NumPy report")
 set(XTENSOR_NUMPY_BENCHMARK_REPORT_MIN_TIME "0.05s" CACHE STRING "Minimum benchmark runtime used when generating the xtensor vs NumPy report")
 
@@ -164,6 +165,7 @@ if(BUILD_NUMPY_BENCHMARKS)
             --benchmark-exe $<TARGET_FILE:${XTENSOR_BENCHMARK_TARGET}>
             --benchmark-filter=${XTENSOR_NUMPY_BENCHMARK_REPORT_FILTER}
             --benchmark-min-time=${XTENSOR_NUMPY_BENCHMARK_REPORT_MIN_TIME}
+            --output-json ${XTENSOR_NUMPY_BENCHMARK_REPORT_JSON}
             --output ${XTENSOR_NUMPY_BENCHMARK_REPORT}
         DEPENDS xbenchmark_numpy_env ${XTENSOR_BENCHMARK_TARGET}
         USES_TERMINAL

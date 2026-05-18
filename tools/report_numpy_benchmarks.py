@@ -35,6 +35,11 @@ def parse_args() -> argparse.Namespace:
         help="Optional file path to write the Markdown report to.",
     )
     parser.add_argument(
+        "--output-json",
+        type=Path,
+        help="Optional file path to write the raw Google Benchmark JSON used for the report.",
+    )
+    parser.add_argument(
         "--benchmark-filter",
         default=".*_(xtensor|numpy)/.*",
         help="Google Benchmark filter used when running the executable.",
@@ -196,6 +201,9 @@ def main() -> int:
         data = load_results(args.input_json)
     else:
         data = run_benchmarks(args.benchmark_exe, args.benchmark_filter, args.benchmark_min_time)
+
+    if args.output_json is not None:
+        args.output_json.write_text(json.dumps(data, indent=2))
 
     report = render_report(data, args.metric)
     if args.output is not None:
