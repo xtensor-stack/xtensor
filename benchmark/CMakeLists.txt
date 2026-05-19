@@ -16,17 +16,26 @@ if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     set(XTENSOR_INCLUDE_DIR ${xtensor_INCLUDE_DIRS})
 endif ()
 
-message(STATUS "Forcing tests build type to Release")
-set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+if(CODSPEED_MODE AND NOT CODSPEED_MODE STREQUAL "off")
+    message(STATUS "CodSpeed mode enabled (${CODSPEED_MODE}) - using RelWithDebInfo build type")
+    set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Choose the type of build." FORCE)
+else()
+    message(STATUS "Forcing tests build type to Release")
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+endif()
 
 include(CheckCXXCompilerFlag)
 
 string(TOUPPER "${CMAKE_BUILD_TYPE}" U_CMAKE_BUILD_TYPE)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-    CHECK_CXX_COMPILER_FLAG(-march=native arch_native_supported)
-    if(arch_native_supported AND NOT CMAKE_CXX_FLAGS MATCHES "-march")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+    # Skip -march=native for CodSpeed simulation mode (valgrind does not
+    # support all native instruction sets)
+    if(NOT (CODSPEED_MODE STREQUAL "simulation"))
+        CHECK_CXX_COMPILER_FLAG(-march=native arch_native_supported)
+        if(arch_native_supported AND NOT CMAKE_CXX_FLAGS MATCHES "-march")
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+        endif()
     endif()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -Wunused-parameter -Wextra -Wreorder")
 
@@ -80,13 +89,14 @@ if(DOWNLOAD_GBENCHMARK OR GBENCHMARK_SRC_DIR)
             GIT_TAG main)
 
     FetchContent_Declare(googlebenchmark
-            GIT_REPOSITORY https://github.com/google/benchmark.git
-            GIT_TAG main) # need main for benchmark::benchmark
+            GIT_REPOSITORY https://github.com/CodSpeedHQ/codspeed-cpp.git
+            GIT_TAG main
+            SOURCE_SUBDIR google_benchmark)
 
     FetchContent_MakeAvailable(
             googletest
             googlebenchmark)
-    set(GBENCHMARK_INCLUDE_DIRS "${googlebenchmark_SOURCE_DIR}/include")
+    set(GBENCHMARK_INCLUDE_DIRS "${googlebenchmark_SOURCE_DIR}/google_benchmark/include")
     set(GBENCHMARK_LIBRARIES benchmark)
 else()
     find_package(benchmark REQUIRED)
