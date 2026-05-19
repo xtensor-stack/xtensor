@@ -24,28 +24,28 @@ jobs:
     name: Run benchmarks
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
+    - name: Checkout code
+      uses: actions/checkout@v6
 
-      - name: Set conda environment
-        uses: mamba-org/setup-micromamba@main
-        with:
-          environment-name: myenv
-          environment-file: environment-dev.yml
-          init-shell: bash
-          cache-downloads: true
+    - name: Set conda environment
+      uses: mamba-org/setup-micromamba@main
+      with:
+        environment-name: myenv
+        environment-file: environment-dev.yml
+        init-shell: bash
+        cache-downloads: true
 
-      - name: Build benchmarks
-        run: |
-          cmake -G Ninja -Bbuild \
-            -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX \
-            -DBUILD_BENCHMARK=ON \
-            -DXTENSOR_USE_XSIMD=ON \
-            -DCODSPEED_MODE=simulation
-          cmake --build build --target benchmark_xtensor --parallel 8
+    - name: Build benchmarks
+      run: |
+        cmake -G Ninja -Bbuild \
+          -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX \
+          -DBUILD_BENCHMARK=ON \
+          -DXTENSOR_USE_XSIMD=ON \
+          -DCODSPEED_MODE=simulation
+        cmake --build build --target benchmark_xtensor --parallel 8
 
-      - name: Run benchmarks
-        uses: CodSpeedHQ/action@v4
-        with:
-          mode: simulation
-          run: ./build/benchmark/benchmark_xtensor
+    - name: Run benchmarks
+      uses: CodSpeedHQ/action@v4
+      with:
+        mode: simulation
+        run: ./build/benchmark/benchmark_xtensor
