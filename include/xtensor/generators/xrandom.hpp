@@ -63,14 +63,14 @@ namespace xt
         auto
         binomial(const S& shape, T trials = 1, D prob = 0.5, E& engine = random::get_default_random_engine());
 
-        template <class T, class S, class D = double, class E = random::default_engine_type>
+        template <class T = int, class S, class D = double, class E = random::default_engine_type>
         auto geometric(const S& shape, D prob = 0.5, E& engine = random::get_default_random_engine());
 
         template <class T, class S, class D = double, class E = random::default_engine_type>
         auto
         negative_binomial(const S& shape, T k = 1, D prob = 0.5, E& engine = random::get_default_random_engine());
 
-        template <class T, class S, class D = double, class E = random::default_engine_type>
+        template <class T = int, class S, class D = double, class E = random::default_engine_type>
         auto poisson(const S& shape, D rate = 1.0, E& engine = random::get_default_random_engine());
 
         template <class T, class S, class E = random::default_engine_type>
@@ -123,7 +123,7 @@ namespace xt
         auto
         binomial(const I (&shape)[L], T trials = 1, D prob = 0.5, E& engine = random::get_default_random_engine());
 
-        template <class T, class I, std::size_t L, class D = double, class E = random::default_engine_type>
+        template <class T = int, class I, std::size_t L, class D = double, class E = random::default_engine_type>
         auto geometric(const I (&shape)[L], D prob = 0.5, E& engine = random::get_default_random_engine());
 
         template <class T, class I, std::size_t L, class D = double, class E = random::default_engine_type>
@@ -134,7 +134,7 @@ namespace xt
             E& engine = random::get_default_random_engine()
         );
 
-        template <class T, class I, std::size_t L, class D = double, class E = random::default_engine_type>
+        template <class T = int, class I, std::size_t L, class D = double, class E = random::default_engine_type>
         auto poisson(const I (&shape)[L], D rate = 1.0, E& engine = random::get_default_random_engine());
 
         template <class T, class I, std::size_t L, class E = random::default_engine_type>
