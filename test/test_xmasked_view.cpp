@@ -9,6 +9,7 @@
 
 #include <sstream>
 
+#include "xtensor/core/xmath.hpp"
 #include "xtensor/io/xio.hpp"
 #include "xtensor/optional/xoptional_assembly.hpp"
 #include "xtensor/views/xmasked_view.hpp"
@@ -226,6 +227,22 @@ namespace xt
                                      " {masked,      5, masked}}";
         EXPECT_EQ(out.str(), expected);
     }
+    
+    TEST(xmasked_view, lazy_expression_stream)
+    {
+        using array_type = xarray<double>;
+        const array_type a = {1., 1., 1., 1.};
+        const array_type b = {0.1, 0.7, 0.3, 0.9};
+
+        const auto mask = b < 0.5;
+
+        EXPECT_TRUE(has_stream_output(minimum(masked_view(a, mask), masked_view(b, mask))));
+        EXPECT_TRUE(has_stream_output(masked_view(minimum(a, b), mask)));
+        EXPECT_TRUE(has_stream_output(maximum(masked_view(a, mask), masked_view(b, mask))));
+        EXPECT_TRUE(has_stream_output(masked_view(maximum(a, b), mask)));
+        EXPECT_TRUE(has_stream_output(clip(masked_view(a, mask), 0.2, 0.8)));
+        EXPECT_TRUE(has_stream_output(masked_view(clip(a, 0.2, 0.8), mask)));
+    }
 
     TEST(xmasked_view, assign)
     {
@@ -238,6 +255,21 @@ namespace xt
         masked_data = data2;
         xarray<double> expected1 = {{0.1, 0.2, 0.3}, {0.4, 5., -6.}, {0.7, 8., 0.9}};
         EXPECT_EQ(data, expected1);
+    }
+
+    TEST(xmasked_view, assign_const_masked_view_rhs)
+    {
+        xarray<double> data = {{1., -2., 3.}, {4., 5., -6.}, {7., 8., -9.}};
+        const xarray<double> data2 = {{0.1, 0.2, 0.3}, {0.4, 0.5, 0.6}, {0.7, 0.8, 0.9}};
+        xarray<bool> mask = {{true, true, true}, {true, false, false}, {true, false, true}};
+
+        auto masked_data = masked_view(data, mask);
+        const auto masked_data2 = masked_view(data2, mask);
+
+        masked_data = masked_data2;
+
+        xarray<double> expected = {{0.1, 0.2, 0.3}, {0.4, 5., -6.}, {0.7, 8., 0.9}};
+        EXPECT_EQ(data, expected);
     }
 
     TEST(xmasked_view, view)
