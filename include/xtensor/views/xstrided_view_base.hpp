@@ -905,6 +905,14 @@ namespace xt
                     if (ptr != nullptr)
                     {
                         auto slice0 = static_cast<old_strides_value_type>(*ptr);
+                        if (slice0 < 0)
+                        {
+                            slice0 += shape[i_ax];
+                        }
+                        if (slice0 < 0 || slice0 >= shape[i_ax])
+                        {
+                            XTENSOR_THROW(std::runtime_error, "Slice index out of range.");
+                        }
                         new_offset += static_cast<std::size_t>(slice0 * old_strides[i_ax]);
                     }
                     else if (std::get_if<xt::xnewaxis_tag>(&slices[i]) != nullptr)
