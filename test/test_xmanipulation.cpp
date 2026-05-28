@@ -514,6 +514,15 @@ namespace xt
 
         xarray<double> expected11 = {{{4, 5, 6}}, {{7, 8, 9}}, {{1, 2, 3}}};
         ASSERT_EQ(expected11, xt::roll(e2, 2, /*axis*/ -3));
+
+        xarray<double> empty_1d = xt::xarray<double>::from_shape({0});
+        EXPECT_EQ(xt::roll(empty_1d, 5).shape(), empty_1d.shape());
+
+        xarray<double> partial_empty = xt::xarray<double>::from_shape({3, 0});
+        EXPECT_EQ(xt::roll(partial_empty, 1, 1).shape(), partial_empty.shape());
+
+        xarray<double> mixed_empty = xt::xarray<double>::from_shape({3, 0, 4});
+        EXPECT_EQ(xt::roll(mixed_empty, 1, 0).shape(), mixed_empty.shape());
     }
 
     TEST(xmanipulation, repeat_all_elements_of_axis_0_of_int_array_2_times)
