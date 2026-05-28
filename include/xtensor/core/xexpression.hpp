@@ -17,9 +17,9 @@
 #include <xtl/xmeta_utils.hpp>
 #include <xtl/xtype_traits.hpp>
 
+#include "../core/xiterator.hpp"
 #include "../core/xlayout.hpp"
 #include "../core/xshape.hpp"
-#include "../core/xiterator.hpp"
 #include "../core/xtensor_forward.hpp"
 #include "../utils/xutils.hpp"
 
