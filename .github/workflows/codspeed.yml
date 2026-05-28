@@ -2,7 +2,7 @@ name: CodSpeed
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request: # Allow CodSpeed to trigger backtest performance analysis
   issue_comment:
     types: [created]
