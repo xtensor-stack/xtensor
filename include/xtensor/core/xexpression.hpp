@@ -10,12 +10,14 @@
 #ifndef XTENSOR_EXPRESSION_HPP
 #define XTENSOR_EXPRESSION_HPP
 
+#include <iterator>
 #include <type_traits>
 
 #include <xtl/xclosure.hpp>
 #include <xtl/xmeta_utils.hpp>
 #include <xtl/xtype_traits.hpp>
 
+#include "../core/xiterator.hpp"
 #include "../core/xlayout.hpp"
 #include "../core/xshape.hpp"
 #include "../core/xtensor_forward.hpp"
@@ -536,8 +538,10 @@ namespace xt
         using stepper = typename E::stepper;
         using const_stepper = typename E::const_stepper;
 
-        using linear_iterator = typename E::linear_iterator;
-        using const_linear_iterator = typename E::const_linear_iterator;
+        using linear_iterator = decltype(xt::linear_begin(std::declval<E&>()));
+        using const_linear_iterator = decltype(xt::linear_begin(std::declval<const E&>()));
+        using reverse_linear_iterator = std::reverse_iterator<linear_iterator>;
+        using const_reverse_linear_iterator = std::reverse_iterator<const_linear_iterator>;
 
         using bool_load_type = typename E::bool_load_type;
 
@@ -573,19 +577,65 @@ namespace xt
         XTENSOR_FORWARD_CONST_ITERATOR_METHOD(crbegin)
         XTENSOR_FORWARD_CONST_ITERATOR_METHOD(crend)
 
-        XTENSOR_FORWARD_METHOD(linear_begin)
-        XTENSOR_FORWARD_METHOD(linear_end)
-        XTENSOR_FORWARD_CONST_METHOD(linear_begin)
-        XTENSOR_FORWARD_CONST_METHOD(linear_end)
-        XTENSOR_FORWARD_CONST_METHOD(linear_cbegin)
-        XTENSOR_FORWARD_CONST_METHOD(linear_cend)
+        linear_iterator linear_begin() noexcept
+        {
+            return xt::linear_begin(*m_ptr);
+        }
 
-        XTENSOR_FORWARD_METHOD(linear_rbegin)
-        XTENSOR_FORWARD_METHOD(linear_rend)
-        XTENSOR_FORWARD_CONST_METHOD(linear_rbegin)
-        XTENSOR_FORWARD_CONST_METHOD(linear_rend)
-        XTENSOR_FORWARD_CONST_METHOD(linear_crbegin)
-        XTENSOR_FORWARD_CONST_METHOD(linear_crend)
+        linear_iterator linear_end() noexcept
+        {
+            return xt::linear_end(*m_ptr);
+        }
+
+        const_linear_iterator linear_begin() const noexcept
+        {
+            return xt::linear_begin(*m_ptr);
+        }
+
+        const_linear_iterator linear_end() const noexcept
+        {
+            return xt::linear_end(*m_ptr);
+        }
+
+        const_linear_iterator linear_cbegin() const noexcept
+        {
+            return xt::linear_begin(*m_ptr);
+        }
+
+        const_linear_iterator linear_cend() const noexcept
+        {
+            return xt::linear_end(*m_ptr);
+        }
+
+        reverse_linear_iterator linear_rbegin() noexcept
+        {
+            return reverse_linear_iterator(linear_end());
+        }
+
+        reverse_linear_iterator linear_rend() noexcept
+        {
+            return reverse_linear_iterator(linear_begin());
+        }
+
+        const_reverse_linear_iterator linear_rbegin() const noexcept
+        {
+            return const_reverse_linear_iterator(linear_end());
+        }
+
+        const_reverse_linear_iterator linear_rend() const noexcept
+        {
+            return const_reverse_linear_iterator(linear_begin());
+        }
+
+        const_reverse_linear_iterator linear_crbegin() const noexcept
+        {
+            return const_reverse_linear_iterator(linear_cend());
+        }
+
+        const_reverse_linear_iterator linear_crend() const noexcept
+        {
+            return const_reverse_linear_iterator(linear_cbegin());
+        }
 
         template <class T = E>
         std::enable_if_t<has_strides<T>::value, const inner_strides_type&> strides() const
