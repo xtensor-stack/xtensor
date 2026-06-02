@@ -1,0 +1,5 @@
+# MSan false positive: doctest reporter registration during static init
+# doctest::String has internal padding that MSan flags as uninitialized
+# when std::map compares keys during insert.
+fun:*doctest::detail::registerReporterImpl*
+src:*doctest/doctest.h
