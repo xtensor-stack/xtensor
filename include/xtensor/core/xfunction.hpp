@@ -133,7 +133,7 @@ namespace xt
     struct xcontainer_inner_types<xfunction<F, CT...>>
     {
         // Added indirection for MSVC 2017 bug with the operator value_type()
-        using func_return_type = typename meta_identity<
+        using func_return_type = typename std::type_identity<
             decltype(std::declval<F>()(std::declval<xvalue_type_t<std::decay_t<CT>>>()...))>::type;
         using value_type = std::decay_t<func_return_type>;
         using reference = func_return_type;
@@ -156,7 +156,7 @@ namespace xt
     template <class E>
     struct overlapping_memory_checker_traits<
         E,
-        std::enable_if_t<!has_memory_address<E>::value && is_specialization_of<xfunction, E>::value>>
+        std::enable_if_t<!has_memory_address<E>() && is_specialization_of<xfunction, E>::value>>
     {
         template <std::size_t I = 0, class... T, std::enable_if_t<(I == sizeof...(T)), int> = 0>
         static bool check_tuple(const std::tuple<T...>&, const memory_range&)

@@ -101,16 +101,6 @@ namespace xt
     template <class T, class R>
     using disable_integral_t = std::enable_if_t<!xtl::is_integral<T>::value, R>;
 
-    /********************************
-     * meta identity implementation *
-     ********************************/
-
-    template <class T>
-    struct meta_identity
-    {
-        using type = T;
-    };
-
     /***************************************
      * is_specialization_of implementation *
      ***************************************/
@@ -370,14 +360,16 @@ namespace xt
             res[i] = normalize_axis(expr.dimension(), axes[i]);
         }
 
-        XTENSOR_ASSERT(std::all_of(
-            res.begin(),
-            res.end(),
-            [&expr](auto ax_el)
-            {
-                return ax_el < expr.dimension();
-            }
-        ));
+        XTENSOR_ASSERT(
+            std::all_of(
+                res.begin(),
+                res.end(),
+                [&expr](auto ax_el)
+                {
+                    return ax_el < expr.dimension();
+                }
+            )
+        );
 
         return res;
     }
@@ -389,14 +381,16 @@ namespace xt
     normalize_axis(E& expr, C&& axes)
     {
         static_cast<void>(expr);
-        XTENSOR_ASSERT(std::all_of(
-            axes.begin(),
-            axes.end(),
-            [&expr](auto ax_el)
-            {
-                return ax_el < expr.dimension();
-            }
-        ));
+        XTENSOR_ASSERT(
+            std::all_of(
+                axes.begin(),
+                axes.end(),
+                [&expr](auto ax_el)
+                {
+                    return ax_el < expr.dimension();
+                }
+            )
+        );
         return std::forward<C>(axes);
     }
 
@@ -417,14 +411,16 @@ namespace xt
             }
         );
 
-        XTENSOR_ASSERT(std::all_of(
-            res.begin(),
-            res.end(),
-            [&expr](auto ax_el)
-            {
-                return ax_el < expr.dimension();
-            }
-        ));
+        XTENSOR_ASSERT(
+            std::all_of(
+                res.begin(),
+                res.end(),
+                [&expr](auto ax_el)
+                {
+                    return ax_el < expr.dimension();
+                }
+            )
+        );
 
         return res;
     }
@@ -439,14 +435,16 @@ namespace xt
         R res;
         xt::resize_container(res, std::size(axes));
         std::copy(std::begin(axes), std::end(axes), std::begin(res));
-        XTENSOR_ASSERT(std::all_of(
-            res.begin(),
-            res.end(),
-            [&expr](auto ax_el)
-            {
-                return ax_el < expr.dimension();
-            }
-        ));
+        XTENSOR_ASSERT(
+            std::all_of(
+                res.begin(),
+                res.end(),
+                [&expr](auto ax_el)
+                {
+                    return ax_el < expr.dimension();
+                }
+            )
+        );
         return res;
     }
 
@@ -456,14 +454,16 @@ namespace xt
         R&&>
     {
         static_cast<void>(expr);
-        XTENSOR_ASSERT(std::all_of(
-            std::begin(axes),
-            std::end(axes),
-            [&expr](auto ax_el)
-            {
-                return ax_el < expr.dimension();
-            }
-        ));
+        XTENSOR_ASSERT(
+            std::all_of(
+                std::begin(axes),
+                std::end(axes),
+                [&expr](auto ax_el)
+                {
+                    return ax_el < expr.dimension();
+                }
+            )
+        );
         return std::move(axes);
     }
 
@@ -471,20 +471,21 @@ namespace xt
      * get_value_type *
      ******************/
 
-    template <class T, class = void_t<>>
-    struct get_value_type
+    template <class T>
+    constexpr auto get_value_type()
     {
-        using type = T;
-    };
+        if constexpr (requires { typename T::value_type; })
+        {
+            return std::type_identity<typename T::value_type>{};
+        }
+        else
+        {
+            return std::type_identity<T>{};
+        }
+    }
 
     template <class T>
-    struct get_value_type<T, void_t<typename T::value_type>>
-    {
-        using type = typename T::value_type;
-    };
-
-    template <class T>
-    using get_value_type_t = typename get_value_type<T>::type;
+    using get_value_type_t = typename decltype(get_value_type<T>())::type;
 
     /**********************
      * get implementation *
@@ -533,81 +534,72 @@ namespace xt
      * has_storage_type implementation *
      ***********************************/
 
-    template <class T, class = void>
-    struct has_storage_type : std::false_type
-    {
-    };
-
     template <class T>
     struct xcontainer_inner_types;
 
     template <class T>
-    struct has_storage_type<T, void_t<typename xcontainer_inner_types<T>::storage_type>>
-        : std::negation<
-              std::is_same<typename std::remove_cv<typename xcontainer_inner_types<T>::storage_type>::type, invalid_type>>
-    {
+    concept has_storage_type_concept = requires {
+        typename xcontainer_inner_types<T>::storage_type;
+        requires !std::is_same_v<
+                     typename std::remove_cv<typename xcontainer_inner_types<T>::storage_type>::type,
+                     invalid_type>;
     };
+
+    template <class T>
+    constexpr bool has_storage_type()
+    {
+        return has_storage_type_concept<T>;
+    }
 
     /*************************************
      * has_data_interface implementation *
      *************************************/
 
-    template <class E, class = void>
-    struct has_data_interface : std::false_type
-    {
-    };
+    template <class E>
+    concept has_data_interface_concept = requires { std::declval<E>().data(); };
 
     template <class E>
-    struct has_data_interface<E, void_t<decltype(std::declval<E>().data())>> : std::true_type
+    constexpr bool has_data_interface()
     {
-    };
+        return has_data_interface_concept<E>;
+    }
 
     template <class E>
-    concept has_data_interface_concept = has_data_interface<E>::value;
-
-    template <class E, class = void>
-    struct has_strides : std::false_type
-    {
-    };
+    concept has_strides_concept = requires { std::declval<E>().strides(); };
 
     template <class E>
-    struct has_strides<E, void_t<decltype(std::declval<E>().strides())>> : std::true_type
+    constexpr bool has_strides()
     {
-    };
-
-    template <class E, class = void>
-    struct has_iterator_interface : std::false_type
-    {
-    };
+        return has_strides_concept<E>;
+    }
 
     template <class E>
-    struct has_iterator_interface<E, void_t<decltype(std::declval<E>().begin())>> : std::true_type
-    {
-    };
+    concept has_iterator_interface_concept = requires { std::declval<E>().begin(); };
 
     template <class E>
-    concept has_iterator_interface_concept = has_iterator_interface<E>::value;
+    constexpr bool has_iterator_interface()
+    {
+        return has_iterator_interface_concept<E>;
+    }
 
     /******************************
      * is_iterator implementation *
      ******************************/
 
-    template <class E, class = void>
-    struct is_iterator : std::false_type
-    {
+    template <typename E>
+    concept iterator_concept = requires {
+        *std::declval<const E>();
+        std::declval<const E>() == std::declval<const E>();
+        std::declval<const E>() != std::declval<const E>();
+        ++(*std::declval<E*>());
+        (*std::declval<E*>())++;
     };
 
     template <class E>
-    struct is_iterator<
-        E,
-        void_t<
-            decltype(*std::declval<const E>(), std::declval<const E>() == std::declval<const E>(), std::declval<const E>() != std::declval<const E>(), ++(*std::declval<E*>()), (*std::declval<E*>())++, std::true_type())>>
-        : std::true_type
+    constexpr bool is_iterator()
     {
-    };
-
-    template <typename E>
-    concept iterator_concept = is_iterator<E>::value;
+        return iterator_concept<E>;
+    }
 
     /*************************
      * conditional type cast *
@@ -739,38 +731,35 @@ namespace xt
      * has_assign_to *
      *****************/
 
-    template <class E1, class E2, class = void>
-    struct has_assign_to : std::false_type
-    {
-    };
+    template <class E1, class E2>
+    concept has_assign_to_concept = requires { std::declval<const E2&>().assign_to(std::declval<E1&>()); };
 
     template <class E1, class E2>
-    struct has_assign_to<E1, E2, void_t<decltype(std::declval<const E2&>().assign_to(std::declval<E1&>()))>>
-        : std::true_type
+    constexpr bool has_assign_to()
     {
-    };
+        return has_assign_to_concept<E1, E2>;
+    }
 
     template <class E1, class E2>
-    constexpr bool has_assign_to_v = has_assign_to<E1, E2>::value;
+    constexpr bool has_assign_to_v = has_assign_to_concept<E1, E2>;
 
     /*************************************
      * overlapping_memory_checker_traits *
      *************************************/
 
-    template <class T, class Enable = void>
-    struct has_memory_address : std::false_type
-    {
-    };
+    template <class T>
+    concept has_memory_address_concept = requires { std::addressof(*std::declval<T>().begin()); };
 
     template <class T>
-    struct has_memory_address<T, void_t<decltype(std::addressof(*std::declval<T>().begin()))>> : std::true_type
+    constexpr bool has_memory_address()
     {
-    };
+        return has_memory_address_concept<T>;
+    }
 
     template <typename T>
-    concept with_memory_address_concept = has_memory_address<std::decay_t<T>>::value;
+    concept with_memory_address_concept = has_memory_address_concept<std::decay_t<T>>;
     template <typename T>
-    concept without_memory_address_concept = !has_memory_address<std::decay_t<T>>::value;
+    concept without_memory_address_concept = !has_memory_address_concept<std::decay_t<T>>;
 
     struct memory_range
     {
@@ -814,7 +803,7 @@ namespace xt
     };
 
     template <class E>
-    struct overlapping_memory_checker_traits<E, std::enable_if_t<has_memory_address<E>::value>>
+    struct overlapping_memory_checker_traits<E, std::enable_if_t<has_memory_address<E>()>>
     {
         static bool check_overlap(const E& expr, const memory_range& dst_range)
         {
@@ -864,23 +853,23 @@ namespace xt
     };
 
     template <class Dst>
-    struct overlapping_memory_checker<Dst, std::enable_if_t<has_memory_address<Dst>::value>>
+    struct overlapping_memory_checker<Dst, std::enable_if_t<has_memory_address<Dst>()>>
         : overlapping_memory_checker_base
     {
         explicit overlapping_memory_checker(const Dst& aDst)
             : overlapping_memory_checker_base(
-                [&]()
-                {
-                    if (aDst.size() == 0)
-                    {
-                        return memory_range();
-                    }
-                    else
-                    {
-                        return memory_range(std::addressof(*aDst.begin()), std::addressof(*aDst.rbegin()));
-                    }
-                }()
-            )
+                  [&]()
+                  {
+                      if (aDst.size() == 0)
+                      {
+                          return memory_range();
+                      }
+                      else
+                      {
+                          return memory_range(std::addressof(*aDst.begin()), std::addressof(*aDst.rbegin()));
+                      }
+                  }()
+              )
         {
         }
     };
@@ -976,44 +965,33 @@ namespace xt
      * get_rank *
      ************/
 
-    template <class E, typename = void>
-    struct get_rank
-    {
-        static constexpr std::size_t value = SIZE_MAX;
+    // Define the requirement
+    template <typename T>
+    concept HasRank = requires {
+        T::rank;  // Checks if T::rank exists as a type nested member
     };
 
     template <class E>
-    struct get_rank<E, decltype((void) E::rank, void())>
+    constexpr std::size_t has_rank()
     {
-        static constexpr std::size_t value = E::rank;
-    };
-
-    /******************
-     * has_fixed_rank *
-     ******************/
+        return HasRank<E>;
+    }
 
     template <class E>
-    struct has_fixed_rank
+    constexpr std::size_t get_rank()
     {
-        using type = std::integral_constant<bool, get_rank<std::decay_t<E>>::value != SIZE_MAX>;
-    };
+        if constexpr (HasRank<std::decay_t<E>>)
+        {
+            return std::decay_t<E>::rank;
+        }
+        return SIZE_MAX;
+    }
 
     template <class E>
-    using has_fixed_rank_t = typename has_fixed_rank<std::decay_t<E>>::type;
-
-    /************
-     * has_rank *
-     ************/
-
-    template <class E, size_t N>
-    struct has_rank
+    constexpr std::size_t has_fixed_rank()
     {
-        using type = std::integral_constant<bool, get_rank<std::decay_t<E>>::value == N>;
-    };
-
-    template <class E, size_t N>
-    using has_rank_t = typename has_rank<std::decay_t<E>, N>::type;
-
+        return get_rank<E>() != SIZE_MAX;
+    }
 }
 
 #endif

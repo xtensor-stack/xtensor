@@ -293,7 +293,7 @@ namespace xt
         };
 
         template <class D>
-        using linear_iterator_traits = linear_iterator_traits_impl<D, has_storage_type<D>::value>;
+        using linear_iterator_traits = linear_iterator_traits_impl<D, has_storage_type<D>()>;
     }
 
     /**

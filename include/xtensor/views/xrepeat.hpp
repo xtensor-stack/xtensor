@@ -64,10 +64,10 @@ namespace xt
 
         static constexpr bool is_const = std::is_const<std::remove_reference_t<CT>>::value;
 
-        using extract_storage_type = xtl::mpl::eval_if_t<
-            has_data_interface<xexpression_type>,
+        using extract_storage_type = typename std::conditional_t<
+            has_data_interface<xexpression_type>(),
             detail::expr_storage_type<xexpression_type>,
-            make_invalid_type<>>;
+            make_invalid_type<>>::type;
         using storage_type = std::conditional_t<is_const, const extract_storage_type, extract_storage_type>;
     };
 

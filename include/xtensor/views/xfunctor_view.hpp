@@ -93,24 +93,24 @@ namespace xt
         using difference_type = typename xexpression_type::difference_type;
 
         using shape_type = typename xexpression_type::shape_type;
-        using strides_type = xtl::mpl::eval_if_t<
-            has_strides<xexpression_type>,
+        using strides_type = typename std::conditional_t<
+            has_strides<xexpression_type>(),
             detail::expr_strides_type<xexpression_type>,
-            get_strides_type<shape_type>>;
-        using backstrides_type = xtl::mpl::eval_if_t<
-            has_strides<xexpression_type>,
+            get_strides_type<shape_type>>::type;
+        using backstrides_type = typename std::conditional_t<
+            has_strides<xexpression_type>(),
             detail::expr_backstrides_type<xexpression_type>,
-            get_strides_type<shape_type>>;
+            get_strides_type<shape_type>>::type;
 
         using inner_shape_type = typename xexpression_type::inner_shape_type;
-        using inner_strides_type = xtl::mpl::eval_if_t<
-            has_strides<xexpression_type>,
+        using inner_strides_type = typename std::conditional_t<
+            has_strides<xexpression_type>(),
             detail::expr_inner_strides_type<xexpression_type>,
-            get_strides_type<shape_type>>;
-        using inner_backstrides_type = xtl::mpl::eval_if_t<
-            has_strides<xexpression_type>,
+            get_strides_type<shape_type>>::type;
+        using inner_backstrides_type = typename std::conditional_t<
+            has_strides<xexpression_type>(),
             detail::expr_inner_backstrides_type<xexpression_type>,
-            get_strides_type<shape_type>>;
+            get_strides_type<shape_type>>::type;
 
         using bool_load_type = xt::bool_load_type<value_type>;
 
