@@ -129,31 +129,32 @@ namespace xt
         template <class CT, class... S>
         struct is_xscalar_impl<xview<CT, S...>>
         {
-            static constexpr bool value = static_cast<std::ptrdiff_t>(integral_count<S...>()
-                                          ) == static_dimension<typename std::decay_t<CT>::shape_type>::value
+            static constexpr bool value = static_cast<std::ptrdiff_t>(integral_count<S...>())
+                                                  == static_dimension<typename std::decay_t<CT>::shape_type>::value
                                               ? true
                                               : false;
         };
 
-        template <class S>
-        struct is_strided_slice_impl : std::true_type
-        {
-        };
+        template <typename S>
+        inline constexpr bool is_strided_slice_impl = true;
+        template <typename T>
+        inline constexpr bool is_strided_slice_impl<xkeep_slice<T>> = false;
+        template <typename T>
+        inline constexpr bool is_strided_slice_impl<xdrop_slice<T>> = false;
 
-        template <class T>
-        struct is_strided_slice_impl<xkeep_slice<T>> : std::false_type
-        {
-        };
+        template <typename S>
+        concept is_strided_slice_concept = is_strided_slice_impl<S>;
 
-        template <class T>
-        struct is_strided_slice_impl<xdrop_slice<T>> : std::false_type
+        template <class... S>
+        constexpr bool is_strided_slice()
         {
-        };
+            return (is_strided_slice_concept<std::decay_t<S>> && ...);
+        }
 
         // If we have no discontiguous slices, we can calculate strides for this view.
         template <class E, class... S>
         struct is_strided_view
-            : std::integral_constant<bool, has_data_interface<E>() && (is_strided_slice_impl<std::decay_t<S>>::value && ...)>
+            : std::integral_constant<bool, has_data_interface<E>() && is_strided_slice<S...>()>
         {
         };
 
@@ -878,11 +879,11 @@ namespace xt
     template <class CTA, class FSL, class... SL>
     xview<CT, S...>::xview(CTA&& e, FSL&& first_slice, SL&&... slices) noexcept
         : xview(
-            std::integral_constant<bool, has_trivial_strides>{},
-            std::forward<CTA>(e),
-            std::forward<FSL>(first_slice),
-            std::forward<SL>(slices)...
-        )
+              std::integral_constant<bool, has_trivial_strides>{},
+              std::forward<CTA>(e),
+              std::forward<FSL>(first_slice),
+              std::forward<SL>(slices)...
+          )
     {
     }
 
@@ -1265,27 +1266,29 @@ namespace xt
      */
     template <class CT, class... S>
     template <class T>
-    inline auto xview<CT, S...>::strides() const
-        -> const inner_strides_type& requires(has_data_interface_concept<T>and strided_view_concept<CT, S...>) {
-            if (!m_strides_computed)
-            {
-                compute_strides(std::integral_constant<bool, has_trivial_strides>{});
-                m_strides_computed = true;
-            }
-            return m_strides;
+    inline auto xview<CT, S...>::strides() const -> const inner_strides_type&
+        requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>)
+    {
+        if (!m_strides_computed)
+        {
+            compute_strides(std::integral_constant<bool, has_trivial_strides>{});
+            m_strides_computed = true;
         }
+        return m_strides;
+    }
 
     template <class CT, class... S>
     template <class T>
-    inline auto xview<CT, S...>::backstrides() const
-        -> const inner_strides_type& requires(has_data_interface_concept<T>and strided_view_concept<CT, S...>) {
-            if (!m_strides_computed)
-            {
-                compute_strides(std::integral_constant<bool, has_trivial_strides>{});
-                m_strides_computed = true;
-            }
-            return m_backstrides;
+    inline auto xview<CT, S...>::backstrides() const -> const inner_strides_type&
+        requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>)
+    {
+        if (!m_strides_computed)
+        {
+            compute_strides(std::integral_constant<bool, has_trivial_strides>{});
+            m_strides_computed = true;
         }
+        return m_backstrides;
+    }
 
     /**
      * Return the pointer to the underlying buffer.
@@ -1696,9 +1699,8 @@ namespace xt
             return xt::value(s, 0);
         };
 
-        auto s = static_cast<diff_type>(
-            (std::min)(static_cast<size_type>(std::distance(first, last)), this->dimension())
-        );
+        auto s = static_cast<diff_type>((std::min) (static_cast<size_type>(std::distance(first, last)),
+                                                    this->dimension()));
         auto first_copy = last - s;
         for (size_type i = 0; i != m_e.dimension(); ++i)
         {
