@@ -360,14 +360,16 @@ namespace xt
             res[i] = normalize_axis(expr.dimension(), axes[i]);
         }
 
-        XTENSOR_ASSERT(std::all_of(
-            res.begin(),
-            res.end(),
-            [&expr](auto ax_el)
-            {
-                return ax_el < expr.dimension();
-            }
-        ));
+        XTENSOR_ASSERT(
+            std::all_of(
+                res.begin(),
+                res.end(),
+                [&expr](auto ax_el)
+                {
+                    return ax_el < expr.dimension();
+                }
+            )
+        );
 
         return res;
     }
@@ -379,14 +381,16 @@ namespace xt
     normalize_axis(E& expr, C&& axes)
     {
         static_cast<void>(expr);
-        XTENSOR_ASSERT(std::all_of(
-            axes.begin(),
-            axes.end(),
-            [&expr](auto ax_el)
-            {
-                return ax_el < expr.dimension();
-            }
-        ));
+        XTENSOR_ASSERT(
+            std::all_of(
+                axes.begin(),
+                axes.end(),
+                [&expr](auto ax_el)
+                {
+                    return ax_el < expr.dimension();
+                }
+            )
+        );
         return std::forward<C>(axes);
     }
 
@@ -407,14 +411,16 @@ namespace xt
             }
         );
 
-        XTENSOR_ASSERT(std::all_of(
-            res.begin(),
-            res.end(),
-            [&expr](auto ax_el)
-            {
-                return ax_el < expr.dimension();
-            }
-        ));
+        XTENSOR_ASSERT(
+            std::all_of(
+                res.begin(),
+                res.end(),
+                [&expr](auto ax_el)
+                {
+                    return ax_el < expr.dimension();
+                }
+            )
+        );
 
         return res;
     }
@@ -429,14 +435,16 @@ namespace xt
         R res;
         xt::resize_container(res, std::size(axes));
         std::copy(std::begin(axes), std::end(axes), std::begin(res));
-        XTENSOR_ASSERT(std::all_of(
-            res.begin(),
-            res.end(),
-            [&expr](auto ax_el)
-            {
-                return ax_el < expr.dimension();
-            }
-        ));
+        XTENSOR_ASSERT(
+            std::all_of(
+                res.begin(),
+                res.end(),
+                [&expr](auto ax_el)
+                {
+                    return ax_el < expr.dimension();
+                }
+            )
+        );
         return res;
     }
 
@@ -446,14 +454,16 @@ namespace xt
         R&&>
     {
         static_cast<void>(expr);
-        XTENSOR_ASSERT(std::all_of(
-            std::begin(axes),
-            std::end(axes),
-            [&expr](auto ax_el)
-            {
-                return ax_el < expr.dimension();
-            }
-        ));
+        XTENSOR_ASSERT(
+            std::all_of(
+                std::begin(axes),
+                std::end(axes),
+                [&expr](auto ax_el)
+                {
+                    return ax_el < expr.dimension();
+                }
+            )
+        );
         return std::move(axes);
     }
 
@@ -729,7 +739,7 @@ namespace xt
     }
 
     template <class E1, class E2>
-    constexpr bool has_assign_to_v = has_assign_to_concept<E1, E2>;
+    constexpr bool has_assign_to_v = has_assign_to<E1, E2>();
 
     /*************************************
      * overlapping_memory_checker_traits *
@@ -846,18 +856,18 @@ namespace xt
     {
         explicit overlapping_memory_checker(const Dst& aDst)
             : overlapping_memory_checker_base(
-                [&]()
-                {
-                    if (aDst.size() == 0)
-                    {
-                        return memory_range();
-                    }
-                    else
-                    {
-                        return memory_range(std::addressof(*aDst.begin()), std::addressof(*aDst.rbegin()));
-                    }
-                }()
-            )
+                  [&]()
+                  {
+                      if (aDst.size() == 0)
+                      {
+                          return memory_range();
+                      }
+                      else
+                      {
+                          return memory_range(std::addressof(*aDst.begin()), std::addressof(*aDst.rbegin()));
+                      }
+                  }()
+              )
         {
         }
     };
@@ -895,59 +905,88 @@ namespace xt
     };
 #endif
 
-    /********************
-     * get_strides_type *
-     ********************/
-
-    template <class S>
-    struct get_strides_type
-    {
-        using type = typename rebind_container<std::ptrdiff_t, S>::type;
-    };
-
-    template <std::size_t... I>
-    struct get_strides_type<fixed_shape<I...>>
-    {
-        // TODO we could compute the strides statically here.
-        //  But we'll need full constexpr support to have a
-        //  homogenous ``compute_strides`` method
-        using type = std::array<std::ptrdiff_t, sizeof...(I)>;
-    };
+    /***************
+     * get_strides *
+     ***************/
 
     template <class CP, class O, class A>
     class xbuffer_adaptor;
 
-    template <class CP, class O, class A>
-    struct get_strides_type<xbuffer_adaptor<CP, O, A>>
+    namespace detail
     {
-        // In bindings this mapping is called by reshape_view with an inner shape of type
-        // xbuffer_adaptor.
-        // Since we cannot create a buffer adaptor holding data, we map it to an std::vector.
-        using type = std::vector<
-            typename xbuffer_adaptor<CP, O, A>::value_type,
-            typename xbuffer_adaptor<CP, O, A>::allocator_type>;
+        template <class>
+        inline constexpr bool is_fixed_shape_v = false;
+
+        template <std::size_t... I>
+        inline constexpr bool is_fixed_shape_v<fixed_shape<I...>> = true;
+
+        template <class>
+        inline constexpr bool is_xbuffer_adaptor_v = false;
+
+        template <class CP, class O, class A>
+        inline constexpr bool is_xbuffer_adaptor_v<xbuffer_adaptor<CP, O, A>> = true;
+
+        template <class S>
+        concept fixed_shape_type = is_fixed_shape_v<S>;
+
+        template <class S>
+        concept xbuffer_adaptor_type = is_xbuffer_adaptor_v<S>;
+    }
+
+    template <class S>
+    constexpr auto get_strides()
+    {
+        if constexpr (detail::fixed_shape_type<S>)
+        {
+            // TODO we could compute the strides statically here.
+            //  But we'll need full constexpr support to have a
+            //  homogenous ``compute_strides`` method
+            return std::type_identity<std::array<std::ptrdiff_t, S::size()>>{};
+        }
+        else if constexpr (detail::xbuffer_adaptor_type<S>)
+        {
+            // In bindings this mapping is called by reshape_view with an inner shape of type
+            // xbuffer_adaptor.
+            // Since we cannot create a buffer adaptor holding data, we map it to an std::vector.
+            return std::type_identity<std::vector<typename S::value_type, typename S::allocator_type>>{};
+        }
+        else
+        {
+            return std::type_identity<typename rebind_container<std::ptrdiff_t, S>::type>{};
+        }
+    }
+
+    template <class S>
+    using get_strides_t = typename decltype(get_strides<S>())::type;
+
+    // Lazy metafunction wrapper around ``get_strides``. Kept so callers can defer the mapping
+    // inside ``std::conditional_t<cond, A, B>::type``, where ``::type`` is only evaluated on the
+    // selected branch (see xshared_expression in xexpression.hpp).
+    template <class S>
+    struct get_strides_type
+    {
+        using type = get_strides_t<S>;
     };
-
-
-    template <class C>
-    using get_strides_t = typename get_strides_type<C>::type;
 
     /*******************
      * inner_reference *
      *******************/
-
     template <class ST>
-    struct inner_reference
+    constexpr auto get_inner_reference()
     {
         using storage_type = std::decay_t<ST>;
-        using type = std::conditional_t<
-            std::is_const<std::remove_reference_t<ST>>::value,
-            typename storage_type::const_reference,
-            typename storage_type::reference>;
-    };
+        if constexpr (std::is_const<std::remove_reference_t<ST>>::value)
+        {
+            return std::type_identity<typename storage_type::const_reference>{};
+        }
+        else
+        {
+            return std::type_identity<typename storage_type::reference>{};
+        }
+    }
 
     template <class ST>
-    using inner_reference_t = typename inner_reference<ST>::type;
+    using inner_reference_t = typename decltype(get_inner_reference<ST>())::type;
 
     /************
      * get_rank *
