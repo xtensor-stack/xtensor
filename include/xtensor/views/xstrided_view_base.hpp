@@ -87,8 +87,7 @@ namespace xt
 
         template <class E, class ST>
         struct provides_data_interface
-            : std::bool_constant<
-                  has_data_interface<std::decay_t<E>>() && !is_flat_expression_adaptor<ST>::value>
+            : std::bool_constant<has_data_interface<std::decay_t<E>>() && !is_flat_expression_adaptor<ST>::value>
         {
         };
     }

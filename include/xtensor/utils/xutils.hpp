@@ -360,16 +360,14 @@ namespace xt
             res[i] = normalize_axis(expr.dimension(), axes[i]);
         }
 
-        XTENSOR_ASSERT(
-            std::all_of(
-                res.begin(),
-                res.end(),
-                [&expr](auto ax_el)
-                {
-                    return ax_el < expr.dimension();
-                }
-            )
-        );
+        XTENSOR_ASSERT(std::all_of(
+            res.begin(),
+            res.end(),
+            [&expr](auto ax_el)
+            {
+                return ax_el < expr.dimension();
+            }
+        ));
 
         return res;
     }
@@ -381,16 +379,14 @@ namespace xt
     normalize_axis(E& expr, C&& axes)
     {
         static_cast<void>(expr);
-        XTENSOR_ASSERT(
-            std::all_of(
-                axes.begin(),
-                axes.end(),
-                [&expr](auto ax_el)
-                {
-                    return ax_el < expr.dimension();
-                }
-            )
-        );
+        XTENSOR_ASSERT(std::all_of(
+            axes.begin(),
+            axes.end(),
+            [&expr](auto ax_el)
+            {
+                return ax_el < expr.dimension();
+            }
+        ));
         return std::forward<C>(axes);
     }
 
@@ -411,16 +407,14 @@ namespace xt
             }
         );
 
-        XTENSOR_ASSERT(
-            std::all_of(
-                res.begin(),
-                res.end(),
-                [&expr](auto ax_el)
-                {
-                    return ax_el < expr.dimension();
-                }
-            )
-        );
+        XTENSOR_ASSERT(std::all_of(
+            res.begin(),
+            res.end(),
+            [&expr](auto ax_el)
+            {
+                return ax_el < expr.dimension();
+            }
+        ));
 
         return res;
     }
@@ -435,16 +429,14 @@ namespace xt
         R res;
         xt::resize_container(res, std::size(axes));
         std::copy(std::begin(axes), std::end(axes), std::begin(res));
-        XTENSOR_ASSERT(
-            std::all_of(
-                res.begin(),
-                res.end(),
-                [&expr](auto ax_el)
-                {
-                    return ax_el < expr.dimension();
-                }
-            )
-        );
+        XTENSOR_ASSERT(std::all_of(
+            res.begin(),
+            res.end(),
+            [&expr](auto ax_el)
+            {
+                return ax_el < expr.dimension();
+            }
+        ));
         return res;
     }
 
@@ -454,16 +446,14 @@ namespace xt
         R&&>
     {
         static_cast<void>(expr);
-        XTENSOR_ASSERT(
-            std::all_of(
-                std::begin(axes),
-                std::end(axes),
-                [&expr](auto ax_el)
-                {
-                    return ax_el < expr.dimension();
-                }
-            )
-        );
+        XTENSOR_ASSERT(std::all_of(
+            std::begin(axes),
+            std::end(axes),
+            [&expr](auto ax_el)
+            {
+                return ax_el < expr.dimension();
+            }
+        ));
         return std::move(axes);
     }
 
@@ -540,9 +530,7 @@ namespace xt
     template <class T>
     concept has_storage_type_concept = requires {
         typename xcontainer_inner_types<T>::storage_type;
-        requires !std::is_same_v<
-                     typename std::remove_cv<typename xcontainer_inner_types<T>::storage_type>::type,
-                     invalid_type>;
+        requires !std::is_same_v<typename std::remove_cv<typename xcontainer_inner_types<T>::storage_type>::type, invalid_type>;
     };
 
     template <class T>
@@ -858,18 +846,18 @@ namespace xt
     {
         explicit overlapping_memory_checker(const Dst& aDst)
             : overlapping_memory_checker_base(
-                  [&]()
-                  {
-                      if (aDst.size() == 0)
-                      {
-                          return memory_range();
-                      }
-                      else
-                      {
-                          return memory_range(std::addressof(*aDst.begin()), std::addressof(*aDst.rbegin()));
-                      }
-                  }()
-              )
+                [&]()
+                {
+                    if (aDst.size() == 0)
+                    {
+                        return memory_range();
+                    }
+                    else
+                    {
+                        return memory_range(std::addressof(*aDst.begin()), std::addressof(*aDst.rbegin()));
+                    }
+                }()
+            )
         {
         }
     };
