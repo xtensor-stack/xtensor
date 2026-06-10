@@ -3,16 +3,19 @@ name: CodSpeed
 on:
   push:
     branches: [master]
-  pull_request:
-  # Allow CodSpeed to trigger backtest performance analysis
+  pull_request: # Allow CodSpeed to trigger backtest performance analysis
+  issue_comment:
+    types: [created]
+
   workflow_dispatch:
+
 
 permissions:
   contents: read
   id-token: write
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.job }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.job }}-${{ github.event.pull_request.number || github.event.issue.number || github.ref }}
   cancel-in-progress: true
 
 defaults:
@@ -22,10 +25,19 @@ defaults:
 jobs:
   benchmarks:
     name: Run benchmarks
-    runs-on: ubuntu-latest
+    runs-on: codspeed-macro
+    if: |
+      github.event_name != 'issue_comment' ||
+      (github.event.issue.pull_request &&
+       contains(github.event.comment.body, '/run-benchmarks') &&
+       (github.event.comment.author_association == 'OWNER' ||
+        github.event.comment.author_association == 'MEMBER' ||
+        github.event.comment.author_association == 'COLLABORATOR'))
     steps:
     - name: Checkout code
       uses: actions/checkout@v6
+      with:
+        ref: ${{ github.event_name == 'issue_comment' && format('refs/pull/{0}/head', github.event.issue.number) || github.ref }}
 
     - name: Set conda environment
       uses: mamba-org/setup-micromamba@main
@@ -41,11 +53,11 @@ jobs:
           -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX \
           -DBUILD_BENCHMARK=ON \
           -DXTENSOR_USE_XSIMD=ON \
-          -DCODSPEED_MODE=simulation
+          -DCODSPEED_MODE=walltime
         cmake --build build --target benchmark_xtensor --parallel 8
 
     - name: Run benchmarks
       uses: CodSpeedHQ/action@v4
       with:
-        mode: simulation
+        mode: walltime
         run: ./build/benchmark/benchmark_xtensor
