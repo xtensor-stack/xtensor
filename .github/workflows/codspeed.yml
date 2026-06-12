@@ -3,9 +3,10 @@ name: CodSpeed
 on:
   push:
     branches: [master]
-  pull_request:
-  # Allow CodSpeed to trigger backtest performance analysis
+  pull_request: # Allow CodSpeed to trigger backtest performance analysis
+
   workflow_dispatch:
+
 
 permissions:
   contents: read
@@ -22,7 +23,7 @@ defaults:
 jobs:
   benchmarks:
     name: Run benchmarks
-    runs-on: ubuntu-latest
+    runs-on: namespace-profile-benchmark;container.privileged=true;container.host-pid-namespace=true
     steps:
     - name: Checkout code
       uses: actions/checkout@v6
