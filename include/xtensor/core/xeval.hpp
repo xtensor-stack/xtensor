@@ -147,7 +147,7 @@ namespace xt
      */
     template <layout_type L = layout_type::any, class E>
     inline auto as_strided(E&& e)
-        -> std::enable_if_t<has_data_interface<std::decay_t<E>>() && detail::has_same_layout<L, E>(), E&&>
+        -> std::enable_if_t<data_interface_expression<std::decay_t<E>> && detail::has_same_layout<L, E>(), E&&>
     {
         return std::forward<E>(e);
     }
@@ -155,7 +155,7 @@ namespace xt
     /// @cond DOXYGEN_INCLUDE_SFINAE
     template <layout_type L = layout_type::any, class E>
     inline auto as_strided(E&& e) -> std::enable_if_t<
-        (!(has_data_interface<std::decay_t<E>>() && detail::has_same_layout<L, E>())) && detail::has_fixed_dims<E>(),
+        (!(data_interface_expression<std::decay_t<E>> && detail::has_same_layout<L, E>())) && detail::has_fixed_dims<E>(),
         detail::as_xtensor_container_t<E, L>>
     {
         return e;
@@ -163,7 +163,7 @@ namespace xt
 
     template <layout_type L = layout_type::any, class E>
     inline auto as_strided(E&& e) -> std::enable_if_t<
-        (!(has_data_interface<std::decay_t<E>>() && detail::has_same_layout<L, E>()))
+        (!(data_interface_expression<std::decay_t<E>> && detail::has_same_layout<L, E>()))
             && (!detail::has_fixed_dims<E>()),
         detail::as_xarray_container_t<E, L>>
     {

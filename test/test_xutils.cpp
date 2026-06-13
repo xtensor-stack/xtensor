@@ -124,10 +124,10 @@ namespace xt
 
     TEST(utils, has_data_interface)
     {
-        static_assert(has_data_interface_concept<xarray<int>>);
-        static_assert(has_data_interface_concept<const xarray<int>>);
-        static_assert(has_data_interface_concept<const xtensor<double, 2>>);
-        static_assert(has_data_interface_concept<const xtensor_fixed<double, xshape<3, 4>>>);
+        static_assert(data_interface_expression<xarray<int>>);
+        static_assert(data_interface_expression<const xarray<int>>);
+        static_assert(data_interface_expression<const xtensor<double, 2>>);
+        static_assert(data_interface_expression<const xtensor_fixed<double, xshape<3, 4>>>);
 
         xarray<int> a = xarray<int>::from_shape({3, 4, 5});
         auto f = a + a - 23;
@@ -135,27 +135,27 @@ namespace xt
         auto vv2 = strided_view(v2, {all(), 2});
         auto v3 = strided_view(f, {all(), 2});
 
-        static_assert(has_data_interface_concept<decltype(v2)>);
-        static_assert(has_data_interface_concept<decltype(vv2)>);
-        static_assert(!has_data_interface_concept<decltype(v3)>);
+        static_assert(data_interface_expression<decltype(v2)>);
+        static_assert(data_interface_expression<decltype(vv2)>);
+        static_assert(!data_interface_expression<decltype(v3)>);
     }
 
     TEST(utils, has_storage_type)
     {
-        static_assert(has_storage_type<xarray<int>>());
+        static_assert(container_expression<xarray<int>>);
 
         xarray<int> x, y;
-        static_assert(!has_storage_type<decltype(x + y)>());
-        static_assert(has_storage_type<decltype(view(x, all()))>());
-        static_assert(!has_storage_type<decltype(view(2 * x, all()))>());
+        static_assert(!container_expression<decltype(x + y)>);
+        static_assert(container_expression<decltype(view(x, all()))>);
+        static_assert(!container_expression<decltype(view(2 * x, all()))>);
     }
 
     TEST(utils, has_strides)
     {
-        static_assert(has_strides<xarray<int>>());
-        static_assert(has_strides<const xarray<int>>());
-        static_assert(has_strides<const xtensor<double, 2>>());
-        static_assert(has_strides<const xtensor_fixed<double, xshape<3, 4>>>());
+        static_assert(strided_expression<xarray<int>>);
+        static_assert(strided_expression<const xarray<int>>);
+        static_assert(strided_expression<const xtensor<double, 2>>);
+        static_assert(strided_expression<const xtensor_fixed<double, xshape<3, 4>>>);
 
         xarray<int> a = xarray<int>::from_shape({3, 4, 5});
         auto f = a + a - 23;
@@ -163,12 +163,12 @@ namespace xt
         auto vv2 = strided_view(v2, {all(), 2});
         auto v3 = strided_view(f, {all(), 2});
 
-        static_assert(has_strides<decltype(v2)>());
-        static_assert(has_strides<decltype(vv2)>());
+        static_assert(strided_expression<decltype(v2)>);
+        static_assert(strided_expression<decltype(vv2)>);
 
 #ifndef _MSC_VER
         // TODO fix this test for MSVC 2015!
-        static_assert(has_strides<decltype(v3)>());
+        static_assert(strided_expression<decltype(v3)>);
 #endif
     }
 

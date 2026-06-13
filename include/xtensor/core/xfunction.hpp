@@ -156,7 +156,7 @@ namespace xt
     template <class E>
     struct overlapping_memory_checker_traits<
         E,
-        std::enable_if_t<!has_memory_address<E>() && is_specialization_of<xfunction, E>::value>>
+        std::enable_if_t<!addressable_expression<E> && is_specialization_of<xfunction, E>::value>>
     {
         template <std::size_t I = 0, class... T, std::enable_if_t<(I == sizeof...(T)), int> = 0>
         static bool check_tuple(const std::tuple<T...>&, const memory_range&)

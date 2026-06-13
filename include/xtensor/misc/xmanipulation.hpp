@@ -214,7 +214,7 @@ namespace xt
         template <class E, class S, class X>
         inline void compute_transposed_strides(E&& e, const S& shape, X& strides)
         {
-            if constexpr (has_data_interface<std::decay_t<E>>())
+            if constexpr (raw_pointer_accessible_expression<std::decay_t<E>>)
             {
                 std::copy(e.strides().crbegin(), e.strides().crend(), strides.begin());
             }
@@ -659,7 +659,7 @@ namespace xt
     template <std::size_t N, class E>
     inline auto atleast_Nd(E&& e)
     {
-        xstrided_slice_vector sv((std::max)(e.dimension(), N), all());
+        xstrided_slice_vector sv((std::max) (e.dimension(), N), all());
         if (e.dimension() < N)
         {
             std::size_t i = 0;

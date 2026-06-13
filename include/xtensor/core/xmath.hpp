@@ -350,13 +350,13 @@ namespace xt
     namespace detail
     {
         template <class R, class T>
-        std::enable_if_t<!has_iterator_interface<R>(), R> fill_init(T init)
+        std::enable_if_t<!iterable_expression<R>, R> fill_init(T init)
         {
             return R(init);
         }
 
         template <class R, class T>
-        std::enable_if_t<has_iterator_interface<R>(), R> fill_init(T init)
+        std::enable_if_t<iterable_expression<R>, R> fill_init(T init)
         {
             R result;
             std::fill(std::begin(result), std::end(result), init);

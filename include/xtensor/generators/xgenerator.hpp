@@ -167,7 +167,7 @@ namespace xt
 
         template <class E, class FE = F>
         void assign_to(xexpression<E>& e) const noexcept
-            requires(has_assign_to_v<E, FE>);
+            requires(assignable_expression<E, FE>);
 
         const functor_type& functor() const noexcept;
 
@@ -374,7 +374,7 @@ namespace xt
     template <class F, class R, class S>
     template <class E, class FE>
     inline void xgenerator<F, R, S>::assign_to(xexpression<E>& e) const noexcept
-        requires(has_assign_to_v<E, FE>)
+        requires(assignable_to<E, FE>)
     {
         e.derived_cast().resize(m_shape);
         m_f.assign_to(e);

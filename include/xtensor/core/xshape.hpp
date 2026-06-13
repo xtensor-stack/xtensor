@@ -138,7 +138,7 @@ namespace xt
      * @param shape the shape to test
      * @return bool
      */
-    template <class E, class S, class = typename std::enable_if_t<has_iterator_interface<S>()>>
+    template <class E, class S, class = typename std::enable_if_t<iterable_expression<S>>>
     inline bool has_shape(const E& e, const S& shape)
     {
         return e.shape().size() == shape.size()

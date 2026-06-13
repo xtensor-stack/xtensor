@@ -531,54 +531,29 @@ namespace xt
     }
 
     /***********************************
-     * has_storage_type implementation *
-     ***********************************/
+     * container_expression / data_interface_expression / strided_expression / iterable_expression *
+     ************************************************************************************************/
 
     template <class T>
     struct xcontainer_inner_types;
 
     template <class T>
-    concept has_storage_type_concept = requires {
+    concept container_expression = requires {
         typename xcontainer_inner_types<T>::storage_type;
         requires !std::is_same_v<typename std::remove_cv<typename xcontainer_inner_types<T>::storage_type>::type, invalid_type>;
     };
 
     template <class T>
-    constexpr bool has_storage_type()
-    {
-        return has_storage_type_concept<T>;
-    }
-
-    /*************************************
-     * has_data_interface implementation *
-     *************************************/
+    using get_storage_type_t = typename xcontainer_inner_types<T>::storage_type;
 
     template <class E>
-    concept has_data_interface_concept = requires { std::declval<E>().data(); };
+    concept raw_pointer_accessible_expression = requires { std::declval<E>().data(); };
 
     template <class E>
-    constexpr bool has_data_interface()
-    {
-        return has_data_interface_concept<E>;
-    }
+    concept strided_expression = requires { std::declval<E>().strides(); };
 
     template <class E>
-    concept has_strides_concept = requires { std::declval<E>().strides(); };
-
-    template <class E>
-    constexpr bool has_strides()
-    {
-        return has_strides_concept<E>;
-    }
-
-    template <class E>
-    concept has_iterator_interface_concept = requires { std::declval<E>().begin(); };
-
-    template <class E>
-    constexpr bool has_iterator_interface()
-    {
-        return has_iterator_interface_concept<E>;
-    }
+    concept iterable_expression = requires { std::declval<E>().begin(); };
 
     /******************************
      * is_iterator implementation *
@@ -726,38 +701,23 @@ namespace xt
     }
 
     /*****************
-     * has_assign_to *
-     *****************/
+     * assignable_to *
+     ******************/
 
     template <class E1, class E2>
-    concept has_assign_to_concept = requires { std::declval<const E2&>().assign_to(std::declval<E1&>()); };
-
-    template <class E1, class E2>
-    constexpr bool has_assign_to()
-    {
-        return has_assign_to_concept<E1, E2>;
-    }
-
-    template <class E1, class E2>
-    constexpr bool has_assign_to_v = has_assign_to<E1, E2>();
+    concept assignable_expression = requires { std::declval<const E2&>().assign_to(std::declval<E1&>()); };
 
     /*************************************
      * overlapping_memory_checker_traits *
      *************************************/
 
     template <class T>
-    concept has_memory_address_concept = requires { std::addressof(*std::declval<T>().begin()); };
-
-    template <class T>
-    constexpr bool has_memory_address()
-    {
-        return has_memory_address_concept<T>;
-    }
+    concept addressable_expression = requires { std::addressof(*std::declval<T>().begin()); };
 
     template <typename T>
-    concept with_memory_address_concept = has_memory_address_concept<std::decay_t<T>>;
+    concept with_memory_address_concept = addressable_expression<std::decay_t<T>>;
     template <typename T>
-    concept without_memory_address_concept = !has_memory_address_concept<std::decay_t<T>>;
+    concept without_memory_address_concept = !addressable_expression<std::decay_t<T>>;
 
     struct memory_range
     {
@@ -801,7 +761,7 @@ namespace xt
     };
 
     template <class E>
-    struct overlapping_memory_checker_traits<E, std::enable_if_t<has_memory_address<E>()>>
+    struct overlapping_memory_checker_traits<E, std::enable_if_t<addressable_expression<E>>>
     {
         static bool check_overlap(const E& expr, const memory_range& dst_range)
         {
@@ -851,7 +811,7 @@ namespace xt
     };
 
     template <class Dst>
-    struct overlapping_memory_checker<Dst, std::enable_if_t<has_memory_address<Dst>()>>
+    struct overlapping_memory_checker<Dst, std::enable_if_t<addressable_expression<Dst>>>
         : overlapping_memory_checker_base
     {
         explicit overlapping_memory_checker(const Dst& aDst)

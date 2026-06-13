@@ -214,7 +214,7 @@ namespace xt
     template <class E1, class E2>
     inline void assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2)
     {
-        if constexpr (has_assign_to<E1, E2>())
+        if constexpr (assignable_to<E1, E2>)
         {
             e2.derived_cast().assign_to(e1);
         }
@@ -266,14 +266,14 @@ namespace xt
         }
 
         template <class E1, class E2>
-        inline auto is_linear_assign(const E1& e1, const E2& e2) -> std::enable_if_t<has_strides<E1>(), bool>
+        inline auto is_linear_assign(const E1& e1, const E2& e2) -> std::enable_if_t<strided_expression<E1>, bool>
         {
             return (E1::contiguous_layout && E2::contiguous_layout && linear_static_layout<E1, E2>())
                    || (e1.is_contiguous() && e2.has_linear_assign(e1.strides()));
         }
 
         template <class E1, class E2>
-        inline auto is_linear_assign(const E1&, const E2&) -> std::enable_if_t<!has_strides<E1>(), bool>
+        inline auto is_linear_assign(const E1&, const E2&) -> std::enable_if_t<!strided_expression<E1>, bool>
         {
             return false;
         }
@@ -303,7 +303,7 @@ namespace xt
                 return std::is_reference<typename T::stepper::reference>::value;
             }
 
-            static constexpr bool value = has_strides<T>() && has_step_leading<typename T::stepper>::value
+            static constexpr bool value = strided_expression<T> && has_step_leading<typename T::stepper>::value
                                           && stepper_deref();
         };
 
@@ -1001,13 +1001,13 @@ namespace xt
             const strides_type& m_strides;
         };
 
-        template <bool possible = true, class E1, class E2, std::enable_if_t<!has_strides<E1>() || !possible, bool> = true>
+        template <bool possible = true, class E1, class E2, std::enable_if_t<!strided_expression<E1> || !possible, bool> = true>
         loop_sizes_t get_loop_sizes(const E1& e1, const E2&)
         {
             return {false, true, 1, e1.size(), e1.dimension(), e1.dimension()};
         }
 
-        template <bool possible = true, class E1, class E2, std::enable_if_t<has_strides<E1>() && possible, bool> = true>
+        template <bool possible = true, class E1, class E2, std::enable_if_t<strided_expression<E1> && possible, bool> = true>
         loop_sizes_t get_loop_sizes(const E1& e1, const E2& e2)
         {
             using shape_value_type = typename E1::shape_type::value_type;
