@@ -653,32 +653,31 @@ namespace xt
         }
 
         template <class T = E>
-        std::enable_if_t<raw_pointer_accessible_expression<T>, pointer> data() noexcept
+        std::enable_if_t<data_interface_expression<T>, pointer> data() noexcept
         {
             return m_ptr->data();
         }
 
         template <class T = E>
-        std::enable_if_t<raw_pointer_accessible_expression<T>, pointer> data() const noexcept
+        std::enable_if_t<data_interface_expression<T>, pointer> data() const noexcept
         {
             return m_ptr->data();
         }
 
         template <class T = E>
-        std::enable_if_t<raw_pointer_accessible_expression<T>, size_type> data_offset() const noexcept
+        std::enable_if_t<data_interface_expression<T>, size_type> data_offset() const noexcept
         {
             return m_ptr->data_offset();
         }
 
         template <class T = E>
-        std::enable_if_t<raw_pointer_accessible_expression<T>, typename T::storage_type&> storage() noexcept
+        std::enable_if_t<data_interface_expression<T>, typename T::storage_type&> storage() noexcept
         {
             return m_ptr->storage();
         }
 
         template <class T = E>
-        std::enable_if_t<raw_pointer_accessible_expression<T>, const typename T::storage_type&>
-        storage() const noexcept
+        std::enable_if_t<data_interface_expression<T>, const typename T::storage_type&> storage() const noexcept
         {
             return m_ptr->storage();
         }

@@ -61,7 +61,7 @@ namespace xt
 
 #define EXPECT_LAYOUT(EXPRESSION, LAYOUT) EXPECT_TRUE((decltype(EXPRESSION)::static_layout == LAYOUT))
 
-#define HAS_DATA_INTERFACE(EXPRESSION) raw_pointer_accessible_expression<std::decay_t<decltype(EXPRESSION)>>
+#define HAS_DATA_INTERFACE(EXPRESSION) data_interface_expression<std::decay_t<decltype(EXPRESSION)>>
 
 #define EXPECT_XARRAY(EXPRESSION) \
     EXPECT_TRUE(!detail::is_array<typename std::decay_t<decltype(EXPRESSION)>::shape_type>::value)

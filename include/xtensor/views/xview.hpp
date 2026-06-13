@@ -154,7 +154,7 @@ namespace xt
         // If we have no discontiguous slices, we can calculate strides for this view.
         template <class E, class... S>
         struct is_strided_view
-            : std::integral_constant<bool, raw_pointer_accessible_expression<E> && is_strided_slice<S...>()>
+            : std::integral_constant<bool, data_interface_expression<E> && is_strided_slice<S...>()>
         {
         };
 
@@ -309,7 +309,7 @@ namespace xt
         static constexpr bool is_const = std::is_const<std::remove_reference_t<CT>>::value;
 
         using extract_storage_type = typename std::conditional_t<
-            raw_pointer_accessible_expression<xexpression_type>,
+            data_interface_expression<xexpression_type>,
             detail::expr_storage_type<xexpression_type>,
             make_invalid_type<>>::type;
         using storage_type = std::conditional_t<is_const, const extract_storage_type, extract_storage_type>;
