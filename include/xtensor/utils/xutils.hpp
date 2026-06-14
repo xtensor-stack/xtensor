@@ -462,20 +462,20 @@ namespace xt
      ******************/
 
     template <class T>
-    constexpr auto get_value_type()
+    struct get_value_type
     {
-        if constexpr (requires { typename T::value_type; })
-        {
-            return std::type_identity<typename T::value_type>{};
-        }
-        else
-        {
-            return std::type_identity<T>{};
-        }
-    }
+        using type = T;
+    };
 
     template <class T>
-    using get_value_type_t = typename decltype(get_value_type<T>())::type;
+        requires requires { typename T::value_type; }
+    struct get_value_type<T>
+    {
+        using type = typename T::value_type;
+    };
+
+    template <class T>
+    using get_value_type_t = typename get_value_type<T>::type;
 
     /**********************
      * get implementation *
@@ -883,60 +883,44 @@ namespace xt
         concept xbuffer_adaptor_type = is_xbuffer_adaptor_v<S>;
     }
 
-    template <class S>
-    constexpr auto get_strides()
-    {
-        if constexpr (detail::fixed_shape_type<S>)
-        {
-            // TODO we could compute the strides statically here.
-            //  But we'll need full constexpr support to have a
-            //  homogenous ``compute_strides`` method
-            return std::type_identity<std::array<std::ptrdiff_t, S::size()>>{};
-        }
-        else if constexpr (detail::xbuffer_adaptor_type<S>)
-        {
-            // In bindings this mapping is called by reshape_view with an inner shape of type
-            // xbuffer_adaptor.
-            // Since we cannot create a buffer adaptor holding data, we map it to an std::vector.
-            return std::type_identity<std::vector<typename S::value_type, typename S::allocator_type>>{};
-        }
-        else
-        {
-            return std::type_identity<typename rebind_container<std::ptrdiff_t, S>::type>{};
-        }
-    }
-
-    template <class S>
-    using get_strides_t = typename decltype(get_strides<S>())::type;
-
-    // Lazy metafunction wrapper around ``get_strides``. Kept so callers can defer the mapping
-    // inside ``std::conditional_t<cond, A, B>::type``, where ``::type`` is only evaluated on the
-    // selected branch (see xshared_expression in xexpression.hpp).
+    // Defers strides-type mapping so callers can use it inside std::conditional_t<cond, A, B>::type
+    // without evaluating both branches (see xshared_expression in xexpression.hpp).
     template <class S>
     struct get_strides_type
     {
-        using type = get_strides_t<S>;
+        using type = typename rebind_container<std::ptrdiff_t, S>::type;
     };
+
+    template <detail::fixed_shape_type S>
+    struct get_strides_type<S>
+    {
+        // TODO we could compute the strides statically here.
+        //  But we'll need full constexpr support to have a
+        //  homogenous ``compute_strides`` method
+        using type = std::array<std::ptrdiff_t, S::size()>;
+    };
+
+    template <detail::xbuffer_adaptor_type S>
+    struct get_strides_type<S>
+    {
+        // In bindings this mapping is called by reshape_view with an inner shape of type
+        // xbuffer_adaptor.
+        // Since we cannot create a buffer adaptor holding data, we map it to an std::vector.
+        using type = std::vector<typename S::value_type, typename S::allocator_type>;
+    };
+
+    template <class S>
+    using get_strides_t = typename get_strides_type<S>::type;
 
     /*******************
      * inner_reference *
      *******************/
-    template <class ST>
-    constexpr auto get_inner_reference()
-    {
-        using storage_type = std::decay_t<ST>;
-        if constexpr (std::is_const<std::remove_reference_t<ST>>::value)
-        {
-            return std::type_identity<typename storage_type::const_reference>{};
-        }
-        else
-        {
-            return std::type_identity<typename storage_type::reference>{};
-        }
-    }
 
     template <class ST>
-    using inner_reference_t = typename decltype(get_inner_reference<ST>())::type;
+    using inner_reference_t = std::conditional_t<
+        std::is_const<std::remove_reference_t<ST>>::value,
+        typename std::decay_t<ST>::const_reference,
+        typename std::decay_t<ST>::reference>;
 
     /************
      * get_rank *
