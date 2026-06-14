@@ -93,7 +93,7 @@ namespace xt
      */
     template <class E, class F>
     inline auto isin(E&& element, F&& test_elements) noexcept
-        requires(has_iterator_interface_concept<F>)
+        requires(iterable_expression<F>)
     {
         auto lambda = detail::lambda_isin<std::is_lvalue_reference<F>::value>::make(std::forward<F>(test_elements
         ));
@@ -150,7 +150,7 @@ namespace xt
      */
     template <class E, class F>
     inline auto in1d(E&& element, F&& test_elements) noexcept
-        requires(has_iterator_interface_concept<F>)
+        requires(iterable_expression<F>)
     {
         XTENSOR_ASSERT(element.dimension() == 1ul);
         XTENSOR_ASSERT(test_elements.dimension() == 1ul);

@@ -525,15 +525,18 @@ namespace xt
         using inner_shape_type = typename E::inner_shape_type;
         using shape_type = typename E::shape_type;
 
-        using strides_type = xtl::mpl::
-            eval_if_t<has_strides<E>, detail::expr_strides_type<E>, get_strides_type<shape_type>>;
-        using backstrides_type = xtl::mpl::
-            eval_if_t<has_strides<E>, detail::expr_backstrides_type<E>, get_strides_type<shape_type>>;
-        using inner_strides_type = xtl::mpl::
-            eval_if_t<has_strides<E>, detail::expr_inner_strides_type<E>, get_strides_type<shape_type>>;
-        using inner_backstrides_type = xtl::mpl::
-            eval_if_t<has_strides<E>, detail::expr_inner_backstrides_type<E>, get_strides_type<shape_type>>;
-        using storage_type = xtl::mpl::eval_if_t<has_storage_type<E>, detail::expr_storage_type<E>, make_invalid_type<>>;
+        using strides_type = typename std::
+            conditional_t<strided_expression<E>, detail::expr_strides_type<E>, get_strides_type<shape_type>>::type;
+        using backstrides_type = typename std::
+            conditional_t<strided_expression<E>, detail::expr_backstrides_type<E>, get_strides_type<shape_type>>::type;
+        using inner_strides_type = typename std::
+            conditional_t<strided_expression<E>, detail::expr_inner_strides_type<E>, get_strides_type<shape_type>>::type;
+        using inner_backstrides_type = typename std::conditional_t<
+            strided_expression<E>,
+            detail::expr_inner_backstrides_type<E>,
+            get_strides_type<shape_type>>::type;
+        using storage_type = typename std::
+            conditional_t<container_expression<E>, detail::expr_storage_type<E>, make_invalid_type<>>::type;
 
         using stepper = typename E::stepper;
         using const_stepper = typename E::const_stepper;
@@ -638,43 +641,43 @@ namespace xt
         }
 
         template <class T = E>
-        std::enable_if_t<has_strides<T>::value, const inner_strides_type&> strides() const
+        std::enable_if_t<strided_expression<T>, const inner_strides_type&> strides() const
         {
             return m_ptr->strides();
         }
 
         template <class T = E>
-        std::enable_if_t<has_strides<T>::value, const inner_strides_type&> backstrides() const
+        std::enable_if_t<strided_expression<T>, const inner_strides_type&> backstrides() const
         {
             return m_ptr->backstrides();
         }
 
         template <class T = E>
-        std::enable_if_t<has_data_interface<T>::value, pointer> data() noexcept
+        std::enable_if_t<data_interface_expression<T>, pointer> data() noexcept
         {
             return m_ptr->data();
         }
 
         template <class T = E>
-        std::enable_if_t<has_data_interface<T>::value, pointer> data() const noexcept
+        std::enable_if_t<data_interface_expression<T>, pointer> data() const noexcept
         {
             return m_ptr->data();
         }
 
         template <class T = E>
-        std::enable_if_t<has_data_interface<T>::value, size_type> data_offset() const noexcept
+        std::enable_if_t<data_interface_expression<T>, size_type> data_offset() const noexcept
         {
             return m_ptr->data_offset();
         }
 
         template <class T = E>
-        std::enable_if_t<has_data_interface<T>::value, typename T::storage_type&> storage() noexcept
+        std::enable_if_t<data_interface_expression<T>, typename T::storage_type&> storage() noexcept
         {
             return m_ptr->storage();
         }
 
         template <class T = E>
-        std::enable_if_t<has_data_interface<T>::value, const typename T::storage_type&> storage() const noexcept
+        std::enable_if_t<data_interface_expression<T>, const typename T::storage_type&> storage() const noexcept
         {
             return m_ptr->storage();
         }

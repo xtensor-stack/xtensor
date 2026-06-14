@@ -135,27 +135,26 @@ namespace xt
                                               : false;
         };
 
-        template <class S>
-        struct is_strided_slice_impl : std::true_type
-        {
-        };
+        template <typename S>
+        inline constexpr bool is_strided_slice_impl = true;
+        template <typename T>
+        inline constexpr bool is_strided_slice_impl<xkeep_slice<T>> = false;
+        template <typename T>
+        inline constexpr bool is_strided_slice_impl<xdrop_slice<T>> = false;
 
-        template <class T>
-        struct is_strided_slice_impl<xkeep_slice<T>> : std::false_type
-        {
-        };
+        template <typename S>
+        concept is_strided_slice_concept = is_strided_slice_impl<S>;
 
-        template <class T>
-        struct is_strided_slice_impl<xdrop_slice<T>> : std::false_type
+        template <class... S>
+        constexpr bool is_strided_slice()
         {
-        };
+            return (is_strided_slice_concept<std::decay_t<S>> && ...);
+        }
 
         // If we have no discontiguous slices, we can calculate strides for this view.
         template <class E, class... S>
         struct is_strided_view
-            : std::integral_constant<
-                  bool,
-                  std::conjunction<has_data_interface<E>, is_strided_slice_impl<std::decay_t<S>>...>::value>
+            : std::integral_constant<bool, data_interface_expression<E> && is_strided_slice<S...>()>
         {
         };
 
@@ -228,7 +227,7 @@ namespace xt
         struct is_contiguous_view
             : std::integral_constant<
                   bool,
-                  has_data_interface<E>::value
+                  data_interface_expression<E>
                       && !(
                           E::static_layout == layout_type::column_major
                           && static_cast<std::size_t>(static_dimension<typename E::shape_type>::value) != sizeof...(S)
@@ -309,10 +308,10 @@ namespace xt
 
         static constexpr bool is_const = std::is_const<std::remove_reference_t<CT>>::value;
 
-        using extract_storage_type = xtl::mpl::eval_if_t<
-            has_data_interface<xexpression_type>,
+        using extract_storage_type = typename std::conditional_t<
+            data_interface_expression<xexpression_type>,
             detail::expr_storage_type<xexpression_type>,
-            make_invalid_type<>>;
+            make_invalid_type<>>::type;
         using storage_type = std::conditional_t<is_const, const extract_storage_type, extract_storage_type>;
     };
 
@@ -397,15 +396,15 @@ namespace xt
         using inner_shape_type = typename iterable_base::inner_shape_type;
         using shape_type = typename xview_shape_type<typename xexpression_type::shape_type, S...>::type;
 
-        using xexpression_inner_strides_type = xtl::mpl::eval_if_t<
-            has_strides<xexpression_type>,
+        using xexpression_inner_strides_type = typename std::conditional_t<
+            strided_expression<xexpression_type>,
             detail::expr_inner_strides_type<xexpression_type>,
-            get_strides_type<shape_type>>;
+            get_strides_type<shape_type>>::type;
 
-        using xexpression_inner_backstrides_type = xtl::mpl::eval_if_t<
-            has_strides<xexpression_type>,
+        using xexpression_inner_backstrides_type = typename std::conditional_t<
+            strided_expression<xexpression_type>,
             detail::expr_inner_backstrides_type<xexpression_type>,
-            get_strides_type<shape_type>>;
+            get_strides_type<shape_type>>::type;
 
         using storage_type = typename inner_types::storage_type;
 
@@ -437,11 +436,11 @@ namespace xt
         using const_stepper = typename iterable_base::const_stepper;
 
         using linear_iterator = std::conditional_t<
-            has_data_interface<xexpression_type>::value && is_strided_view,
+            data_interface_expression<xexpression_type> && is_strided_view,
             std::conditional_t<is_const, typename xexpression_type::const_linear_iterator, typename xexpression_type::linear_iterator>,
             typename iterable_base::linear_iterator>;
         using const_linear_iterator = std::conditional_t<
-            has_data_interface<xexpression_type>::value && is_strided_view,
+            data_interface_expression<xexpression_type> && is_strided_view,
             typename xexpression_type::const_linear_iterator,
             typename iterable_base::const_linear_iterator>;
 
@@ -510,79 +509,79 @@ namespace xt
 
         template <class T = xexpression_type>
         storage_type& storage()
-            requires(has_data_interface_concept<T>);
+            requires(data_interface_expression<T>);
 
         template <class T = xexpression_type>
         const storage_type& storage() const
-            requires(has_data_interface_concept<T>);
+            requires(data_interface_expression<T>);
 
         template <class T = xexpression_type>
         linear_iterator linear_begin()
-            requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>);
+            requires(data_interface_expression<T> and strided_view_concept<CT, S...>);
 
         template <class T = xexpression_type>
         linear_iterator linear_end()
-            requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>);
+            requires(data_interface_expression<T> and strided_view_concept<CT, S...>);
 
         template <class T = xexpression_type>
         const_linear_iterator linear_begin() const
-            requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>);
+            requires(data_interface_expression<T> and strided_view_concept<CT, S...>);
 
         template <class T = xexpression_type>
         const_linear_iterator linear_end() const
-            requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>);
+            requires(data_interface_expression<T> and strided_view_concept<CT, S...>);
 
         template <class T = xexpression_type>
         const_linear_iterator linear_cbegin() const
-            requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>);
+            requires(data_interface_expression<T> and strided_view_concept<CT, S...>);
 
         template <class T = xexpression_type>
         const_linear_iterator linear_cend() const
-            requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>);
+            requires(data_interface_expression<T> and strided_view_concept<CT, S...>);
 
         template <class T = xexpression_type>
         reverse_linear_iterator linear_rbegin()
-            requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>);
+            requires(data_interface_expression<T> and strided_view_concept<CT, S...>);
 
         template <class T = xexpression_type>
         reverse_linear_iterator linear_rend()
-            requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>);
+            requires(data_interface_expression<T> and strided_view_concept<CT, S...>);
 
         template <class T = xexpression_type>
         const_reverse_linear_iterator linear_rbegin() const
-            requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>);
+            requires(data_interface_expression<T> and strided_view_concept<CT, S...>);
 
         template <class T = xexpression_type>
         const_reverse_linear_iterator linear_rend() const
-            requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>);
+            requires(data_interface_expression<T> and strided_view_concept<CT, S...>);
 
         template <class T = xexpression_type>
         const_reverse_linear_iterator linear_crbegin() const
-            requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>);
+            requires(data_interface_expression<T> and strided_view_concept<CT, S...>);
 
         template <class T = xexpression_type>
         const_reverse_linear_iterator linear_crend() const
-            requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>);
+            requires(data_interface_expression<T> and strided_view_concept<CT, S...>);
 
         template <class T = xexpression_type>
         const inner_strides_type& strides() const
-            requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>);
+            requires(data_interface_expression<T> and strided_view_concept<CT, S...>);
 
         template <class T = xexpression_type>
         const inner_strides_type& backstrides() const
-            requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>);
+            requires(data_interface_expression<T> and strided_view_concept<CT, S...>);
 
         template <class T = xexpression_type>
         const_pointer data() const
-            requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>);
+            requires(data_interface_expression<T> and strided_view_concept<CT, S...>);
 
         template <class T = xexpression_type>
         pointer data()
-            requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>);
+            requires(data_interface_expression<T> and strided_view_concept<CT, S...>);
 
         template <class T = xexpression_type>
         std::size_t data_offset() const noexcept
-            requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>);
+            requires(data_interface_expression<T> and strided_view_concept<CT, S...>);
 
         template <class It>
         inline It data_xbegin_impl(It begin) const noexcept;
@@ -616,7 +615,7 @@ namespace xt
 
         template <class E, class T = xexpression_type>
         void assign_to(xexpression<E>& e, bool force_resize) const
-            requires(has_data_interface_concept<T> and contiguous_view_concept<E, S...>);
+            requires(data_interface_expression<T> and contiguous_view_concept<E, S...>);
 
         template <class E>
         using rebind_t = xview<E, S...>;
@@ -1153,7 +1152,7 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     inline auto xview<CT, S...>::storage() -> storage_type&
-        requires(has_data_interface_concept<T>)
+        requires(data_interface_expression<T>)
     {
         return m_e.storage();
     }
@@ -1161,7 +1160,7 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     inline auto xview<CT, S...>::storage() const -> const storage_type&
-        requires(has_data_interface_concept<T>)
+        requires(data_interface_expression<T>)
     {
         return m_e.storage();
     }
@@ -1169,7 +1168,7 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     auto xview<CT, S...>::linear_begin() -> linear_iterator
-        requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>)
+        requires(data_interface_expression<T> and strided_view_concept<CT, S...>)
     {
         return m_e.storage().begin() + data_offset();
     }
@@ -1177,7 +1176,7 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     auto xview<CT, S...>::linear_end() -> linear_iterator
-        requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>)
+        requires(data_interface_expression<T> and strided_view_concept<CT, S...>)
     {
         return m_e.storage().begin() + data_offset() + this->size();
     }
@@ -1185,7 +1184,7 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     auto xview<CT, S...>::linear_begin() const -> const_linear_iterator
-        requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>)
+        requires(data_interface_expression<T> and strided_view_concept<CT, S...>)
     {
         return linear_cbegin();
     }
@@ -1193,7 +1192,7 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     auto xview<CT, S...>::linear_end() const -> const_linear_iterator
-        requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>)
+        requires(data_interface_expression<T> and strided_view_concept<CT, S...>)
     {
         return linear_cend();
     }
@@ -1201,7 +1200,7 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     auto xview<CT, S...>::linear_cbegin() const -> const_linear_iterator
-        requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>)
+        requires(data_interface_expression<T> and strided_view_concept<CT, S...>)
     {
         return m_e.storage().cbegin() + data_offset();
     }
@@ -1209,7 +1208,7 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     auto xview<CT, S...>::linear_cend() const -> const_linear_iterator
-        requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>)
+        requires(data_interface_expression<T> and strided_view_concept<CT, S...>)
     {
         return m_e.storage().cbegin() + data_offset() + this->size();
     }
@@ -1217,7 +1216,7 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     auto xview<CT, S...>::linear_rbegin() -> reverse_linear_iterator
-        requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>)
+        requires(data_interface_expression<T> and strided_view_concept<CT, S...>)
     {
         return reverse_linear_iterator(linear_end());
     }
@@ -1225,7 +1224,7 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     auto xview<CT, S...>::linear_rend() -> reverse_linear_iterator
-        requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>)
+        requires(data_interface_expression<T> and strided_view_concept<CT, S...>)
     {
         return reverse_linear_iterator(linear_begin());
     }
@@ -1233,7 +1232,7 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     auto xview<CT, S...>::linear_rbegin() const -> const_reverse_linear_iterator
-        requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>)
+        requires(data_interface_expression<T> and strided_view_concept<CT, S...>)
     {
         return linear_crbegin();
     }
@@ -1241,7 +1240,7 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     auto xview<CT, S...>::linear_rend() const -> const_reverse_linear_iterator
-        requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>)
+        requires(data_interface_expression<T> and strided_view_concept<CT, S...>)
     {
         return linear_crend();
     }
@@ -1249,7 +1248,7 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     auto xview<CT, S...>::linear_crbegin() const -> const_reverse_linear_iterator
-        requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>)
+        requires(data_interface_expression<T> and strided_view_concept<CT, S...>)
     {
         return const_reverse_linear_iterator(linear_end());
     }
@@ -1257,7 +1256,7 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     auto xview<CT, S...>::linear_crend() const -> const_reverse_linear_iterator
-        requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>)
+        requires(data_interface_expression<T> and strided_view_concept<CT, S...>)
     {
         return const_reverse_linear_iterator(linear_begin());
     }
@@ -1268,7 +1267,7 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     inline auto xview<CT, S...>::strides() const
-        -> const inner_strides_type& requires(has_data_interface_concept<T>and strided_view_concept<CT, S...>) {
+        -> const inner_strides_type& requires(data_interface_expression<T>and strided_view_concept<CT, S...>) {
             if (!m_strides_computed)
             {
                 compute_strides(std::integral_constant<bool, has_trivial_strides>{});
@@ -1280,7 +1279,7 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     inline auto xview<CT, S...>::backstrides() const
-        -> const inner_strides_type& requires(has_data_interface_concept<T>and strided_view_concept<CT, S...>) {
+        -> const inner_strides_type& requires(data_interface_expression<T>and strided_view_concept<CT, S...>) {
             if (!m_strides_computed)
             {
                 compute_strides(std::integral_constant<bool, has_trivial_strides>{});
@@ -1295,7 +1294,7 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     inline auto xview<CT, S...>::data() const -> const_pointer
-        requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>)
+        requires(data_interface_expression<T> and strided_view_concept<CT, S...>)
     {
         return m_e.data();
     }
@@ -1303,7 +1302,7 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     inline auto xview<CT, S...>::data() -> pointer
-        requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>)
+        requires(data_interface_expression<T> and strided_view_concept<CT, S...>)
     {
         return m_e.data();
     }
@@ -1335,7 +1334,7 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     inline std::size_t xview<CT, S...>::data_offset() const noexcept
-        requires(has_data_interface_concept<T> and strided_view_concept<CT, S...>)
+        requires(data_interface_expression<T> and strided_view_concept<CT, S...>)
     {
         if (!m_strides_computed)
         {
@@ -1452,7 +1451,7 @@ namespace xt
     template <class CT, class... S>
     template <class E, class T>
     void xview<CT, S...>::assign_to(xexpression<E>& e, bool force_resize) const
-        requires(has_data_interface_concept<T> and contiguous_view_concept<E, S...>)
+        requires(data_interface_expression<T> and contiguous_view_concept<E, S...>)
     {
         auto& de = e.derived_cast();
         de.resize(shape(), force_resize);

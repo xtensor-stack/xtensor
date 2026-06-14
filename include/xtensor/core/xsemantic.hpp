@@ -224,7 +224,7 @@ namespace xt
     template <class E>
     struct overlapping_memory_checker_traits<
         E,
-        std::enable_if_t<!has_memory_address<E>::value && is_crtp_base_of<xview_semantic, E>::value>>
+        std::enable_if_t<!addressable_expression<E> && is_crtp_base_of<xview_semantic, E>::value>>
     {
         static bool check_overlap(const E& expr, const memory_range& dst_range)
         {

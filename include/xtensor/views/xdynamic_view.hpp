@@ -50,9 +50,9 @@ namespace xt
 
 #if defined(__GNUC__) && !defined(__clang__) && __GNUC__ == 8
         static constexpr auto
-            random_instantiation_var_for_gcc8_data_iface = has_data_interface<xdynamic_view<CT, S, L, FST>>::value;
+            random_instantiation_var_for_gcc8_data_iface = data_interface_expression<xdynamic_view<CT, S, L, FST>>;
         static constexpr auto
-            random_instantiation_var_for_gcc8_has_strides = has_strides<xdynamic_view<CT, S, L, FST>>::value;
+            random_instantiation_var_for_gcc8_has_strides = strided_expression<xdynamic_view<CT, S, L, FST>>;
 #endif
 
         // TODO: implement efficient stepper specific to the dynamic_view
