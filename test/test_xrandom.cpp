@@ -237,6 +237,20 @@ namespace xt
 #endif
     }
 
+    TEST(xrandom, poisson_geometric_default_type)
+    {
+        // poisson and geometric have no parameter from which T can be deduced,
+        // so they require a default T (= int) to be callable without explicit template arg.
+        auto p = random::poisson({3, 3}, 1.0);
+        static_assert(std::is_same<decltype(p)::value_type, int>::value, "poisson default T must be int");
+
+        auto g = random::geometric({3, 3}, 0.5);
+        static_assert(std::is_same<decltype(g)::value_type, int>::value, "geometric default T must be int");
+
+        auto p2 = random::poisson({3, 3});
+        static_assert(std::is_same<decltype(p2)::value_type, int>::value, "poisson default T must be int");
+    }
+
     TEST(xrandom, permutation)
     {
         xt::random::seed(123);

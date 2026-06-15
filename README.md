@@ -7,6 +7,7 @@
 [![Doxygen -> gh-pages](https://github.com/xtensor-stack/xtensor/workflows/gh-pages/badge.svg)](https://xtensor-stack.github.io/xtensor)
 [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/xtensor-stack/xtensor/stable?filepath=notebooks%2Fxtensor.ipynb)
 [![Zulip](https://img.shields.io/badge/social_chat-zulip-blue.svg)](https://xtensor.zulipchat.com/#narrow/channel/539553-Ask-anything)
+[![CodSpeed](https://img.shields.io/endpoint?url=https://codspeed.io/badge.json)](https://codspeed.io/xtensor-stack/xtensor?utm_source=badge)
 
 Multi-dimensional arrays with broadcasting and lazy computing.
 
