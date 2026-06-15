@@ -10,8 +10,10 @@
 #include <sstream>
 
 #include "xtensor/containers/xarray.hpp"
+#include "xtensor/containers/xtensor.hpp"
 #include "xtensor/core/xexpression.hpp"
 #include "xtensor/core/xmath.hpp"
+#include "xtensor/generators/xrandom.hpp"
 #include "xtensor/io/xio.hpp"
 
 #include "test_common_macros.hpp"
@@ -114,6 +116,21 @@ namespace xt
         auto expr = fun();
         xarray<double> a = {{1, 2, 3, 4}, {5, 6, 7, 8}};
         EXPECT_EQ(expr, a * a);
+    }
+
+    TEST(xexpression, shared_reducer_result)
+    {
+        std::size_t n = 1000;
+        std::size_t m = 9;
+        std::size_t o = 12;
+
+        xtensor<double, 3> tensor = random::rand({n, m, o}, -20., 20.);
+        auto result = make_xshared(sum(tensor, {2}));
+        auto expected = sum(tensor, {2});
+
+        EXPECT_EQ(result.dimension(), std::size_t(2));
+        EXPECT_EQ(result.shape(), expected.shape());
+        EXPECT_TRUE(all(equal(result, expected)));
     }
 
     TEST(xexpression, temporary_type)
