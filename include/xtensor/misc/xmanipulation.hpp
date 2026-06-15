@@ -954,12 +954,13 @@ namespace xt
     inline auto roll(E&& e, std::ptrdiff_t shift)
     {
         auto cpy = empty_like(e);
-        auto flat_size = std::accumulate(
-            cpy.shape().begin(),
-            cpy.shape().end(),
-            1L,
-            std::multiplies<std::size_t>()
-        );
+
+        if (cpy.size() == 0)
+        {
+            return cpy;
+        }
+
+        const auto flat_size = static_cast<std::ptrdiff_t>(cpy.size());
         while (shift < 0)
         {
             shift += flat_size;
@@ -1059,9 +1060,14 @@ namespace xt
             XTENSOR_THROW(std::runtime_error, "axis is not within shape dimension.");
         }
 
-        std::size_t saxis = normalize_axis(dim, axis);
+        if (cpy.size() == 0)
+        {
+            return cpy;
+        }
 
+        std::size_t saxis = normalize_axis(dim, axis);
         const auto axis_dim = static_cast<std::ptrdiff_t>(shape[saxis]);
+
         while (shift < 0)
         {
             shift += axis_dim;
