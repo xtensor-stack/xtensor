@@ -520,7 +520,7 @@ namespace xt
                         const size_t stride = std::accumulate(
                             shape.begin() + i + 1,
                             shape.end(),
-                            1,
+                            size_t(1),
                             std::multiplies<size_t>()
                         );
                         if (i == axis)
