@@ -658,7 +658,7 @@ namespace xt
     template <class E>
     inline auto xcontainer_semantic<D>::assign_xexpression(const xexpression<E>& e) -> derived_type&
     {
-        xt::assign_xexpression(*this, e);
+        xt::assign_to_container(*this, e);
         return this->derived_cast();
     }
 
@@ -701,32 +701,11 @@ namespace xt
         return this->derived_cast();
     }
 
-    namespace detail
-    {
-        template <class F>
-        bool get_rhs_triviality(const F&)
-        {
-            return true;
-        }
-
-        template <class F, class R, class... CT>
-        bool get_rhs_triviality(const xfunction<F, R, CT...>& rhs)
-        {
-            using index_type = xindex_type_t<typename xfunction<F, R, CT...>::shape_type>;
-            using size_type = typename index_type::size_type;
-            size_type size = rhs.dimension();
-            index_type shape = uninitialized_shape<index_type>(size);
-            bool trivial_broadcast = rhs.broadcast_shape(shape, true);
-            return trivial_broadcast;
-        }
-    }
-
     template <class D>
     template <class E>
     inline auto xview_semantic<D>::assign_xexpression(const xexpression<E>& e) -> derived_type&
     {
-        xt::assert_compatible_shape(*this, e);
-        xt::assign_data(*this, e, detail::get_rhs_triviality(e.derived_cast()));
+        xt::assign_to_view(*this, e);
         return this->derived_cast();
     }
 
@@ -734,8 +713,7 @@ namespace xt
     template <class E>
     inline auto xview_semantic<D>::computed_assign(const xexpression<E>& e) -> derived_type&
     {
-        xt::assert_compatible_shape(*this, e);
-        xt::assign_data(*this, e, detail::get_rhs_triviality(e.derived_cast()));
+        xt::assign_to_view(*this, e);
         return this->derived_cast();
     }
 

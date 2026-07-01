@@ -498,8 +498,6 @@ namespace xt
 
         EXPECT_FALSE(broadcastable(v.shape(), b.shape()));
         EXPECT_FALSE(broadcastable(b.shape(), v.shape()));
-        XT_EXPECT_THROW(assert_compatible_shape(b, v), broadcast_error);
-        XT_EXPECT_THROW(assert_compatible_shape(v, b), broadcast_error);
         XT_EXPECT_THROW(v = b, broadcast_error);
         XT_EXPECT_THROW(noalias(v) = b, broadcast_error);
     }

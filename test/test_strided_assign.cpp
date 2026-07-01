@@ -27,12 +27,10 @@ namespace xt
     {
         auto check_linear_assign = [](auto a, auto b)
         {
-            assert_compatible_shape(a, b);
             return xassign_traits<decltype(a), decltype(b)>::linear_assign(a, b, true);
         };
         auto check_strided_assign = [](auto a, auto b)
         {
-            assert_compatible_shape(a, b);
 #ifndef _WIN32
             static_assert(
                 xassign_traits<decltype(a), decltype(b)>::strided_assign(),

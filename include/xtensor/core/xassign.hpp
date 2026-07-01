@@ -38,25 +38,16 @@ namespace xt
      ********************/
 
     template <class E1, class E2>
-    void assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial);
-
-    template <class E1, class E2>
-    void assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2);
-
-    template <class E1, class E2>
     void computed_assign(xexpression<E1>& e1, const xexpression<E2>& e2);
 
     template <class E1, class E2, class F>
     void scalar_computed_assign(xexpression<E1>& e1, const E2& e2, F&& f);
 
     template <class E1, class E2>
-    void assert_compatible_shape(const xexpression<E1>& e1, const xexpression<E2>& e2);
+    void assign_to_container(xexpression<E1>& e1, const xexpression<E2>& e2);
 
     template <class E1, class E2>
-    void strided_assign(E1& e1, const E2& e2, std::false_type /*disable*/);
-
-    template <class E1, class E2>
-    void strided_assign(E1& e1, const E2& e2, std::true_type /*enable*/);
+    void assign_to_view(xexpression<E1>& e1, const xexpression<E2>& e2);
 
     /************************
      * xexpression_assigner *
@@ -82,16 +73,16 @@ namespace xt
         using base_type = xexpression_assigner_base<Tag>;
 
         template <class E1, class E2>
-        static void assign_xexpression(E1& e1, const E2& e2);
-
-        template <class E1, class E2>
         static void computed_assign(xexpression<E1>& e1, const xexpression<E2>& e2);
 
         template <class E1, class E2, class F>
         static void scalar_computed_assign(xexpression<E1>& e1, const E2& e2, F&& f);
 
         template <class E1, class E2>
-        static void assert_compatible_shape(const xexpression<E1>& e1, const xexpression<E2>& e2);
+        static void assign_to_container(xexpression<E1>& e1, const xexpression<E2>& e2);
+
+        template <class E1, class E2>
+        static void assign_to_view(xexpression<E1>& e1, const xexpression<E2>& e2);
 
     private:
 
@@ -100,6 +91,10 @@ namespace xt
 
         template <class E1, class F, class... CT>
         static bool resize(E1& e1, const xfunction<F, CT...>& e2);
+
+        template <class E1, class E2>
+        static void assert_compatible_shape(const xexpression<E1>& e1, const xexpression<E2>& e2);
+
     };
 
     /********************
@@ -205,27 +200,6 @@ namespace xt
      ***********************************/
 
     template <class E1, class E2>
-    inline void assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial)
-    {
-        using tag = xexpression_tag_t<E1, E2>;
-        xexpression_assigner<tag>::assign_data(e1, e2, trivial);
-    }
-
-    template <class E1, class E2>
-    inline void assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2)
-    {
-        if constexpr (assignable_to_expression<E1, E2>)
-        {
-            e2.derived_cast().assign_to(e1);
-        }
-        else
-        {
-            using tag = xexpression_tag_t<E1, E2>;
-            xexpression_assigner<tag>::assign_xexpression(e1, e2);
-        }
-    }
-
-    template <class E1, class E2>
     inline void computed_assign(xexpression<E1>& e1, const xexpression<E2>& e2)
     {
         using tag = xexpression_tag_t<E1, E2>;
@@ -240,10 +214,25 @@ namespace xt
     }
 
     template <class E1, class E2>
-    inline void assert_compatible_shape(const xexpression<E1>& e1, const xexpression<E2>& e2)
+    inline void assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2)
+    {
+        if constexpr (assignable_to_expression<E1, E2>)
+        {
+            e2.derived_cast().assign_to(e1);
+        }
+        else
+        {
+            using tag = xexpression_tag_t<E1, E2>;
+            xexpression_assigner<tag>::assign_to_container(e1, e2);
+        }
+    }
+
+
+    template <class E1, class E2>
+    inline void assign_to_view(xexpression<E1>& e1, const xexpression<E2>& e2)
     {
         using tag = xexpression_tag_t<E1, E2>;
-        xexpression_assigner<tag>::assert_compatible_shape(e1, e2);
+        xexpression_assigner<tag>::assign_to_view(e1, e2);
     }
 
     /***************************************
@@ -479,10 +468,38 @@ namespace xt
 
     template <class Tag>
     template <class E1, class E2>
-    inline void xexpression_assigner<Tag>::assign_xexpression(E1& e1, const E2& e2)
+    inline void xexpression_assigner<Tag>::assign_to_container(xexpression<E1>& e1, const xexpression<E2>& e2)
     {
         bool trivial_broadcast = resize(e1.derived_cast(), e2.derived_cast());
         base_type::assign_data(e1, e2, trivial_broadcast);
+    }
+
+    namespace detail
+    {
+        template <class F>
+        bool get_rhs_triviality(const F&)
+        {
+            return true;
+        }
+
+        template <class F, class R, class... CT>
+        bool get_rhs_triviality(const xfunction<F, R, CT...>& rhs)
+        {
+            using index_type = xindex_type_t<typename xfunction<F, R, CT...>::shape_type>;
+            using size_type = typename index_type::size_type;
+            size_type size = rhs.dimension();
+            index_type shape = uninitialized_shape<index_type>(size);
+            bool trivial_broadcast = rhs.broadcast_shape(shape, true);
+            return trivial_broadcast;
+        }
+    }
+
+    template <class Tag>
+    template <class E1, class E2>
+    inline void xexpression_assigner<Tag>::assign_to_view(xexpression<E1>& e1, const xexpression<E2>& e2)
+    {
+        assert_compatible_shape(e1, e2);
+        base_type::assign_data(e1, e2, detail::get_rhs_triviality(e2.derived_cast()));
     }
 
     template <class Tag>
@@ -533,19 +550,6 @@ namespace xt
         {
             *dst = f(*dst, e2);
             ++dst;
-        }
-    }
-
-    template <class Tag>
-    template <class E1, class E2>
-    inline void
-    xexpression_assigner<Tag>::assert_compatible_shape(const xexpression<E1>& e1, const xexpression<E2>& e2)
-    {
-        const E1& de1 = e1.derived_cast();
-        const E2& de2 = e2.derived_cast();
-        if (!broadcastable(de2.shape(), de1.shape()))
-        {
-            throw_broadcast_error(de2.shape(), de1.shape());
         }
     }
 
@@ -603,6 +607,19 @@ namespace xt
             bool trivial_broadcast = e2.broadcast_shape(shape, true);
             e1.resize(std::move(shape));
             return trivial_broadcast;
+        }
+    }
+
+    template <class Tag>
+    template <class E1, class E2>
+    inline void
+    xexpression_assigner<Tag>::assert_compatible_shape(const xexpression<E1>& e1, const xexpression<E2>& e2)
+    {
+        const E1& de1 = e1.derived_cast();
+        const E2& de2 = e2.derived_cast();
+        if (!broadcastable(de2.shape(), de1.shape()))
+        {
+            throw_broadcast_error(de2.shape(), de1.shape());
         }
     }
 
