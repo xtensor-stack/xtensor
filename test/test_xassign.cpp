@@ -14,7 +14,6 @@
 #include "xtensor/containers/xarray.hpp"
 #include "xtensor/containers/xtensor.hpp"
 #include "xtensor/core/xassign.hpp"
-#include "xtensor/core/xnoalias.hpp"
 #include "xtensor/misc/xmanipulation.hpp"
 
 #include "test_common.hpp"

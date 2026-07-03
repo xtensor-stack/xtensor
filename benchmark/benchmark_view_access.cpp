@@ -11,7 +11,6 @@
 // #include "xtensor/core/core/xshape.hpp"
 #include "xtensor/containers/xadapt.hpp"
 #include "xtensor/containers/xstorage.hpp"
-#include "xtensor/core/xnoalias.hpp"
 #include "xtensor/generators/xbuilder.hpp"
 #include "xtensor/generators/xrandom.hpp"
 #include "xtensor/utils/xutils.hpp"

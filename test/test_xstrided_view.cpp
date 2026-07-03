@@ -10,7 +10,6 @@
 #include "xtensor/containers/xarray.hpp"
 #include "xtensor/containers/xfixed.hpp"
 #include "xtensor/containers/xtensor.hpp"
-#include "xtensor/core/xnoalias.hpp"
 #include "xtensor/generators/xbuilder.hpp"
 #include "xtensor/io/xio.hpp"
 #include "xtensor/misc/xmanipulation.hpp"

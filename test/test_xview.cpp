@@ -24,7 +24,6 @@
 #include "xtensor/containers/xarray.hpp"
 #include "xtensor/containers/xfixed.hpp"
 #include "xtensor/containers/xtensor.hpp"
-#include "xtensor/core/xnoalias.hpp"
 #include "xtensor/generators/xbuilder.hpp"
 #include "xtensor/generators/xrandom.hpp"
 #include "xtensor/misc/xmanipulation.hpp"
@@ -1494,7 +1493,7 @@ namespace xt
                 b = xt::view(a, xt::all(), xt::range(0, 1));
                 break;
             case 2:
-                b.assign(xt::view(a, xt::all(), xt::range(0, 1)));
+                b.assign(xt::view(a, xt::all(), xt::range(0, 1)), noalias);
                 break;
             case 3:
                 b = xt::view(a, xt::all(), xt::range(0, 2));

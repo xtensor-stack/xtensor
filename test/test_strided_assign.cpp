@@ -15,7 +15,6 @@
 #include "xtensor/containers/xtensor.hpp"
 #include "xtensor/core/xassign.hpp"
 #include "xtensor/core/xlayout.hpp"
-#include "xtensor/core/xnoalias.hpp"
 #include "xtensor/views/xview.hpp"
 
 #include "test_common.hpp"

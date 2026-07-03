@@ -8,7 +8,6 @@
  ****************************************************************************/
 
 #include "xtensor/containers/xarray.hpp"
-#include "xtensor/core/xnoalias.hpp"
 #include "xtensor/io/xio.hpp"
 #include "xtensor/views/xview.hpp"
 

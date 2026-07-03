@@ -14,7 +14,6 @@
 
 #include "../chunk/xchunked_array.hpp"
 #include "../containers/xstorage.hpp"
-#include "../core/xnoalias.hpp"
 #include "../views/xstrided_view.hpp"
 
 namespace xt

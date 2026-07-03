@@ -15,7 +15,6 @@
 
 #include "xtensor/containers/xarray.hpp"
 #include "xtensor/containers/xtensor.hpp"
-#include "xtensor/core/xnoalias.hpp"
 
 // For how many sizes should math functions be tested?
 #define MATH_RANGE 64, 64

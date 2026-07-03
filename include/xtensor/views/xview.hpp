@@ -1746,28 +1746,21 @@ namespace xt
         return shape;
     }
 
-    namespace xview_detail
-    {
-        template <class V, class T>
-        inline void run_assign_temporary_impl(V& v, const T& t, std::true_type /* enable strided assign */)
-        {
-            strided_loop_assigner<true>::run(v, t);
-        }
-
-        template <class V, class T>
-        inline void
-        run_assign_temporary_impl(V& v, const T& t, std::false_type /* fallback to iterator assign */)
-        {
-            std::copy(t.cbegin(), t.cend(), v.begin());
-        }
-    }
-
     template <class CT, class... S>
     inline void xview<CT, S...>::assign_temporary_impl(temporary_type&& tmp)
     {
         constexpr bool fast_assign = detail::is_strided_view<xexpression_type, S...>::value
                                      && xassign_traits<xview<CT, S...>, temporary_type>::simd_strided_assign();
-        xview_detail::run_assign_temporary_impl(*this, tmp, std::integral_constant<bool, fast_assign>{});
+        if constexpr (fast_assign)
+        {
+            using self_type = xview<CT, S...>;
+            parallel_assigner_t<self_type, temporary_type, default_parallel_tag> assigner;
+            assigner.strided_loop_assign(*this, tmp);
+        }
+        else
+        {
+            std::copy(tmp.cbegin(), tmp.cend(), this->begin());
+        }
     }
 
     namespace detail
