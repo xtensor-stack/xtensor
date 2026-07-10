@@ -226,6 +226,41 @@ namespace xt
         EXPECT_EQ(view0, view1);
     }
 
+    TEST(xview, negative_step)
+    {
+        view_shape_type shape = {3, 4};
+        xarray<double> a(shape);
+        std::vector<double> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
+
+        auto view0 = view(a, 1, range(3, 0, -1));
+        EXPECT_EQ(size_t(1), view0.dimension());
+        EXPECT_EQ(size_t(3), view0.shape(0));
+        EXPECT_EQ(a(1, 3), view0(0));
+        EXPECT_EQ(a(1, 2), view0(1));
+        EXPECT_EQ(a(1, 1), view0(2));
+    }
+
+    TEST(xview, size_zero)
+    {
+        view_shape_type shape = {3, 4};
+        xarray<double> a(shape);
+        std::vector<double> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
+
+        auto view0 = view(a, 1, range(0, 0));
+        EXPECT_EQ(size_t(1), view0.dimension());
+        EXPECT_EQ(size_t(0), view0.shape(0));
+
+        auto view1 = view(a, 1, range(3, 0, 1));
+        EXPECT_EQ(size_t(1), view1.dimension());
+        EXPECT_EQ(size_t(0), view1.shape(0));
+
+        auto view2 = view(a, 1, range(0, 3, -1));
+        EXPECT_EQ(size_t(1), view2.dimension());
+        EXPECT_EQ(size_t(0), view2.shape(0));
+    }
+
     TEST(xview, stored_range)
     {
         view_shape_type shape = {3, 4};
