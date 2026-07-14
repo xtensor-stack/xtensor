@@ -14,7 +14,6 @@
 #include <iterator>
 #include <type_traits>
 
-
 #include <xtl/xsequence.hpp>
 
 #include "../containers/xscalar.hpp"
