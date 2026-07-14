@@ -15,6 +15,7 @@
 #include <cstddef>
 #include <initializer_list>
 #include <iostream>
+#include <iterator>
 #include <memory>
 #include <tuple>
 #include <type_traits>
@@ -545,25 +546,6 @@ namespace xt
     template <class E>
     concept iterable_expression = requires { std::declval<E>().begin(); };
 
-    /******************************
-     * is_iterator implementation *
-     ******************************/
-
-    template <typename E>
-    concept iterator_concept = requires {
-        *std::declval<const E>();
-        std::declval<const E>() == std::declval<const E>();
-        std::declval<const E>() != std::declval<const E>();
-        ++(*std::declval<E*>());
-        (*std::declval<E*>())++;
-    };
-
-    template <class E>
-    constexpr bool is_iterator()
-    {
-        return iterator_concept<E>;
-    }
-
     /*************************
      * conditional type cast *
      *************************/
@@ -695,19 +677,14 @@ namespace xt
      ******************/
 
     template <class E1, class E2>
-    concept assignable_expression = requires { std::declval<const E2&>().assign_to(std::declval<E1&>()); };
+    concept assignable_to_expression = requires { std::declval<const E2&>().assign_to(std::declval<E1&>()); };
 
     /*************************************
      * overlapping_memory_checker_traits *
      *************************************/
 
     template <class T>
-    concept addressable_expression = requires { std::addressof(*std::declval<T>().begin()); };
-
-    template <typename T>
-    concept with_memory_address_concept = addressable_expression<std::decay_t<T>>;
-    template <typename T>
-    concept without_memory_address_concept = !addressable_expression<std::decay_t<T>>;
+    concept addressable_to_expression = requires { std::addressof(*std::declval<T>().begin()); };
 
     struct memory_range
     {
@@ -751,7 +728,7 @@ namespace xt
     };
 
     template <class E>
-    struct overlapping_memory_checker_traits<E, std::enable_if_t<addressable_expression<E>>>
+    struct overlapping_memory_checker_traits<E, std::enable_if_t<addressable_to_expression<E>>>
     {
         static bool check_overlap(const E& expr, const memory_range& dst_range)
         {
@@ -801,7 +778,7 @@ namespace xt
     };
 
     template <class Dst>
-    struct overlapping_memory_checker<Dst, std::enable_if_t<addressable_expression<Dst>>>
+    struct overlapping_memory_checker<Dst, std::enable_if_t<addressable_to_expression<Dst>>>
         : overlapping_memory_checker_base
     {
         explicit overlapping_memory_checker(const Dst& aDst)

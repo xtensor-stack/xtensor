@@ -11,7 +11,9 @@
 #define XTENSOR_XSET_OPERATION_HPP
 
 #include <algorithm>
+#include <iterator>
 #include <type_traits>
+
 
 #include <xtl/xsequence.hpp>
 
@@ -111,7 +113,7 @@ namespace xt
      * @param test_elements_end iterator to the end of an array
      * @return a boolean array
      */
-    template <class E, iterator_concept I>
+    template <class E, std::forward_iterator I>
     inline auto isin(E&& element, I&& test_elements_begin, I&& test_elements_end) noexcept
     {
         auto lambda = [&test_elements_begin, &test_elements_end](const auto& t)
@@ -168,7 +170,7 @@ namespace xt
      * @param test_elements_end iterator to the end of an array
      * @return a boolean array
      */
-    template <class E, iterator_concept I>
+    template <class E, std::forward_iterator I>
     inline auto in1d(E&& element, I&& test_elements_begin, I&& test_elements_end) noexcept
     {
         XTENSOR_ASSERT(element.dimension() == 1ul);

@@ -214,7 +214,7 @@ namespace xt
     template <class E1, class E2>
     inline void assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2)
     {
-        if constexpr (assignable_expression<E1, E2>)
+        if constexpr (assignable_to_expression<E1, E2>)
         {
             e2.derived_cast().assign_to(e1);
         }
