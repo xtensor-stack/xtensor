@@ -13,11 +13,11 @@ jobs:
     - uses: actions/stale@v8
       with:
         any-of-issue-labels: Needs clarification, Answered, Stale?
-        days-before-issue-stale: 30
+        days-before-issue-stale: 365
         days-before-issue-close: 14
         stale-issue-label: Stale
         stale-issue-message: |
-          This issue is stale because it has been open for 30 days with no activity.
+          This issue is stale because it has been open for 365 days with no activity.
           It will be automatically closed in 14 days.
         close-issue-message: |
           This issue was closed because it has been inactive for 14 days since being marked as stale.
