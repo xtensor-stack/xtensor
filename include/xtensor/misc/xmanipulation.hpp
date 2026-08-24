@@ -214,7 +214,7 @@ namespace xt
         template <class E, class S, class X>
         inline void compute_transposed_strides(E&& e, const S& shape, X& strides)
         {
-            if constexpr (has_data_interface<std::decay_t<E>>::value)
+            if constexpr (data_interface_expression<std::decay_t<E>>)
             {
                 std::copy(e.strides().crbegin(), e.strides().crend(), strides.begin());
             }

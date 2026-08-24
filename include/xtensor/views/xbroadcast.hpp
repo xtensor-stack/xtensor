@@ -124,7 +124,7 @@ namespace xt
      *************************************/
 
     template <xbroadcast_concept E>
-        requires(without_memory_address_concept<E>)
+        requires(!addressable_to_expression<std::decay_t<E>>)
     struct overlapping_memory_checker_traits<E>
     {
         static bool check_overlap(const E& expr, const memory_range& dst_range)

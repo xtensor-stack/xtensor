@@ -1058,8 +1058,13 @@ namespace xt
         , m_size(size_type(0))
         , m_step(step)
     {
+        if ((step > 0 && start_val >= stop_val) || (step < 0 && start_val <= stop_val))
+        {
+            m_size = 0;
+            return;
+        }
         size_type n = stop_val - start_val;
-        m_size = n / step + (((n < 0) ^ (step > 0)) && (n % step));
+        m_size = n / step + static_cast<bool>(n % step);
     }
 
     template <class T>

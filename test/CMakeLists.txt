@@ -231,6 +231,9 @@ endforeach()
 
 file(GLOB XTENSOR_PREPROCESS_FILES files/cppy_source/*.cppy)
 
+# Sanitizer support
+include(${CMAKE_SOURCE_DIR}/cmake/sanitizers.cmake)
+
 # This target should only be run when the test source files have been changed.
 add_custom_target(
     preprocess_cppy
@@ -258,6 +261,8 @@ foreach(filename IN LISTS COMMON_BASE XTENSOR_TESTS)
     endif()
     target_include_directories(${targetname} PRIVATE ${XTENSOR_INCLUDE_DIR})
     target_link_libraries(${targetname} PRIVATE xtensor doctest::doctest ${CMAKE_THREAD_LIBS_INIT})
+    target_compile_options(${targetname} PRIVATE  $<$<BOOL:USE_SANITIZER>:${SANITIZER_COMPILE_OPTIONS}>)
+    target_link_options(${targetname} PRIVATE  $<$<BOOL:USE_SANITIZER>:${SANITIZER_LINK_OPTIONS}>)
     add_custom_target(
         x${targetname}
         COMMAND ${targetname}
@@ -282,10 +287,30 @@ if(XTENSOR_USE_OPENMP)
     target_compile_definitions(test_xtensor_lib PRIVATE XTENSOR_USE_OPENMP)
 endif()
 
+target_compile_options(test_xtensor_lib PRIVATE  $<$<BOOL:USE_SANITIZER>:${SANITIZER_COMPILE_OPTIONS}>)
+target_link_options(test_xtensor_lib PRIVATE  $<$<BOOL:USE_SANITIZER>:${SANITIZER_LINK_OPTIONS}>)
+
+# doctest's String union + MSan libc interceptors (strlen/strcmp) cause
+# false-positive use-of-uninitialized-value reports during reporter
+# registration and exception formatting. These cannot be suppressed at the
+# attribute level because MSan's libc interceptors check memory regardless
+# of calling-function attributes. The combined convenience binary therefore
+# opts out of MSan instrumentation so the xtest target can complete.
+# Individual per-test executables (test_xarray, test_xview, etc.) remain
+# fully instrumented and are the correct targets for MSan CI validation.
+if(USE_SANITIZER MATCHES "memory")
+  target_compile_options(test_xtensor_lib PRIVATE -fno-sanitize=memory)
+  target_link_options(test_xtensor_lib PRIVATE -fno-sanitize=memory)
+endif()
+
 target_include_directories(test_xtensor_lib PRIVATE ${XTENSOR_INCLUDE_DIR})
 target_link_libraries(test_xtensor_lib PRIVATE xtensor  doctest::doctest ${CMAKE_THREAD_LIBS_INIT})
 
-add_custom_target(xtest COMMAND test_xtensor_lib DEPENDS test_xtensor_lib)
+add_custom_target(
+  xtest
+  COMMAND $<TARGET_FILE:test_xtensor_lib>
+  DEPENDS test_xtensor_lib
+)
 add_test(NAME xtest COMMAND test_xtensor_lib)
 
 # Some files will be compiled twice, however compiling common files in a static

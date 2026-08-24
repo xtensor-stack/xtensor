@@ -87,7 +87,7 @@ namespace xt
 
         template <class E, class ST>
         struct provides_data_interface
-            : std::conjunction<has_data_interface<std::decay_t<E>>, std::negation<is_flat_expression_adaptor<ST>>>
+            : std::bool_constant<data_interface_expression<std::decay_t<E>> && !is_flat_expression_adaptor<ST>::value>
         {
         };
     }
@@ -278,7 +278,7 @@ namespace xt
 
         template <class CT, layout_type L>
         using flat_storage_getter = std::conditional_t<
-            has_data_interface<std::decay_t<CT>>::value,
+            data_interface_expression<std::decay_t<CT>>,
             inner_storage_getter<CT>,
             flat_adaptor_getter<CT, L>>;
 
@@ -654,7 +654,7 @@ namespace xt
     template <class O>
     inline bool xstrided_view_base<D>::has_linear_assign(const O& str) const noexcept
     {
-        return has_data_interface<xexpression_type>::value && str.size() == strides().size()
+        return data_interface_expression<xexpression_type> && str.size() == strides().size()
                && std::equal(str.cbegin(), str.cend(), strides().begin());
     }
 

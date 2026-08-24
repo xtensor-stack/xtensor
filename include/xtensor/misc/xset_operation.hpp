@@ -11,6 +11,7 @@
 #define XTENSOR_XSET_OPERATION_HPP
 
 #include <algorithm>
+#include <iterator>
 #include <type_traits>
 
 #include <xtl/xsequence.hpp>
@@ -93,7 +94,7 @@ namespace xt
      */
     template <class E, class F>
     inline auto isin(E&& element, F&& test_elements) noexcept
-        requires(has_iterator_interface_concept<F>)
+        requires(iterable_expression<F>)
     {
         auto lambda = detail::lambda_isin<std::is_lvalue_reference<F>::value>::make(std::forward<F>(test_elements
         ));
@@ -111,7 +112,7 @@ namespace xt
      * @param test_elements_end iterator to the end of an array
      * @return a boolean array
      */
-    template <class E, iterator_concept I>
+    template <class E, std::forward_iterator I>
     inline auto isin(E&& element, I&& test_elements_begin, I&& test_elements_end) noexcept
     {
         auto lambda = [&test_elements_begin, &test_elements_end](const auto& t)
@@ -150,7 +151,7 @@ namespace xt
      */
     template <class E, class F>
     inline auto in1d(E&& element, F&& test_elements) noexcept
-        requires(has_iterator_interface_concept<F>)
+        requires(iterable_expression<F>)
     {
         XTENSOR_ASSERT(element.dimension() == 1ul);
         XTENSOR_ASSERT(test_elements.dimension() == 1ul);
@@ -168,7 +169,7 @@ namespace xt
      * @param test_elements_end iterator to the end of an array
      * @return a boolean array
      */
-    template <class E, iterator_concept I>
+    template <class E, std::forward_iterator I>
     inline auto in1d(E&& element, I&& test_elements_begin, I&& test_elements_end) noexcept
     {
         XTENSOR_ASSERT(element.dimension() == 1ul);

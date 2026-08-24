@@ -499,7 +499,7 @@ namespace xt
             {
                 // trim off extra indices if provided to match behavior of containers
                 auto dim_offset = std::distance(first, last) - std::get<0>(t).dimension();
-                size_t axis_dim = *(first + axis + dim_offset);
+                std::size_t axis_dim = *(first + axis + dim_offset);
                 auto match = [&](auto& arr)
                 {
                     if (axis_dim >= arr.shape()[axis])
@@ -512,16 +512,16 @@ namespace xt
 
                 auto get = [&](auto& arr)
                 {
-                    size_t offset = 0;
-                    const size_t end = arr.dimension();
-                    for (size_t i = 0; i < end; i++)
+                    std::size_t offset = 0;
+                    const std::size_t end = arr.dimension();
+                    for (std::size_t i = 0; i < end; i++)
                     {
                         const auto& shape = arr.shape();
-                        const size_t stride = std::accumulate(
+                        const std::size_t stride = std::accumulate(
                             shape.begin() + i + 1,
                             shape.end(),
-                            1,
-                            std::multiplies<size_t>()
+                            size_t(1),
+                            std::multiplies<std::size_t>()
                         );
                         if (i == axis)
                         {
@@ -563,21 +563,21 @@ namespace xt
             {
                 auto get_item = [&](auto& arr)
                 {
-                    size_t offset = 0;
-                    const size_t end = arr.dimension();
-                    size_t after_axis = 0;
-                    for (size_t i = 0; i < end; i++)
+                    std::size_t offset = 0;
+                    const std::size_t end = arr.dimension();
+                    std::size_t after_axis = 0;
+                    for (std::size_t i = 0; i < end; i++)
                     {
                         if (i == axis)
                         {
                             after_axis = 1;
                         }
                         const auto& shape = arr.shape();
-                        const size_t stride = std::accumulate(
+                        const std::size_t stride = std::accumulate(
                             shape.begin() + static_cast<std::ptrdiff_t>(i) + 1,
                             shape.end(),
-                            size_t(1),
-                            std::multiplies<size_t>()
+                            std::size_t(1),
+                            std::multiplies<std::size_t>()
                         );
                         const auto len = (*(first + static_cast<std::ptrdiff_t>(i + after_axis)));
                         offset += len * stride;
