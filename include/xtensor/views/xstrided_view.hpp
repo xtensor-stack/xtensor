@@ -179,8 +179,13 @@ namespace xt
         using simd_value_type = xt_simd::simd_type<value_type>;
         using bool_load_type = typename base_type::bool_load_type;
 
+        // load_simd/store_simd take the address of the flat storage, which requires the
+        // storage to expose lvalue references (not the case for lazy expressions wrapped
+        // in a flat_expression_adaptor).
         static constexpr bool provides_simd_interface = has_simd_interface<xexpression_type>::value
-                                                        && L != layout_type::dynamic;
+                                                        && L != layout_type::dynamic
+                                                        && std::is_lvalue_reference_v<
+                                                            decltype(std::declval<const storage_type&>()[0])>;
 
         template <class CTA, class SA>
         xstrided_view(CTA&& e, SA&& shape, strides_type&& strides, std::size_t offset, layout_type layout) noexcept;
