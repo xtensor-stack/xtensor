@@ -1,0 +1,183 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: Type of version bump
+        required: true
+        default: patch
+        type: choice
+        options:
+        - patch
+        - minor
+        - major
+      custom_version:
+        description: Custom version (optional, overrides version_type)
+        required: false
+        type: string
+      prerelease:
+        description: Create a prerelease
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v6
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Determine version
+      id: version
+      run: |
+        if [ -n "${{ github.event.inputs.custom_version }}" ]; then
+          BASE_VERSION="${{ github.event.inputs.custom_version }}"
+        else
+          # Get current version from header file
+          if [ ! -f "include/xtensor/core/xtensor_config.hpp" ]; then
+            echo "Error: xtensor_config.hpp not found"
+            exit 1
+          fi
+
+          CURRENT_MAJOR=$(grep "#define XTENSOR_VERSION_MAJOR" include/xtensor/core/xtensor_config.hpp | awk '{print $3}')
+          CURRENT_MINOR=$(grep "#define XTENSOR_VERSION_MINOR" include/xtensor/core/xtensor_config.hpp | awk '{print $3}')
+          CURRENT_PATCH=$(grep "#define XTENSOR_VERSION_PATCH" include/xtensor/core/xtensor_config.hpp | awk '{print $3}')
+
+          # Verify version numbers were found
+          if [ -z "$CURRENT_MAJOR" ] || [ -z "$CURRENT_MINOR" ] || [ -z "$CURRENT_PATCH" ]; then
+            echo "Error: Could not parse current version from header file"
+            exit 1
+          fi
+
+          echo "Current version: ${CURRENT_MAJOR}.${CURRENT_MINOR}.${CURRENT_PATCH}"
+
+          case "${{ github.event.inputs.version_type }}" in
+            "major")
+              BASE_VERSION="$((CURRENT_MAJOR + 1)).0.0"
+              ;;
+            "minor")
+              BASE_VERSION="${CURRENT_MAJOR}.$((CURRENT_MINOR + 1)).0"
+              ;;
+            "patch")
+              BASE_VERSION="${CURRENT_MAJOR}.${CURRENT_MINOR}.$((CURRENT_PATCH + 1))"
+              ;;
+          esac
+        fi
+
+        # Handle prerelease
+        if [ "${{ github.event.inputs.prerelease }}" = "true" ]; then
+          # Find existing prerelease tags for this version
+          EXISTING_TAGS=$(git tag -l "${BASE_VERSION}_r*" | sort -V)
+
+          if [ -z "$EXISTING_TAGS" ]; then
+            # No existing prereleases, start with _r0
+            PRERELEASE_NUM=0
+          else
+            # Get the highest prerelease number and increment
+            LAST_TAG=$(echo "$EXISTING_TAGS" | tail -n 1)
+            PRERELEASE_NUM=$(echo "$LAST_TAG" | sed "s/${BASE_VERSION}_r//" | sed 's/^0*//')
+            if [ -z "$PRERELEASE_NUM" ]; then
+              PRERELEASE_NUM=0
+            fi
+            PRERELEASE_NUM=$((PRERELEASE_NUM + 1))
+          fi
+
+          FINAL_VERSION="${BASE_VERSION}_r${PRERELEASE_NUM}"
+          echo "is_prerelease=true" >> $GITHUB_OUTPUT
+        else
+          FINAL_VERSION="$BASE_VERSION"
+          echo "is_prerelease=false" >> $GITHUB_OUTPUT
+        fi
+
+        echo "Final version: $FINAL_VERSION"
+        echo "version=$FINAL_VERSION" >> $GITHUB_OUTPUT
+        echo "base_version=$BASE_VERSION" >> $GITHUB_OUTPUT
+
+    - name: Update changelog
+      if: steps.version.outputs.is_prerelease == 'false'
+      env:
+        VERSION: ${{ steps.version.outputs.version }}
+      run: |
+        python3 - <<'EOF'
+        import os, pathlib, re, subprocess
+
+        version = os.environ["VERSION"]
+        changelog = pathlib.Path("docs/source/changelog.rst")
+
+        # Last non-prerelease tag (tags are exactly Major.minor.patch)
+        tags = subprocess.check_output(
+            ["git", "tag", "-l", "[0-9]*.[0-9]*.[0-9]*", "--sort=-v:refname"],
+            text=True).strip().splitlines()
+        if not tags:
+            print("Error: no previous release tag found")
+            exit(1)
+        last_tag = tags[0]
+
+        # Commit subjects since the last release, oldest first
+        subjects = subprocess.check_output(
+            ["git", "log", "--no-merges", "--reverse", "--pretty=format:%s", f"{last_tag}..HEAD"],
+            text=True).strip().splitlines()
+
+        lines = [version, "------", ""]
+        for s in subjects:
+            m = re.match(r"^(.*?) \(#(\d+)\)$", s)
+            if m:
+                lines.append(f"- {m.group(1)}")
+                lines.append(f"  `# {m.group(2)} https://github.com/xtensor-stack/xtensor/pull/{m.group(2)}`")
+            else:
+                lines.append(f"- {s}")
+
+        text = changelog.read_text()
+        marker = "=========\n\n"
+        head, sep, tail = text.partition(marker)
+        if not sep:
+            print("Error: changelog header not found")
+            exit(1)
+        changelog.write_text(head + sep + "\n".join(lines) + "\n\n" + tail)
+        print(f"Added {len(subjects)} commits to changelog for version {version}")
+        EOF
+
+    - name: Update version in header file
+      run: |
+        BASE_VERSION="${{ steps.version.outputs.base_version }}"
+        IFS='.' read -r NEW_MAJOR NEW_MINOR NEW_PATCH <<< "$BASE_VERSION"
+
+        # Only update header file for non-prerelease versions
+        if [ "${{ steps.version.outputs.is_prerelease }}" = "false" ]; then
+          # Update version numbers in header file
+          sed -i "s/^#define XTENSOR_VERSION_MAJOR [0-9]*/#define XTENSOR_VERSION_MAJOR $NEW_MAJOR/" include/xtensor/core/xtensor_config.hpp
+          sed -i "s/^#define XTENSOR_VERSION_MINOR [0-9]*/#define XTENSOR_VERSION_MINOR $NEW_MINOR/" include/xtensor/core/xtensor_config.hpp
+          sed -i "s/^#define XTENSOR_VERSION_PATCH [0-9]*/#define XTENSOR_VERSION_PATCH $NEW_PATCH/" include/xtensor/core/xtensor_config.hpp
+
+          git config --local user.name "GitHub Action"
+          git add include/xtensor/core/xtensor_config.hpp docs/source/changelog.rst
+          git commit -m "Release version ${{ steps.version.outputs.version }}"
+        else
+          echo "Skipping header file update for prerelease"
+          git config --local user.name "GitHub Action"
+        fi
+
+    - name: Create tag
+      run: |
+        git tag -a "${{ steps.version.outputs.version }}" -m "Release version ${{ steps.version.outputs.version }}"
+
+    - name: Push changes and tag
+      run: |
+        git push origin master
+        git push origin "${{ steps.version.outputs.version }}"
+
+    - name: Create GitHub Release
+      uses: elgohr/Github-Release-Action@v5
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        title: Release ${{ steps.version.outputs.version }}
+        tag: ${{ steps.version.outputs.version }}
+        prerelease: ${{ steps.version.outputs.is_prerelease }}
