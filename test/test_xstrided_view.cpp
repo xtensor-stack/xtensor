@@ -723,6 +723,29 @@ namespace xt
         EXPECT_TRUE(std::equal(nv.shape().begin(), nv.shape().end(), expected_shape.begin()));
     }
 
+    TEST(xstrided_view, reshape_view_lazy_expression)
+    {
+        const std::size_t G = 8, N = 4;
+        xtensor<double, 1> w = xt::arange<double>(G) + 1.0;
+        xtensor<double, 2> Phi = 3.0 * xt::ones<double>({G, N});
+
+        // reshape_view over a lazy expression must not enable the SIMD assign path,
+        // which takes the address of the (computed) flat storage.
+        auto col = xt::reshape_view(w * w, {G, std::size_t(1)});
+        xtensor<double, 2> out = Phi * col;
+
+#if XTENSOR_USE_XSIMD
+        using lazy_traits = xassign_traits<xtensor<double, 2>, decltype(Phi * col)>;
+        EXPECT_FALSE(lazy_traits::simd_linear_assign());
+
+        auto colc = xt::reshape_view(w, {G, std::size_t(1)});
+        using cont_traits = xassign_traits<xtensor<double, 2>, decltype(Phi * colc)>;
+        EXPECT_TRUE(cont_traits::simd_linear_assign());
+#endif
+
+        EXPECT_EQ(108.0, out(5, 2));
+    }
+
     TEST(xstrided_view, reshape_view_assign)
     {
         xarray<int, layout_type::column_major> xa = {{1, 2, 3}, {4, 5, 6}};
