@@ -100,6 +100,50 @@ jobs:
         echo "version=$FINAL_VERSION" >> $GITHUB_OUTPUT
         echo "base_version=$BASE_VERSION" >> $GITHUB_OUTPUT
 
+    - name: Update changelog
+      if: steps.version.outputs.is_prerelease == 'false'
+      env:
+        VERSION: ${{ steps.version.outputs.version }}
+      run: |
+        python3 - <<'EOF'
+        import os, pathlib, re, subprocess
+
+        version = os.environ["VERSION"]
+        changelog = pathlib.Path("docs/source/changelog.rst")
+
+        # Last non-prerelease tag (tags are exactly Major.minor.patch)
+        tags = subprocess.check_output(
+            ["git", "tag", "-l", "[0-9]*.[0-9]*.[0-9]*", "--sort=-v:refname"],
+            text=True).strip().splitlines()
+        if not tags:
+            print("Error: no previous release tag found")
+            exit(1)
+        last_tag = tags[0]
+
+        # Commit subjects since the last release, oldest first
+        subjects = subprocess.check_output(
+            ["git", "log", "--no-merges", "--reverse", "--pretty=format:%s", f"{last_tag}..HEAD"],
+            text=True).strip().splitlines()
+
+        lines = [version, "------", ""]
+        for s in subjects:
+            m = re.match(r"^(.*?) \(#(\d+)\)$", s)
+            if m:
+                lines.append(f"- {m.group(1)}")
+                lines.append(f"  `# {m.group(2)} https://github.com/xtensor-stack/xtensor/pull/{m.group(2)}`")
+            else:
+                lines.append(f"- {s}")
+
+        text = changelog.read_text()
+        marker = "=========\n\n"
+        head, sep, tail = text.partition(marker)
+        if not sep:
+            print("Error: changelog header not found")
+            exit(1)
+        changelog.write_text(head + sep + "\n".join(lines) + "\n\n" + tail)
+        print(f"Added {len(subjects)} commits to changelog for version {version}")
+        EOF
+
     - name: Update version in header file
       run: |
         BASE_VERSION="${{ steps.version.outputs.base_version }}"
@@ -113,7 +157,7 @@ jobs:
           sed -i "s/^#define XTENSOR_VERSION_PATCH [0-9]*/#define XTENSOR_VERSION_PATCH $NEW_PATCH/" include/xtensor/core/xtensor_config.hpp
 
           git config --local user.name "GitHub Action"
-          git add include/xtensor/core/xtensor_config.hpp
+          git add include/xtensor/core/xtensor_config.hpp docs/source/changelog.rst
           git commit -m "Release version ${{ steps.version.outputs.version }}"
         else
           echo "Skipping header file update for prerelease"
