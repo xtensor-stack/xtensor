@@ -1,0 +1,28 @@
+var group__xt__xmanipulation =
+[
+    [ "xt::atleast_1d", "group__xt__xmanipulation.html#ga220444924c684f9f2afbc3384a8ff09e", null ],
+    [ "xt::atleast_2d", "group__xt__xmanipulation.html#gae2392e470cec79a918e975987d431c54", null ],
+    [ "xt::atleast_3d", "group__xt__xmanipulation.html#gaf9edf6c754946e30b77d9617852ed15c", null ],
+    [ "xt::atleast_Nd", "group__xt__xmanipulation.html#ga66c613dc60a31ca07c28b45337ee59b7", null ],
+    [ "xt::expand_dims", "group__xt__xmanipulation.html#gabe8cb55041a20cb995a15c599b7a2bc2", null ],
+    [ "xt::flatten", "group__xt__xmanipulation.html#ga10a975d3b718bfaf8ecf1db8072a0a0c", null ],
+    [ "xt::flip", "group__xt__xmanipulation.html#gad4b24c51356470db0a22b0c6c7d7611d", null ],
+    [ "xt::flip", "group__xt__xmanipulation.html#ga4bf31ad3a5950024a3825118f9f6a4e7", null ],
+    [ "xt::hsplit", "group__xt__xmanipulation.html#gaf342a194380b6c7bbc7f2c89f4e88317", null ],
+    [ "xt::moveaxis", "group__xt__xmanipulation.html#ga2d8bcbb846f2efae57cf6fb4aa24625a", null ],
+    [ "xt::ravel", "group__xt__xmanipulation.html#ga52d3b08fa67fe8c498e4271fca338e28", null ],
+    [ "xt::repeat", "group__xt__xmanipulation.html#ga0061839371ca8e1f29c37e812dee9ad1", null ],
+    [ "xt::repeat", "group__xt__xmanipulation.html#ga86b343ba5d1f6150c418475a00e3d3c3", null ],
+    [ "xt::repeat", "group__xt__xmanipulation.html#ga7aba37875778e4c7a786cbe6ec909ef2", null ],
+    [ "xt::roll", "group__xt__xmanipulation.html#ga2211d25aea0f9a27855fb602419a365b", null ],
+    [ "xt::roll", "group__xt__xmanipulation.html#ga957635620a4f4c19c4ee0546c69fcb1d", null ],
+    [ "xt::rot90", "group__xt__xmanipulation.html#gab5a947902290cc80a26e8d091428497e", null ],
+    [ "xt::split", "group__xt__xmanipulation.html#gaad5c56f6a09fb0a6ebaa2ec6cf22cf5c", null ],
+    [ "xt::squeeze", "group__xt__xmanipulation.html#ga2734defabe45fcb86ed9545c1b033134", null ],
+    [ "xt::squeeze", "group__xt__xmanipulation.html#gafb20871153217193f33827b3b14e448a", null ],
+    [ "xt::swapaxes", "group__xt__xmanipulation.html#gaed086f2e402aa1e927f745fceae54018", null ],
+    [ "xt::transpose", "group__xt__xmanipulation.html#ga620b1159b15601a1fd9b2ddaa746225e", null ],
+    [ "xt::transpose", "group__xt__xmanipulation.html#gae8b37193755be9f7e4c0161a6d9f9b6b", null ],
+    [ "xt::trim_zeros", "group__xt__xmanipulation.html#ga938cc86961805cf29a1f68394922d9f7", null ],
+    [ "xt::vsplit", "group__xt__xmanipulation.html#gad25f3a38510304cf1e3489748a43812c", null ]
+];

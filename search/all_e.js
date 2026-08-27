@@ -1,0 +1,18 @@
+var searchData=
+[
+  ['pad_0',['pad',['../namespacext.html#a030cc6fd43c1f7a452a4ed069881a4fa',1,'xt::pad(E &amp;&amp;e, const std::vector&lt; std::vector&lt; S &gt; &gt; &amp;pad_width, pad_mode mode=pad_mode::constant, V constant_value=0)'],['../namespacext.html#abd5658ce24f2035e2175546c9ca6ec59',1,'xt::pad(E &amp;&amp;e, const std::vector&lt; S &gt; &amp;pad_width, pad_mode mode=pad_mode::constant, V constant_value=0)'],['../namespacext.html#ad10c047180a5ce9129d25c180369ad00',1,'xt::pad(E &amp;&amp;e, S pad_width, pad_mode mode=pad_mode::constant, V constant_value=0)']]],
+  ['pad_5fmode_1',['pad_mode',['../namespacext.html#aa9d095239ac8c959a5d0a5b7086b5ae7',1,'xt']]],
+  ['partition_2',['partition',['../group__xt__xsort.html#ga443845cd4d1992ae5e7ec155529b1636',1,'xt']]],
+  ['periodic_3',['periodic',['../classxt_1_1xconst__accessible.html#a1dd1a72839cb7dcfabf6dea0b496063f',1,'xt::xconst_accessible::periodic()'],['../classxt_1_1xaccessible.html#a90c93eeb3cad66cef7530552953e6e7f',1,'xt::xaccessible::periodic()'],['../classxt_1_1xoptional__assembly__base.html#a61c7afac1e9726c89f85140dfcddc142',1,'xt::xoptional_assembly_base::periodic(Args... args)'],['../classxt_1_1xoptional__assembly__base.html#a3591117d0afa205407673d7f22e224f7',1,'xt::xoptional_assembly_base::periodic(Args... args) const'],['../classxt_1_1xcontainer.html#a90c93eeb3cad66cef7530552953e6e7f',1,'xt::xcontainer::periodic()'],['../classxt_1_1xscalar.html#a84a54f6707451dc7d429c84c5c488f57',1,'xt::xscalar::periodic()'],['../classxt_1_1xaccessible.html#a1dd1a72839cb7dcfabf6dea0b496063f',1,'xt::xaccessible::periodic()'],['../classxt_1_1xfunction.html#aa7c15b82cd10fbdeeba85a95e566772f',1,'xt::xfunction::periodic()'],['../classxt_1_1xfunctor__applier__base.html#a90c93eeb3cad66cef7530552953e6e7f',1,'xt::xfunctor_applier_base::periodic(Args... args)'],['../classxt_1_1xfunctor__applier__base.html#a1dd1a72839cb7dcfabf6dea0b496063f',1,'xt::xfunctor_applier_base::periodic(Args... args) const'],['../classxt_1_1xmasked__view.html#a84a54f6707451dc7d429c84c5c488f57',1,'xt::xmasked_view::periodic(Args... args)'],['../classxt_1_1xmasked__view.html#a15ff96c4b34189c318d997ad987893b2',1,'xt::xmasked_view::periodic(Args... args) const']]],
+  ['plus_5fassign_4',['plus_assign',['../classxt_1_1xsemantic__base.html#a2e0e43309959f7d58b0117644d02615b',1,'xt::xsemantic_base']]],
+  ['point_20operations_5',['Nearest integer floating point operations',['../group__nearint__functions.html',1,'']]],
+  ['pointer_5fconcept_6',['pointer_concept',['../conceptxtl_1_1pointer__concept.html',1,'xtl']]],
+  ['pow_7',['pow',['../group__pow__functions.html#ga726d449a0411dabbe7451c38cec235ae',1,'xt::pow(E1 &amp;&amp;e1, E2 &amp;&amp;e2) noexcept -&gt; detail::xfunction_type_t&lt; math::pow_fun, E1, E2 &gt;'],['../group__pow__functions.html#ga9cf15362f1892675576f2298c01e2b6b',1,'xt::pow(E &amp;&amp;e) noexcept']]],
+  ['pow_5ffun_8',['pow_fun',['../structxt_1_1math_1_1pow__fun.html',1,'xt::math']]],
+  ['power_20functions_9',['Power functions',['../group__pow__functions.html',1,'']]],
+  ['precision_10',['precision',['../classxt_1_1print__options_1_1precision.html',1,'xt::print_options']]],
+  ['print_5foptions_5fimpl_11',['print_options_impl',['../structxt_1_1print__options_1_1print__options__impl.html',1,'xt::print_options']]],
+  ['prod_12',['prod',['../group__red__functions.html#ga90d729a5dc08b66740997ad3e7fdb0c1',1,'xt']]],
+  ['promote_5fshape_13',['promote_shape',['../structxt_1_1promote__shape.html',1,'xt']]],
+  ['promote_5fstrides_14',['promote_strides',['../structxt_1_1promote__strides.html',1,'xt']]]
+];
