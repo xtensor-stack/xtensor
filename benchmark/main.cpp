@@ -13,6 +13,13 @@
 #include "xtensor/containers/xarray.hpp"
 #include "xtensor/containers/xtensor.hpp"
 
+#ifdef XTENSOR_ENABLE_NUMPY_BENCHMARKS
+namespace xt::numpy
+{
+    void print_stats();
+}
+#endif
+
 #ifdef XTENSOR_USE_XSIMD
 #ifdef __GNUC__
 template <class T>
@@ -41,6 +48,9 @@ void print_stats()
 int main(int argc, char** argv)
 {
     print_stats();
+#ifdef XTENSOR_ENABLE_NUMPY_BENCHMARKS
+    xt::numpy::print_stats();
+#endif
     benchmark::Initialize(&argc, argv);
     if (benchmark::ReportUnrecognizedArguments(argc, argv))
     {
