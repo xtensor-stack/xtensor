@@ -392,7 +392,7 @@ namespace xt
 
         static constexpr bool simd_interface()
         {
-            return has_simd_interface<E1, requested_value_type>()
+            return data_interface_expression<E1> && has_simd_interface<E1, requested_value_type>()
                    && has_simd_interface<E2, requested_value_type>();
         }
 
