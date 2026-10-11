@@ -10,6 +10,7 @@
 #ifndef XTENSOR_SLICE_HPP
 #define XTENSOR_SLICE_HPP
 
+#include <algorithm>
 #include <cstddef>
 #include <map>
 #include <type_traits>
@@ -1506,6 +1507,8 @@ namespace xt
             m_indices[i] = m_raw_indices[i] < 0 ? static_cast<size_type>(shape) + m_raw_indices[i]
                                                 : m_raw_indices[i];
         }
+        std::sort(m_indices.begin(), m_indices.end());
+        m_inc.clear();
         size_type cum = size_type(0);
         size_type prev_cum = cum;
         for (std::size_t i = 0; i < sz; ++i)

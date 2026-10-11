@@ -1259,6 +1259,55 @@ namespace xt
         EXPECT_EQ(a(1, 1, 1), 456);
     }
 
+    TEST(xview, drop_unsorted)
+    {
+        xtensor<int, 1> a = {0, 1, 2, 3, 4, 5};
+        xtensor<int, 1> expected = {1, 3, 4, 5};
+        auto v = xt::view(a, drop(2, 0));
+        EXPECT_EQ(v, expected);
+        test_view_iter(v, expected);
+
+        std::vector<std::ptrdiff_t> indices = {2, 0};
+        xtensor<int, 1> result = xt::view(a, drop(indices));
+        EXPECT_EQ(result, expected);
+
+        xtensor<int, 1> kept = xt::view(a, keep(2, 0));
+        xtensor<int, 1> expected_kept = {2, 0};
+        EXPECT_EQ(kept, expected_kept);
+
+        v = -1;
+        xtensor<int, 1> expected_a = {0, -1, 2, -1, -1, -1};
+        EXPECT_EQ(a, expected_a);
+    }
+
+    TEST(xview, drop_unsorted_negative)
+    {
+        xtensor<int, 2> a = {{0, 1, 2, 3, 4, 5}, {6, 7, 8, 9, 10, 11}};
+        xtensor<int, 2> expected = {{1, 2, 3, 4}, {7, 8, 9, 10}};
+        auto v = xt::view(a, all(), drop(-1, 0));
+        EXPECT_EQ(v, expected);
+        test_view_iter(v, expected);
+
+        xtensor<int, 2> result = v;
+        EXPECT_EQ(result, expected);
+    }
+
+    TEST(xview, drop_normalize_reuse)
+    {
+        auto slice = drop(-2, -1);
+        slice.normalize(4);
+        EXPECT_EQ(slice.size(), 2);
+        EXPECT_EQ(slice(0), 0);
+        EXPECT_EQ(slice(1), 1);
+
+        slice.normalize(6);
+        EXPECT_EQ(slice.size(), 4);
+        for (std::ptrdiff_t i = 0; i < slice.size(); ++i)
+        {
+            EXPECT_EQ(slice(i), i);
+        }
+    }
+
     TEST(xview, drop_negative)
     {
         xtensor<double, 3, layout_type::row_major> a = {
