@@ -536,7 +536,13 @@ namespace xt
             }
         );
 
-        return strided_view(std::forward<E>(e), std::move(new_shape), std::move(new_strides), 0, e.layout());
+        return strided_view(
+            std::forward<E>(e),
+            std::move(new_shape),
+            std::move(new_strides),
+            detail::get_offset<XTENSOR_DEFAULT_LAYOUT>(e),
+            e.layout()
+        );
     }
 
     namespace detail
@@ -559,7 +565,13 @@ namespace xt
                 }
             }
 
-            return strided_view(std::forward<E>(e), std::move(new_shape), std::move(new_strides), 0, e.layout());
+            return strided_view(
+                std::forward<E>(e),
+                std::move(new_shape),
+                std::move(new_strides),
+                detail::get_offset<XTENSOR_DEFAULT_LAYOUT>(e),
+                e.layout()
+            );
         }
 
         template <class E, class S>
