@@ -87,7 +87,7 @@ namespace xt
     {
         static bool check_overlap(const E&, const memory_range&)
         {
-            return false;
+            return true;
         }
     };
 
