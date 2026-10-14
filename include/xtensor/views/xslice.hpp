@@ -478,6 +478,9 @@ namespace xt
      * xt::view(a, xt::drop(0, 2); // => {{3, 4, 5}}
      * @endcode
      *
+     * The indices must be in increasing order after resolving negative indices
+     * relative to the sliced axis. The library does not sort or check their order.
+     *
      * @param indices The container of indices to drop
      * @return instance of xdrop_slice
      */
@@ -1506,6 +1509,7 @@ namespace xt
             m_indices[i] = m_raw_indices[i] < 0 ? static_cast<size_type>(shape) + m_raw_indices[i]
                                                 : m_raw_indices[i];
         }
+        m_inc.clear();
         size_type cum = size_type(0);
         size_type prev_cum = cum;
         for (std::size_t i = 0; i < sz; ++i)

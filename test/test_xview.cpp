@@ -1259,6 +1259,15 @@ namespace xt
         EXPECT_EQ(a(1, 1, 1), 456);
     }
 
+    TEST(xview, drop_normalize_reuse)
+    {
+        auto slice = drop(-2, -1);
+        slice.normalize(4);
+        EXPECT_EQ(slice(1), 1);
+        slice.normalize(6);
+        EXPECT_EQ(slice(2), 2);
+    }
+
     TEST(xview, drop_negative)
     {
         xtensor<double, 3, layout_type::row_major> a = {

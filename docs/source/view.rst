@@ -30,6 +30,12 @@ Slices can be specified in the following ways:
 - :cpp:func:`xt::keep(i0, i1, i2, ...) <xt::keep>` a slice selecting non-contiguous indices to keep on the underlying expression
 - :cpp:func:`xt::drop(i0, i1, i2, ...) <xt::drop>` a slice selecting non-contiguous indices to drop on the underlying expression
 
+For ``xt::drop``, indices must be in increasing order after resolving negative indices
+relative to the sliced axis. For an axis of size 6, ``xt::drop(0, -1)`` gives the ordered
+positions 0 and 5, whereas ``xt::drop(-1, 0)`` does not satisfy this requirement.
+The library does not sort or check the order. When reusing a slice with a different
+axis size, its resolved indices must still satisfy this requirement.
+
 .. code::
 
     #include <vector>
