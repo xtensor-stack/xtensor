@@ -100,7 +100,13 @@ if(DOWNLOAD_GBENCHMARK OR GBENCHMARK_SRC_DIR)
     set(GBENCHMARK_LIBRARIES benchmark)
 else()
     find_package(benchmark REQUIRED)
+    if(TARGET benchmark::benchmark)
+        set(GBENCHMARK_LIBRARIES benchmark::benchmark)
+    endif()
 endif()
+
+find_package(Eigen3 QUIET NO_MODULE)
+find_package(Armadillo QUIET)
 
 find_package(xsimd)
 if (xsimd_FOUND)
@@ -113,6 +119,7 @@ include_directories(${GBENCHMARK_INCLUDE_DIRS})
 
 set(XTENSOR_BENCHMARK
     benchmark_assign.cpp
+    benchmark_compare.cpp
     benchmark_builder.cpp
     benchmark_container.cpp
     benchmark_creation.cpp
@@ -134,6 +141,15 @@ set(XTENSOR_BENCHMARK
 set(XTENSOR_BENCHMARK_TARGET benchmark_xtensor)
 add_executable(${XTENSOR_BENCHMARK_TARGET} EXCLUDE_FROM_ALL ${XTENSOR_BENCHMARK} ${XTENSOR_HEADERS})
 target_link_libraries(${XTENSOR_BENCHMARK_TARGET} PUBLIC xtensor ${GBENCHMARK_LIBRARIES})
+if(Eigen3_FOUND)
+    target_compile_definitions(${XTENSOR_BENCHMARK_TARGET} PRIVATE XTENSOR_BENCHMARK_USE_EIGEN)
+    target_link_libraries(${XTENSOR_BENCHMARK_TARGET} PRIVATE Eigen3::Eigen)
+endif()
+if(ARMADILLO_FOUND)
+    target_compile_definitions(${XTENSOR_BENCHMARK_TARGET} PRIVATE XTENSOR_BENCHMARK_USE_ARMADILLO)
+    target_include_directories(${XTENSOR_BENCHMARK_TARGET} PRIVATE ${ARMADILLO_INCLUDE_DIRS})
+    target_link_libraries(${XTENSOR_BENCHMARK_TARGET} PRIVATE ${ARMADILLO_LIBRARIES})
+endif()
 
 if(XTENSOR_USE_TBB)
     target_compile_definitions(${XTENSOR_BENCHMARK_TARGET} PUBLIC XTENSOR_USE_TBB)

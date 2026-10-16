@@ -11,7 +11,9 @@
 #define XTENSOR_ASSIGN_HPP
 
 #include <algorithm>
+#include <array>
 #include <functional>
+#include <tuple>
 #include <type_traits>
 #include <utility>
 
@@ -57,6 +59,12 @@ namespace xt
 
     template <class E1, class E2>
     void strided_assign(E1& e1, const E2& e2, std::true_type /*enable*/);
+
+    template <class E1, class E2>
+    bool try_permutation_assign(E1&, const E2&)
+    {
+        return false;
+    }
 
     /************************
      * xexpression_assigner *
@@ -320,6 +328,187 @@ namespace xt
             static constexpr bool value = std::conjunction<use_strided_loop<std::decay_t<CT>>...>::value;
         };
 
+        template <class E, bool = !std::is_same<typename E::value_type, bool>::value, class = void>
+        struct runtime_plan_expression : std::false_type
+        {
+        };
+
+        template <class E>
+        struct runtime_plan_expression<E, true, std::void_t<decltype(std::declval<const E&>().storage().data())>>
+            : std::bool_constant<
+                  data_interface_expression<E> && std::is_arithmetic<typename E::value_type>::value
+                  && std::is_pointer<decltype(std::declval<const E&>().storage().data())>::value
+                  && std::is_same<
+                      std::remove_cv_t<std::remove_pointer_t<decltype(std::declval<const E&>().storage().data())>>,
+                      typename E::value_type>::value>
+        {
+        };
+
+        template <class T>
+        struct runtime_plan_expression<xscalar<T>, true, void>
+            : std::bool_constant<std::is_arithmetic<T>::value>
+        {
+        };
+
+        template <class F, class... CT>
+        struct runtime_plan_expression<xfunction<F, CT...>, true, void>
+            : std::conjunction<runtime_plan_expression<std::decay_t<CT>>...>
+        {
+        };
+
+        template <class E, bool = !std::is_same<typename E::value_type, bool>::value, class = void>
+        struct runtime_plan_output : std::false_type
+        {
+        };
+
+        template <class E>
+        struct runtime_plan_output<
+            E,
+            true,
+            std::void_t<decltype(std::declval<E&>().storage().data()), decltype(std::declval<E&>().data_offset())>>
+            : std::bool_constant<
+                  E::contiguous_layout && E::static_layout == layout_type::row_major
+                  && std::is_pointer<decltype(std::declval<E&>().storage().data())>::value
+                  && std::is_same<
+                      std::remove_cv_t<std::remove_pointer_t<decltype(std::declval<E&>().storage().data())>>,
+                      typename E::value_type>::value>
+        {
+        };
+
+        template <class E>
+        struct runtime_leaf_plan
+        {
+            using value_type = typename E::value_type;
+            const value_type* data;
+            std::array<std::ptrdiff_t, 3> strides;
+
+            value_type operator()(std::size_t i, std::size_t j, std::size_t k) const
+            {
+                const auto offset = static_cast<std::ptrdiff_t>(i) * strides[0]
+                                    + static_cast<std::ptrdiff_t>(j) * strides[1];
+                if (strides[2] == 0)
+                {
+                    return data[offset];
+                }
+                if (strides[2] == 1)
+                {
+                    return data[offset + static_cast<std::ptrdiff_t>(k)];
+                }
+                return data[offset + static_cast<std::ptrdiff_t>(k) * strides[2]];
+            }
+        };
+
+        template <class T>
+        struct runtime_scalar_plan
+        {
+            T value;
+
+            T operator()(std::size_t, std::size_t, std::size_t) const
+            {
+                return value;
+            }
+        };
+
+        template <class F, class P>
+        struct runtime_function_plan
+        {
+            F functor;
+            P arguments;
+
+            auto operator()(std::size_t i, std::size_t j, std::size_t k) const
+            {
+                return std::apply(
+                    [&](const auto&... argument)
+                    {
+                        return functor(argument(i, j, k)...);
+                    },
+                    arguments
+                );
+            }
+        };
+
+        template <class E>
+        struct runtime_plan_builder
+        {
+            static auto make(const E& expression)
+            {
+                std::array<std::ptrdiff_t, 3> strides = {0, 0, 0};
+                const std::size_t offset = 3 - expression.dimension();
+                for (std::size_t i = 0; i < expression.dimension(); ++i)
+                {
+                    if (expression.shape()[i] != 1)
+                    {
+                        strides[offset + i] = expression.strides()[i];
+                    }
+                }
+                return runtime_leaf_plan<E>{expression.storage().data() + expression.data_offset(), strides};
+            }
+        };
+
+        template <class T>
+        struct runtime_plan_builder<xscalar<T>>
+        {
+            static auto make(const xscalar<T>& expression)
+            {
+                return runtime_scalar_plan<T>{expression()};
+            }
+        };
+
+        template <class F, class... CT>
+        struct runtime_plan_builder<xfunction<F, CT...>>
+        {
+            using expression_type = xfunction<F, CT...>;
+
+            template <std::size_t... I>
+            static auto make(const expression_type& expression, std::index_sequence<I...>)
+            {
+                auto arguments = std::make_tuple(
+                    runtime_plan_builder<std::decay_t<decltype(std::get<I>(expression.arguments()))>>::make(
+                        std::get<I>(expression.arguments())
+                    )...
+                );
+                return runtime_function_plan<std::decay_t<F>, decltype(arguments)>{
+                    expression.functor(),
+                    std::move(arguments)
+                };
+            }
+
+            static auto make(const expression_type& expression)
+            {
+                return make(expression, std::index_sequence_for<CT...>{});
+            }
+        };
+
+        template <class E1, class E2>
+        bool try_runtime_plan(E1& dst, const E2& expression, bool trivial)
+        {
+            if (trivial)
+            {
+                return false;
+            }
+            if constexpr (runtime_plan_output<E1>::value && runtime_plan_expression<E2>::value)
+            {
+                if (dst.dimension() == 3 && expression.dimension() <= 3)
+                {
+                    auto plan = runtime_plan_builder<E2>::make(expression);
+                    auto* output = dst.storage().data() + dst.data_offset();
+                    std::size_t n = 0;
+                    for (std::size_t i = 0; i < dst.shape()[0]; ++i)
+                    {
+                        for (std::size_t j = 0; j < dst.shape()[1]; ++j)
+                        {
+                            for (std::size_t k = 0; k < dst.shape()[2]; ++k)
+                            {
+                                output[n++] = plan(i, j, k);
+                            }
+                        }
+                    }
+                    return true;
+                }
+            }
+            return false;
+        }
+
         /**
          * Considering the assignment LHS = RHS, if the requested value type used for
          * loading simd from RHS is not complex while LHS value_type is complex,
@@ -446,6 +635,11 @@ namespace xt
         E1& de1 = e1.derived_cast();
         const E2& de2 = e2.derived_cast();
         using traits = xassign_traits<E1, E2>;
+
+        if (try_permutation_assign(de1, de2) || detail::try_runtime_plan(de1, de2, trivial))
+        {
+            return;
+        }
 
         bool linear_assign = traits::linear_assign(de1, de2, trivial);
         constexpr bool simd_assign = traits::simd_assign();
@@ -1047,6 +1241,7 @@ namespace xt
             {
                 auto csf = check_strides_functor<layout_type::row_major, decltype(e1.strides())>(e1.strides());
                 cut = csf(e2);
+
                 // This makes that only one dimension will be treated in the inner loop.
                 if (cut < e1.strides().size() - 1)
                 {
@@ -1054,7 +1249,7 @@ namespace xt
                     cut = e1.strides().size() - 1;
                 }
             }
-            else if (!is_row_major)
+            else
             {
                 auto csf = check_strides_functor<layout_type::column_major, decltype(e1.strides())>(e1.strides()
                 );
@@ -1064,7 +1259,7 @@ namespace xt
                     // Only make the inner loop go over one dimension by default for now
                     cut = 1;
                 }
-            }  // can't reach here because this would have already triggered the fallback
+            }
 
             std::size_t outer_loop_size = static_cast<std::size_t>(std::accumulate(
                 e1.shape().begin(),
