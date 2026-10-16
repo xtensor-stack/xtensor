@@ -116,4 +116,83 @@ installation mode you choose, you can add *xtensor* to your project using cmake:
     target_include_directories(your_target PUBLIC ${xtensor_INCLUDE_DIRS})
     target_link_libraries(your_target PUBLIC xtensor)
 
+.. _header-migration:
+
+Migrating from xtensor 0.25 or earlier
+--------------------------------------
+
+Starting with xtensor 0.26, headers are organized into subdirectories by
+functionality. Includes such as ``#include <xtensor/xarray.hpp>`` must be
+updated to ``#include <xtensor/containers/xarray.hpp>``. The same change applies
+to includes written with double quotes.
+
+Common replacements are:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 45 55
+
+   * - Before 0.26
+     - Since 0.26
+   * - ``xtensor/xarray.hpp``
+     - ``xtensor/containers/xarray.hpp``
+   * - ``xtensor/xtensor.hpp``
+     - ``xtensor/containers/xtensor.hpp``
+   * - ``xtensor/xfixed.hpp``
+     - ``xtensor/containers/xfixed.hpp``
+   * - ``xtensor/xadapt.hpp``
+     - ``xtensor/containers/xadapt.hpp``
+   * - ``xtensor/xmath.hpp``
+     - ``xtensor/core/xmath.hpp``
+   * - ``xtensor/xeval.hpp``
+     - ``xtensor/core/xeval.hpp``
+   * - ``xtensor/xview.hpp``
+     - ``xtensor/views/xview.hpp``
+   * - ``xtensor/xstrided_view.hpp``
+     - ``xtensor/views/xstrided_view.hpp``
+   * - ``xtensor/xbuilder.hpp``
+     - ``xtensor/generators/xbuilder.hpp``
+   * - ``xtensor/xrandom.hpp``
+     - ``xtensor/generators/xrandom.hpp``
+   * - ``xtensor/xio.hpp``
+     - ``xtensor/io/xio.hpp``
+   * - ``xtensor/xnpy.hpp``
+     - ``xtensor/io/xnpy.hpp``
+   * - ``xtensor/xmanipulation.hpp``
+     - ``xtensor/misc/xmanipulation.hpp``
+   * - ``xtensor/xsort.hpp``
+     - ``xtensor/misc/xsort.hpp``
+   * - ``xtensor/xreducer.hpp``
+     - ``xtensor/reducers/xreducer.hpp``
+   * - ``xtensor/xnorm.hpp``
+     - ``xtensor/reducers/xnorm.hpp``
+
+For other headers, locate the filename under the installed ``include/xtensor``
+directory and use its path relative to ``include``. Update includes in your
+own headers as well as source files. Keep the compiler's include search path
+pointing to the parent of ``xtensor`` (typically ``<prefix>/include``); adding
+each new subdirectory to the search path does not replace updating the
+``#include`` directives. The CMake integration above supplies the include path.
+
+Also check the language standard and xtl dependency when upgrading:
+
+.. list-table::
+   :header-rows: 1
+
+   * - xtensor release
+     - C++ standard
+     - Minimum xtl version
+   * - 0.25.0
+     - C++14
+     - 0.7.5
+   * - 0.26.0
+     - C++17
+     - 0.8.0
+   * - 0.27.0
+     - C++20
+     - 0.8.0
+
+This addresses the header layout change; consult the :doc:`changelog` for other
+API and dependency changes in the release you are upgrading to.
+
 .. _xtl: https://github.com/xtensor-stack/xtl

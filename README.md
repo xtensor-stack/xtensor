@@ -33,7 +33,7 @@ Julia and R bindings, check out the [xtensor-python](https://github.com/xtensor-
 [xtensor-julia](https://github.com/xtensor-stack/Xtensor.jl) and
 [xtensor-r](https://github.com/xtensor-stack/xtensor-r) projects respectively.
 
-Up to version 0.26.0, `xtensor` requires a C++ compiler supporting C++14.
+Before version 0.26.0, `xtensor` requires a C++ compiler supporting C++14.
 `xtensor` 0.26.x requires a C++ compiler supporting C++17.
 `xtensor` 0.27.x requires a C++ compiler supporting C++20.
 
@@ -119,15 +119,19 @@ in `xtensor`. This can be done by defining the macro `XTENSOR_USE_XSIMD`
 
 ## Usage
 
+Upgrading from xtensor 0.25 or earlier? See the
+[header migration guide](https://xtensor.readthedocs.io/en/latest/installation.html#migrating-from-xtensor-0-25-or-earlier)
+for the include paths introduced in 0.26.
+
 ### Basic usage
 
 **Initialize a 2-D array and compute the sum of one of its rows and a 1-D array.**
 
 ```cpp
 #include <iostream>
-#include "xtensor/xarray.hpp"
-#include "xtensor/xio.hpp"
-#include "xtensor/xview.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/io/xio.hpp"
+#include "xtensor/views/xview.hpp"
 
 xt::xarray<double> arr1
   {{1.0, 2.0, 3.0},
@@ -152,8 +156,8 @@ Outputs:
 
 ```cpp
 #include <iostream>
-#include "xtensor/xarray.hpp"
-#include "xtensor/xio.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/io/xio.hpp"
 
 xt::xarray<int> arr
   {1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -175,8 +179,8 @@ Outputs:
 
 ```cpp
 #include <iostream>
-#include "xtensor/xarray.hpp"
-#include "xtensor/xio.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/io/xio.hpp"
 
 xt::xarray<double> arr1
   {{1.0, 2.0, 3.0},
