@@ -30,11 +30,9 @@ using Python's `buffer protocol`_. For more details on the NumPy bindings,
 check out the xtensor-python_ project. Language bindings for R and Julia are
 also available.
 
-*xtensor* requires a modern C++ compiler supporting C++14. The following C++
-compilers are supported:
-
-- On Windows platforms, Visual C++ 2015 Update 2, or more recent
-- On Unix platforms, gcc 4.9 or a recent version of Clang
+*xtensor* requires a C++ compiler supporting C++20. See
+:ref:`header-migration` for the requirements of earlier releases and how to
+update include paths when upgrading.
 
 Licensing
 ---------
