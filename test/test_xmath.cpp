@@ -885,6 +885,18 @@ namespace xt
         EXPECT_EQ(xt::average(v, w, {0, 1})(), m);
     }
 
+    TEST(xmath, variance_ddof)
+    {
+        xt::xtensor<double, 2> v = {{1.0, 3.0, 5.0}, {2.0, 4.0, 6.0}};
+        xt::xtensor<double, 1> v1_ddof1 = {4.0, 4.0};
+        xt::xtensor<double, 1> v1_ddof2 = {8.0, 8.0};
+        std::vector<std::size_t> axes = {1};
+
+        EXPECT_TRUE(xt::all(xt::equal(xt::variance(v, {1}, 1), v1_ddof1)));
+        EXPECT_TRUE(xt::all(xt::equal(xt::variance(v, {1}, 2), v1_ddof2)));
+        EXPECT_TRUE(xt::all(xt::equal(xt::variance(v, axes, 2), v1_ddof2)));
+    }
+
     /************************
      * Linear interpolation *
      ************************/
