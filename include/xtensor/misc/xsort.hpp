@@ -101,7 +101,7 @@ namespace xt
 
             const auto begin1 = e1.data();
             const auto end1 = begin1 + n_iters * secondary_stride1;
-            const auto begin2 = e2.data();
+            const auto begin2 = e2.data() + e2.data_offset();
             const auto end2 = begin2 + n_iters * secondary_stride2;
             auto iter1 = begin1;
             auto iter2 = begin2;
