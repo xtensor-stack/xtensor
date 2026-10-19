@@ -1457,6 +1457,26 @@ namespace xt
         EXPECT_EQ(static_cast<std::size_t>(doe2), do2);
     }
 
+    TEST(xview, multiple_leading_newaxis_data_offset)
+    {
+        xarray<int, layout_type::row_major> a = {{0, 1}, {2, 3}};
+        auto v = view(a, newaxis(), newaxis(), range(1, 2), all());
+
+        view_shape_type expected_shape = {1, 1, 1, 2};
+        EXPECT_EQ(v.shape(), expected_shape);
+        EXPECT_EQ(v.data_offset(), size_t(2));
+        EXPECT_EQ(v(0, 0, 0, 0), 2);
+        EXPECT_EQ(v(0, 0, 0, 1), 3);
+
+        xarray<int> copied = v;
+        xarray<int> expected_copy = {{{{2, 3}}}};
+        EXPECT_EQ(copied, expected_copy);
+
+        v = 100;
+        xarray<int> expected_parent = {{0, 1}, {100, 100}};
+        EXPECT_EQ(a, expected_parent);
+    }
+
     TEST(xview, view_simd_test)
     {
         if (XTENSOR_DEFAULT_LAYOUT == layout_type::row_major)
