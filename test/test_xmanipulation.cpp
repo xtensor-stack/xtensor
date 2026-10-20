@@ -300,6 +300,19 @@ namespace xt
         EXPECT_EQ(sq3(2, 2, 0, 1, 0, 2), b(2, 2, 0, 0, 1, 0, 2));
     }
 
+    TEST(xmanipulation, squeeze_offset)
+    {
+        xtensor<int, 2> a = {{1, 2, 3}};
+        xtensor<int, 1> expected = {2, 3};
+
+        EXPECT_EQ(squeeze(view(a, all(), range(1, 3))), expected);
+        EXPECT_EQ(squeeze(view(a, all(), range(1, 3)), 0, check_policy::full()), expected);
+
+        auto expression = view(a, all(), range(1, 3)) + 0;
+        EXPECT_EQ(squeeze(expression), expected);
+        EXPECT_EQ(squeeze(expression, 0, check_policy::full()), expected);
+    }
+
     TEST(xmanipulation, expand_dims)
     {
         auto b = xt::xarray<double>::from_shape({3, 3});
