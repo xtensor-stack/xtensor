@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <limits>
+#include <sstream>
 #include <type_traits>
 
 #include "xtensor/core/xexpression.hpp"
@@ -94,6 +95,20 @@ namespace xt
             res = scalar_near(*iter1++, *iter2++);
         }
         return res;
+    }
+
+    template <class E>
+    std::string stream_output(const E& expression)
+    {
+        std::stringstream out;
+        out << expression;
+        return out.str();
+    }
+
+    template <class E>
+    bool has_stream_output(const E& expression)
+    {
+        return !stream_output(expression).empty();
     }
 }
 

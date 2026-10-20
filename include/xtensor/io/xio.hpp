@@ -186,6 +186,18 @@ namespace xt
 
     namespace detail
     {
+        template <typename T, typename B>
+        inline auto printable_value(const xtl::xmasked_value<T, B>& value)
+        {
+            return +value;
+        }
+
+        template <typename T>
+        inline const T& printable_value(const T& value)
+        {
+            return value;
+        }
+
         template <class E, class F>
         std::ostream& xoutput(
             std::ostream& out,
@@ -647,14 +659,7 @@ namespace xt
             void update(const_reference val)
             {
                 std::stringstream buf;
-                if constexpr (xtl::is_xmasked_value<value_type>::value)
-                {
-                    buf << +val;
-                }
-                else
-                {
-                    buf << val;
-                }
+                buf << printable_value(val);
                 std::string s = buf.str();
                 if (int(s.size()) > m_width)
                 {
