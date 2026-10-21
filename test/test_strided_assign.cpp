@@ -16,6 +16,8 @@
 #include "xtensor/core/xassign.hpp"
 #include "xtensor/core/xlayout.hpp"
 #include "xtensor/core/xnoalias.hpp"
+#include "xtensor/core/xoperation.hpp"
+#include "xtensor/views/xstrided_view.hpp"
 #include "xtensor/views/xview.hpp"
 
 #include "test_common.hpp"
@@ -193,6 +195,89 @@ namespace xt
                 auto result_expected = std::vector<double>{-1, -1, 3,  4,  -1, -1, 7,  8,  -1, -1,
                                                            11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
                 EXPECT_EQ(data, result_expected);
+            }
+        }
+    }
+
+    TEST(xassign_strided, transpose_cast_permutation_plan)
+    {
+        xarray<unsigned char, layout_type::row_major>
+            input = xarray<unsigned char, layout_type::row_major>::from_shape({4, 16, 3});
+        xarray<float, layout_type::row_major> result = xarray<float, layout_type::row_major>::from_shape(
+            {3, 4, 16}
+        );
+        for (std::size_t i = 0; i < input.size(); ++i)
+        {
+            input.storage()[i] = static_cast<unsigned char>(i % 251);
+        }
+
+        auto expression = cast<float>(transpose(input, {2, 0, 1})) / 255.0f;
+        noalias(result) = expression;
+
+        EXPECT_TRUE(try_permutation_assign(result, expression));
+        for (std::size_t c = 0; c < 3; ++c)
+        {
+            for (std::size_t i = 0; i < 4; ++i)
+            {
+                for (std::size_t j = 0; j < 16; ++j)
+                {
+                    EXPECT_EQ(result(c, i, j), static_cast<float>(input(i, j, c)) / 255.0f);
+                }
+            }
+        }
+
+        xarray<unsigned char, layout_type::row_major>
+            tiled_input = xarray<unsigned char, layout_type::row_major>::from_shape({4, 5, 2});
+        xarray<float, layout_type::row_major> tiled_result = xarray<float, layout_type::row_major>::from_shape(
+            {5, 4, 2}
+        );
+        for (std::size_t i = 0; i < tiled_input.size(); ++i)
+        {
+            tiled_input.storage()[i] = static_cast<unsigned char>(i);
+        }
+        auto tiled_expression = cast<float>(transpose(tiled_input, {1, 0, 2})) / 7.0f;
+        EXPECT_TRUE(try_permutation_assign(tiled_result, tiled_expression));
+        for (std::size_t i = 0; i < 5; ++i)
+        {
+            for (std::size_t j = 0; j < 4; ++j)
+            {
+                for (std::size_t c = 0; c < 2; ++c)
+                {
+                    EXPECT_EQ(tiled_result(i, j, c), static_cast<float>(tiled_input(j, i, c)) / 7.0f);
+                }
+            }
+        }
+    }
+
+    TEST(xassign_strided, runtime_broadcast_plan)
+    {
+        xarray<double, layout_type::row_major> x = xarray<double, layout_type::row_major>::from_shape({3, 4, 5});
+        xarray<double, layout_type::row_major> row = {1.0, 2.0, 3.0, 4.0, 5.0};
+        xarray<double, layout_type::row_major> column = xarray<double, layout_type::row_major>::from_shape(
+            {3, 1, 1}
+        );
+        xarray<double, layout_type::row_major> result = xarray<double, layout_type::row_major>::from_shape(
+            x.shape()
+        );
+        for (std::size_t i = 0; i < x.size(); ++i)
+        {
+            x.storage()[i] = static_cast<double>(i);
+        }
+        for (std::size_t i = 0; i < column.size(); ++i)
+        {
+            column.storage()[i] = static_cast<double>(i * 3);
+        }
+        auto expression = (x + row) * 1.5 - column;
+
+        EXPECT_TRUE(detail::try_runtime_plan(result, expression, false));
+        for (std::size_t i = 0; i < 3; ++i)
+        {
+            for (std::size_t j = 0; j < 4; ++j)
+            {
+                for (std::size_t k = 0; k < 5; ++k)
+                {
+                    EXPECT_EQ(result(i, j, k), (x(i, j, k) + row(k)) * 1.5 - column(i, 0, 0));
+                }
             }
         }
     }
