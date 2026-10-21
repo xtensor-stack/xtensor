@@ -252,6 +252,43 @@ namespace xt
 
     namespace detail
     {
+        template <class E>
+        inline bool is_dense_storage(const E& e)
+        {
+            if constexpr (strided_expression<E>)
+            {
+                const auto& shape = e.shape();
+                const auto& strides = e.strides();
+                using size_type = typename E::size_type;
+                size_type remaining = e.size();
+                size_type stride = 1;
+                // Custom strides can cover dense storage in any axis order.
+                while (remaining > 1)
+                {
+                    bool found = false;
+                    for (std::size_t axis = 0; axis < shape.size(); ++axis)
+                    {
+                        if (shape[axis] > 1 && std::cmp_equal(strides[axis], stride))
+                        {
+                            remaining /= shape[axis];
+                            stride *= shape[axis];
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found)
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         template <class E1, class E2>
         constexpr bool linear_static_layout()
         {
@@ -528,11 +565,22 @@ namespace xt
     {
         E1& d = e1.derived_cast();
         using size_type = typename E1::size_type;
-        auto dst = d.storage().begin();
-        for (size_type i = d.size(); i > 0; --i)
+        auto assign = [&](auto dst)
         {
-            *dst = f(*dst, e2);
-            ++dst;
+            const size_type n = d.size();
+            for (size_type i = 0; i < n; ++i)
+            {
+                *dst = f(*dst, e2);
+                ++dst;
+            }
+        };
+        if (E1::contiguous_layout || d.is_contiguous() || detail::is_dense_storage(d))
+        {
+            assign(d.storage().begin());
+        }
+        else
+        {
+            assign(d.begin());
         }
     }
 
