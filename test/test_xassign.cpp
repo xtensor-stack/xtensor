@@ -8,6 +8,7 @@
  ****************************************************************************/
 
 #include <iterator>
+#include <memory>
 #include <type_traits>
 #include <vector>
 
@@ -15,10 +16,57 @@
 #include "xtensor/containers/xtensor.hpp"
 #include "xtensor/core/xassign.hpp"
 #include "xtensor/core/xnoalias.hpp"
+#include "xtensor/generators/xbuilder.hpp"
 #include "xtensor/misc/xmanipulation.hpp"
 
 #include "test_common.hpp"
 #include "test_common_macros.hpp"
+
+namespace
+{
+    template <class T>
+    struct counting_allocator : std::allocator<T>
+    {
+        using value_type = T;
+        inline static std::size_t allocations = 0;
+
+        template <class U>
+        struct rebind
+        {
+            using other = counting_allocator<U>;
+        };
+
+        counting_allocator() = default;
+
+        template <class U>
+        counting_allocator(const counting_allocator<U>&)
+        {
+        }
+
+        T* allocate(std::size_t n)
+        {
+            ++allocations;
+            return std::allocator<T>::allocate(n);
+        }
+    };
+
+    struct reverse_reader
+    {
+        using value_type = int;
+        const xt::xarray<int>& source;
+
+        int operator()(std::size_t i) const
+        {
+            return source(source.size() - 1 - i);
+        }
+
+        template <class It>
+        int element(It first, It) const
+        {
+            return (*this)(*first);
+        }
+    };
+}
 
 // a dummy shape *not derived* from std::vector but compatible
 template <class T>
@@ -137,6 +185,57 @@ private:
 namespace xt
 {
 
+#ifndef XTENSOR_FORCE_TEMPORARY_MEMORY_IN_ASSIGNMENTS
+    TEST(xassign, independent_generator_reuses_storage)
+    {
+        using allocator = counting_allocator<double>;
+        using array = xtensor<double, 1, layout_type::row_major, allocator>;
+        array a = array::from_shape({16});
+
+        allocator::allocations = 0;
+        a = arange<double>(16);
+        EXPECT_EQ(allocator::allocations, 0u);
+        for (std::size_t i = 0; i < a.size(); ++i)
+        {
+            EXPECT_EQ(a(i), double(i));
+        }
+
+        allocator::allocations = 0;
+        a = linspace<double>(0., 15., 16);
+        EXPECT_EQ(allocator::allocations, 0u);
+        for (std::size_t i = 0; i < a.size(); ++i)
+        {
+            EXPECT_EQ(a(i), double(i));
+        }
+    }
+#endif
+
+    TEST(xassign, independent_generator_resizes)
+    {
+        xarray<double> a = {{-1., -1.}, {-1., -1.}};
+        a = arange<double>(5);
+        EXPECT_EQ(a.dimension(), 1u);
+        EXPECT_EQ(a.size(), 5u);
+        EXPECT_EQ(a(4), 4.);
+
+        a = arange<double>(0);
+        EXPECT_EQ(a.size(), 0u);
+        a = linspace<double>(2., 4., 3);
+        EXPECT_EQ(a, (xarray<double>{2., 3., 4.}));
+    }
+
+    TEST(xassign, reading_generators_keep_overlap_protection)
+    {
+        xarray<int> a = {1, 2, 3, 4};
+        auto reverse = detail::make_xgenerator(reverse_reader{a}, {4});
+        static_assert(!is_memory_independent<decltype(reverse)>::value);
+        a = reverse;
+        EXPECT_EQ(a, (xarray<int>{4, 3, 2, 1}));
+
+        a = concatenate(xtuple(a, a));
+        EXPECT_EQ(a, (xarray<int>{4, 3, 2, 1, 4, 3, 2, 1}));
+    }
+
     template <class T, class C_T>
     struct rebind_container<T, my_vector<C_T>>
     {
@@ -173,5 +272,7 @@ namespace xt
     {
         auto a = xt::xtensor<float, 1>::from_shape({2});
         XT_ASSERT_THROW(a = xt::expand_dims(a, 0), std::runtime_error);
+        auto b = xt::xtensor<float, 2>::from_shape({2, 2});
+        XT_ASSERT_THROW(b = arange<float>(4), std::runtime_error);
     }
 }

@@ -58,6 +58,11 @@ namespace xt
     template <class F, class R, class S>
     class xgenerator;
 
+    template <class F, class R, class S>
+    struct is_memory_independent<xgenerator<F, R, S>> : is_memory_independent<std::decay_t<F>>
+    {
+    };
+
     template <typename T>
     concept xgenerator_concept = is_specialization_of<xgenerator, std::decay_t<T>>::value;
 

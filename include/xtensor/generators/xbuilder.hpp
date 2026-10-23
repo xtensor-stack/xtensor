@@ -390,6 +390,12 @@ namespace xt
         };
     }
 
+    template <class T, class R, class S>
+    struct is_memory_independent<detail::arange_generator<T, R, S>>
+        : std::conjunction<std::is_arithmetic<T>, std::is_arithmetic<R>, std::is_arithmetic<S>>
+    {
+    };
+
     /**
      * Generates an array with ones on the diagonal.
      * @param shape shape of the resulting expression
