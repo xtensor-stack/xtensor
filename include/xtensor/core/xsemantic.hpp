@@ -682,7 +682,20 @@ namespace xt
     template <class E>
     inline auto xcontainer_semantic<D>::operator=(const xexpression<E>& e) -> derived_type&
     {
-        return base_type::operator=(e);
+#ifndef XTENSOR_FORCE_TEMPORARY_MEMORY_IN_ASSIGNMENTS
+        // Keep this optimization on containers: a view may benefit from first
+        // generating into a contiguous temporary with a specialized assign_to.
+        if constexpr (is_memory_independent<E>::value && D::contiguous_layout)
+        {
+            // Validate the shape before entering a generator's noexcept assign_to.
+            this->derived_cast().resize(e.derived_cast().shape());
+            return this->assign(e);
+        }
+        else
+#endif
+        {
+            return base_type::operator=(e);
+        }
     }
 
     /*********************************

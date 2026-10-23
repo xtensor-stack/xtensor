@@ -672,6 +672,16 @@ namespace xt
         return !(a == b);
     }
 
+    /**
+     * Whether evaluating a functor or expression is independent of array storage.
+     * Specialize only for types which cannot read from an assignment destination.
+     * Unknown types conservatively retain overlap protection.
+     */
+    template <class T>
+    struct is_memory_independent : std::false_type
+    {
+    };
+
     /*****************
      * assignable_to *
      ******************/

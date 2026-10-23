@@ -26,6 +26,22 @@ Numerical ranges
 - :cpp:func:`xt::linspace(start, stop, num_samples) <xt::linspace>`: generates num_samples evenly spaced numbers over given interval.
 - :cpp:func:`xt::logspace(start, stop, num_samples) <xt::logspace>`: generates num_samples evenly spaced on a log scale over given interval
 
+Assignment of independent generators
+-----------------------------------
+
+Assigning ``arange`` or ``linspace`` with arithmetic types to a contiguous
+container reuses its storage when the size is unchanged, without creating a
+temporary array. Views retain their existing assignment path, which can benefit
+from generating into a contiguous temporary first.
+
+Custom generator functors conservatively retain overlap protection. A functor
+which cannot read array storage can opt in by specializing
+``xt::is_memory_independent<Functor>`` to inherit from ``std::true_type``.
+``xgenerator`` forwards this trait from its functor, including reference-qualified
+functors. Do not opt in for functors that read other expressions, since those
+expressions can refer to the assignment destination. The option
+``XTENSOR_FORCE_TEMPORARY_MEMORY_IN_ASSIGNMENTS`` still forces temporary evaluation.
+
 Joining expressions
 -------------------
 
