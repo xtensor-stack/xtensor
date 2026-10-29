@@ -19,6 +19,7 @@
 #include <cmath>
 #include <cstddef>
 #include <functional>
+#include <iterator>
 #include <utility>
 #include <vector>
 
@@ -485,6 +486,28 @@ namespace xt
 
     namespace detail
     {
+        /**
+         * Returns the index along dimension @p d of a @p dim-dimensional expression,
+         * read from the indices in [first, last).
+         *
+         * As for containers, the indices are aligned on the last dimensions: extra
+         * leading indices are ignored and missing leading indices are 0. The indices
+         * may have a signed type (flat_expression_adaptor passes the result of
+         * unravel_index) but they are never negative.
+         */
+        template <class It>
+        inline std::size_t trailing_index(It first, It last, std::size_t dim, std::size_t d)
+        {
+            using difference_type = typename std::iterator_traits<It>::difference_type;
+            // d < dim, so the distance from the end is in [1, dim].
+            const auto from_end = static_cast<difference_type>(dim - d);
+            if (std::distance(first, last) < from_end)
+            {
+                return 0;
+            }
+            return static_cast<std::size_t>(*(last - from_end));
+        }
+
         template <class... CT>
         class concatenate_access
         {
@@ -497,9 +520,8 @@ namespace xt
             template <class It>
             inline value_type access(const tuple_type& t, size_type axis, It first, It last) const
             {
-                // trim off extra indices if provided to match behavior of containers
-                auto dim_offset = std::distance(first, last) - std::get<0>(t).dimension();
-                std::size_t axis_dim = *(first + axis + dim_offset);
+                const size_type dim = std::get<0>(t).dimension();
+                size_type axis_dim = trailing_index(first, last, dim, axis);
                 auto match = [&](auto& arr)
                 {
                     if (axis_dim >= arr.shape()[axis])
@@ -512,28 +534,21 @@ namespace xt
 
                 auto get = [&](auto& arr)
                 {
-                    std::size_t offset = 0;
-                    const std::size_t end = arr.dimension();
-                    for (std::size_t i = 0; i < end; i++)
+                    size_type offset = 0;
+                    const auto& shape = arr.shape();
+                    for (size_type i = 0; i < dim; i++)
                     {
-                        const auto& shape = arr.shape();
-                        const std::size_t stride = std::accumulate(
-                            shape.begin() + i + 1,
+                        const size_type stride = std::accumulate(
+                            shape.begin() + static_cast<std::ptrdiff_t>(i) + 1,
                             shape.end(),
-                            size_t(1),
-                            std::multiplies<std::size_t>()
+                            size_type(1),
+                            std::multiplies<size_type>()
                         );
-                        if (i == axis)
-                        {
-                            offset += axis_dim * stride;
-                        }
-                        else
-                        {
-                            const auto len = (*(first + i + dim_offset));
-                            offset += len * stride;
-                        }
+                        const size_type index = i == axis ? axis_dim : trailing_index(first, last, dim, i);
+                        offset += index * stride;
                     }
-                    const auto element = arr.begin() + offset;
+                    // offset < arr.size(), so it fits in a ptrdiff_t.
+                    const auto element = arr.begin() + static_cast<std::ptrdiff_t>(offset);
                     return *element;
                 };
 
@@ -559,34 +574,31 @@ namespace xt
             using value_type = xtl::promote_type_t<typename std::decay_t<CT>::value_type...>;
 
             template <class It>
-            inline value_type access(const tuple_type& t, size_type axis, It first, It) const
+            inline value_type access(const tuple_type& t, size_type axis, It first, It last) const
             {
+                // The stacked expression has one more dimension than its operands.
+                const size_type dim = std::get<0>(t).dimension() + 1;
                 auto get_item = [&](auto& arr)
                 {
-                    std::size_t offset = 0;
-                    const std::size_t end = arr.dimension();
-                    std::size_t after_axis = 0;
-                    for (std::size_t i = 0; i < end; i++)
+                    size_type offset = 0;
+                    const auto& shape = arr.shape();
+                    for (size_type i = 0; i < arr.dimension(); i++)
                     {
-                        if (i == axis)
-                        {
-                            after_axis = 1;
-                        }
-                        const auto& shape = arr.shape();
-                        const std::size_t stride = std::accumulate(
+                        const size_type stride = std::accumulate(
                             shape.begin() + static_cast<std::ptrdiff_t>(i) + 1,
                             shape.end(),
-                            std::size_t(1),
-                            std::multiplies<std::size_t>()
+                            size_type(1),
+                            std::multiplies<size_type>()
                         );
-                        const auto len = (*(first + static_cast<std::ptrdiff_t>(i + after_axis)));
-                        offset += len * stride;
+                        // Dimensions of arr after the stacking axis are shifted by one.
+                        const size_type index = trailing_index(first, last, dim, i < axis ? i : i + 1);
+                        offset += index * stride;
                     }
+                    // offset < arr.size(), so it fits in a ptrdiff_t.
                     const auto element = arr.begin() + static_cast<std::ptrdiff_t>(offset);
                     return *element;
                 };
-                size_type i = *(first + static_cast<std::ptrdiff_t>(axis));
-                return apply<value_type>(i, get_item, t);
+                return apply<value_type>(trailing_index(first, last, dim, axis), get_item, t);
             }
         };
 
