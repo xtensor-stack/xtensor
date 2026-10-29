@@ -61,8 +61,10 @@ namespace xt
                     auto odd = radix2(xt::view(ev, xt::range(1, _, 2)));
 #endif
 
-                    auto range = xt::arange<double>(static_cast<double>(N) / 2);
-                    auto exp = xt::exp(static_cast<value_type>(-2i) * pi * range / N);
+                    // N is a power of 2, so it is exactly representable as a double.
+                    const auto N_dbl = static_cast<double>(N);
+                    auto range = xt::arange<double>(N_dbl / 2);
+                    auto exp = xt::exp(static_cast<value_type>(-2i) * pi * range / N_dbl);
                     auto t = exp * odd;
                     auto first_half = even + t;
                     auto second_half = even - t;
@@ -90,7 +92,10 @@ namespace xt
                 xt::xtensor<std::size_t, 1> i = xt::pow(xt::linspace<std::size_t>(0, n - 1, n), 2);
                 i %= (n * 2);
 
-                auto angles = xt::eval(precision{3.141592653589793238463} * i / n);
+                // The angles are computed in precision, the integer operands are converted to it.
+                auto angles = xt::eval(
+                    xt::numeric_constants<precision>::PI * xt::cast<precision>(i) / static_cast<precision>(n)
+                );
                 auto j = std::complex<precision>(0, 1);
                 exp_table = xt::exp(-angles * j);
 
@@ -112,7 +117,8 @@ namespace xt
                 auto spectrum_k = xv * yv;
                 auto complex_args = xt::conj(spectrum_k);
                 auto fft_res = radix2(complex_args);
-                auto cv = xt::conj(fft_res) / m;
+                // m is a power of 2, so it is exactly representable in floating point.
+                auto cv = xt::conj(fft_res) / static_cast<precision>(m);
 
                 return xt::eval(xt::view(cv, xt::range(0, n)) * exp_table);
             }
@@ -226,7 +232,8 @@ namespace xt
             auto outvec = ifft(xv, axis);
 
             // Scaling (because this FFT implementation omits it)
-            outvec = outvec / n;
+            using precision = typename std::decay_t<decltype(outvec)>::value_type::value_type;
+            outvec = outvec / static_cast<precision>(n);
 
             return outvec;
         }

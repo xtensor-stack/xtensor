@@ -612,7 +612,7 @@ namespace xt
             {
                 XTENSOR_TRY(check_index(shape(), args...));
                 XTENSOR_CHECK_DIMENSION(shape(), args...);
-                return m_f(e(args...)...);
+                return m_f(e(static_cast<size_type>(args)...)...);
             },
             m_e
         );

@@ -77,7 +77,10 @@ namespace xt
         {
             XTENSOR_ASSERT(ev.dimension() >= 2);
 
-            const std::size_t n_iters = leading_axis_n_iters(ev);
+            // Pointer arithmetic needs a signed count. n_iters * secondary_stride is the
+            // size of the container (or the stride is 0 and n_iters does not matter),
+            // so n_iters fits in a ptrdiff_t.
+            const auto n_iters = static_cast<std::ptrdiff_t>(leading_axis_n_iters(ev));
             const std::ptrdiff_t secondary_stride = get_secondary_stride(ev);
 
             const auto begin = ev.data();
@@ -94,7 +97,8 @@ namespace xt
             XTENSOR_ASSERT(e1.dimension() >= 2);
             XTENSOR_ASSERT(e1.dimension() == e2.dimension());
 
-            const std::size_t n_iters = leading_axis_n_iters(e1);
+            // See above, n_iters fits in a ptrdiff_t.
+            const auto n_iters = static_cast<std::ptrdiff_t>(leading_axis_n_iters(e1));
             const std::ptrdiff_t secondary_stride1 = get_secondary_stride(e1);
             const std::ptrdiff_t secondary_stride2 = get_secondary_stride(e2);
             XTENSOR_ASSERT(secondary_stride1 == secondary_stride2);
@@ -306,29 +310,25 @@ namespace xt
             (void) idx_end;  // TODO(C++17) [[maybe_unused]] only used in assertion.
 
             std::iota(idx_begin, idx_end, 0);
+            // The indices are in [0, std::distance(data_begin, data_end)), so they fit in
+            // the difference type of the data iterator.
+            using difference_type = typename std::iterator_traits<ConstRandomIt>::difference_type;
+            auto index_comp = [&](const auto i, const auto j)
+            {
+                return comp(
+                    *(data_begin + static_cast<difference_type>(i)),
+                    *(data_begin + static_cast<difference_type>(j))
+                );
+            };
             switch (method)
             {
                 case (sorting_method::quick):
                 {
-                    std::sort(
-                        idx_begin,
-                        idx_end,
-                        [&](const auto i, const auto j)
-                        {
-                            return comp(*(data_begin + i), *(data_begin + j));
-                        }
-                    );
+                    std::sort(idx_begin, idx_end, index_comp);
                 }
                 case (sorting_method::stable):
                 {
-                    std::stable_sort(
-                        idx_begin,
-                        idx_end,
-                        [&](const auto i, const auto j)
-                        {
-                            return comp(*(data_begin + i), *(data_begin + j));
-                        }
-                    );
+                    std::stable_sort(idx_begin, idx_end, index_comp);
                 }
             }
         }
@@ -820,7 +820,7 @@ namespace xt
         template <class S, class I>
         inline auto select_indices(const S& shape, const I& indices, std::size_t axis)
         {
-            using index_type = get_strides_t<S>;
+            using index_type = xindex_type_t<S>;
             auto out = std::vector<index_type>();
             select_indices_impl(shape, indices, axis, 0, xtl::make_sequence<index_type>(shape.size()), out);
             return out;
@@ -832,7 +832,7 @@ namespace xt
         inline auto fancy_indexing(E&& e, const I& indices, std::ptrdiff_t axis)
         {
             const std::size_t ax = normalize_axis(e.dimension(), axis);
-            using shape_t = get_strides_t<typename std::decay_t<E>::shape_type>;
+            using shape_t = xindex_type_t<typename std::decay_t<E>::shape_type>;
             auto shape = xtl::forward_sequence<shape_t, decltype(e.shape())>(e.shape());
             shape[ax] = indices.size();
             return reshape_view(
@@ -907,7 +907,7 @@ namespace xt
         XTENSOR_ASSERT(0. <= beta);
         XTENSOR_ASSERT(beta <= 1.);
 
-        using tmp_shape_t = get_strides_t<typename std::decay_t<E>::shape_type>;
+        using tmp_shape_t = xindex_type_t<typename std::decay_t<E>::shape_type>;
         using id_t = typename tmp_shape_t::value_type;
 
         const std::size_t ax = normalize_axis(e.dimension(), axis);
@@ -915,8 +915,8 @@ namespace xt
         auto kth_gamma = detail::quantile_kth_gamma<T, id_t, P>(n, probas, alpha, beta);
 
         // Select relevant values for computing interpolating quantiles
-        auto e_partition = xt::partition(std::forward<E>(e), kth_gamma.first, ax);
-        auto e_kth = detail::fancy_indexing(std::move(e_partition), std::move(kth_gamma.first), ax);
+        auto e_partition = xt::partition(std::forward<E>(e), kth_gamma.first, axis);
+        auto e_kth = detail::fancy_indexing(std::move(e_partition), std::move(kth_gamma.first), axis);
 
         // Reshape interpolation coefficients
         auto gm1_g_shape = xtl::make_sequence<tmp_shape_t>(e.dimension(), 1);
@@ -931,8 +931,9 @@ namespace xt
         e_kth_g_shape[ax] = 2;
         e_kth_g_shape[ax + 1] /= 2;
         auto quantiles = xt::sum(reshape_view(std::move(e_kth_g), std::move(e_kth_g_shape)), ax);
-        // Cannot do a transpose on a non-strided expression so we have to eval
-        return moveaxis(eval(std::move(quantiles)), ax, 0);
+        // Cannot do a transpose on a non-strided expression so we have to eval.
+        // quantiles has as many dimensions as e, so axis designates the same axis.
+        return moveaxis(eval(std::move(quantiles)), axis, 0);
     }
 
     // Static proba array overload
