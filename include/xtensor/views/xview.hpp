@@ -817,25 +817,14 @@ namespace xt
     private:
 
         bool is_newaxis_slice(size_type index) const noexcept;
-        void to_end_impl(layout_type l);
-
-        template <class F>
-        void common_step_forward(size_type dim, F f);
-        template <class F>
-        void common_step_backward(size_type dim, F f);
-
-        template <class F>
-        void common_step_forward(size_type dim, size_type n, F f);
-        template <class F>
-        void common_step_backward(size_type dim, size_type n, F f);
-
-        template <class F>
-        void common_reset(size_type dim, F f, bool backwards);
+        void to_slice_begin();
+        void common_reset(size_type dim, bool backwards);
 
         view_type* p_view;
         substepper_type m_it;
         size_type m_offset;
-        std::array<std::size_t, sizeof...(S)> m_index_keeper;
+        // Position of the stepper in each slice, indexed like the slices.
+        std::array<std::size_t, sizeof...(S)> m_index_keeper{};
     };
 
     // meta-function returning the shape type for an xview
@@ -2010,26 +1999,13 @@ namespace xt
         , m_it(it)
         , m_offset(offset)
     {
-        if (!end)
+        if (end)
         {
-            std::fill(m_index_keeper.begin(), m_index_keeper.end(), 0);
-            auto func = [](const auto& s) noexcept
-            {
-                return xt::value(s, 0);
-            };
-            for (size_type i = 0; i < sizeof...(S); ++i)
-            {
-                if (!is_newaxis_slice(i))
-                {
-                    size_type s = apply<size_type>(i, func, p_view->slices());
-                    size_type index = i - newaxis_count_before<S...>(i);
-                    m_it.step(index, s);
-                }
-            }
+            to_end(l);
         }
         else
         {
-            to_end_impl(l);
+            to_slice_begin();
         }
     }
 
@@ -2042,75 +2018,112 @@ namespace xt
     template <bool is_const, class CT, class... S>
     inline void xview_stepper<is_const, CT, S...>::step(size_type dim)
     {
-        auto func = [this](size_type index, size_type offset)
-        {
-            m_it.step(index, offset);
-        };
-        common_step_forward(dim, func);
+        step(dim, size_type(1));
     }
 
     template <bool is_const, class CT, class... S>
     inline void xview_stepper<is_const, CT, S...>::step_back(size_type dim)
     {
-        auto func = [this](size_type index, size_type offset)
-        {
-            m_it.step_back(index, offset);
-        };
-        common_step_backward(dim, func);
+        step_back(dim, size_type(1));
     }
 
+    // dim is a dimension of the (possibly broadcast) shape being iterated; the
+    // m_offset leading dimensions of that shape are not dimensions of the view.
     template <bool is_const, class CT, class... S>
     inline void xview_stepper<is_const, CT, S...>::step(size_type dim, size_type n)
     {
-        auto func = [this](size_type index, size_type offset)
+        if (dim < m_offset)
         {
-            m_it.step(index, offset);
-        };
-        common_step_forward(dim, n, func);
+            return;
+        }
+        const size_type index = integral_skip<S...>(dim - m_offset);
+        if (index >= sizeof...(S))
+        {
+            m_it.step(index - newaxis_count<S...>(), n);
+        }
+        else if (!is_newaxis_slice(index))
+        {
+            auto func = [this, index, n](const auto& s) noexcept
+            {
+                const size_type st = step_size(s, m_index_keeper[index], n);
+                m_index_keeper[index] += n;
+                return st;
+            };
+            m_it.step(index - newaxis_count_before<S...>(index), apply<size_type>(index, func, p_view->slices()));
+        }
     }
 
     template <bool is_const, class CT, class... S>
     inline void xview_stepper<is_const, CT, S...>::step_back(size_type dim, size_type n)
     {
-        auto func = [this](size_type index, size_type offset)
+        if (dim < m_offset)
         {
-            m_it.step_back(index, offset);
-        };
-        common_step_backward(dim, n, func);
+            return;
+        }
+        const size_type index = integral_skip<S...>(dim - m_offset);
+        if (index >= sizeof...(S))
+        {
+            m_it.step_back(index - newaxis_count<S...>(), n);
+        }
+        else if (!is_newaxis_slice(index))
+        {
+            auto func = [this, index, n](const auto& s) noexcept
+            {
+                m_index_keeper[index] -= n;
+                return step_size(s, m_index_keeper[index], n);
+            };
+            m_it.step_back(
+                index - newaxis_count_before<S...>(index),
+                apply<size_type>(index, func, p_view->slices())
+            );
+        }
     }
 
     template <bool is_const, class CT, class... S>
     inline void xview_stepper<is_const, CT, S...>::reset(size_type dim)
     {
-        auto func = [this](size_type index, size_type offset)
-        {
-            m_it.step_back(index, offset);
-        };
-        common_reset(dim, func, false);
+        common_reset(dim, false);
     }
 
     template <bool is_const, class CT, class... S>
     inline void xview_stepper<is_const, CT, S...>::reset_back(size_type dim)
     {
-        auto func = [this](size_type index, size_type offset)
-        {
-            m_it.step(index, offset);
-        };
-        common_reset(dim, func, true);
+        common_reset(dim, true);
     }
 
     template <bool is_const, class CT, class... S>
     inline void xview_stepper<is_const, CT, S...>::to_begin()
     {
-        std::fill(m_index_keeper.begin(), m_index_keeper.end(), 0);
         m_it.to_begin();
+        to_slice_begin();
     }
 
+    // Leaves the stepper where increment_stepper would leave it after the last
+    // element: one step past it along the innermost dimension of the traversal.
     template <bool is_const, class CT, class... S>
     inline void xview_stepper<is_const, CT, S...>::to_end(layout_type l)
     {
-        m_it.to_end(l);
-        to_end_impl(l);
+        if (l != layout_type::row_major && l != layout_type::column_major)
+        {
+            XTENSOR_THROW(std::runtime_error, "Iteration only allowed in row or column major.");
+        }
+        to_begin();
+        if (p_view->size() == 0)
+        {
+            return;
+        }
+        const auto& shape = p_view->shape();
+        const size_type dimension = shape.size();
+        for (size_type d = 0; d < dimension; ++d)
+        {
+            step(m_offset + d, shape[d] - 1);
+        }
+        if (dimension != 0)
+        {
+            // In column major order the innermost dimension is the first one of the
+            // iterated shape, which is not a view dimension when m_offset != 0.
+            step(l == layout_type::row_major ? m_offset + dimension - 1 : size_type(0));
+        }
     }
 
     template <bool is_const, class CT, class... S>
@@ -2120,175 +2133,66 @@ namespace xt
         return newaxis_count_before<S...>(index + 1) != newaxis_count_before<S...>(index);
     }
 
+    // Moves m_it from the first element of the underlying expression to the
+    // first element of the view.
     template <bool is_const, class CT, class... S>
-    inline void xview_stepper<is_const, CT, S...>::to_end_impl(layout_type l)
+    inline void xview_stepper<is_const, CT, S...>::to_slice_begin()
     {
+        m_index_keeper.fill(0);
         auto func = [](const auto& s) noexcept
         {
-            return xt::value(s, get_size(s) - 1);
+            return xt::value(s, 0);
         };
-        auto size_func = [](const auto& s) noexcept
-        {
-            return get_size(s);
-        };
-
         for (size_type i = 0; i < sizeof...(S); ++i)
         {
             if (!is_newaxis_slice(i))
             {
                 size_type s = apply<size_type>(i, func, p_view->slices());
-                size_type ix = apply<size_type>(i, size_func, p_view->slices());
-                m_index_keeper[i] = ix - size_type(1);
-                size_type index = i - newaxis_count_before<S...>(i);
-                s = p_view->underlying_size(index) - 1 - s;
-                m_it.step_back(index, s);
+                m_it.step(i - newaxis_count_before<S...>(i), s);
             }
-        }
-        if (l == layout_type::row_major)
-        {
-            for (size_type i = sizeof...(S); i > 0; --i)
-            {
-                if (!is_newaxis_slice(i - 1))
-                {
-                    m_index_keeper[i - 1]++;
-                    break;
-                }
-            }
-        }
-        else if (l == layout_type::column_major)
-        {
-            for (size_type i = 0; i < sizeof...(S); ++i)
-            {
-                if (!is_newaxis_slice(i))
-                {
-                    m_index_keeper[i]++;
-                    break;
-                }
-            }
-        }
-        else
-        {
-            XTENSOR_THROW(std::runtime_error, "Iteration only allowed in row or column major.");
         }
     }
 
     template <bool is_const, class CT, class... S>
-    template <class F>
-    void xview_stepper<is_const, CT, S...>::common_step_forward(size_type dim, F f)
+    inline void xview_stepper<is_const, CT, S...>::common_reset(size_type dim, bool backwards)
     {
-        if (dim >= m_offset)
+        if (dim < m_offset)
         {
-            auto func = [&dim, this](const auto& s) noexcept
+            return;
+        }
+        const size_type index = integral_skip<S...>(dim - m_offset);
+        if (index >= sizeof...(S))
+        {
+            // Not covered by a slice: the view spans this whole dimension of the
+            // underlying expression, whose stepper knows its extent.
+            const size_type underlying_dim = index - newaxis_count<S...>();
+            if (backwards)
             {
-                return step_size(s, this->m_index_keeper[dim]++, 1);
+                m_it.reset_back(underlying_dim);
+            }
+            else
+            {
+                m_it.reset(underlying_dim);
+            }
+        }
+        else if (!is_newaxis_slice(index))
+        {
+            auto func = [this, index, backwards](const auto& s) noexcept
+            {
+                const size_type size = get_size(s);
+                m_index_keeper[index] = backwards ? size - 1 : 0;
+                return xt::value(s, size - 1) - xt::value(s, 0);
             };
-            size_type index = integral_skip<S...>(dim);
-            if (!is_newaxis_slice(index))
+            const size_type underlying_dim = index - newaxis_count_before<S...>(index);
+            const size_type n = apply<size_type>(index, func, p_view->slices());
+            if (backwards)
             {
-                size_type step_size = index < sizeof...(S) ? apply<size_type>(index, func, p_view->slices())
-                                                           : 1;
-                index -= newaxis_count_before<S...>(index);
-                f(index, step_size);
+                m_it.step(underlying_dim, n);
             }
-        }
-    }
-
-    template <bool is_const, class CT, class... S>
-    template <class F>
-    void xview_stepper<is_const, CT, S...>::common_step_forward(size_type dim, size_type n, F f)
-    {
-        if (dim >= m_offset)
-        {
-            auto func = [&dim, &n, this](const auto& s) noexcept
+            else
             {
-                auto st_size = step_size(s, this->m_index_keeper[dim], n);
-                this->m_index_keeper[dim] += n;
-                return size_type(st_size);
-            };
-
-            size_type index = integral_skip<S...>(dim);
-            if (!is_newaxis_slice(index))
-            {
-                size_type step_size = index < sizeof...(S) ? apply<size_type>(index, func, p_view->slices())
-                                                           : n;
-                index -= newaxis_count_before<S...>(index);
-                f(index, step_size);
+                m_it.step_back(underlying_dim, n);
             }
-        }
-    }
-
-    template <bool is_const, class CT, class... S>
-    template <class F>
-    void xview_stepper<is_const, CT, S...>::common_step_backward(size_type dim, F f)
-    {
-        if (dim >= m_offset)
-        {
-            auto func = [&dim, this](const auto& s) noexcept
-            {
-                this->m_index_keeper[dim]--;
-                return step_size(s, this->m_index_keeper[dim], 1);
-            };
-            size_type index = integral_skip<S...>(dim);
-            if (!is_newaxis_slice(index))
-            {
-                size_type step_size = index < sizeof...(S) ? apply<size_type>(index, func, p_view->slices())
-                                                           : 1;
-                index -= newaxis_count_before<S...>(index);
-                f(index, step_size);
-            }
-        }
-    }
-
-    template <bool is_const, class CT, class... S>
-    template <class F>
-    void xview_stepper<is_const, CT, S...>::common_step_backward(size_type dim, size_type n, F f)
-    {
-        if (dim >= m_offset)
-        {
-            auto func = [&dim, &n, this](const auto& s) noexcept
-            {
-                this->m_index_keeper[dim] -= n;
-                return step_size(s, this->m_index_keeper[dim], n);
-            };
-
-            size_type index = integral_skip<S...>(dim);
-            if (!is_newaxis_slice(index))
-            {
-                size_type step_size = index < sizeof...(S) ? apply<size_type>(index, func, p_view->slices())
-                                                           : n;
-                index -= newaxis_count_before<S...>(index);
-                f(index, step_size);
-            }
-        }
-    }
-
-    template <bool is_const, class CT, class... S>
-    template <class F>
-    void xview_stepper<is_const, CT, S...>::common_reset(size_type dim, F f, bool backwards)
-    {
-        auto size_func = [](const auto& s) noexcept
-        {
-            return get_size(s);
-        };
-        auto end_func = [](const auto& s) noexcept
-        {
-            return xt::value(s, get_size(s) - 1) - xt::value(s, 0);
-        };
-
-        size_type index = integral_skip<S...>(dim);
-        if (!is_newaxis_slice(index))
-        {
-            if (dim < m_index_keeper.size())
-            {
-                size_type size = index < sizeof...(S) ? apply<size_type>(index, size_func, p_view->slices())
-                                                      : p_view->shape()[dim];
-                m_index_keeper[dim] = backwards ? size - 1 : 0;
-            }
-
-            size_type reset_n = index < sizeof...(S) ? apply<size_type>(index, end_func, p_view->slices())
-                                                     : p_view->shape()[dim] - 1;
-            index -= newaxis_count_before<S...>(index);
-            f(index, reset_n);
         }
     }
 }

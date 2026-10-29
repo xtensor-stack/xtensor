@@ -1117,16 +1117,14 @@ namespace xt
             ++riter_expv1;
         }
 
-        // TODO: this test cannot pass for views containing squeezes of
-        // keep slices with a single element. This is NOT trivial to fix,
-        // but this use case is not that common.
-        /*auto rciter_expv1 = exp.template rbegin<layout_type::column_major>();
+        auto rciter_expv1 = exp.template rbegin<layout_type::column_major>();
         for (auto iter = v.template rbegin<layout_type::column_major>();
-             iter != v.template rend<layout_type::column_major>(); ++iter)
+             iter != v.template rend<layout_type::column_major>();
+             ++iter)
         {
             EXPECT_EQ(*iter, *rciter_expv1);
             ++rciter_expv1;
-        }*/
+        }
     }
 
     TEST(xview, random_stepper)
@@ -1219,6 +1217,51 @@ namespace xt
         xtensor<int, 2> res = xt::view(a, xt::keep(0), xt::all()) + b;
         xtensor<int, 2> exp = {{4, 6}, {7, 9}};
         EXPECT_EQ(res, exp);
+    }
+
+    TEST(xview, keep_slice_reverse_iteration)
+    {
+        xtensor<int, 2> a = {{0, 1, 2, 3}, {4, 5, 6, 7}, {8, 9, 10, 11}};
+
+        auto v1 = xt::view(a, 1, keep(0, 2, 3));
+        xtensor<int, 1> exp_v1 = {4, 6, 7};
+        test_view_iter(v1, exp_v1);
+
+        auto v2 = xt::view(a, keep(0, 2), 1);
+        xtensor<int, 1> exp_v2 = {1, 9};
+        test_view_iter(v2, exp_v2);
+
+        auto v3 = xt::view(a, keep(0, 2));
+        xtensor<int, 2> exp_v3 = {{0, 1, 2, 3}, {8, 9, 10, 11}};
+        test_view_iter(v3, exp_v3);
+
+        auto v4 = xt::view(a, keep(0, 2), xt::all(), xt::newaxis());
+        xtensor<int, 3> exp_v4 = {{{0}, {1}, {2}, {3}}, {{8}, {9}, {10}, {11}}};
+        test_view_iter(v4, exp_v4);
+
+        auto v5 = xt::view(a, xt::newaxis(), drop(1), 2);
+        xtensor<int, 2> exp_v5 = {{2, 10}};
+        test_view_iter(v5, exp_v5);
+    }
+
+    TEST(xview, keep_broadcast_higher_rank)
+    {
+        xtensor<int, 2> a = {{0, 1, 2, 3}, {4, 5, 6, 7}, {8, 9, 10, 11}};
+
+        auto v = xt::view(a, keep(0, 2), keep(1, 3));
+        xtensor<int, 3> exp = {{{1, 3}, {9, 11}}, {{1, 3}, {9, 11}}};
+        xtensor<int, 3> z = xt::zeros<int>({2, 2, 2});
+        xtensor<int, 3> res = z + v;
+        EXPECT_EQ(res, exp);
+        xtensor<int, 3, layout_type::column_major> zc = xt::zeros<int>({2, 2, 2});
+        xtensor<int, 3, layout_type::column_major> res_cm = zc + v;
+        EXPECT_EQ(res_cm, exp);
+
+        auto w = xt::view(a, 1, keep(0, 2, 3));
+        xtensor<int, 2> b = {{100, 200, 300}, {400, 500, 600}};
+        xtensor<int, 2> res2 = b + w;
+        xtensor<int, 2> exp2 = {{104, 206, 307}, {404, 506, 607}};
+        EXPECT_EQ(res2, exp2);
     }
 
     TEST(xview, drop_slice)
