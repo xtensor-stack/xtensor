@@ -2966,6 +2966,27 @@ namespace xt
         return eval(sum(trap, {saxis}));
     }
 
+    namespace detail
+    {
+        // The result is a one-dimensional xtensor built from the shape of x, and
+        // xp and fp are read at the indices found in xp.
+        template <class E1, class E2, class E3>
+        inline void check_interp_arguments(const E1& x, const E2& xp, const E3& fp)
+        {
+            if (x.dimension() != 1 || xp.dimension() != 1 || fp.dimension() != 1)
+            {
+                XTENSOR_THROW(std::runtime_error, "interp: x, xp and fp must be one-dimensional.");
+            }
+            if (xp.size() == 0 || fp.size() != xp.size())
+            {
+                XTENSOR_THROW(
+                    std::runtime_error,
+                    "interp: xp must not be empty and fp must have the length of xp."
+                );
+            }
+        }
+    }
+
     /**
      * @ingroup basic_functions
      * @brief Returns the one-dimensional piecewise linear interpolant to a function with given discrete data
@@ -2985,7 +3006,7 @@ namespace xt
         using value_type = typename E3::value_type;
 
         // basic checks
-        XTENSOR_ASSERT(xp.dimension() == 1);
+        detail::check_interp_arguments(x, xp, fp);
         XTENSOR_ASSERT(std::is_sorted(x.cbegin(), x.cend()));
         XTENSOR_ASSERT(std::is_sorted(xp.cbegin(), xp.cend()));
 
@@ -3146,6 +3167,7 @@ namespace xt
     template <class E1, class E2, class E3>
     inline auto interp(const E1& x, const E2& xp, const E3& fp)
     {
+        detail::check_interp_arguments(x, xp, fp);
         return interp(x, xp, fp, fp[0], fp[fp.size() - 1]);
     }
 

@@ -233,6 +233,23 @@ namespace xt
         test_throwing_reshape(b);
     }
 
+    TEST(xtensor, change_dimension)
+    {
+        // The shape of an xtensor holds exactly N values.
+        xtensor<int, 1> a = xt::arange(6);
+        XT_EXPECT_THROW(a.reshape({2, 3}), std::runtime_error);
+        XT_EXPECT_THROW(a.reshape(std::vector<std::size_t>{2, 3}), std::runtime_error);
+        XT_EXPECT_THROW(a.reshape(std::vector<int>{2, -1}), std::runtime_error);
+        XT_EXPECT_THROW(a.resize(std::vector<std::size_t>{2, 3}), std::runtime_error);
+        EXPECT_EQ(a.shape()[0], 6u);
+
+        using shape = std::vector<std::size_t>;
+        XT_EXPECT_THROW((xtensor<int, 1>::from_shape(shape{2, 3})), std::runtime_error);
+        XT_EXPECT_THROW((xtensor<int, 2>::from_shape(shape{6})), std::runtime_error);
+        XT_EXPECT_THROW((xtensor<int, 2>::from_shape(shape{})), std::runtime_error);
+        EXPECT_EQ((xtensor<int, 2>::from_shape(shape{2, 3}).size()), 6u);
+    }
+
     TEST(xtensor, transpose)
     {
         xtensor_dynamic a;

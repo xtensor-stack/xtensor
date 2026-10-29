@@ -543,7 +543,7 @@ namespace xt
     template <class S>
     inline xtensor_container<EC, N, L, Tag> xtensor_container<EC, N, L, Tag>::from_shape(S&& s)
     {
-        XTENSOR_ASSERT_MSG(s.size() == N, "Cannot change dimension of xtensor.");
+        XTENSOR_PRECONDITION(s.size() == N, "cannot change the number of dimensions of xtensor");
         shape_type shape = xtl::forward_sequence<shape_type, S>(s);
         return self_type(shape);
     }

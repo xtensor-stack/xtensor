@@ -903,6 +903,27 @@ namespace xt
         }
     }
 
+    TEST(xmath, interp_invalid_arguments)
+    {
+        xt::xarray<double> xp = {0.0, 1.0, 3.0};
+        xt::xarray<double> fp = {0.0, 1.0, 3.0};
+        xt::xarray<double> x = {0.5, 2.0};
+        xt::xarray<double> x2 = {{0.5, 1.5}, {2.0, 2.5}};
+        xt::xarray<double> empty = xt::xarray<double>::from_shape({0});
+        xt::xarray<double> fp_short = {0.0, 1.0};
+
+        XT_EXPECT_THROW(xt::interp(x2, xp, fp), std::runtime_error);
+        XT_EXPECT_THROW(xt::interp(x, x2, fp), std::runtime_error);
+        XT_EXPECT_THROW(xt::interp(x, xp, x2), std::runtime_error);
+        XT_EXPECT_THROW(xt::interp(x, empty, empty), std::runtime_error);
+        XT_EXPECT_THROW(xt::interp(x, xp, fp_short), std::runtime_error);
+        XT_EXPECT_THROW(xt::interp(x, xp, fp_short, 0.0, 1.0), std::runtime_error);
+
+        auto f = xt::interp(x, xp, fp);
+        EXPECT_EQ(f(0), 0.5);
+        EXPECT_EQ(f(1), 2.0);
+    }
+
     TEST(xmath, cov)
     {
         xt::xarray<double> x = {0.0, 1.0, 2.0};
