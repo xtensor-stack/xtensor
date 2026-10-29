@@ -296,6 +296,7 @@ namespace xt
     inline auto axis_begin(E&& e, typename std::decay_t<E>::size_type axis)
     {
         using return_type = xaxis_iterator<xtl::closure_type_t<E>>;
+        axis = normalize_axis(e.dimension(), axis);
         return return_type(std::forward<E>(e), axis);
     }
 
@@ -332,6 +333,7 @@ namespace xt
     {
         using size_type = typename std::decay_t<E>::size_type;
         using return_type = xaxis_iterator<xtl::closure_type_t<E>>;
+        axis = normalize_axis(e.dimension(), axis);
         return return_type(
             std::forward<E>(e),
             axis,

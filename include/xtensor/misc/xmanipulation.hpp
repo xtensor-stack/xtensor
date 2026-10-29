@@ -547,10 +547,29 @@ namespace xt
 
     namespace detail
     {
+        // Each squeezed axis removes one dimension from the result, so the axes
+        // must be valid and distinct for the result shape to be filled exactly.
+        template <class S>
+        inline dynamic_shape<std::size_t> normalize_squeeze_axes(std::size_t dim, const S& axis)
+        {
+            dynamic_shape<std::size_t> res;
+            for (auto ax : axis)
+            {
+                const std::size_t nax = normalize_axis(dim, ax);
+                if (std::find(res.cbegin(), res.cend(), nax) != res.cend())
+                {
+                    XTENSOR_THROW(std::runtime_error, "Axis " + std::to_string(nax) + " is repeated in squeeze.");
+                }
+                res.push_back(nax);
+            }
+            return res;
+        }
+
         template <class E, class S>
         inline auto squeeze_impl(E&& e, S&& axis, check_policy::none)
         {
-            std::size_t new_dim = e.dimension() - axis.size();
+            const auto axes = normalize_squeeze_axes(e.dimension(), axis);
+            std::size_t new_dim = e.dimension() - axes.size();
             dynamic_shape<std::size_t> new_shape(new_dim);
             dynamic_shape<std::ptrdiff_t> new_strides(new_dim);
 
@@ -558,7 +577,7 @@ namespace xt
 
             for (std::size_t i = 0, ix = 0; i < e.dimension(); ++i)
             {
-                if (axis.cend() == std::find(axis.cbegin(), axis.cend(), i))
+                if (axes.cend() == std::find(axes.cbegin(), axes.cend(), i))
                 {
                     new_shape[ix] = e.shape()[i];
                     new_strides[ix++] = old_strides[i];
@@ -577,18 +596,15 @@ namespace xt
         template <class E, class S>
         inline auto squeeze_impl(E&& e, S&& axis, check_policy::full)
         {
-            for (auto ix : axis)
+            auto axes = normalize_squeeze_axes(e.dimension(), axis);
+            for (auto ix : axes)
             {
-                if (static_cast<std::size_t>(ix) > e.dimension())
-                {
-                    XTENSOR_THROW(std::runtime_error, "Axis argument to squeeze > dimension of expression");
-                }
-                if (e.shape()[static_cast<std::size_t>(ix)] != 1)
+                if (e.shape()[ix] != 1)
                 {
                     XTENSOR_THROW(std::runtime_error, "Trying to squeeze axis != 1");
                 }
             }
-            return squeeze_impl(std::forward<E>(e), std::forward<S>(axis), check_policy::none());
+            return squeeze_impl(std::forward<E>(e), std::move(axes), check_policy::none());
         }
     }
 
@@ -646,8 +662,10 @@ namespace xt
     template <class E>
     inline auto expand_dims(E&& e, std::size_t axis)
     {
-        xstrided_slice_vector sv(e.dimension() + 1, all());
-        sv[axis] = newaxis();
+        // The new axis can be inserted at any position up to and including dimension().
+        const std::size_t new_dim = e.dimension() + 1;
+        xstrided_slice_vector sv(new_dim, all());
+        sv[normalize_axis(new_dim, axis)] = newaxis();
         return strided_view(std::forward<E>(e), std::move(sv));
     }
 
@@ -734,8 +752,9 @@ namespace xt
      *
      * This splits an xexpression along the axis in `n` equal parts and
      * returns a vector of ``strided_view``.
-     * Calling split with axis > dimension of e or a `n` that does not result in
-     * an equal division of the xexpression will throw a runtime_error.
+     * Calling split with an axis that is not smaller than the dimension of e or
+     * a `n` that does not result in an equal division of the xexpression will
+     * throw a runtime_error.
      *
      * @ingroup xt_xmanipulation
      * @param e input xexpression
@@ -745,11 +764,7 @@ namespace xt
     template <class E>
     inline auto split(E& e, std::size_t n, std::size_t axis)
     {
-        if (axis >= e.dimension())
-        {
-            XTENSOR_THROW(std::runtime_error, "Split along axis > dimension.");
-        }
-
+        axis = normalize_axis(e.dimension(), axis);
         std::size_t ax_sz = e.shape()[axis];
         xstrided_slice_vector sv(e.dimension(), all());
         std::size_t step = ax_sz / n;
@@ -838,6 +853,7 @@ namespace xt
     {
         using shape_type = xindex_type_t<typename std::decay_t<E>::shape_type>;
 
+        axis = normalize_axis(e.dimension(), axis);
         shape_type shape;
         resize_container(shape, e.shape().size());
         std::copy(e.shape().cbegin(), e.shape().cend(), shape.begin());
@@ -1067,17 +1083,13 @@ namespace xt
         const auto& shape = cpy.shape();
         const auto dim = cpy.dimension();
 
-        if (axis < -static_cast<std::ptrdiff_t>(dim) || axis >= static_cast<std::ptrdiff_t>(dim))
-        {
-            XTENSOR_THROW(std::runtime_error, "axis is not within shape dimension.");
-        }
+        const std::size_t saxis = normalize_axis(dim, axis);
 
         if (cpy.size() == 0)
         {
             return cpy;
         }
 
-        std::size_t saxis = normalize_axis(dim, axis);
         const auto axis_dim = static_cast<std::ptrdiff_t>(shape[saxis]);
 
         while (shift < 0)
@@ -1098,8 +1110,8 @@ namespace xt
         template <class E, class R>
         inline auto make_xrepeat(E&& e, R&& r, typename std::decay_t<E>::size_type axis)
         {
-            const auto casted_axis = static_cast<typename std::decay_t<E>::size_type>(axis);
-            if (r.size() != e.shape(casted_axis))
+            axis = normalize_axis(e.dimension(), axis);
+            if (r.size() != e.shape(axis))
             {
                 XTENSOR_THROW(std::invalid_argument, "repeats must have the same size as the specified axis");
             }
@@ -1120,8 +1132,8 @@ namespace xt
     template <class E>
     inline auto repeat(E&& e, std::size_t repeats, std::size_t axis)
     {
-        const auto casted_axis = static_cast<typename std::decay_t<E>::size_type>(axis);
-        std::vector<std::size_t> broadcasted_repeats(e.shape(casted_axis));
+        axis = normalize_axis(e.dimension(), axis);
+        std::vector<std::size_t> broadcasted_repeats(e.shape(axis));
         std::fill(broadcasted_repeats.begin(), broadcasted_repeats.end(), repeats);
         return repeat(std::forward<E>(e), std::move(broadcasted_repeats), axis);
     }

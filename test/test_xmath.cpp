@@ -1025,4 +1025,23 @@ namespace xt
         xt::xtensor<double, 1> expected_sums = {1.0, 1.0};
         EXPECT_TRUE(xt::allclose(row_sums, expected_sums));
     }
+
+    TEST(xmath, invalid_axis)
+    {
+        xarray<double> a = {{1., 2., 3.}, {4., 5., 6.}};
+        xarray<double> x = {0., 1., 2.};
+        xarray<double> w = {1., 2.};
+
+        XT_EXPECT_THROW(diff(a, 1, 2), std::runtime_error);
+        XT_EXPECT_THROW(trapz(a, 1.0, 2), std::runtime_error);
+        XT_EXPECT_THROW(trapz(a, x, -3), std::runtime_error);
+        XT_EXPECT_THROW(unwrap(a, xnone(), 2), std::runtime_error);
+        XT_EXPECT_THROW(cumsum(a, 2), std::runtime_error);
+        XT_EXPECT_THROW(cumprod(a, -3), std::runtime_error);
+
+        XT_EXPECT_THROW(average(a, w, {2}), std::runtime_error);
+        XT_EXPECT_THROW(average(a, w, {std::size_t(2)}), std::runtime_error);
+        XT_EXPECT_THROW(average(a, w, std::vector<std::size_t>{2}), std::runtime_error);
+        XT_EXPECT_THROW(average(a, w, {0, 1}), std::runtime_error);
+    }
 }

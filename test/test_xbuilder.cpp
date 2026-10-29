@@ -706,4 +706,22 @@ namespace xt
         b = std::is_same<decltype(ed3), xarray<double>>::value;
         EXPECT_TRUE(b);
     }
+
+    TEST(xbuilder, invalid_axis)
+    {
+        xarray<double> a = {{1., 2.}, {3., 4.}};
+        xarray<double> b = {{5., 6.}, {7., 8.}};
+
+        XT_EXPECT_THROW(concatenate(xtuple(a, b), 2), std::runtime_error);
+        XT_EXPECT_THROW(stack(xtuple(a, b), 3), std::runtime_error);
+
+        xtensor<double, 2> ta = a;
+        xtensor<double, 2> tb = b;
+        XT_EXPECT_THROW(stack(xtuple(ta, tb), 3), std::runtime_error);
+
+        // Stacking inserts a new axis, so dimension() itself is valid.
+        auto s = stack(xtuple(a, b), 2);
+        EXPECT_EQ(s.shape(), (dynamic_shape<std::size_t>{2, 2, 2}));
+        EXPECT_EQ(s(1, 0, 1), 7.);
+    }
 }

@@ -92,4 +92,12 @@ namespace xt
             REQUIRE(expected(i) == doctest::Approx(abs(i)).epsilon(.0001));
         }
     }
+
+    TEST(xfft, invalid_axis)
+    {
+        xt::xarray<float> y = {1.f, 2.f, 3.f, 4.f};
+        XT_EXPECT_THROW(xt::fft::fft(y, 1), std::runtime_error);
+        XT_EXPECT_THROW(xt::fft::ifft(y, -2), std::runtime_error);
+        XT_EXPECT_THROW(xt::fft::convolve(y, y, 1), std::runtime_error);
+    }
 }

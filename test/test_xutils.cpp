@@ -237,4 +237,37 @@ namespace xt
         sdim = static_dimension<xt::sequence_view<xt::fixed_shape<4, 1, 2, 3>, 1, 4>>::value;
         EXPECT_EQ(sdim, 3);
     }
+
+    TEST(utils, normalize_axis)
+    {
+        EXPECT_EQ(normalize_axis(3, 0), 0u);
+        EXPECT_EQ(normalize_axis(3, 2), 2u);
+        EXPECT_EQ(normalize_axis(3, -1), 2u);
+        EXPECT_EQ(normalize_axis(3, -3), 0u);
+        EXPECT_EQ(normalize_axis(3, std::size_t(2)), 2u);
+
+        XT_EXPECT_THROW(normalize_axis(3, 3), std::runtime_error);
+        XT_EXPECT_THROW(normalize_axis(3, -4), std::runtime_error);
+        XT_EXPECT_THROW(normalize_axis(0, 0), std::runtime_error);
+        XT_EXPECT_THROW(normalize_axis(0, -1), std::runtime_error);
+        XT_EXPECT_THROW(normalize_axis(3, std::size_t(3)), std::runtime_error);
+        // An unsigned axis never counts from the end.
+        XT_EXPECT_THROW(normalize_axis(3, std::size_t(-1)), std::runtime_error);
+    }
+
+    TEST(utils, normalize_axes)
+    {
+        xt::xarray<double> a = {{1., 2.}, {3., 4.}};
+
+        auto signed_axes = normalize_axis(a, std::vector<int>{0, -1});
+        EXPECT_EQ(signed_axes, (std::vector<std::size_t>{0, 1}));
+        XT_EXPECT_THROW(normalize_axis(a, std::vector<int>{0, 2}), std::runtime_error);
+        XT_EXPECT_THROW(normalize_axis(a, std::vector<int>{-3}), std::runtime_error);
+        XT_EXPECT_THROW(normalize_axis(a, std::vector<std::size_t>{0, 2}), std::runtime_error);
+
+        using array_type = std::array<std::size_t, 2>;
+        XT_EXPECT_THROW(forward_normalize<array_type>(a, std::array<int, 2>{0, 2}), std::runtime_error);
+        XT_EXPECT_THROW(forward_normalize<array_type>(a, std::vector<std::size_t>{0, 2}), std::runtime_error);
+        XT_EXPECT_THROW(forward_normalize<array_type>(a, array_type{0, 2}), std::runtime_error);
+    }
 }

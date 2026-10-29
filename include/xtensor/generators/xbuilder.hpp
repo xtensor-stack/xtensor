@@ -779,6 +779,7 @@ namespace xt
                 shape_type new_shape = xtl::forward_sequence<shape_type, source_shape_type>(
                     std::get<0>(t).shape()
                 );
+                axis = normalize_axis(new_shape.size(), axis);
 
                 auto check_shape = [&axis, &new_shape](auto& arr)
                 {
@@ -884,6 +885,8 @@ namespace xt
     {
         using shape_type = promote_shape_t<typename std::decay_t<CT>::shape_type...>;
         using source_shape_type = decltype(std::get<0>(t).shape());
+        // The stacking axis is a new one, it can be inserted up to and including dimension().
+        axis = normalize_axis(std::get<0>(t).dimension() + 1, axis);
         auto new_shape = detail::add_axis(
             xtl::forward_sequence<shape_type, source_shape_type>(std::get<0>(t).shape()),
             axis,

@@ -156,6 +156,7 @@ namespace xt
         template <class R, class E, class F>
         inline R map_axis(const E& e, std::ptrdiff_t axis, F&& lambda)
         {
+            const std::size_t ax = normalize_axis(e.dimension(), axis);
             if (e.dimension() == 1)
             {
                 R res = e;
@@ -163,7 +164,6 @@ namespace xt
                 return res;
             }
 
-            const std::size_t ax = normalize_axis(e.dimension(), axis);
             if (ax == detail::leading_axis(e))
             {
                 R res = e;
@@ -706,6 +706,7 @@ namespace xt
         using result_type = typename detail::argsort_result_type<eval_type>::type;
 
         const auto& de = e.derived_cast();
+        const std::size_t ax = normalize_axis(de.dimension(), axis);
 
         if (de.dimension() == 1)
         {
@@ -729,7 +730,6 @@ namespace xt
             );
         };
 
-        const std::size_t ax = normalize_axis(de.dimension(), axis);
         if (ax == detail::leading_axis(de))
         {
             result_type res = result_type::from_shape(de.shape());
@@ -1157,12 +1157,15 @@ namespace xt
         };
 
         template <layout_type L, class E, class F>
-        inline typename argfunc_result_type<E>::type arg_func_impl(const E& e, std::size_t axis, F&& cmp)
+        inline typename argfunc_result_type<E>::type arg_func_impl(const E& e, std::ptrdiff_t ax, F&& cmp)
         {
             using eval_type = typename detail::sort_eval_type<E>::type;
             using value_type = typename E::value_type;
             using result_type = typename argfunc_result_type<E>::type;
             using result_shape_type = typename result_type::shape_type;
+
+            // Checked here because the result shape below relies on axis < dimension().
+            const std::size_t axis = normalize_axis(e.dimension(), ax);
 
             if (e.dimension() == 1)
             {
@@ -1184,13 +1187,14 @@ namespace xt
             result_shape_type alt_shape;
             xt::resize_container(alt_shape, e.dimension() - 1);
 
-            // Excluding copy, copy all of shape except for axis
-            std::copy(e.shape().cbegin(), e.shape().cbegin() + std::ptrdiff_t(axis), alt_shape.begin());
-            std::copy(
-                e.shape().cbegin() + std::ptrdiff_t(axis) + 1,
-                e.shape().cend(),
-                alt_shape.begin() + std::ptrdiff_t(axis)
-            );
+            // Copy all of shape except for axis
+            for (std::size_t i = 0, j = 0; i < e.dimension(); ++i)
+            {
+                if (i != axis)
+                {
+                    alt_shape[j++] = e.shape()[i];
+                }
+            }
 
             result_type result = result_type::from_shape(std::move(alt_shape));
             auto result_iter = result.template begin<L>();
@@ -1260,8 +1264,7 @@ namespace xt
     {
         using value_type = typename E::value_type;
         auto&& ed = eval(e.derived_cast());
-        std::size_t ax = normalize_axis(ed.dimension(), axis);
-        return detail::arg_func_impl<L>(ed, ax, std::less<value_type>());
+        return detail::arg_func_impl<L>(ed, axis, std::less<value_type>());
     }
 
     template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E>
@@ -1291,8 +1294,7 @@ namespace xt
     {
         using value_type = typename E::value_type;
         auto&& ed = eval(e.derived_cast());
-        std::size_t ax = normalize_axis(ed.dimension(), axis);
-        return detail::arg_func_impl<L>(ed, ax, std::greater<value_type>());
+        return detail::arg_func_impl<L>(ed, axis, std::greater<value_type>());
     }
 
     /**

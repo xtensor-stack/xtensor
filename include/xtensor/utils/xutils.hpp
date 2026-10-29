@@ -12,22 +12,27 @@
 
 #include <algorithm>
 #include <array>
+#include <concepts>
 #include <cstddef>
 #include <initializer_list>
 #include <iostream>
 #include <iterator>
 #include <memory>
+#include <stdexcept>
+#include <string>
 #include <tuple>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
+#include <xtl/xcompare.hpp>
 #include <xtl/xfunctional.hpp>
 #include <xtl/xmeta_utils.hpp>
 #include <xtl/xsequence.hpp>
 #include <xtl/xtype_traits.hpp>
 
 #include "../core/xtensor_config.hpp"
+#include "xexception.hpp"
 
 namespace xt
 {
@@ -74,7 +79,8 @@ namespace xt
     template <class X, class C>
     using rebind_container_t = typename rebind_container<X, C>::type;
 
-    std::size_t normalize_axis(std::size_t dim, std::ptrdiff_t axis);
+    template <std::integral A>
+    std::size_t normalize_axis(std::size_t dim, A axis);
 
     // gcc 4.9 is affected by C++14 defect CGW 1558
     // see http://open-std.org/JTC1/SC22/WG21/docs/cwg_defects.html#1558
@@ -340,11 +346,57 @@ namespace xt
      * normalize_axis implementation *
      *********************************/
 
-    // scalar normalize axis
-    inline std::size_t normalize_axis(std::size_t dim, std::ptrdiff_t axis)
+    namespace detail
     {
-        return axis < 0 ? static_cast<std::size_t>(static_cast<std::ptrdiff_t>(dim) + axis)
-                        : static_cast<std::size_t>(axis);
+        // Axes come from the user and are used to index shape and strides
+        // containers, so an out-of-range axis reads or writes past their end.
+        // Functions taking an axis validate it here, through normalize_axis,
+        // and the check stays on in release builds for that reason.
+        // Signed axes may be negative and count from the end, as in NumPy.
+        template <std::integral A>
+        inline void check_axis(std::size_t dim, A axis)
+        {
+            if (xtl::cmp_greater_equal(axis, dim) || xtl::cmp_less(axis, -static_cast<std::ptrdiff_t>(dim)))
+            {
+                XTENSOR_THROW(
+                    std::runtime_error,
+                    "Axis " + std::to_string(axis) + " is out of bounds for an expression of dimension "
+                        + std::to_string(dim) + "."
+                );
+            }
+        }
+
+        template <class E, class C>
+        inline void check_axes(const E& expr, const C& axes)
+        {
+            const std::size_t dim = expr.dimension();
+            for (const auto& ax : axes)
+            {
+                check_axis(dim, ax);
+            }
+        }
+    }
+
+    /**
+     * Returns the position of @p axis in an expression of dimension @p dim.
+     *
+     * Negative values of a signed @p axis count from the end. Throws
+     * std::runtime_error when @p axis is not in [-dim, dim).
+     * To validate the position of a new axis (as in stack or expand_dims),
+     * pass ``dim + 1``.
+     */
+    template <std::integral A>
+    inline std::size_t normalize_axis(std::size_t dim, A axis)
+    {
+        detail::check_axis(dim, axis);
+        if constexpr (std::is_signed_v<A>)
+        {
+            if (axis < 0)
+            {
+                return static_cast<std::size_t>(static_cast<std::ptrdiff_t>(dim) + axis);
+            }
+        }
+        return static_cast<std::size_t>(axis);
     }
 
     template <class E, class C>
@@ -361,15 +413,6 @@ namespace xt
             res[i] = normalize_axis(expr.dimension(), axes[i]);
         }
 
-        XTENSOR_ASSERT(std::all_of(
-            res.begin(),
-            res.end(),
-            [&expr](auto ax_el)
-            {
-                return ax_el < expr.dimension();
-            }
-        ));
-
         return res;
     }
 
@@ -379,15 +422,7 @@ namespace xt
         C&&>
     normalize_axis(E& expr, C&& axes)
     {
-        static_cast<void>(expr);
-        XTENSOR_ASSERT(std::all_of(
-            axes.begin(),
-            axes.end(),
-            [&expr](auto ax_el)
-            {
-                return ax_el < expr.dimension();
-            }
-        ));
+        detail::check_axes(expr, axes);
         return std::forward<C>(axes);
     }
 
@@ -408,15 +443,6 @@ namespace xt
             }
         );
 
-        XTENSOR_ASSERT(std::all_of(
-            res.begin(),
-            res.end(),
-            [&expr](auto ax_el)
-            {
-                return ax_el < expr.dimension();
-            }
-        ));
-
         return res;
     }
 
@@ -425,19 +451,11 @@ namespace xt
         !xtl::is_signed<std::decay_t<decltype(*std::begin(axes))>>::value && !std::is_same<R, std::decay_t<C>>::value,
         R>
     {
-        static_cast<void>(expr);
+        detail::check_axes(expr, axes);
 
         R res;
         xt::resize_container(res, std::size(axes));
         std::copy(std::begin(axes), std::end(axes), std::begin(res));
-        XTENSOR_ASSERT(std::all_of(
-            res.begin(),
-            res.end(),
-            [&expr](auto ax_el)
-            {
-                return ax_el < expr.dimension();
-            }
-        ));
         return res;
     }
 
@@ -446,15 +464,7 @@ namespace xt
         !xtl::is_signed<std::decay_t<decltype(*std::begin(axes))>>::value && std::is_same<R, std::decay_t<C>>::value,
         R&&>
     {
-        static_cast<void>(expr);
-        XTENSOR_ASSERT(std::all_of(
-            std::begin(axes),
-            std::end(axes),
-            [&expr](auto ax_el)
-            {
-                return ax_el < expr.dimension();
-            }
-        ));
+        detail::check_axes(expr, axes);
         return std::move(axes);
     }
 

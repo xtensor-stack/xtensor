@@ -308,6 +308,7 @@ namespace xt
     inline auto axis_slice_begin(E&& e, typename std::decay_t<E>::size_type axis)
     {
         using return_type = xaxis_slice_iterator<xtl::closure_type_t<E>>;
+        axis = normalize_axis(e.dimension(), axis);
         return return_type(std::forward<E>(e), axis, 0, e.data_offset());
     }
 
@@ -342,6 +343,7 @@ namespace xt
     inline auto axis_slice_end(E&& e, typename std::decay_t<E>::size_type axis)
     {
         using return_type = xaxis_slice_iterator<xtl::closure_type_t<E>>;
+        axis = normalize_axis(e.dimension(), axis);
         auto index_sum = std::accumulate(
             e.shape().begin(),
             e.shape().begin() + axis,

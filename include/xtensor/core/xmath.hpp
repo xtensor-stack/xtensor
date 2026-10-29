@@ -1942,6 +1942,10 @@ namespace xt
         auto ax = normalize_axis(e, axes);
         if (weights.dimension() == 1)
         {
+            if (ax.size() != 1)
+            {
+                XTENSOR_THROW(std::runtime_error, "1-D weights need exactly one axis.");
+            }
             if (weights.size() != e.shape()[ax[0]])
             {
                 XTENSOR_THROW(std::runtime_error, "Weights need to have the same shape as expression at axes.");
