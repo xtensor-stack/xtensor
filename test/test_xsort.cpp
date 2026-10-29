@@ -7,6 +7,10 @@
  * The full license is in the file LICENSE, distributed with this software. *
  ****************************************************************************/
 
+#include <algorithm>
+#include <numeric>
+#include <vector>
+
 #include "xtensor/containers/xadapt.hpp"
 #include "xtensor/containers/xarray.hpp"
 #include "xtensor/containers/xfixed.hpp"
@@ -174,6 +178,44 @@ namespace xt
         };
 
         EXPECT_EQ(ex, xt::argsort(a, {0}, xt::sorting_method::stable));
+    }
+
+    TEST(xsort, argsort_quick_sorts_once)
+    {
+        // The quick method must not fall through to the stable sort: both
+        // orderings are valid, so only the number of comparisons tells them apart.
+        const std::vector<double> data = {5., 3., 8., 1., 9., 2., 7., 4., 6., 0., 3., 8., 1., 5., 2.};
+
+        std::size_t argsort_comparisons = 0;
+        std::vector<std::size_t> indices(data.size());
+        detail::argsort_iter(
+            data.cbegin(),
+            data.cend(),
+            indices.begin(),
+            indices.end(),
+            [&argsort_comparisons](double lhs, double rhs)
+            {
+                ++argsort_comparisons;
+                return lhs < rhs;
+            },
+            sorting_method::quick
+        );
+
+        std::size_t sort_comparisons = 0;
+        std::vector<std::size_t> expected(data.size());
+        std::iota(expected.begin(), expected.end(), std::size_t(0));
+        std::sort(
+            expected.begin(),
+            expected.end(),
+            [&](std::size_t i, std::size_t j)
+            {
+                ++sort_comparisons;
+                return data[i] < data[j];
+            }
+        );
+
+        EXPECT_EQ(indices, expected);
+        EXPECT_EQ(argsort_comparisons, sort_comparisons);
     }
 
     TEST(xsort, sort_easy)

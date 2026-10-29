@@ -318,6 +318,7 @@ namespace xt
                             return comp(*(data_begin + i), *(data_begin + j));
                         }
                     );
+                    break;
                 }
                 case (sorting_method::stable):
                 {
@@ -329,6 +330,7 @@ namespace xt
                             return comp(*(data_begin + i), *(data_begin + j));
                         }
                     );
+                    break;
                 }
             }
         }
