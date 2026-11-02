@@ -145,6 +145,69 @@ namespace xt
         EXPECT_TRUE(std::equal(s.begin(), s.end(), v.begin()));
     }
 
+    // A full heap buffer: the next insertion reallocates and frees the old
+    // buffer, the one that holds the aliased argument in the tests below.
+    using small_svector_type = svector<std::size_t, 1>;
+
+    TEST(svector, insert_aliased_element)
+    {
+        {
+            small_svector_type s = {1, 2, 3};
+            ASSERT_FALSE(s.on_stack());
+            ASSERT_EQ(s.size(), s.capacity());
+            s.insert(s.begin(), s[0]);
+            EXPECT_EQ(s, small_svector_type({1, 1, 2, 3}));
+        }
+
+        {
+            small_svector_type s = {1, 2, 3};
+            ASSERT_EQ(s.size(), s.capacity());
+            s.insert(s.begin() + 1, s[1]);
+            EXPECT_EQ(s, small_svector_type({1, 2, 2, 3}));
+        }
+
+        {
+            small_svector_type s = {1, 2, 3};
+            ASSERT_EQ(s.size(), s.capacity());
+            s.insert(s.end(), s[0]);
+            EXPECT_EQ(s, small_svector_type({1, 2, 3, 1}));
+        }
+
+        {
+            // No reallocation: the shift moves the aliased element.
+            small_svector_type s = {1, 2, 3};
+            s.reserve(8);
+            s.insert(s.begin(), s[1]);
+            EXPECT_EQ(s, small_svector_type({2, 1, 2, 3}));
+        }
+    }
+
+    TEST(svector, push_back_aliased_element)
+    {
+        {
+            small_svector_type s = {1, 2, 3};
+            ASSERT_FALSE(s.on_stack());
+            ASSERT_EQ(s.size(), s.capacity());
+            s.push_back(s[0]);
+            EXPECT_EQ(s, small_svector_type({1, 2, 3, 1}));
+        }
+
+        {
+            small_svector_type s = {1, 2, 3};
+            ASSERT_EQ(s.size(), s.capacity());
+            s.push_back(std::move(s[1]));
+            EXPECT_EQ(s, small_svector_type({1, 2, 3, 2}));
+        }
+    }
+
+    TEST(svector, assign_aliased_element)
+    {
+        small_svector_type s = {7, 2, 3};
+        ASSERT_FALSE(s.on_stack());
+        s.assign(5, s[0]);
+        EXPECT_EQ(s, small_svector_type({7, 7, 7, 7, 7}));
+    }
+
     TEST(svector, insert_range)
     {
         svector_type s0 = {1, 2, 3, 4};

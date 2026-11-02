@@ -897,12 +897,15 @@ namespace xt
     template <class T, std::size_t N, class A, bool Init>
     inline void svector<T, N, A, Init>::assign(size_type n, const value_type& v)
     {
+        // v may refer to an element of this vector, and grow() may free the
+        // buffer that holds it.
+        const value_type value(v);
         if (n > N && n > capacity())
         {
             grow(n);
         }
         m_end = m_begin + n;
-        std::fill(begin(), end(), v);
+        std::fill(begin(), end(), value);
     }
 
     template <class T, std::size_t N, class A, bool Init>
@@ -1022,9 +1025,16 @@ namespace xt
     {
         if (m_end >= m_capacity)
         {
+            // elt may refer to an element of this vector, and grow() may free
+            // the buffer that holds it.
+            T value(elt);
             grow();
+            *(m_end++) = std::move(value);
         }
-        *(m_end++) = elt;
+        else
+        {
+            *(m_end++) = elt;
+        }
     }
 
     template <class T, std::size_t N, class A, bool Init>
@@ -1032,9 +1042,15 @@ namespace xt
     {
         if (m_end >= m_capacity)
         {
+            // Same as above: take the value out before grow() runs.
+            T value(std::move(elt));
             grow();
+            *(m_end++) = std::move(value);
         }
-        *(m_end++) = std::move(elt);
+        else
+        {
+            *(m_end++) = std::move(elt);
+        }
     }
 
     template <class T, std::size_t N, class A, bool Init>
@@ -1196,13 +1212,10 @@ namespace xt
     template <class T, std::size_t N, class A, bool Init>
     inline auto svector<T, N, A, Init>::insert(const_iterator cit, const T& elt) -> iterator
     {
+        // elt may refer to an element of this vector: the shift below moves it
+        // and grow() may free the buffer that holds it.
+        T value(elt);
         auto it = const_cast<pointer>(cit);
-        if (it == m_end)
-        {
-            push_back(elt);
-            return m_end - 1;
-        }
-
         if (m_end >= m_capacity)
         {
             std::ptrdiff_t elt_no = it - m_begin;
@@ -1210,17 +1223,9 @@ namespace xt
             it = m_begin + elt_no;
         }
 
-        (*m_end) = back();
-        std::move_backward(it, m_end - 1, m_end);
+        std::move_backward(it, m_end, m_end + 1);
         ++m_end;
-
-        // Update ref if element moved
-        const T* elt_ptr = &elt;
-        bool cond = it <= elt_ptr && elt_ptr < m_end;
-        // More complicated than incrementing elt_ptr, but this avoids
-        // false positive array-bounds warning on GCC 10
-        const T* src_ptr = cond ? it + (elt_ptr - it) + std::ptrdiff_t(1) : elt_ptr;
-        *it = *src_ptr;
+        *it = std::move(value);
         return it;
     }
 
