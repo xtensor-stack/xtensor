@@ -1960,7 +1960,7 @@ namespace xt
                 );
             }
 
-            std::copy(e.shape().begin(), e.shape().end(), broadcast_shape.begin());
+            std::copy_n(e.shape().begin(), e.shape().size(), broadcast_shape.begin());
         }
 
         constexpr layout_type L = default_assignable_layout(std::decay_t<W>::static_layout);

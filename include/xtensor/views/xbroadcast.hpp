@@ -293,7 +293,7 @@ namespace xt
             XTENSOR_THROW(xt::broadcast_error, "Broadcast shape has fewer elements than original expression.");
         }
         xt::resize_container(m_shape, s.size());
-        std::copy(s.begin(), s.end(), m_shape.begin());
+        std::copy_n(s.begin(), s.size(), m_shape.begin());
         xt::broadcast_shape(m_e.shape(), m_shape);
     }
 

@@ -712,7 +712,7 @@ namespace xt
     {
         if (m_cache.is_initialized && reuse_cache)
         {
-            std::copy(m_cache.shape.cbegin(), m_cache.shape.cend(), shape.begin());
+            std::copy_n(m_cache.shape.cbegin(), m_cache.shape.size(), shape.begin());
             return m_cache.is_trivial;
         }
         else

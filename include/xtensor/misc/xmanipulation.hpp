@@ -840,12 +840,12 @@ namespace xt
 
         shape_type shape;
         resize_container(shape, e.shape().size());
-        std::copy(e.shape().cbegin(), e.shape().cend(), shape.begin());
+        std::copy_n(e.shape().cbegin(), e.shape().size(), shape.begin());
 
         get_strides_t<shape_type> strides;
         decltype(auto) old_strides = detail::get_strides<XTENSOR_DEFAULT_LAYOUT>(e);
         resize_container(strides, old_strides.size());
-        std::copy(old_strides.cbegin(), old_strides.cend(), strides.begin());
+        std::copy_n(old_strides.cbegin(), old_strides.size(), strides.begin());
 
         strides[axis] *= -1;
         std::size_t offset = static_cast<std::size_t>(
