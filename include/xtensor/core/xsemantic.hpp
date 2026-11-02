@@ -526,7 +526,7 @@ namespace xt
             }
             else
             {
-                using new_policy = assign_policy<noalias_tag, P::broadcasting, P::parallelism>;
+                using new_policy = assign_policy<noalias_tag, typename P::broadcasting, typename P::parallelism>;
                 return this->derived_cast().assign_xexpression(e, new_policy{});
             }
 #endif

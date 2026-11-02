@@ -304,39 +304,13 @@ namespace xt
             xt_simd::simd_type<value_type>>;
         static constexpr bool needs_cast = has_assign_conversion<e2_value_type, e1_value_type>::value;
 
-        // Holds the per-thread state (steppers and outer index) required
-        // to assign a sequence of consecutive outer iterations.
-        class cursor
-        {
-        public:
-
-            explicit cursor(const strided_loop_assigner& assigner);
-
-            // Assigns the inner loop corresponding to the outer iteration ox,
-            // and moves to the next outer iteration. The first call positions
-            // the steppers on ox, subsequent calls must be made with ox + 1.
-            void assign_row(size_type ox);
-
-        private:
-
-            void step_to_index();
-
-            const strided_loop_assigner* p_assigner;
-            lhs_stepper m_lhs;
-            rhs_stepper m_rhs;
-            index_type m_index;
-            bool m_positioned;
-        };
-
         strided_loop_assigner(E1& e1, const E2& e2);
 
         bool can_do_strided_assign() const noexcept;
         size_type inner_loop_size() const noexcept;
         size_type outer_loop_size() const noexcept;
 
-        cursor make_cursor() const;
-
-        // Assigns the outer iterations [begin, end)
+        // Assigns the outer iterations [begin, end).
         void run(size_type begin, size_type end) const;
 
     private:
@@ -583,13 +557,17 @@ namespace xt
         size_type outer_loop_size = helper.outer_loop_size();
         if (outer_loop_size >= XTENSOR_OPENMP_TRESHOLD / helper.inner_loop_size())
         {
-            // Each thread gets its own copy of the cursor, which positions itself
-            // on the first outer iteration of the chunk assigned to the thread.
-            auto cursor = helper.make_cursor();
-#pragma omp parallel for schedule(static) firstprivate(cursor)
-            for (std::ptrdiff_t ox = 0; ox < static_cast<std::ptrdiff_t>(outer_loop_size); ++ox)
+            // Each thread assigns a contiguous chunk of outer iterations,
+            // as schedule(static) would do
+#pragma omp parallel default(none) shared(helper, outer_loop_size)
             {
-                cursor.assign_row(static_cast<size_type>(ox));
+                size_type nb_threads = static_cast<size_type>(omp_get_num_threads());
+                size_type thread_id = static_cast<size_type>(omp_get_thread_num());
+                size_type chunk = outer_loop_size / nb_threads;
+                size_type rest = outer_loop_size % nb_threads;
+                size_type begin = thread_id * chunk + std::min(thread_id, rest);
+                size_type end = begin + chunk + (thread_id < rest ? 1u : 0u);
+                helper.run(begin, end);
             }
         }
         else
@@ -1071,18 +1049,64 @@ namespace xt
     }
 
     template <class E1, class E2>
-    inline auto strided_loop_assigner<E1, E2>::make_cursor() const -> cursor
-    {
-        return cursor(*this);
-    }
-
-    template <class E1, class E2>
     inline void strided_loop_assigner<E1, E2>::run(size_type begin, size_type end) const
     {
-        cursor c(*this);
+        if (begin >= end)
+        {
+            return;
+        }
+
+        const size_type step_dim = m_step_dim;
+        const size_type simd_size = m_simd_size;
+        const size_type simd_rest = m_simd_rest;
+
+        lhs_stepper lhs = m_e1.stepper_begin(m_e1.shape());
+        rhs_stepper rhs = m_e2.stepper_begin(m_e1.shape());
+        index_type index = xtl::make_sequence<index_type>(m_max_shape.size(), size_type(0));
+
+        if (begin != size_type(0))
+        {
+            nth_idx(begin, index);
+            for (size_type i = 0; i < index.size(); ++i)
+            {
+                lhs.step(i + step_dim, index[i]);
+                rhs.step(i + step_dim, index[i]);
+            }
+        }
+
         for (size_type ox = begin; ox < end; ++ox)
         {
-            c.assign_row(ox);
+            for (size_type i = 0; i < simd_size; ++i)
+            {
+                lhs.store_simd(rhs.template step_simd<value_type>());
+            }
+            for (size_type i = 0; i < simd_rest; ++i)
+            {
+                *lhs = conditional_cast<needs_cast, e1_value_type>(*rhs);
+                lhs.step_leading();
+                rhs.step_leading();
+            }
+
+            next_idx(index);
+
+            // need to step E1 as well if not contiguous assign (e.g. view)
+            rhs.to_begin();
+            if (!E1::contiguous_layout)
+            {
+                lhs.to_begin();
+                for (size_type i = 0; i < index.size(); ++i)
+                {
+                    lhs.step(i + step_dim, index[i]);
+                    rhs.step(i + step_dim, index[i]);
+                }
+            }
+            else
+            {
+                for (size_type i = 0; i < index.size(); ++i)
+                {
+                    rhs.step(i + step_dim, index[i]);
+                }
+            }
         }
     }
 
@@ -1109,72 +1133,6 @@ namespace xt
         else
         {
             strided_assign_detail::idx_tools<layout_type::column_major>::next_idx(index, m_max_shape);
-        }
-    }
-
-    template <class E1, class E2>
-    inline strided_loop_assigner<E1, E2>::cursor::cursor(const strided_loop_assigner& assigner)
-        : p_assigner(&assigner)
-        , m_lhs(assigner.m_e1.stepper_begin(assigner.m_e1.shape()))
-        , m_rhs(assigner.m_e2.stepper_begin(assigner.m_e1.shape()))
-        , m_index(xtl::make_sequence<index_type>(assigner.m_max_shape.size(), size_type(0)))
-        , m_positioned(false)
-    {
-    }
-
-    template <class E1, class E2>
-    inline void strided_loop_assigner<E1, E2>::cursor::assign_row(size_type ox)
-    {
-        const strided_loop_assigner& a = *p_assigner;
-
-        if (!m_positioned)
-        {
-            if (ox != size_type(0))
-            {
-                a.nth_idx(ox, m_index);
-                step_to_index();
-            }
-            m_positioned = true;
-        }
-
-        for (size_type i = 0; i < a.m_simd_size; ++i)
-        {
-            m_lhs.store_simd(m_rhs.template step_simd<value_type>());
-        }
-        for (size_type i = 0; i < a.m_simd_rest; ++i)
-        {
-            *m_lhs = conditional_cast<needs_cast, e1_value_type>(*m_rhs);
-            m_lhs.step_leading();
-            m_rhs.step_leading();
-        }
-
-        a.next_idx(m_index);
-
-        // need to step E1 as well if not contiguous assign (e.g. view)
-        if (!E1::contiguous_layout)
-        {
-            m_lhs.to_begin();
-            m_rhs.to_begin();
-            step_to_index();
-        }
-        else
-        {
-            m_rhs.to_begin();
-            for (size_type i = 0; i < m_index.size(); ++i)
-            {
-                m_rhs.step(i + a.m_step_dim, m_index[i]);
-            }
-        }
-    }
-
-    template <class E1, class E2>
-    inline void strided_loop_assigner<E1, E2>::cursor::step_to_index()
-    {
-        size_type step_dim = p_assigner->m_step_dim;
-        for (size_type i = 0; i < m_index.size(); ++i)
-        {
-            m_lhs.step(i + step_dim, m_index[i]);
-            m_rhs.step(i + step_dim, m_index[i]);
         }
     }
 }
