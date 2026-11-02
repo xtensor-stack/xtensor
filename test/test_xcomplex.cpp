@@ -319,6 +319,16 @@ namespace xt
         EXPECT_EQ(a(4, 4), cmplx(-123.321L, -123.321L));
     }
 
+    TEST(xcomplex, assign_to_real_part)
+    {
+        using cpx = std::complex<double>;
+        xt::xtensor<cpx, 1> a = {cpx(1, 2), cpx(3, 4), cpx(5, 6), cpx(7, 8), cpx(9, 10)};
+        xt::xtensor<double, 1> wr = {11, 12, 13, 14, 15};
+        xt::real(a) = wr;
+        xt::xtensor<cpx, 1> expected = {cpx(11, 2), cpx(12, 4), cpx(13, 6), cpx(14, 8), cpx(15, 10)};
+        EXPECT_EQ(a, expected);
+    }
+
     TEST(xcomplex, build_from_double)
     {
         xt::xarray<double> r = {1., 2., 3.};
