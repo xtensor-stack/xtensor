@@ -185,4 +185,13 @@ namespace xt
         EXPECT_EQ(norm_induced_l1(a, evaluation_strategy::immediate)(), 6.0);
         EXPECT_EQ(norm_induced_linf(a, evaluation_strategy::immediate)(), 7.0);
     }
+
+    TEST(xnorm, invalid_axis)
+    {
+        xarray<double> a = {1., 2., 3.};
+        XT_EXPECT_ANY_THROW(norm_l1(a, {1}));
+        XT_EXPECT_ANY_THROW(norm_l2(a, {1}));
+        XT_EXPECT_ANY_THROW(norm_lp_to_p(a, 3., {1}));
+    }
+
 }  // namespace xt

@@ -187,4 +187,12 @@ namespace xt
         xarray<double> expected = {{1, 2, 3}, {5, 7, 9}};
         EXPECT_EQ(expected, b);
     }
+
+    TEST(xindex_view, filter_broadcast_error)
+    {
+        xarray<double> a = {1., 2., 3.};
+        xarray<double> b = {1., 2.};
+        XT_EXPECT_THROW(filter(a, a > b), broadcast_error);
+    }
+
 }

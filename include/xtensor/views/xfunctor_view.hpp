@@ -169,8 +169,9 @@ namespace xt
         template <class Func, class E>
         xfunctor_applier_base(Func&&, E&&) noexcept;
 
-        size_type size() const noexcept;
-        const inner_shape_type& shape() const noexcept;
+        size_type size() const noexcept(noexcept(std::declval<const xexpression_type&>().size()));
+        const inner_shape_type& shape() const
+            noexcept(noexcept(std::declval<const xexpression_type&>().shape()));
         const inner_strides_type& strides() const noexcept;
         const inner_backstrides_type& backstrides() const noexcept;
         using accessible_base::dimension;
@@ -266,60 +267,60 @@ namespace xt
         }
 
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        auto begin() noexcept;
+        auto begin();
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        auto end() noexcept;
+        auto end();
 
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        auto begin() const noexcept;
+        auto begin() const;
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        auto end() const noexcept;
+        auto end() const;
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        auto cbegin() const noexcept;
+        auto cbegin() const;
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        auto cend() const noexcept;
+        auto cend() const;
 
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        auto rbegin() noexcept;
+        auto rbegin();
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        auto rend() noexcept;
+        auto rend();
 
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        auto rbegin() const noexcept;
+        auto rbegin() const;
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        auto rend() const noexcept;
+        auto rend() const;
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        auto crbegin() const noexcept;
+        auto crbegin() const;
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        auto crend() const noexcept;
+        auto crend() const;
 
         template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        broadcast_iterator<S, L> begin(const S& shape) noexcept;
+        broadcast_iterator<S, L> begin(const S& shape);
         template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        broadcast_iterator<S, L> end(const S& shape) noexcept;
+        broadcast_iterator<S, L> end(const S& shape);
 
         template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        const_broadcast_iterator<S, L> begin(const S& shape) const noexcept;
+        const_broadcast_iterator<S, L> begin(const S& shape) const;
         template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        const_broadcast_iterator<S, L> end(const S& shape) const noexcept;
+        const_broadcast_iterator<S, L> end(const S& shape) const;
         template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        const_broadcast_iterator<S, L> cbegin(const S& shape) const noexcept;
+        const_broadcast_iterator<S, L> cbegin(const S& shape) const;
         template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        const_broadcast_iterator<S, L> cend(const S& shape) const noexcept;
+        const_broadcast_iterator<S, L> cend(const S& shape) const;
 
         template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        reverse_broadcast_iterator<S, L> rbegin(const S& shape) noexcept;
+        reverse_broadcast_iterator<S, L> rbegin(const S& shape);
         template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        reverse_broadcast_iterator<S, L> rend(const S& shape) noexcept;
+        reverse_broadcast_iterator<S, L> rend(const S& shape);
 
         template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        const_reverse_broadcast_iterator<S, L> rbegin(const S& shape) const noexcept;
+        const_reverse_broadcast_iterator<S, L> rbegin(const S& shape) const;
         template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        const_reverse_broadcast_iterator<S, L> rend(const S& shape) const noexcept;
+        const_reverse_broadcast_iterator<S, L> rend(const S& shape) const;
         template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        const_reverse_broadcast_iterator<S, L> crbegin(const S& shape) const noexcept;
+        const_reverse_broadcast_iterator<S, L> crbegin(const S& shape) const;
         template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        const_reverse_broadcast_iterator<S, L> crend(const S& shape) const noexcept;
+        const_reverse_broadcast_iterator<S, L> crend(const S& shape) const;
 
         linear_iterator linear_begin() noexcept;
         linear_iterator linear_end() noexcept;
@@ -706,7 +707,8 @@ namespace xt
      * Returns the size of the expression.
      */
     template <class D>
-    inline auto xfunctor_applier_base<D>::size() const noexcept -> size_type
+    inline auto xfunctor_applier_base<D>::size() const
+        noexcept(noexcept(std::declval<const xexpression_type&>().size())) -> size_type
     {
         return m_e.size();
     }
@@ -715,7 +717,8 @@ namespace xt
      * Returns the shape of the expression.
      */
     template <class D>
-    inline auto xfunctor_applier_base<D>::shape() const noexcept -> const inner_shape_type&
+    inline auto xfunctor_applier_base<D>::shape() const
+        noexcept(noexcept(std::declval<const xexpression_type&>().shape())) -> const inner_shape_type&
     {
         return m_e.shape();
     }
@@ -933,7 +936,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xfunctor_applier_base<D>::begin() noexcept
+    inline auto xfunctor_applier_base<D>::begin()
     {
         return xfunctor_iterator<functor_type, decltype(m_e.template begin<L>())>(
             m_e.template begin<L>(),
@@ -948,7 +951,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xfunctor_applier_base<D>::end() noexcept
+    inline auto xfunctor_applier_base<D>::end()
     {
         return xfunctor_iterator<functor_type, decltype(m_e.template end<L>())>(m_e.template end<L>(), &m_functor);
     }
@@ -959,7 +962,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xfunctor_applier_base<D>::begin() const noexcept
+    inline auto xfunctor_applier_base<D>::begin() const
     {
         return this->template cbegin<L>();
     }
@@ -971,7 +974,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xfunctor_applier_base<D>::end() const noexcept
+    inline auto xfunctor_applier_base<D>::end() const
     {
         return this->template cend<L>();
     }
@@ -982,7 +985,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xfunctor_applier_base<D>::cbegin() const noexcept
+    inline auto xfunctor_applier_base<D>::cbegin() const
     {
         return xfunctor_iterator<const functor_type, decltype(m_e.template cbegin<L>())>(
             m_e.template cbegin<L>(),
@@ -997,7 +1000,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xfunctor_applier_base<D>::cend() const noexcept
+    inline auto xfunctor_applier_base<D>::cend() const
     {
         return xfunctor_iterator<const functor_type, decltype(m_e.template cend<L>())>(
             m_e.template cend<L>(),
@@ -1020,7 +1023,7 @@ namespace xt
      */
     template <class D>
     template <class S, layout_type L>
-    inline auto xfunctor_applier_base<D>::begin(const S& shape) noexcept -> broadcast_iterator<S, L>
+    inline auto xfunctor_applier_base<D>::begin(const S& shape) -> broadcast_iterator<S, L>
     {
         return broadcast_iterator<S, L>(m_e.template begin<S, L>(shape), &m_functor);
     }
@@ -1034,7 +1037,7 @@ namespace xt
      */
     template <class D>
     template <class S, layout_type L>
-    inline auto xfunctor_applier_base<D>::end(const S& shape) noexcept -> broadcast_iterator<S, L>
+    inline auto xfunctor_applier_base<D>::end(const S& shape) -> broadcast_iterator<S, L>
     {
         return broadcast_iterator<S, L>(m_e.template end<S, L>(shape), &m_functor);
     }
@@ -1048,8 +1051,7 @@ namespace xt
      */
     template <class D>
     template <class S, layout_type L>
-    inline auto xfunctor_applier_base<D>::begin(const S& shape) const noexcept
-        -> const_broadcast_iterator<S, L>
+    inline auto xfunctor_applier_base<D>::begin(const S& shape) const -> const_broadcast_iterator<S, L>
     {
         return cbegin<S, L>(shape);
     }
@@ -1063,7 +1065,7 @@ namespace xt
      */
     template <class D>
     template <class S, layout_type L>
-    inline auto xfunctor_applier_base<D>::end(const S& shape) const noexcept -> const_broadcast_iterator<S, L>
+    inline auto xfunctor_applier_base<D>::end(const S& shape) const -> const_broadcast_iterator<S, L>
     {
         return cend<S, L>(shape);
     }
@@ -1077,8 +1079,7 @@ namespace xt
      */
     template <class D>
     template <class S, layout_type L>
-    inline auto xfunctor_applier_base<D>::cbegin(const S& shape) const noexcept
-        -> const_broadcast_iterator<S, L>
+    inline auto xfunctor_applier_base<D>::cbegin(const S& shape) const -> const_broadcast_iterator<S, L>
     {
         return const_broadcast_iterator<S, L>(m_e.template cbegin<S, L>(shape), &m_functor);
     }
@@ -1092,7 +1093,7 @@ namespace xt
      */
     template <class D>
     template <class S, layout_type L>
-    inline auto xfunctor_applier_base<D>::cend(const S& shape) const noexcept -> const_broadcast_iterator<S, L>
+    inline auto xfunctor_applier_base<D>::cend(const S& shape) const -> const_broadcast_iterator<S, L>
     {
         return const_broadcast_iterator<S, L>(m_e.template cend<S, L>(shape), &m_functor);
     }
@@ -1109,7 +1110,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xfunctor_applier_base<D>::rbegin() noexcept
+    inline auto xfunctor_applier_base<D>::rbegin()
     {
         return xfunctor_iterator<functor_type, decltype(m_e.template rbegin<L>())>(
             m_e.template rbegin<L>(),
@@ -1124,7 +1125,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xfunctor_applier_base<D>::rend() noexcept
+    inline auto xfunctor_applier_base<D>::rend()
     {
         return xfunctor_iterator<functor_type, decltype(m_e.template rend<L>())>(
             m_e.template rend<L>(),
@@ -1138,7 +1139,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xfunctor_applier_base<D>::rbegin() const noexcept
+    inline auto xfunctor_applier_base<D>::rbegin() const
     {
         return this->template crbegin<L>();
     }
@@ -1150,7 +1151,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xfunctor_applier_base<D>::rend() const noexcept
+    inline auto xfunctor_applier_base<D>::rend() const
     {
         return this->template crend<L>();
     }
@@ -1161,7 +1162,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xfunctor_applier_base<D>::crbegin() const noexcept
+    inline auto xfunctor_applier_base<D>::crbegin() const
     {
         return xfunctor_iterator<const functor_type, decltype(m_e.template crbegin<L>())>(
             m_e.template crbegin<L>(),
@@ -1176,7 +1177,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xfunctor_applier_base<D>::crend() const noexcept
+    inline auto xfunctor_applier_base<D>::crend() const
     {
         return xfunctor_iterator<const functor_type, decltype(m_e.template crend<L>())>(
             m_e.template crend<L>(),
@@ -1199,7 +1200,7 @@ namespace xt
      */
     template <class D>
     template <class S, layout_type L>
-    inline auto xfunctor_applier_base<D>::rbegin(const S& shape) noexcept -> reverse_broadcast_iterator<S, L>
+    inline auto xfunctor_applier_base<D>::rbegin(const S& shape) -> reverse_broadcast_iterator<S, L>
     {
         return reverse_broadcast_iterator<S, L>(m_e.template rbegin<S, L>(shape), &m_functor);
     }
@@ -1213,7 +1214,7 @@ namespace xt
      */
     template <class D>
     template <class S, layout_type L>
-    inline auto xfunctor_applier_base<D>::rend(const S& shape) noexcept -> reverse_broadcast_iterator<S, L>
+    inline auto xfunctor_applier_base<D>::rend(const S& shape) -> reverse_broadcast_iterator<S, L>
     {
         return reverse_broadcast_iterator<S, L>(m_e.template rend<S, L>(shape), &m_functor);
     }
@@ -1227,7 +1228,7 @@ namespace xt
      */
     template <class D>
     template <class S, layout_type L>
-    inline auto xfunctor_applier_base<D>::rbegin(const S& shape) const noexcept
+    inline auto xfunctor_applier_base<D>::rbegin(const S& shape) const
         -> const_reverse_broadcast_iterator<S, L>
     {
         return crbegin<S, L>(shape);
@@ -1242,7 +1243,7 @@ namespace xt
      */
     template <class D>
     template <class S, layout_type L>
-    inline auto xfunctor_applier_base<D>::rend(const S& /*shape*/) const noexcept
+    inline auto xfunctor_applier_base<D>::rend(const S& /*shape*/) const
         -> const_reverse_broadcast_iterator<S, L>
     {
         return crend<S, L>();
@@ -1257,7 +1258,7 @@ namespace xt
      */
     template <class D>
     template <class S, layout_type L>
-    inline auto xfunctor_applier_base<D>::crbegin(const S& /*shape*/) const noexcept
+    inline auto xfunctor_applier_base<D>::crbegin(const S& /*shape*/) const
         -> const_reverse_broadcast_iterator<S, L>
     {
         return const_reverse_broadcast_iterator<S, L>(m_e.template crbegin<S, L>(), &m_functor);
@@ -1272,8 +1273,7 @@ namespace xt
      */
     template <class D>
     template <class S, layout_type L>
-    inline auto xfunctor_applier_base<D>::crend(const S& shape) const noexcept
-        -> const_reverse_broadcast_iterator<S, L>
+    inline auto xfunctor_applier_base<D>::crend(const S& shape) const -> const_reverse_broadcast_iterator<S, L>
     {
         return const_reverse_broadcast_iterator<S, L>(m_e.template crend<S, L>(shape), &m_functor);
     }

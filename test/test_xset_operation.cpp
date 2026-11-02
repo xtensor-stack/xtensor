@@ -8,6 +8,7 @@
  ****************************************************************************/
 
 #include <cstddef>
+#include <stdexcept>
 
 #include "xtensor/containers/xarray.hpp"
 #include "xtensor/containers/xtensor.hpp"
@@ -25,6 +26,7 @@ namespace xt
         EXPECT_EQ(xt::isin(a, b), res);
         EXPECT_EQ(xt::isin(a, b.begin(), b.end()), res);
         EXPECT_EQ(xt::isin(a, {1, 2}), res);
+        EXPECT_EQ(xt::isin(a, xt::xtensor<int, 1>({1, 2})), res);
     }
 
     TEST(xset_operation, in1d)
@@ -36,6 +38,17 @@ namespace xt
         EXPECT_EQ(xt::in1d(a, b.begin(), b.end()), res);
         EXPECT_EQ(xt::in1d(a, {1, 2}), res);
     }
+
+#ifdef XTENSOR_ENABLE_ASSERT
+    TEST(xset_operation, in1d_not_1d)
+    {
+        xt::xtensor<int, 2> a = {{1, 2}, {3, 4}};
+        xt::xtensor<int, 1> b = {1, 2};
+        XT_EXPECT_THROW(xt::in1d(a, b), std::runtime_error);
+        XT_EXPECT_THROW(xt::in1d(a, b.begin(), b.end()), std::runtime_error);
+        XT_EXPECT_THROW(xt::in1d(a, {1, 2}), std::runtime_error);
+    }
+#endif
 
     TEST(xset_operation, searchsorted)
     {

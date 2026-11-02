@@ -36,7 +36,7 @@ namespace xt
     decltype(auto) real(E&& e) noexcept;
 
     template <class E>
-    decltype(auto) imag(E&& e) noexcept;
+    decltype(auto) imag(E&& e);
 
     /********************************
      * real and imag implementation *
@@ -72,7 +72,7 @@ namespace xt
             }
 
             template <class E>
-            inline static auto imag(E&& e) noexcept
+            inline static auto imag(E&& e)
             {
                 return zeros<typename std::decay_t<E>::value_type>(e.shape());
             }
@@ -90,7 +90,7 @@ namespace xt
             }
 
             template <class E>
-            inline static decltype(auto) imag(E&& e) noexcept
+            inline static decltype(auto) imag(E&& e)
             {
                 return detail::complex_helper<xtl::is_complex<typename std::decay_t<E>::value_type>::value>::imag(
                     std::forward<E>(e)
@@ -141,7 +141,7 @@ namespace xt
      * @tparam e The xt::xexpression
      */
     template <class E>
-    inline decltype(auto) imag(E&& e) noexcept
+    inline decltype(auto) imag(E&& e)
     {
         return detail::complex_expression_helper<is_xexpression<std::decay_t<E>>::value>::imag(std::forward<E>(e
         ));

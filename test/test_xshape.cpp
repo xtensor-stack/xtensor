@@ -66,4 +66,12 @@ namespace xt
         ASSERT_TRUE(xt::has_shape(A, shape));
         ASSERT_TRUE(xt::has_shape(A, {2, 3}));
     }
+
+    TEST(xshape, has_shape_broadcast_error)
+    {
+        xarray<int> a = {1, 2, 3};
+        xarray<int> b = {1, 2};
+        XT_EXPECT_THROW(has_shape(a + b, {3}), broadcast_error);
+    }
+
 }

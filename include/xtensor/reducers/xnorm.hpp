@@ -368,7 +368,7 @@ namespace xt
 
 #define XTENSOR_NORM_FUNCTION_AXES(NAME)                                                             \
     template <class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>                \
-    inline auto NAME(E&& e, const I(&axes)[N], EVS es = EVS()) noexcept                              \
+    inline auto NAME(E&& e, const I(&axes)[N], EVS es = EVS())                                       \
     {                                                                                                \
         using axes_type = std::array<typename std::decay_t<E>::size_type, N>;                        \
         return NAME(std::forward<E>(e), xtl::forward_sequence<axes_type, decltype(axes)>(axes), es); \
@@ -396,7 +396,7 @@ namespace xt
 #define XTENSOR_COMMA ,
 #define XTENSOR_NORM_FUNCTION(NAME, RESULT_TYPE, REDUCE_EXPR, REDUCE_OP, MERGE_FUNC)                                       \
     template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS, XTL_REQUIRES(std::negation<is_reducer_options<X>>)> \
-    inline auto NAME(E&& e, X&& axes, EVS es = EVS()) noexcept                                                             \
+    inline auto NAME(E&& e, X&& axes, EVS es = EVS())                                                                      \
     {                                                                                                                      \
         using value_type = typename std::decay_t<E>::value_type;                                                           \
         using result_type = detail::norm_value_type_t<RESULT_TYPE>;                                                        \
@@ -415,7 +415,7 @@ namespace xt
     }                                                                                                                      \
                                                                                                                            \
     template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS, XTL_REQUIRES(is_xexpression<E>)>                             \
-    inline auto NAME(E&& e, EVS es = EVS()) noexcept                                                                       \
+    inline auto NAME(E&& e, EVS es = EVS())                                                                                \
     {                                                                                                                      \
         return NAME(std::forward<E>(e), arange(e.dimension()), es);                                                        \
     }                                                                                                                      \
@@ -450,7 +450,7 @@ namespace xt
      * the reducer represents a scalar result, otherwise an array of appropriate dimension.
      */
     template <class E, class X, class EVS, class>
-    auto norm_l0(E&& e, X&& axes, EVS es) noexcept;
+    auto norm_l0(E&& e, X&& axes, EVS es);
 
     /**
      * @ingroup red_functions
@@ -465,7 +465,7 @@ namespace xt
      * the reducer represents a scalar result, otherwise an array of appropriate dimension.
      */
     template <class E, class X, class EVS, class>
-    auto norm_l1(E&& e, X&& axes, EVS es) noexcept;
+    auto norm_l1(E&& e, X&& axes, EVS es);
 
     /**
      * @ingroup red_functions
@@ -480,7 +480,7 @@ namespace xt
      * the reducer represents a scalar result, otherwise an array of appropriate dimension.
      */
     template <class E, class X, class EVS, class>
-    auto norm_sq(E&& e, X&& axes, EVS es) noexcept;
+    auto norm_sq(E&& e, X&& axes, EVS es);
 
     /**
      * @ingroup red_functions
@@ -491,7 +491,7 @@ namespace xt
      *  otherwise: implemented as <tt>sqrt(norm_sq(t))</tt>.
      */
     template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS, XTL_REQUIRES(is_xexpression<E>)>
-    inline auto norm_l2(E&& e, EVS es = EVS()) noexcept
+    inline auto norm_l2(E&& e, EVS es = EVS())
     {
         using std::sqrt;
         return sqrt(norm_sq(std::forward<E>(e), es));
@@ -513,13 +513,13 @@ namespace xt
         class X,
         class EVS = DEFAULT_STRATEGY_REDUCERS,
         XTL_REQUIRES(is_xexpression<E>, std::negation<is_reducer_options<X>>)>
-    inline auto norm_l2(E&& e, X&& axes, EVS es = EVS()) noexcept
+    inline auto norm_l2(E&& e, X&& axes, EVS es = EVS())
     {
         return sqrt(norm_sq(std::forward<E>(e), std::forward<X>(axes), es));
     }
 
     template <class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
-    inline auto norm_l2(E&& e, const I (&axes)[N], EVS es = EVS()) noexcept
+    inline auto norm_l2(E&& e, const I (&axes)[N], EVS es = EVS())
     {
         using axes_type = std::array<typename std::decay_t<E>::size_type, N>;
         return sqrt(norm_sq(std::forward<E>(e), xtl::forward_sequence<axes_type, decltype(axes)>(axes), es));
@@ -538,7 +538,7 @@ namespace xt
      * the reducer represents a scalar result, otherwise an array of appropriate dimension.
      */
     template <class E, class X, class EVS, class>
-    auto norm_linf(E&& e, X&& axes, EVS es) noexcept;
+    auto norm_linf(E&& e, X&& axes, EVS es);
 
     /**
      * @ingroup red_functions
@@ -554,7 +554,7 @@ namespace xt
      * the reducer represents a scalar result, otherwise an array of appropriate dimension.
      */
     template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS, XTL_REQUIRES(std::negation<is_reducer_options<X>>)>
-    inline auto norm_lp_to_p(E&& e, double p, X&& axes, EVS es = EVS()) noexcept
+    inline auto norm_lp_to_p(E&& e, double p, X&& axes, EVS es = EVS())
     {
         using value_type = typename std::decay_t<E>::value_type;
         using result_type = norm_type_t<std::decay_t<E>>;
@@ -572,13 +572,13 @@ namespace xt
     }
 
     template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS, XTL_REQUIRES(is_xexpression<E>)>
-    inline auto norm_lp_to_p(E&& e, double p, EVS es = EVS()) noexcept
+    inline auto norm_lp_to_p(E&& e, double p, EVS es = EVS())
     {
         return norm_lp_to_p(std::forward<E>(e), p, arange(e.dimension()), es);
     }
 
     template <class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
-    inline auto norm_lp_to_p(E&& e, double p, const I (&axes)[N], EVS es = EVS()) noexcept
+    inline auto norm_lp_to_p(E&& e, double p, const I (&axes)[N], EVS es = EVS())
     {
         using axes_type = std::array<typename std::decay_t<E>::size_type, N>;
         return norm_lp_to_p(std::forward<E>(e), p, xtl::forward_sequence<axes_type, decltype(axes)>(axes), es);

@@ -1772,7 +1772,7 @@ namespace xt
      * @return a boolean
      */
     template <class E1, class E2>
-    inline auto allclose(E1&& e1, E2&& e2, double rtol = 1e-05, double atol = 1e-08) noexcept
+    inline auto allclose(E1&& e1, E2&& e2, double rtol = 1e-05, double atol = 1e-08)
     {
         return xt::all(isclose(std::forward<E1>(e1), std::forward<E2>(e2), rtol, atol));
     }

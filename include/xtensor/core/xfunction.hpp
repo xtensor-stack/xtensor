@@ -50,8 +50,8 @@ namespace xt
             bool is_trivial;
             bool is_initialized;
 
-            xfunction_cache_impl()
-                : shape(xtl::make_sequence<S>(0, std::size_t(0)))
+            xfunction_cache_impl() noexcept
+                : shape()
                 , is_trivial(false)
                 , is_initialized(false)
             {
@@ -272,10 +272,13 @@ namespace xt
         using const_reverse_iterator = typename iterable_base::const_reverse_iterator;
 
         template <class Func, class... CTA, class U = std::enable_if_t<!std::is_base_of<std::decay_t<Func>, self_type>::value>>
-        xfunction(Func&& f, CTA&&... e) noexcept;
+        xfunction(Func&& f, CTA&&... e) noexcept(
+            std::is_nothrow_constructible<tuple_type, CTA&&...>::value
+            && std::is_nothrow_constructible<functor_type, Func&&>::value
+        );
 
         template <class FA, class... CTA>
-        xfunction(xfunction<FA, CTA...> xf) noexcept;
+        xfunction(xfunction<FA, CTA...> xf);
 
         ~xfunction() = default;
 
@@ -498,7 +501,10 @@ namespace xt
      */
     template <class F, class... CT>
     template <class Func, class... CTA, class U>
-    inline xfunction<F, CT...>::xfunction(Func&& f, CTA&&... e) noexcept
+    inline xfunction<F, CT...>::xfunction(Func&& f, CTA&&... e) noexcept(
+        std::is_nothrow_constructible<tuple_type, CTA&&...>::value
+        && std::is_nothrow_constructible<functor_type, Func&&>::value
+    )
         : m_e(std::forward<CTA>(e)...)
         , m_f(std::forward<Func>(f))
     {
@@ -511,7 +517,7 @@ namespace xt
      */
     template <class F, class... CT>
     template <class FA, class... CTA>
-    inline xfunction<F, CT...>::xfunction(xfunction<FA, CTA...> xf) noexcept
+    inline xfunction<F, CT...>::xfunction(xfunction<FA, CTA...> xf)
         : m_e(xf.arguments())
         , m_f(xf.functor())
     {

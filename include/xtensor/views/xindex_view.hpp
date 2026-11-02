@@ -818,7 +818,7 @@ namespace xt
      * \sa filtration
      */
     template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E, class O>
-    inline auto filter(E&& e, O&& condition) noexcept
+    inline auto filter(E&& e, O&& condition)
     {
         auto indices = argwhere<L>(std::forward<O>(condition));
         using view_type = xindex_view<xclosure_t<E>, decltype(indices)>;

@@ -12,6 +12,7 @@
 #endif
 
 #include <sstream>
+#include <stdexcept>
 
 #include "xtensor/containers/xarray.hpp"
 #include "xtensor/containers/xfixed.hpp"
@@ -706,4 +707,20 @@ namespace xt
         b = std::is_same<decltype(ed3), xarray<double>>::value;
         EXPECT_TRUE(b);
     }
+
+    TEST(xbuilder, meshgrid_broadcast_error)
+    {
+        xarray<int> a = {1, 2, 3};
+        xarray<int> b = {1, 2};
+        XT_EXPECT_THROW(meshgrid(a + b, a), broadcast_error);
+    }
+
+#ifdef XTENSOR_ENABLE_ASSERT
+    TEST(xbuilder, arange_fixed_shape_mismatch)
+    {
+        xtensor_fixed<int, xshape<3>> a;
+        XT_EXPECT_THROW(a = arange(5), std::runtime_error);
+    }
+#endif
+
 }

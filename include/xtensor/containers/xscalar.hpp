@@ -159,12 +159,12 @@ namespace xt
         using accessible_base::shape;
 
         template <class... Args>
-        reference operator()(Args...) noexcept;
+        reference operator()(Args...);
         template <class... Args>
         reference unchecked(Args...) noexcept;
 
         template <class... Args>
-        const_reference operator()(Args...) const noexcept;
+        const_reference operator()(Args...) const;
         template <class... Args>
         const_reference unchecked(Args...) const noexcept;
 
@@ -551,7 +551,7 @@ namespace xt
 
     template <class CT>
     template <class... Args>
-    inline auto xscalar<CT>::operator()(Args...) noexcept -> reference
+    inline auto xscalar<CT>::operator()(Args...) -> reference
     {
         XTENSOR_CHECK_DIMENSION((std::array<int, 0>()), Args()...);
         return m_value;
@@ -566,7 +566,7 @@ namespace xt
 
     template <class CT>
     template <class... Args>
-    inline auto xscalar<CT>::operator()(Args...) const noexcept -> const_reference
+    inline auto xscalar<CT>::operator()(Args...) const -> const_reference
     {
         XTENSOR_CHECK_DIMENSION((std::array<int, 0>()), Args()...);
         return m_value;

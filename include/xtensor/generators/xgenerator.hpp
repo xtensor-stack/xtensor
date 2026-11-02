@@ -166,7 +166,7 @@ namespace xt
         const_stepper stepper_end(const O& shape, layout_type) const noexcept;
 
         template <class E, class FE = F>
-        void assign_to(xexpression<E>& e) const noexcept
+        void assign_to(xexpression<E>& e) const
             requires(assignable_to_expression<E, FE>);
 
         const functor_type& functor() const noexcept;
@@ -373,7 +373,7 @@ namespace xt
 
     template <class F, class R, class S>
     template <class E, class FE>
-    inline void xgenerator<F, R, S>::assign_to(xexpression<E>& e) const noexcept
+    inline void xgenerator<F, R, S>::assign_to(xexpression<E>& e) const
         requires(assignable_to_expression<E, FE>)
     {
         e.derived_cast().resize(m_shape);

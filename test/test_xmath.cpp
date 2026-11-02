@@ -1025,4 +1025,12 @@ namespace xt
         xt::xtensor<double, 1> expected_sums = {1.0, 1.0};
         EXPECT_TRUE(xt::allclose(row_sums, expected_sums));
     }
+
+    TEST(xmath, allclose_broadcast_error)
+    {
+        xarray<double> a = {1., 2., 3.};
+        xarray<double> b = {1., 2.};
+        XT_EXPECT_THROW(allclose(a, b), broadcast_error);
+    }
+
 }

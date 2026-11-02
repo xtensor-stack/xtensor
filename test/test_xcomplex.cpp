@@ -356,4 +356,16 @@ namespace xt
         xtensor<double, 1> exp_im = {double(1), double(1), double(-2)};
         EXPECT_EQ(im, exp_im);
     }
+
+    TEST(xcomplex, broadcast_error)
+    {
+        using cpx = std::complex<double>;
+        xarray<cpx> a = {cpx(1., 1.), cpx(2., 2.), cpx(3., 3.)};
+        xarray<cpx> b = {cpx(1., 1.), cpx(2., 2.)};
+        XT_EXPECT_THROW(real(a + b).shape(), broadcast_error);
+        xarray<double> c = {1., 2., 3.};
+        xarray<double> d = {1., 2.};
+        XT_EXPECT_THROW(imag(c + d), broadcast_error);
+    }
+
 }
