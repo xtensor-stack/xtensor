@@ -28,6 +28,7 @@
 #include <xtl/xtype_traits.hpp>
 
 #include "../core/xtensor_config.hpp"
+#include "xexception.hpp"
 
 namespace xt
 {
@@ -47,8 +48,22 @@ namespace xt
     template <std::size_t I, class... Args>
     constexpr decltype(auto) argument(Args&&... args) noexcept;
 
+    namespace detail
+    {
+        // Whether calling F on each element type S and converting the result to R cannot throw.
+        template <class R, class F, class... S>
+        inline constexpr bool
+            is_nothrow_apply_call_v = (noexcept(static_cast<R>(std::declval<F&>()(std::declval<const S&>()))) && ...);
+
+        // apply also checks the index and falls back to R{}.
+        template <class R, class F, class... S>
+        inline constexpr bool is_nothrow_apply_v = is_nothrow_apply_call_v<R, F, S...>
+                                                   && std::is_nothrow_default_constructible<R>::value
+                                                   && !assert_can_throw;
+    }
+
     template <class R, class F, class... S>
-    R apply(std::size_t index, F&& func, const std::tuple<S...>& s) noexcept(noexcept(func(std::get<0>(s))));
+    R apply(std::size_t index, F&& func, const std::tuple<S...>& s) noexcept(detail::is_nothrow_apply_v<R, F, S...>);
 
     template <class T, class S>
     void nested_copy(T&& iter, const S& s);
@@ -252,7 +267,7 @@ namespace xt
 
     template <class R, class F, class... S>
     inline R
-    apply(std::size_t index, F&& func, const std::tuple<S...>& s) noexcept(noexcept(func(std::get<0>(s))))
+    apply(std::size_t index, F&& func, const std::tuple<S...>& s) noexcept(detail::is_nothrow_apply_v<R, F, S...>)
     {
         XTENSOR_ASSERT(sizeof...(S) > index);
         return std::apply(

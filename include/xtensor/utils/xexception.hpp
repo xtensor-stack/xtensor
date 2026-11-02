@@ -340,6 +340,17 @@ namespace xt
 #define XTENSOR_ASSERT(expr)
 #endif
 
+    namespace detail
+    {
+        // True when a failing XTENSOR_ASSERT throws. A function containing an
+        // XTENSOR_ASSERT can only be noexcept when this is false.
+#if defined(XTENSOR_ENABLE_ASSERT) && !defined(XTENSOR_DISABLE_EXCEPTIONS)
+        inline constexpr bool assert_can_throw = true;
+#else
+        inline constexpr bool assert_can_throw = false;
+#endif
+    }
+
 #ifdef XTENSOR_ENABLE_CHECK_DIMENSION
 #define XTENSOR_CHECK_DIMENSION(S, ARGS) XTENSOR_TRY(check_dimension(S, ARGS))
 #else
