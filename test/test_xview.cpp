@@ -1736,6 +1736,28 @@ namespace xt
         EXPECT_EQ(res, 2);
     }
 
+    TEST(xview, element_newaxis_before_integral)
+    {
+        xarray<int> a = xt::arange<int>(24).reshape({2, 3, 4});
+
+        // The newaxis shifts the view dimensions that follow the integral slice.
+        auto v = view(a, newaxis(), 1, all());
+        auto w = view(a, newaxis(), keep(1), 0, newaxis(), drop(0, 3));
+        for (std::size_t j = 0; j < 3; ++j)
+        {
+            for (std::size_t k = 0; k < 4; ++k)
+            {
+                xindex idx = {0, j, k};
+                EXPECT_EQ(v[idx], a(1, j, k));
+            }
+        }
+        for (std::size_t k = 0; k < 2; ++k)
+        {
+            xindex idx = {0, 0, 0, k};
+            EXPECT_EQ(w[idx], a(1, 0, k + 1));
+        }
+    }
+
     TEST(xview, view_reshape_view)
     {
         xtensor<int, 1> a = {0, 1, 2};
