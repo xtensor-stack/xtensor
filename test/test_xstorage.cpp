@@ -8,6 +8,8 @@
  ****************************************************************************/
 
 #include <numeric>
+#include <type_traits>
+#include <utility>
 
 #include "xtensor/containers/xstorage.hpp"
 #include "xtensor/core/xtensor_config.hpp"
@@ -345,4 +347,41 @@ namespace xt
         EXPECT_EQ(a.front(), size_t(3));
         EXPECT_EQ(a.size(), size_t(3));
     }
+
+    TEST(svector, move)
+    {
+        static_assert(std::is_nothrow_move_constructible<svector_type>::value);
+        static_assert(std::is_nothrow_move_assignable<svector_type>::value);
+        static_assert(std::is_nothrow_swappable<svector_type>::value);
+
+        // A heap buffer is transferred, not copied.
+        svector_type a = {1, 3, 4, 6, 7};
+        const std::size_t* heap = a.data();
+        svector_type b(std::move(a));
+        EXPECT_EQ(b.data(), heap);
+        EXPECT_EQ(b, svector_type({1, 3, 4, 6, 7}));
+        EXPECT_TRUE(a.empty());
+
+        svector_type c = {1, 2};
+        c = std::move(b);
+        EXPECT_EQ(c.data(), heap);
+        EXPECT_EQ(c, svector_type({1, 3, 4, 6, 7}));
+        EXPECT_TRUE(b.empty());
+
+        // Elements stored inline are moved into the existing storage.
+        svector_type d = {5, 6};
+        svector_type e(std::move(d));
+        EXPECT_EQ(e, svector_type({5, 6}));
+        EXPECT_TRUE(d.empty());
+
+        c = std::move(e);
+        EXPECT_EQ(c.data(), heap);
+        EXPECT_EQ(c, svector_type({5, 6}));
+        EXPECT_TRUE(e.empty());
+
+        // Moved-from vectors can be reused.
+        a = {8, 9};
+        EXPECT_EQ(a, svector_type({8, 9}));
+    }
+
 }

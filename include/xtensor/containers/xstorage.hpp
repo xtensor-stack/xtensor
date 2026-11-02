@@ -680,7 +680,7 @@ namespace xt
             requires(N != N2);
 
         svector(const svector& other);
-        svector(svector&& other) noexcept(std::is_nothrow_move_constructible<value_type>::value);
+        svector(svector&& other) noexcept(std::is_nothrow_move_assignable<value_type>::value);
 
         void assign(size_type n, const value_type& v);
 
@@ -761,6 +761,7 @@ namespace xt
 
         void grow(size_type min_capacity = 0);
         void destroy_range(T* begin, T* end);
+        void move_from(svector& rhs) noexcept(std::is_nothrow_move_assignable<value_type>::value);
     };
 
     template <class T, std::size_t N, class A, bool Init>
@@ -846,7 +847,10 @@ namespace xt
     inline svector<T, N, A, Init>& svector<T, N, A, Init>::operator=(svector&& rhs
     ) noexcept(std::is_nothrow_move_assignable<value_type>::value)
     {
-        assign(rhs.begin(), rhs.end());
+        if (this != &rhs)
+        {
+            move_from(rhs);
+        }
         return *this;
     }
 
@@ -889,9 +893,10 @@ namespace xt
 
     template <class T, std::size_t N, class A, bool Init>
     inline svector<T, N, A, Init>::svector(svector&& rhs
-    ) noexcept(std::is_nothrow_move_constructible<value_type>::value)
+    ) noexcept(std::is_nothrow_move_assignable<value_type>::value)
+        : m_allocator(rhs.m_allocator)
     {
-        this->swap(rhs);
+        move_from(rhs);
     }
 
     template <class T, std::size_t N, class A, bool Init>
@@ -1275,46 +1280,89 @@ namespace xt
             return;
         }
 
-        // We can only avoid copying elements if neither vector is small.
-        if (!this->on_stack() && !rhs.on_stack())
+        if constexpr (std::is_same<svector<T, ON, OA, InitA>, self_type>::value)
         {
-            swap(this->m_begin, rhs.m_begin);
-            swap(this->m_end, rhs.m_end);
-            swap(this->m_capacity, rhs.m_capacity);
-            return;
+            // Moves never allocate, so swapping two vectors of the same type cannot fail.
+            self_type tmp(std::move(*this));
+            *this = std::move(rhs);
+            rhs = std::move(tmp);
         }
+        else
+        {
+            // We can only avoid copying elements if neither vector is small.
+            if (!this->on_stack() && !rhs.on_stack())
+            {
+                swap(this->m_begin, rhs.m_begin);
+                swap(this->m_end, rhs.m_end);
+                swap(this->m_capacity, rhs.m_capacity);
+                return;
+            }
 
-        size_type rhs_old_size = rhs.size();
-        size_type old_size = this->size();
+            size_type rhs_old_size = rhs.size();
+            size_type old_size = this->size();
 
-        if (rhs_old_size > old_size)
-        {
-            this->resize(rhs_old_size);
-        }
-        else if (old_size > rhs_old_size)
-        {
-            rhs.resize(old_size);
-        }
+            if (rhs_old_size > old_size)
+            {
+                this->resize(rhs_old_size);
+            }
+            else if (old_size > rhs_old_size)
+            {
+                rhs.resize(old_size);
+            }
 
-        // Swap the shared elements.
-        size_type min_size = (std::min)(old_size, rhs_old_size);
-        for (size_type i = 0; i < min_size; ++i)
-        {
-            swap((*this)[i], rhs[i]);
-        }
+            // Swap the shared elements.
+            size_type min_size = (std::min)(old_size, rhs_old_size);
+            for (size_type i = 0; i < min_size; ++i)
+            {
+                swap((*this)[i], rhs[i]);
+            }
 
-        // Copy over the extra elts.
-        if (old_size > rhs_old_size)
-        {
-            std::copy(this->begin() + min_size, this->end(), rhs.begin() + min_size);
-            this->destroy_range(this->begin() + min_size, this->end());
-            this->m_end = this->begin() + min_size;
+            // Copy over the extra elts.
+            if (old_size > rhs_old_size)
+            {
+                std::copy(this->begin() + min_size, this->end(), rhs.begin() + min_size);
+                this->destroy_range(this->begin() + min_size, this->end());
+                this->m_end = this->begin() + min_size;
+            }
+            else if (rhs_old_size > old_size)
+            {
+                std::copy(rhs.begin() + min_size, rhs.end(), this->begin() + min_size);
+                this->destroy_range(rhs.begin() + min_size, rhs.end());
+                rhs.m_end = rhs.begin() + min_size;
+            }
         }
-        else if (rhs_old_size > old_size)
+    }
+
+    template <class T, std::size_t N, class A, bool Init>
+    inline void svector<T, N, A, Init>::move_from(svector& rhs
+    ) noexcept(std::is_nothrow_move_assignable<value_type>::value)
+    {
+        if (rhs.on_stack())
         {
-            std::copy(rhs.begin() + min_size, rhs.end(), this->begin() + min_size);
-            this->destroy_range(rhs.begin() + min_size, rhs.end());
-            rhs.m_end = rhs.begin() + min_size;
+            // rhs holds at most N elements, and the current storage (inline buffer or a heap
+            // buffer, whose capacity is always greater than N) can hold them.
+            m_end = std::move(rhs.m_begin, rhs.m_end, m_begin);
+            rhs.m_end = rhs.m_begin;
+        }
+        else
+        {
+            // Take ownership of the heap buffer of rhs together with the allocator that
+            // allocated it.
+            if (!on_stack())
+            {
+                detail::safe_destroy_deallocate(
+                    m_allocator,
+                    m_begin,
+                    static_cast<std::size_t>(m_capacity - m_begin)
+                );
+            }
+            m_allocator = rhs.m_allocator;
+            m_begin = rhs.m_begin;
+            m_end = rhs.m_end;
+            m_capacity = rhs.m_capacity;
+            rhs.m_begin = std::begin(rhs.m_data);
+            rhs.m_end = std::begin(rhs.m_data);
+            rhs.m_capacity = std::end(rhs.m_data);
         }
     }
 
@@ -1398,7 +1446,9 @@ namespace xt
     }
 
     template <class T, std::size_t N, class A, bool Init>
-    inline void swap(svector<T, N, A, Init>& lhs, svector<T, N, A, Init>& rhs) noexcept
+    inline void
+    swap(svector<T, N, A, Init>& lhs, svector<T, N, A, Init>& rhs) noexcept(std::is_nothrow_move_assignable<T>::value
+    )
     {
         lhs.swap(rhs);
     }
