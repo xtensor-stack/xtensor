@@ -7,6 +7,9 @@
  * The full license is in the file LICENSE, distributed with this software. *
  ****************************************************************************/
 
+#ifndef XTENSOR_ASSIGNER_HPP
+#define XTENSOR_ASSIGNER_HPP
+
 #include "../core/xassign_proxy.hpp"
 #include "../core/xfunction.hpp"
 
@@ -119,7 +122,7 @@ namespace xt
 
 #if defined(XTENSOR_USE_OPENMP)
     template <class E1, class E2>
-    struct parallel_assigner<E1, E2, mpi_tag>
+    struct parallel_assigner<E1, E2, openmp_tag>
     {
         using type = openmp_assigner<E1, E2>;
     };
@@ -1136,3 +1139,5 @@ namespace xt
         }
     }
 }
+
+#endif

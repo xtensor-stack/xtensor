@@ -7,7 +7,8 @@
  * The full license is in the file LICENSE, distributed with this software. *
  ****************************************************************************/
 
-#pragma once
+#ifndef XTENSOR_ASSIGN_PROXY_HPP
+#define XTENSOR_ASSIGN_PROXY_HPP
 
 #include <concepts>
 
@@ -47,7 +48,7 @@ namespace xt
     {
     };
 
-    struct mpi_tag
+    struct openmp_tag
     {
     };
 
@@ -59,7 +60,7 @@ namespace xt
 
     template <class A>
     concept parallel_policy = std::same_as<A, default_parallel_tag> or std::same_as<A, noparallel_tag>
-                              or std::same_as<A, tbb_tag> or std::same_as<A, mpi_tag>;
+                              or std::same_as<A, tbb_tag> or std::same_as<A, openmp_tag>;
 
     template <aliasing_policy A1, aliasing_policy A2>
     constexpr auto operator|(A1, A2) noexcept;
@@ -89,7 +90,7 @@ namespace xt
     inline constexpr assign_policy<alias_tag, nobroadcast_tag> nobroadcast{};
     inline constexpr assign_policy<alias_tag, broadcast_tag, noparallel_tag> noparallel{};
     inline constexpr assign_policy<alias_tag, broadcast_tag, tbb_tag> tbb{};
-    inline constexpr assign_policy<alias_tag, broadcast_tag, mpi_tag> mpi{};
+    inline constexpr assign_policy<alias_tag, broadcast_tag, openmp_tag> openmp{};
 
     template <class P>
     concept has_aliasing = std::same_as<typename P::aliasing, alias_tag>;
@@ -178,7 +179,10 @@ namespace xt
         {
             return A2{};
         }
-        return A1{};
+        else
+        {
+            return A1{};
+        }
     }
 
     template <broadcasting_policy B1, broadcasting_policy B2>
@@ -188,7 +192,10 @@ namespace xt
         {
             return B2{};
         }
-        return B1{};
+        else
+        {
+            return B1{};
+        }
     }
 
     template <parallel_policy P1, parallel_policy P2>
@@ -198,7 +205,10 @@ namespace xt
         {
             return P2{};
         }
-        return P1{};
+        else
+        {
+            return P1{};
+        }
     }
 
     template <aliasing_policy A, broadcasting_policy B, parallel_policy P>
@@ -353,3 +363,5 @@ namespace xt
         return m_array.bit_xor_assign(e, P{});
     }
 }
+
+#endif

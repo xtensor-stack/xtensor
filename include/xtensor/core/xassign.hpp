@@ -84,11 +84,14 @@ namespace xt
 
     private:
 
-        template <class E>
-        static typename E::shape_type get_nobroadcast_shape(const E& e);
+        template <class S, class E>
+        static S get_nobroadcast_shape(const E& e);
 
-        template <class F, class... CT>
-        static typename xfunction<F, CT...>::shape_type get_nobroadcast_shape(const xfunction<F, CT...>& f);
+        template <class S, class F, class... CT>
+        static S get_nobroadcast_shape(const xfunction<F, CT...>& f);
+
+        template <class S, size_t I, class... CT>
+        static S get_nobroadcast_shape(const std::tuple<CT...>& args);
 
         template <class E1, class E2, class P>
         static bool resize(E1& e1, const E2& e2, P);
@@ -430,6 +433,7 @@ namespace xt
         }
         else
         {
+            XTENSOR_ASSERT(same_shape(de1.shape(), de2.shape()));
             base_type::assign_data(e1, e2, true, p);
         }
     }
@@ -478,19 +482,36 @@ namespace xt
     }
 
     template <class Tag>
-    template <class E>
-    inline auto xexpression_assigner<Tag>::get_nobroadcast_shape(const E& e) -> typename E::shape_type
+    template <class S, class E>
+    inline S xexpression_assigner<Tag>::get_nobroadcast_shape(const E& e)
     {
-        return e.shape();
+        const auto& shape = e.shape();
+        return xtl::forward_sequence<S, decltype(shape)>(shape);
     }
 
     template <class Tag>
-    template <class F, class... CT>
-    inline auto xexpression_assigner<Tag>::get_nobroadcast_shape(const xfunction<F, CT...>& f) ->
-        typename xfunction<F, CT...>::shape_type
+    template <class S, class F, class... CT>
+    inline S xexpression_assigner<Tag>::get_nobroadcast_shape(const xfunction<F, CT...>& f)
     {
-        auto& first_arg = std::get<0>(f.arguments());
-        return get_nobroadcast_shape(first_arg);
+        return get_nobroadcast_shape<S, 0>(f.arguments());
+    }
+
+    template <class Tag>
+    template <class S, size_t I, class... CT>
+    inline S xexpression_assigner<Tag>::get_nobroadcast_shape(const std::tuple<CT...>& args)
+    {
+        if constexpr (I == sizeof...(CT))
+        {
+            return S{};
+        }
+        else if constexpr (xscalar_concept<std::tuple_element_t<I, std::tuple<CT...>>>)
+        {
+            return get_nobroadcast_shape<S, I + 1>(args);
+        }
+        else
+        {
+            return get_nobroadcast_shape<S>(std::get<I>(args));
+        }
     }
 
     template <class Tag>
@@ -523,8 +544,8 @@ namespace xt
             }
             else
             {
-                using shape_type = typename xfunction<F, CT...>::shape_type;
-                shape_type shape = get_nobroadcast_shape(e2);
+                using shape_type = typename E1::shape_type;
+                shape_type shape = get_nobroadcast_shape<shape_type>(e2);
                 e1.resize(std::move(shape));
                 return true;
             }
@@ -547,7 +568,7 @@ namespace xt
         }
         else
         {
-            if (!de1.shape() == de2.shape())
+            if (!same_shape(de1.shape(), de2.shape()))
             {
                 throw_broadcast_error(de2.shape(), de1.shape());
             }

@@ -152,6 +152,11 @@ namespace xt
 
         template <class E>
         derived_type& operator=(const xexpression<E>&);
+
+    private:
+
+        template <class E, class P>
+        derived_type& computed_assign(const xexpression<E>& e, P p);
     };
 
     template <class E>
@@ -186,10 +191,10 @@ namespace xt
         derived_type& assign_temporary(temporary_type&&);
 
         template <class E, class P>
-        derived_type& assign_xexpression(const xexpression<E>& e, P p = P{});
+        derived_type& assign_xexpression(const xexpression<E>& e, P p);
 
-        template <class E, class P = assign_policy<>>
-        derived_type& computed_assign(const xexpression<E>& e, P p = P{});
+        template <class E, class P>
+        derived_type& eval_computed_assign(const xexpression<E>& e, P p);
 
         template <class E, class F, class P = assign_policy<>>
         derived_type& scalar_computed_assign(const E& e, F&& f, P p = P{});
@@ -263,10 +268,10 @@ namespace xt
         derived_type& assign_temporary(temporary_type&&);
 
         template <class E, class P>
-        derived_type& assign_xexpression(const xexpression<E>& e, P p = P{});
+        derived_type& assign_xexpression(const xexpression<E>& e, P p);
 
-        template <class E, class P = assign_policy<>>
-        derived_type& computed_assign(const xexpression<E>& e, P p = P{});
+        template <class E, class P>
+        derived_type& eval_computed_assign(const xexpression<E>& e, P p);
 
         template <class E, class F, class P = assign_policy<>>
         derived_type& scalar_computed_assign(const E& e, F&& f, P p = P{});
@@ -408,7 +413,7 @@ namespace xt
     template <class E>
     inline auto xsemantic_base<D>::operator+=(const xexpression<E>& e) -> derived_type&
     {
-        return this->derived_cast() = this->derived_cast() + e.derived_cast();
+        return this->derived_cast().computed_assign(this->derived_cast() + e.derived_cast(), default_assign);
     }
 
     /**
@@ -420,7 +425,7 @@ namespace xt
     template <class E>
     inline auto xsemantic_base<D>::operator-=(const xexpression<E>& e) -> derived_type&
     {
-        return this->derived_cast() = this->derived_cast() - e.derived_cast();
+        return this->derived_cast().computed_assign(this->derived_cast() - e.derived_cast(), default_assign);
     }
 
     /**
@@ -432,7 +437,7 @@ namespace xt
     template <class E>
     inline auto xsemantic_base<D>::operator*=(const xexpression<E>& e) -> derived_type&
     {
-        return this->derived_cast() = this->derived_cast() * e.derived_cast();
+        return this->derived_cast().computed_assign(this->derived_cast() * e.derived_cast(), default_assign);
     }
 
     /**
@@ -444,7 +449,7 @@ namespace xt
     template <class E>
     inline auto xsemantic_base<D>::operator/=(const xexpression<E>& e) -> derived_type&
     {
-        return this->derived_cast() = this->derived_cast() / e.derived_cast();
+        return this->derived_cast().computed_assign(this->derived_cast() / e.derived_cast(), default_assign);
     }
 
     /**
@@ -456,7 +461,7 @@ namespace xt
     template <class E>
     inline auto xsemantic_base<D>::operator%=(const xexpression<E>& e) -> derived_type&
     {
-        return this->derived_cast() = this->derived_cast() % e.derived_cast();
+        return this->derived_cast().computed_assign(this->derived_cast() % e.derived_cast(), default_assign);
     }
 
     /**
@@ -468,7 +473,7 @@ namespace xt
     template <class E>
     inline auto xsemantic_base<D>::operator&=(const xexpression<E>& e) -> derived_type&
     {
-        return this->derived_cast() = this->derived_cast() & e.derived_cast();
+        return this->derived_cast().computed_assign(this->derived_cast() & e.derived_cast(), default_assign);
     }
 
     /**
@@ -480,7 +485,7 @@ namespace xt
     template <class E>
     inline auto xsemantic_base<D>::operator|=(const xexpression<E>& e) -> derived_type&
     {
-        return this->derived_cast() = this->derived_cast() | e.derived_cast();
+        return this->derived_cast().computed_assign(this->derived_cast() | e.derived_cast(), default_assign);
     }
 
     /**
@@ -492,7 +497,7 @@ namespace xt
     template <class E>
     inline auto xsemantic_base<D>::operator^=(const xexpression<E>& e) -> derived_type&
     {
-        return this->derived_cast() = this->derived_cast() ^ e.derived_cast();
+        return this->derived_cast().computed_assign(this->derived_cast() ^ e.derived_cast(), default_assign);
     }
 
     //@}
@@ -648,6 +653,21 @@ namespace xt
         return this->assign(e, default_assign);
     }
 
+    template <class D>
+    template <class E, class P>
+    inline auto xsemantic_base<D>::computed_assign(const xexpression<E>& e, P p) -> derived_type&
+    {
+        if constexpr (has_aliasing<P>)
+        {
+            temporary_type tmp(e);
+            return this->derived_cast().assign_temporary(std::move(tmp));
+        }
+        else
+        {
+            return this->derived_cast().eval_computed_assign(e, p);
+        }
+    }
+
     /**************************************
      * xcontainer_semantic implementation *
      **************************************/
@@ -673,7 +693,7 @@ namespace xt
 
     template <class D>
     template <class E, class P>
-    inline auto xcontainer_semantic<D>::computed_assign(const xexpression<E>& e, P p) -> derived_type&
+    inline auto xcontainer_semantic<D>::eval_computed_assign(const xexpression<E>& e, P p) -> derived_type&
     {
         xt::computed_assign(*this, e, p);
         return this->derived_cast();
@@ -720,7 +740,7 @@ namespace xt
 
     template <class D>
     template <class E, class P>
-    inline auto xview_semantic<D>::computed_assign(const xexpression<E>& e, P p) -> derived_type&
+    inline auto xview_semantic<D>::eval_computed_assign(const xexpression<E>& e, P p) -> derived_type&
     {
         xt::assign_to_view(*this, e, p);
         return this->derived_cast();
