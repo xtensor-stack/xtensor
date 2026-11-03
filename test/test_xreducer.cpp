@@ -1017,6 +1017,35 @@ namespace xt
         EXPECT_TRUE(xt::all(equal(rex0, 0.)));
     }
 
+    TEST(xreducer, keep_dims_lazy_all_axes)
+    {
+        xt::xarray<int> a = xt::reshape_view(xt::arange<int>(2 * 3 * 4 * 5), {2, 3, 4, 5});
+        xt::xarray<int, xt::layout_type::column_major> c = a;
+
+        // Every non-empty set of axes, including non-adjacent ones.
+        for (std::size_t mask = 1; mask < 16; ++mask)
+        {
+            std::vector<std::size_t> axes;
+            for (std::size_t d = 0; d < 4; ++d)
+            {
+                if (mask & (std::size_t(1) << d))
+                {
+                    axes.push_back(d);
+                }
+            }
+            auto expected = xt::sum(a, axes, xt::keep_dims | xt::evaluation_strategy::immediate);
+
+            xt::xarray<int> lazy = xt::sum(a, axes, xt::keep_dims);
+            EXPECT_EQ(lazy, expected);
+
+            xt::xarray<int> lazy_init = xt::sum(a, axes, xt::keep_dims | initial(7));
+            EXPECT_EQ(lazy_init, expected + 7);
+
+            xt::xarray<int> lazy_col = xt::sum(c, axes, xt::keep_dims);
+            EXPECT_EQ(lazy_col, expected);
+        }
+    }
+
     TEST(xreducer, ones_first)
     {
         auto a = xt::ones<int>(std::vector<int>({1, 1, 2, 4}));
