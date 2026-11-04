@@ -1301,9 +1301,9 @@ namespace xt
             t.begin(),
             t.end(),
             m_raw_indices.begin(),
-            [](auto t)
+            [](auto index)
             {
-                return static_cast<size_type>(t);
+                return static_cast<size_type>(index);
             }
         );
     }
@@ -1445,9 +1445,9 @@ namespace xt
             t.begin(),
             t.end(),
             m_raw_indices.begin(),
-            [](auto t)
+            [](auto index)
             {
-                return static_cast<size_type>(t);
+                return static_cast<size_type>(index);
             }
         );
     }

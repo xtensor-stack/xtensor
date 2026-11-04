@@ -95,14 +95,14 @@ namespace xt
     TEST(xbuffer_adaptor, owner_move_assign_check_size)
     {
         size_check_allocator custom_allocator;
-        using owner_adaptor = xbuffer_adaptor<size_t*&, acquire_ownership, size_check_allocator>;
+        using size_checked_adaptor = xbuffer_adaptor<size_t*&, acquire_ownership, size_check_allocator>;
         size_t size1 = 100;
         size_t* data1 = custom_allocator.allocate(size1);
-        owner_adaptor adapt1(data1, size1);
+        size_checked_adaptor adapt1(data1, size1);
 
         size_t size2 = 200;
         size_t* data2 = custom_allocator.allocate(size2);
-        owner_adaptor adapt2(data2, size2);
+        size_checked_adaptor adapt2(data2, size2);
 
         adapt1 = adapt2;
         EXPECT_EQ(adapt1.size(), size2);

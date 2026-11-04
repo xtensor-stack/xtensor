@@ -249,7 +249,7 @@ namespace xt
         xtensor_adaptor& operator=(const xexpression<E>& e);
 
         template <class P, class S>
-        void reset_buffer(P&& pointer, S&& size);
+        void reset_buffer(P&& buffer, S&& size);
 
     private:
 
@@ -720,9 +720,9 @@ namespace xt
 
     template <class EC, std::size_t N, layout_type L, class Tag>
     template <class P, class S>
-    inline void xtensor_adaptor<EC, N, L, Tag>::reset_buffer(P&& pointer, S&& size)
+    inline void xtensor_adaptor<EC, N, L, Tag>::reset_buffer(P&& buffer, S&& size)
     {
-        return m_storage.reset_data(std::forward<P>(pointer), std::forward<S>(size));
+        return m_storage.reset_data(std::forward<P>(buffer), std::forward<S>(size));
     }
 
     /*******************************

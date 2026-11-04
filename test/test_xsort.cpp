@@ -173,7 +173,7 @@ namespace xt
             47,  41,  40,  34,  33,  43,  64
         };
 
-        EXPECT_EQ(ex, xt::argsort(a, {0}, xt::sorting_method::stable));
+        EXPECT_EQ(ex, xt::argsort(a, 0, xt::sorting_method::stable));
     }
 
     TEST(xsort, sort_easy)

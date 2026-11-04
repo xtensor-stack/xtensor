@@ -36,20 +36,20 @@ namespace xt
 
 #define CHECK_RESULT_TYPE(EXPRESSION, EXPECTED_TYPE)                                 \
     {                                                                                \
-        using result_type = typename std::decay_t<decltype(EXPRESSION)>::value_type; \
-        EXPECT_TRUE((std::is_same<result_type, EXPECTED_TYPE>::value));              \
+        using actual_type = typename std::decay_t<decltype(EXPRESSION)>::value_type; \
+        EXPECT_TRUE((std::is_same<actual_type, EXPECTED_TYPE>::value));              \
     }
 
 #define CHECK_TAG_TYPE(EXPRESSION, EXPECTED_TYPE)                                        \
     {                                                                                    \
-        using result_type = typename std::decay_t<decltype(EXPRESSION)>::expression_tag; \
-        EXPECT_TRUE((std::is_same<result_type, EXPECTED_TYPE>::value));                  \
+        using actual_type = typename std::decay_t<decltype(EXPRESSION)>::expression_tag; \
+        EXPECT_TRUE((std::is_same<actual_type, EXPECTED_TYPE>::value));                  \
     }
 
 #define CHECK_TYPE(VALUE, EXPECTED_TYPE)                                \
     {                                                                   \
-        using result_type = typename std::decay_t<decltype(VALUE)>;     \
-        EXPECT_TRUE((std::is_same<result_type, EXPECTED_TYPE>::value)); \
+        using actual_type = typename std::decay_t<decltype(VALUE)>;     \
+        EXPECT_TRUE((std::is_same<actual_type, EXPECTED_TYPE>::value)); \
     }
 
     struct xreducer_features
@@ -155,13 +155,13 @@ namespace xt
 
 #undef TEST_EXPRESSION_TAG
 
-#define TEST_VALUE_HAS_VALUE(INPUT, V_TYPE, OPTIONAL)                                 \
-    using result_type = std::conditional_t<OPTIONAL, xtl::xoptional<double>, double>; \
-                                                                                      \
-    auto res = xt::sum(INPUT, feats.m_axes);                                          \
-    CHECK_RESULT_TYPE(res, result_type);                                              \
-    CHECK_TYPE(xt::value(res)(1, 1, 1), V_TYPE);                                      \
-    EXPECT_EQ(!OPTIONAL, xt::has_value(res)(0, 0, 0));                                \
+#define TEST_VALUE_HAS_VALUE(INPUT, V_TYPE, OPTIONAL)                                   \
+    using expected_type = std::conditional_t<OPTIONAL, xtl::xoptional<double>, double>; \
+                                                                                        \
+    auto res = xt::sum(INPUT, feats.m_axes);                                            \
+    CHECK_RESULT_TYPE(res, expected_type);                                              \
+    CHECK_TYPE(xt::value(res)(1, 1, 1), V_TYPE);                                        \
+    EXPECT_EQ(!OPTIONAL, xt::has_value(res)(0, 0, 0));                                  \
     EXPECT_TRUE(xt::has_value(res)(1, 1, 1));
 
     TEST(xreducer, value_has_value)
@@ -784,9 +784,9 @@ namespace xt
     {
         xtensor<double, 2> c = {{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}};
         auto xa = xt::sum(c, {0}, evaluation_strategy::immediate);
-        auto is_arr = [](const auto& c)
+        auto is_arr = [](const auto& shape)
         {
-            bool istrue = detail::is_array<std::decay_t<decltype(c)>>::value;
+            bool istrue = detail::is_array<std::decay_t<decltype(shape)>>::value;
             return istrue;
         };
 
@@ -826,9 +826,9 @@ namespace xt
         b.resize({3, 3, 3});
         std::iota(b.storage().begin(), b.storage().end(), 0);
 
-        auto is_arr = [](const auto& c)
+        auto is_arr = [](const auto& shape)
         {
-            bool istrue = detail::is_array<std::decay_t<decltype(c)>>::value;
+            bool istrue = detail::is_array<std::decay_t<decltype(shape)>>::value;
             return istrue;
         };
 

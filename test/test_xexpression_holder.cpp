@@ -24,7 +24,8 @@ namespace xt
 
         xexpression_holder holder_a = xexpression_holder(a);
         xexpression_holder holder_b(b);
-        xexpression_holder holder_c(std::move(xexpression_holder(c)));
+        xexpression_holder holder_tmp(c);
+        xexpression_holder holder_c(std::move(holder_tmp));
     }
 
     TEST(xexpression_holder, assign)

@@ -150,10 +150,10 @@ namespace xt
         template <class CTA, class SA>
         xdynamic_view(
             CTA&& e,
-            SA&& shape,
-            get_strides_t<S>&& strides,
+            SA&& view_shape,
+            get_strides_t<S>&& view_strides,
             std::size_t offset,
-            layout_type layout,
+            layout_type view_layout,
             slice_vector_type&& slices,
             get_strides_t<S>&& adj_strides
         ) noexcept;
@@ -225,14 +225,14 @@ namespace xt
         void fill(const T& value);
 
         template <class ST>
-        stepper stepper_begin(const ST& shape);
+        stepper stepper_begin(const ST& iteration_shape);
         template <class ST>
-        stepper stepper_end(const ST& shape, layout_type l);
+        stepper stepper_end(const ST& iteration_shape, layout_type l);
 
         template <class ST>
-        const_stepper stepper_begin(const ST& shape) const;
+        const_stepper stepper_begin(const ST& iteration_shape) const;
         template <class ST>
-        const_stepper stepper_end(const ST& shape, layout_type l) const;
+        const_stepper stepper_end(const ST& iteration_shape, layout_type l) const;
 
         using container_iterator = std::
             conditional_t<is_const, typename storage_type::const_iterator, typename storage_type::iterator>;
@@ -383,14 +383,14 @@ namespace xt
     template <class CTA, class SA>
     inline xdynamic_view<CT, S, L, FST>::xdynamic_view(
         CTA&& e,
-        SA&& shape,
-        get_strides_t<S>&& strides,
+        SA&& view_shape,
+        get_strides_t<S>&& view_strides,
         std::size_t offset,
-        layout_type layout,
+        layout_type view_layout,
         slice_vector_type&& slices,
         get_strides_t<S>&& adj_strides
     ) noexcept
-        : base_type(std::forward<CTA>(e), std::forward<SA>(shape), std::move(strides), offset, layout)
+        : base_type(std::forward<CTA>(e), std::forward<SA>(view_shape), std::move(view_strides), offset, view_layout)
         , m_slices(std::move(slices))
         , m_adj_strides(std::move(adj_strides))
     {
@@ -525,34 +525,35 @@ namespace xt
 
     template <class CT, class S, layout_type L, class FST>
     template <class ST>
-    inline auto xdynamic_view<CT, S, L, FST>::stepper_begin(const ST& shape) -> stepper
+    inline auto xdynamic_view<CT, S, L, FST>::stepper_begin(const ST& iteration_shape) -> stepper
     {
-        size_type offset = shape.size() - dimension();
+        size_type offset = iteration_shape.size() - dimension();
         return stepper(this, offset);
     }
 
     template <class CT, class S, layout_type L, class FST>
     template <class ST>
-    inline auto xdynamic_view<CT, S, L, FST>::stepper_end(const ST& shape, layout_type /*l*/) -> stepper
+    inline auto xdynamic_view<CT, S, L, FST>::stepper_end(const ST& iteration_shape, layout_type /*l*/)
+        -> stepper
     {
-        size_type offset = shape.size() - dimension();
+        size_type offset = iteration_shape.size() - dimension();
         return stepper(this, offset, true);
     }
 
     template <class CT, class S, layout_type L, class FST>
     template <class ST>
-    inline auto xdynamic_view<CT, S, L, FST>::stepper_begin(const ST& shape) const -> const_stepper
+    inline auto xdynamic_view<CT, S, L, FST>::stepper_begin(const ST& iteration_shape) const -> const_stepper
     {
-        size_type offset = shape.size() - dimension();
+        size_type offset = iteration_shape.size() - dimension();
         return const_stepper(this, offset);
     }
 
     template <class CT, class S, layout_type L, class FST>
     template <class ST>
-    inline auto xdynamic_view<CT, S, L, FST>::stepper_end(const ST& shape, layout_type /*l*/) const
+    inline auto xdynamic_view<CT, S, L, FST>::stepper_end(const ST& iteration_shape, layout_type /*l*/) const
         -> const_stepper
     {
-        size_type offset = shape.size() - dimension();
+        size_type offset = iteration_shape.size() - dimension();
         return const_stepper(this, offset, true);
     }
 

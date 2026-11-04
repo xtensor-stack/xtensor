@@ -310,17 +310,18 @@ namespace xt
 
 #if (defined(XTENSOR_ENABLE_ASSERT) && !defined(XTENSOR_DISABLE_EXCEPTIONS))
 #define XTENSOR_TRY(expr) XTENSOR_TRY_IMPL(expr, __FILE__, __LINE__)
-#define XTENSOR_TRY_IMPL(expr, file, line)                                                                \
-    try                                                                                                   \
-    {                                                                                                     \
-        expr;                                                                                             \
-    }                                                                                                     \
-    catch (std::exception & e)                                                                            \
-    {                                                                                                     \
-        XTENSOR_THROW(                                                                                    \
-            std::runtime_error,                                                                           \
-            std::string(file) + ':' + std::to_string(line) + ": check failed\n\t" + std::string(e.what()) \
-        );                                                                                                \
+#define XTENSOR_TRY_IMPL(expr, file, line)                                        \
+    try                                                                           \
+    {                                                                             \
+        expr;                                                                     \
+    }                                                                             \
+    catch (std::exception & xtensor_check_error)                                  \
+    {                                                                             \
+        XTENSOR_THROW(                                                            \
+            std::runtime_error,                                                   \
+            std::string(file) + ':' + std::to_string(line) + ": check failed\n\t" \
+                + std::string(xtensor_check_error.what())                         \
+        );                                                                        \
     }
 #else
 #define XTENSOR_TRY(expr)

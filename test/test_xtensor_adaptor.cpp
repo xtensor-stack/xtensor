@@ -192,7 +192,6 @@ namespace xt
 
     TEST(xtensor_adaptor, iterator_types)
     {
-        using vec_type = std::vector<int>;
         using tensor_type = xtensor_adaptor<vec_type, 2>;
         using const_tensor_type = xtensor_adaptor<const vec_type, 2>;
         using iterator = vec_type::iterator;

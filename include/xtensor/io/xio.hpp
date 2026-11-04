@@ -302,8 +302,8 @@ namespace xt
             using cache_type = std::vector<value_type>;
             using cache_iterator = typename cache_type::const_iterator;
 
-            explicit printer(std::streamsize precision)
-                : m_precision(precision)
+            explicit printer(std::streamsize max_precision)
+                : m_precision(max_precision)
             {
             }
 
@@ -554,9 +554,9 @@ namespace xt
             using cache_type = std::vector<bool>;
             using cache_iterator = typename cache_type::const_iterator;
 
-            explicit printer(std::streamsize precision)
-                : real_printer(precision)
-                , imag_printer(precision)
+            explicit printer(std::streamsize max_precision)
+                : real_printer(max_precision)
+                , imag_printer(max_precision)
             {
             }
 

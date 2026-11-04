@@ -199,7 +199,7 @@ namespace xt
             template <class U, class... Args>
             constexpr result_type apply_impl(const U& t, const Args&... args) const
             {
-                return t & apply_impl(args...);
+                return t && apply_impl(args...);
             }
 
             template <class B>
@@ -242,7 +242,6 @@ namespace xt
         struct xreducer_temporary_type<xtl::xoptional<T, B>>
         {
             using type = xtl::xoptional<std::decay_t<T>, bool>;
-            ;
         };
     }
 

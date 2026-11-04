@@ -1357,6 +1357,7 @@ namespace xt
 
         EXPECT_TRUE((detail::is_contiguous_view<ctes, xall<int>, xall<int>, int, int>()));
         EXPECT_TRUE((detail::is_contiguous_view<cfix, xall<int>, xall<int>, int, int>()));
+        EXPECT_FALSE((detail::is_contiguous_view<carr, xall<int>, xall<int>, int, int>()));
         EXPECT_FALSE((detail::is_contiguous_view<xarr, xall<int>, xall<int>, int, int>()));
         EXPECT_TRUE((detail::is_contiguous_view<ctes, xall<int>, xall<int>, xrange<int>, int>()));
         EXPECT_FALSE((detail::is_contiguous_view<ctes, xall<int>, xrange<int>, xrange<int>, int>()));
@@ -1474,13 +1475,12 @@ namespace xt
 
 #if XTENSOR_USE_XSIMD
             EXPECT_TRUE(assign_traits::simd_linear_assign());
+#else
+            EXPECT_FALSE(assign_traits::simd_linear_assign());
 #endif
 
             using assign_traits2 = xassign_traits<decltype(b), decltype(vxa)>;
-
-#if XTENSOR_USE_XSIMD
             EXPECT_FALSE(assign_traits2::simd_linear_assign());
-#endif
         }
     }
 

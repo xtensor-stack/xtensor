@@ -193,11 +193,7 @@ namespace xt
         )
         {
             R res = init;
-            auto wrapper = [&](const auto& i, const auto& j)
-            {
-                res = f(i, j);
-            };
-            (wrapper(res, std::get<I>(t)), ...);
+            ((res = f(res, std::get<I>(t))), ...);
             return res;
         }
     }

@@ -47,6 +47,8 @@ namespace xt
 
 #if XTENSOR_USE_XSIMD
         EXPECT_TRUE(assign_traits::simd_linear_assign());
+#else
+        EXPECT_FALSE(assign_traits::simd_linear_assign());
 #endif
     }
 
@@ -170,55 +172,55 @@ namespace xt
     TEST(xmath, minimum)
     {
         using opt_type = xoptional_assembly<xarray<double>, xarray<bool>>;
-        auto missing = xtl::missing<double>();
+        auto missing_value = xtl::missing<double>();
 
         xarray<double> a = {1, 2, 3, 4, 5, 6};
         xarray<double> b = {6, 5, 4, 3, 2, 1};
-        opt_type opt_a = {1, missing, 3, 4, 5, missing};
-        opt_type opt_b = {6, 5, 4, 3, missing, 1};
+        opt_type opt_a = {1, missing_value, 3, 4, 5, missing_value};
+        opt_type opt_b = {6, 5, 4, 3, missing_value, 1};
 
         xarray<double> res = {1, 2, 3, 3, 2, 1};
         EXPECT_EQ(res, minimum(a, b));
 
-        opt_type res1 = {1, missing, 3, 3, 2, missing};
+        opt_type res1 = {1, missing_value, 3, 3, 2, missing_value};
         EXPECT_EQ(res1, minimum(opt_a, b));
 
-        opt_type res2 = {1, missing, 3, 3, missing, missing};
+        opt_type res2 = {1, missing_value, 3, 3, missing_value, missing_value};
         EXPECT_EQ(res2, minimum(opt_a, opt_b));
     }
 
     TEST(xmath, maximum)
     {
         using opt_type = xoptional_assembly<xarray<double>, xarray<bool>>;
-        auto missing = xtl::missing<double>();
+        auto missing_value = xtl::missing<double>();
 
         xarray<double> a = {1, 2, 3, 4, 5, 6};
         xarray<double> b = {6, 5, 4, 3, 2, 1};
-        opt_type opt_a = {1, missing, 3, 4, 5, missing};
-        opt_type opt_b = {6, 5, 4, 3, missing, 1};
+        opt_type opt_a = {1, missing_value, 3, 4, 5, missing_value};
+        opt_type opt_b = {6, 5, 4, 3, missing_value, 1};
 
         xarray<double> res = {6, 5, 4, 4, 5, 6};
         EXPECT_EQ(res, maximum(a, b));
 
-        opt_type res1 = {6, missing, 4, 4, 5, missing};
+        opt_type res1 = {6, missing_value, 4, 4, 5, missing_value};
         EXPECT_EQ(res1, maximum(opt_a, b));
 
-        opt_type res2 = {6, missing, 4, 4, missing, missing};
+        opt_type res2 = {6, missing_value, 4, 4, missing_value, missing_value};
         EXPECT_EQ(res2, maximum(opt_a, opt_b));
     }
 
     TEST(xmath, clip)
     {
         using opt_type = xoptional_assembly<xarray<double>, xarray<bool>>;
-        auto missing = xtl::missing<double>();
+        auto missing_value = xtl::missing<double>();
 
         xarray<double> a = {1, 2, 3, 4, 5, 6};
-        opt_type opt_a = {1, missing, 3, 4, 5, missing};
+        opt_type opt_a = {1, missing_value, 3, 4, 5, missing_value};
 
         xarray<double> res = {2, 2, 3, 4, 4, 4};
         EXPECT_EQ(res, clip(a, 2.0, 4.0));
 
-        opt_type res1 = {2, missing, 3, 4, 4, missing};
+        opt_type res1 = {2, missing_value, 3, 4, 4, missing_value};
         EXPECT_EQ(res1, clip(opt_a, 2.0, 4.0));
     }
 
@@ -743,7 +745,7 @@ namespace xt
         EXPECT_EQ(math::abs(1ul), 1ul);
         EXPECT_EQ(math::abs(1u), 1u);
         EXPECT_EQ(math::abs(static_cast<unsigned char>(1)), static_cast<unsigned char>(1));
-        EXPECT_EQ(math::abs(char(1)), 1);
+        EXPECT_EQ(math::abs(static_cast<signed char>(-1)), 1);
         EXPECT_EQ(math::abs(int(1)), 1);
         EXPECT_EQ(math::abs(int(-1)), 1);
         EXPECT_EQ(math::abs(long(-1)), long(1));

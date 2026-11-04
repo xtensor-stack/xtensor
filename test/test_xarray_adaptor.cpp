@@ -191,7 +191,6 @@ namespace xt
 
     TEST(xarray_adaptor, iterator_types)
     {
-        using vec_type = std::vector<int>;
         using array_type = xarray_adaptor<vec_type>;
         using const_array_type = xarray_adaptor<const vec_type>;
         using iterator = vec_type::iterator;

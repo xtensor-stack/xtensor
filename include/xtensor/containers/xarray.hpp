@@ -253,7 +253,7 @@ namespace xt
         xarray_adaptor& operator=(const xexpression<E>& e);
 
         template <class P, class S>
-        void reset_buffer(P&& pointer, S&& size);
+        void reset_buffer(P&& buffer, S&& size);
 
     private:
 
@@ -657,9 +657,9 @@ namespace xt
 
     template <class EC, layout_type L, class SC, class Tag>
     template <class P, class S>
-    inline void xarray_adaptor<EC, L, SC, Tag>::reset_buffer(P&& pointer, S&& size)
+    inline void xarray_adaptor<EC, L, SC, Tag>::reset_buffer(P&& buffer, S&& size)
     {
-        return m_storage.reset_data(std::forward<P>(pointer), std::forward<S>(size));
+        return m_storage.reset_data(std::forward<P>(buffer), std::forward<S>(size));
     }
 }
 

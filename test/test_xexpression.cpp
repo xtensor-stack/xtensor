@@ -102,13 +102,15 @@ namespace xt
         buffer << expr1;
         EXPECT_EQ(buffer.str(), "{{  2.,   4.,   6.,   8.},\n { 10.,  12.,  14.,  16.}}");
 
-        // Compilation test
+        // An xfunction has no strides of its own, so the shared expression
+        // derives all its strides types from its shape type.
         auto sexpr1 = make_xshared(std::move(expr1));
         using expr_type = decltype(sexpr1);
-        using strides_type = typename expr_type::strides_type;
-        using inner_strides_type = typename expr_type::inner_strides_type;
-        using backstrides_type = typename expr_type::backstrides_type;
-        using inner_strides_tybackstrides_typepe = typename expr_type::inner_backstrides_type;
+        using expected_strides_type = get_strides_type<expr_type::shape_type>::type;
+        EXPECT_TRUE((std::is_same<expr_type::strides_type, expected_strides_type>::value));
+        EXPECT_TRUE((std::is_same<expr_type::inner_strides_type, expected_strides_type>::value));
+        EXPECT_TRUE((std::is_same<expr_type::backstrides_type, expected_strides_type>::value));
+        EXPECT_TRUE((std::is_same<expr_type::inner_backstrides_type, expected_strides_type>::value));
     }
 
     TEST(xexpression, shared_expr_return)

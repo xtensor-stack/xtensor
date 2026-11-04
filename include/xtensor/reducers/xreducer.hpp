@@ -1552,7 +1552,7 @@ namespace xt
     inline auto xreducer<F, CT, X, O>::element(It first, It last) const -> const_reference
     {
         XTENSOR_TRY(check_element_index(shape(), first, last));
-        auto stepper = const_stepper(*this, 0);
+        auto reducer_stepper = const_stepper(*this, 0);
         if (first != last)
         {
             size_type dim = 0;
@@ -1563,16 +1563,16 @@ namespace xt
             {
                 if (begin < first)
                 {
-                    stepper.step(dim++, std::size_t(0));
+                    reducer_stepper.step(dim++, std::size_t(0));
                     begin++;
                 }
                 else
                 {
-                    stepper.step(dim++, std::size_t(*begin++));
+                    reducer_stepper.step(dim++, std::size_t(*begin++));
                 }
             }
         }
-        return *stepper;
+        return *reducer_stepper;
     }
 
     /**

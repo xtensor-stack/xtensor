@@ -688,6 +688,8 @@ namespace xt
 
 #if XTENSOR_USE_XSIMD
         EXPECT_TRUE(assign_traits::simd_linear_assign());
+#else
+        EXPECT_FALSE(assign_traits::simd_linear_assign());
 #endif
 
         EXPECT_EQ(av, e);

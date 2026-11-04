@@ -137,6 +137,8 @@ namespace xt
 
 #if XTENSOR_USE_XSIMD
         EXPECT_TRUE(assign_t_angle::simd_linear_assign());
+#else
+        EXPECT_FALSE(assign_t_angle::simd_linear_assign());
 #endif
 
         auto cmplres_conj = xt::conj(cmplarg_0);
@@ -155,6 +157,8 @@ namespace xt
         static_cast<void>(b1);
         static_cast<void>(b2);
         EXPECT_TRUE(assign_t_conj::simd_linear_assign());
+#else
+        EXPECT_FALSE(assign_t_conj::simd_linear_assign());
 #endif
 
         auto cmplres_norm = xt::norm(cmplarg_0);
@@ -168,6 +172,8 @@ namespace xt
 
 #if XTENSOR_USE_XSIMD
         EXPECT_TRUE(assign_t_norm::simd_linear_assign());
+#else
+        EXPECT_FALSE(assign_t_norm::simd_linear_assign());
 #endif
 
         EXPECT_TRUE(allclose(fieldnorm, cmplres_norm));
@@ -196,6 +202,8 @@ namespace xt
 
 #if XTENSOR_USE_XSIMD
         EXPECT_TRUE(assign_t_arg::simd_linear_assign());
+#else
+        EXPECT_FALSE(assign_t_arg::simd_linear_assign());
 #endif
     }
 

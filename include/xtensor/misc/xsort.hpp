@@ -294,7 +294,7 @@ namespace xt
         template <class ConstRandomIt, class RandomIt, class Compare, class Method>
         inline void argsort_iter(
             ConstRandomIt data_begin,
-            ConstRandomIt data_end,
+            [[maybe_unused]] ConstRandomIt data_end,
             RandomIt idx_begin,
             RandomIt idx_end,
             Compare comp,
@@ -303,7 +303,6 @@ namespace xt
         {
             XTENSOR_ASSERT(std::distance(data_begin, data_end) >= 0);
             XTENSOR_ASSERT(std::distance(idx_begin, idx_end) == std::distance(data_begin, data_end));
-            (void) idx_end;  // TODO(C++17) [[maybe_unused]] only used in assertion.
 
             std::iota(idx_begin, idx_end, 0);
             switch (method)
@@ -1237,7 +1236,6 @@ namespace xt
     template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E>
     inline auto argmin(const xexpression<E>& e)
     {
-        using value_type = typename E::value_type;
         auto&& ed = eval(e.derived_cast());
         auto begin = ed.template begin<L>();
         auto end = ed.template end<L>();
@@ -1267,7 +1265,6 @@ namespace xt
     template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E>
     inline auto argmax(const xexpression<E>& e)
     {
-        using value_type = typename E::value_type;
         auto&& ed = eval(e.derived_cast());
         auto begin = ed.template begin<L>();
         auto end = ed.template end<L>();
