@@ -414,28 +414,21 @@ namespace xt
         return *this;
     }
 
-    namespace xstrided_view_detail
-    {
-        template <class V, class T>
-        inline void run_assign_temporary_impl(V& v, const T& t, std::true_type /* enable strided assign */)
-        {
-            strided_loop_assigner<true>::run(v, t);
-        }
-
-        template <class V, class T>
-        inline void
-        run_assign_temporary_impl(V& v, const T& t, std::false_type /* fallback to iterator assign */)
-        {
-            std::copy(t.cbegin(), t.cend(), v.begin());
-        }
-    }
-
     template <class CT, class S, layout_type L, class FST>
     inline void xstrided_view<CT, S, L, FST>::assign_temporary_impl(temporary_type&& tmp)
     {
         constexpr bool
             fast_assign = xassign_traits<xstrided_view<CT, S, L, FST>, temporary_type>::simd_strided_assign();
-        xstrided_view_detail::run_assign_temporary_impl(*this, tmp, std::integral_constant<bool, fast_assign>{});
+        if constexpr (fast_assign)
+        {
+            using self_type = xstrided_view<CT, S, L, FST>;
+            parallel_assigner_t<self_type, temporary_type, default_parallel_tag> assigner;
+            assigner.strided_loop_assign(*this, tmp);
+        }
+        else
+        {
+            std::copy(tmp.cbegin(), tmp.cend(), this->begin());
+        }
     }
 
     /**

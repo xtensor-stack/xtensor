@@ -567,7 +567,7 @@ namespace xt
         , m_has_value()
         , m_storage(m_value.storage(), m_has_value.storage())
     {
-        semantic_base::assign(e);
+        semantic_base::assign(e, noalias);
     }
 
     /**

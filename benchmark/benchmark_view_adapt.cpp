@@ -14,7 +14,6 @@
 #include "xtensor/containers/xadapt.hpp"
 #include "xtensor/containers/xfixed.hpp"
 #include "xtensor/containers/xtensor.hpp"
-#include "xtensor/core/xnoalias.hpp"
 #include "xtensor/generators/xrandom.hpp"
 #include "xtensor/views/xview.hpp"
 

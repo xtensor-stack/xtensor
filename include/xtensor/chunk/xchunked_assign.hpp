@@ -10,7 +10,7 @@
 #ifndef XTENSOR_CHUNKED_ASSIGN_HPP
 #define XTENSOR_CHUNKED_ASSIGN_HPP
 
-#include "../core/xnoalias.hpp"
+#include "../core/xassign_proxy.hpp"
 #include "../views/xstrided_view.hpp"
 
 namespace xt
@@ -44,14 +44,14 @@ namespace xt
         using derived_type = D;
         using temporary_type = typename base_type::temporary_type;
 
-        template <class E>
-        derived_type& assign_xexpression(const xexpression<E>& e);
+        template <class E, class P = assign_policy<>>
+        derived_type& assign_xexpression(const xexpression<E>& e, P p = P{});
 
-        template <class E>
-        derived_type& computed_assign(const xexpression<E>& e);
+        template <class E, class P = assign_policy<>>
+        derived_type& computed_assign(const xexpression<E>& e, P p = P{});
 
-        template <class E, class F>
-        derived_type& scalar_computed_assign(const E& e, F&& f);
+        template <class E, class F, class P = assign_policy<>>
+        derived_type& scalar_computed_assign(const E& e, F&& f, P p = P{});
 
     protected:
 
@@ -201,8 +201,8 @@ namespace xt
     }
 
     template <class D>
-    template <class E>
-    inline auto xchunked_semantic<D>::assign_xexpression(const xexpression<E>& e) -> derived_type&
+    template <class E, class P>
+    inline auto xchunked_semantic<D>::assign_xexpression(const xexpression<E>& e, P) -> derived_type&
     {
         auto& d = this->derived_cast();
         const auto& chunk_shape = d.chunk_shape();
@@ -225,8 +225,8 @@ namespace xt
     }
 
     template <class D>
-    template <class E>
-    inline auto xchunked_semantic<D>::computed_assign(const xexpression<E>& e) -> derived_type&
+    template <class E, class P>
+    inline auto xchunked_semantic<D>::computed_assign(const xexpression<E>& e, P) -> derived_type&
     {
         D& d = this->derived_cast();
         if (e.derived_cast().dimension() > d.dimension() || e.derived_cast().shape() > d.shape())
@@ -240,8 +240,8 @@ namespace xt
     }
 
     template <class D>
-    template <class E, class F>
-    inline auto xchunked_semantic<D>::scalar_computed_assign(const E& e, F&& f) -> derived_type&
+    template <class E, class F, class P>
+    inline auto xchunked_semantic<D>::scalar_computed_assign(const E& e, F&& f, P) -> derived_type&
     {
         for (auto& c : this->derived_cast().chunks())
         {

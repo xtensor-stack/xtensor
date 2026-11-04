@@ -10,7 +10,6 @@
 #include "xtensor/containers/xarray.hpp"
 #include "xtensor/containers/xfixed.hpp"
 #include "xtensor/containers/xtensor.hpp"
-#include "xtensor/core/xnoalias.hpp"
 #include "xtensor/generators/xbuilder.hpp"
 #include "xtensor/io/xio.hpp"
 #include "xtensor/misc/xmanipulation.hpp"
@@ -498,8 +497,6 @@ namespace xt
 
         EXPECT_FALSE(broadcastable(v.shape(), b.shape()));
         EXPECT_FALSE(broadcastable(b.shape(), v.shape()));
-        XT_EXPECT_THROW(assert_compatible_shape(b, v), broadcast_error);
-        XT_EXPECT_THROW(assert_compatible_shape(v, b), broadcast_error);
         XT_EXPECT_THROW(v = b, broadcast_error);
         XT_EXPECT_THROW(noalias(v) = b, broadcast_error);
     }

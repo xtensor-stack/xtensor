@@ -8,7 +8,7 @@
  ****************************************************************************/
 
 #include "xtensor/containers/xarray.hpp"
-#include "xtensor/core/xnoalias.hpp"
+#include "xtensor/containers/xtensor.hpp"
 #include "xtensor/io/xio.hpp"
 #include "xtensor/views/xview.hpp"
 
@@ -368,6 +368,82 @@ namespace xt
             xt::noalias(xt::view(a, 1)) = 10;
             xt::view(b, 1) = 10;
             EXPECT_EQ(a, b);
+        }
+
+        TEST_CASE("nobroadcast_function")
+        {
+            // Combined with noalias so that the nobroadcast path is reached even when
+            // XTENSOR_FORCE_TEMPORARY_MEMORY_IN_ASSIGNMENTS is defined (as in the test build).
+            constexpr auto policy = xt::noalias | xt::nobroadcast;
+
+            SUBCASE("xtensor, scalar first")
+            {
+                xtensor<double, 1> a = {1., 2., 3.};
+                xtensor<double, 1> b;
+                policy(b) = 2.0 * a;
+                xtensor<double, 1> expected = {2., 4., 6.};
+                EXPECT_EQ(b, expected);
+            }
+
+            SUBCASE("xtensor, scalar last")
+            {
+                xtensor<double, 1> a = {1., 2., 3.};
+                xtensor<double, 1> b;
+                policy(b) = a * 2.0;
+                xtensor<double, 1> expected = {2., 4., 6.};
+                EXPECT_EQ(b, expected);
+            }
+
+            SUBCASE("xtensor, nested function")
+            {
+                xtensor<double, 2> a = {{1., 2.}, {3., 4.}};
+                xtensor<double, 2> b;
+                policy(b) = 2.0 * (a + 1.0);
+                xtensor<double, 2> expected = {{4., 6.}, {8., 10.}};
+                EXPECT_EQ(b, expected);
+            }
+
+            SUBCASE("xarray")
+            {
+                xarray<double> a = {{1., 2.}, {3., 4.}};
+                xarray<double> b;
+                policy(b) = 3.0 * a - 1.0;
+                xarray<double> expected = {{2., 5.}, {8., 11.}};
+                EXPECT_EQ(b, expected);
+            }
+        }
+
+        TEST_CASE("nobroadcast_computed_assign")
+        {
+            constexpr auto policy = xt::noalias | xt::nobroadcast;
+
+            SUBCASE("compound assignment")
+            {
+                xarray<double> a = {1., 2., 3.};
+                xarray<double> b = {10., 20., 30.};
+                policy(b) += a;
+                xarray<double> expected = {11., 22., 33.};
+                EXPECT_EQ(b, expected);
+            }
+
+            SUBCASE("computed_assign")
+            {
+                xarray<double> a = {1., 2., 3.};
+                xarray<double> b = {10., 20., 30.};
+                xt::computed_assign(b, a, policy);
+                EXPECT_EQ(b, a);
+            }
+
+#ifdef XTENSOR_ENABLE_ASSERT
+            SUBCASE("computed_assign shape mismatch")
+            {
+                // Without broadcasting, computed_assign writes directly into the
+                // destination: a shape mismatch must be caught by the assertion.
+                xarray<double> a = {1., 2.};
+                xarray<double> b = {10., 20., 30.};
+                XT_EXPECT_ANY_THROW(xt::computed_assign(b, a, policy));
+            }
+#endif
         }
     }
 }

@@ -11,7 +11,6 @@
 #include "xtensor/containers/xarray.hpp"
 #include "xtensor/containers/xtensor.hpp"
 #include "xtensor/core/xmath.hpp"
-#include "xtensor/core/xnoalias.hpp"
 #include "xtensor/generators/xbuilder.hpp"
 
 namespace xt

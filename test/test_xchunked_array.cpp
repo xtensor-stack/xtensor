@@ -8,7 +8,6 @@
  ****************************************************************************/
 
 #include "xtensor/chunk/xchunked_array.hpp"
-#include "xtensor/core/xnoalias.hpp"
 #include "xtensor/io/xcsv.hpp"
 #include "xtensor/views/xbroadcast.hpp"
 

@@ -137,6 +137,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/containers/xtensor.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/core/xaccessible.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/core/xassign.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/core/xassign_proxy.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/core/xeval.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/core/xexpression.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/core/xexpression_traits.hpp
@@ -146,7 +147,6 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/core/xlayout.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/core/xmath.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/core/xmultiindex_iterator.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/core/xnoalias.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/core/xoperation.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/core/xsemantic.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/core/xshape.hpp

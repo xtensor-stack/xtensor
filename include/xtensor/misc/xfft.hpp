@@ -7,7 +7,6 @@
 
 #include "../containers/xarray.hpp"
 #include "../core/xmath.hpp"
-#include "../core/xnoalias.hpp"
 #include "../generators/xbuilder.hpp"
 #include "../misc/xcomplex.hpp"
 #include "../views/xaxis_slice_iterator.hpp"

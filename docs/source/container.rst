@@ -184,7 +184,6 @@ A mechanism is provided to forcibly prevent usage of a temporary variable:
 .. code::
 
     #include <xtensor/containers/xarray.hpp>
-    #include <xtensor/core/xnoalias.hpp>
 
     // a, b, and c are xt::xarrays previously initialized
     xt::noalias(b) = a + c;

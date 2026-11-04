@@ -264,8 +264,8 @@ namespace xt
     {
     public:
 
-        template <class E1, class E2>
-        static void assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial);
+        template <class E1, class E2, class P>
+        static void assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial, P);
     };
 
     /**********************************
@@ -1279,24 +1279,24 @@ namespace xt
         template <class T1, class T2>
         struct assign_data_impl
         {
-            template <class E1, class E2>
-            static void run(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial)
+            template <class E1, class E2, class P>
+            static void run(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial, P p)
             {
                 E1& de1 = e1.derived_cast();
                 const E2& de2 = e2.derived_cast();
 
                 decltype(auto) bde1 = xt::value(de1);
                 decltype(auto) hde1 = xt::has_value(de1);
-                xexpression_assigner_base<xtensor_expression_tag>::assign_data(bde1, xt::value(de2), trivial);
-                xexpression_assigner_base<xtensor_expression_tag>::assign_data(hde1, xt::has_value(de2), trivial);
+                xexpression_assigner_base<xtensor_expression_tag>::assign_data(bde1, xt::value(de2), trivial, p);
+                xexpression_assigner_base<xtensor_expression_tag>::assign_data(hde1, xt::has_value(de2), trivial, p);
             }
         };
 
         template <class T>
         struct xarray_assigner
         {
-            template <class E1, class E2>
-            static void assign(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial)
+            template <class E1, class E2, class P>
+            static void assign(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial, P p)
             {
                 E1& de1 = e1.derived_cast();
                 const E2& de2 = e2.derived_cast();
@@ -1304,50 +1304,51 @@ namespace xt
 
                 decltype(auto) bde1 = xt::value(de1);
                 decltype(auto) hde1 = xt::has_value(de1);
-                xexpression_assigner_base<xtensor_expression_tag>::assign_data(bde1, e2, trivial);
-                xexpression_assigner_base<xtensor_expression_tag>::assign_data(hde1, mask, trivial);
+                xexpression_assigner_base<xtensor_expression_tag>::assign_data(bde1, e2, trivial, p);
+                xexpression_assigner_base<xtensor_expression_tag>::assign_data(hde1, mask, trivial, p);
             }
         };
 
         template <class T>
         struct xarray_assigner<xtl::xoptional<T>>
         {
-            template <class E1, class E2>
-            static void assign(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial)
+            template <class E1, class E2, class P>
+            static void assign(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial, P p)
             {
-                xexpression_assigner_base<xtensor_expression_tag>::assign_data(e1, e2, trivial);
+                xexpression_assigner_base<xtensor_expression_tag>::assign_data(e1, e2, trivial, p);
             }
         };
 
         template <>
         struct assign_data_impl<xoptional_expression_tag, xtensor_expression_tag>
         {
-            template <class E1, class E2>
-            static void run(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial)
+            template <class E1, class E2, class P>
+            static void run(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial, P p)
             {
-                xarray_assigner<typename E2::value_type>::assign(e1, e2, trivial);
+                xarray_assigner<typename E2::value_type>::assign(e1, e2, trivial, p);
             }
         };
 
         template <>
         struct assign_data_impl<xtensor_expression_tag, xoptional_expression_tag>
         {
-            template <class E1, class E2>
-            static void run(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial)
+            template <class E1, class E2, class P>
+            static void run(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial, P p)
             {
-                xexpression_assigner_base<xtensor_expression_tag>::assign_data(e1, e2, trivial);
+                xexpression_assigner_base<xtensor_expression_tag>::assign_data(e1, e2, trivial, p);
             }
         };
     }
 
-    template <class E1, class E2>
+    template <class E1, class E2, class P>
     inline void xexpression_assigner_base<xoptional_expression_tag>::assign_data(
         xexpression<E1>& e1,
         const xexpression<E2>& e2,
-        bool trivial
+        bool trivial,
+        P p
     )
     {
-        detail::assign_data_impl<typename E1::expression_tag, typename E2::expression_tag>::run(e1, e2, trivial);
+        detail::assign_data_impl<typename E1::expression_tag, typename E2::expression_tag>::run(e1, e2, trivial, p);
     }
 }
 
