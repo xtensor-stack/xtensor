@@ -11,6 +11,7 @@
 #define XTENSOR_OPERATION_HPP
 
 #include <algorithm>
+#include <array>
 #include <type_traits>
 
 #include <xtl/xsequence.hpp>
@@ -148,21 +149,132 @@ namespace xt
             struct functor
             {
                 using result_type = R;
+                using cast_result_type = R;
 
                 template <class A1>
                 constexpr result_type operator()(const A1& arg) const
                 {
                     return static_cast<R>(arg);
                 }
-
-                // SIMD conversion disabled for now since it does not make sense
-                // in most of the cases
-                /*constexpr simd_result_type simd_apply(const simd_value_type& arg) const
-                {
-                    return static_cast<R>(arg);
-                }*/
             };
         };
+
+        template <class E, class = void>
+        struct cast_expression : std::false_type
+        {
+        };
+
+        template <class F, class CT>
+        struct cast_expression<xfunction<F, CT>, std::void_t<typename F::cast_result_type>> : std::true_type
+        {
+            using result_type = typename F::cast_result_type;
+        };
+
+        template <class E>
+        struct permutation_view : std::false_type
+        {
+        };
+
+        template <class CT, class S, layout_type L, class FST>
+        struct permutation_view<xstrided_view<CT, S, L, FST>>
+            : std::bool_constant<L == layout_type::dynamic && is_specialization_of<inner_storage_getter, FST>::value>
+        {
+        };
+
+        template <std::size_t A, std::size_t B, std::size_t C, class E1, class V, class R, class S>
+        inline void run_permutation_assign(E1& dst, const V& src, S scale)
+        {
+            const std::size_t shape_a = src.shape()[A];
+            const std::size_t shape_b = src.shape()[B];
+            const std::size_t shape_c = src.shape()[C];
+            const std::size_t src_stride_a = static_cast<std::size_t>(src.strides()[A]);
+            const std::size_t src_stride_b = static_cast<std::size_t>(src.strides()[B]);
+            const std::size_t src_stride_c = static_cast<std::size_t>(src.strides()[C]);
+            const std::size_t dst_stride_a = static_cast<std::size_t>(dst.strides()[A]);
+            const std::size_t dst_stride_b = static_cast<std::size_t>(dst.strides()[B]);
+            const std::size_t dst_stride_c = static_cast<std::size_t>(dst.strides()[C]);
+            auto* src_data = src.data() + src.data_offset();
+            auto* dst_data = dst.data() + dst.data_offset();
+            if (shape_c == 3 && src_stride_c == 1 && src_stride_b == 3 && src_stride_a == shape_b * 3
+                && dst_stride_b == 1 && dst_stride_a == shape_b && dst_stride_c == shape_a * shape_b)
+            {
+                const std::size_t plane_size = shape_a * shape_b;
+                auto* dst_0 = dst_data;
+                auto* dst_1 = dst_data + plane_size;
+                auto* dst_2 = dst_data + 2 * plane_size;
+                for (std::size_t i = 0; i < plane_size; ++i)
+                {
+                    dst_0[i] = static_cast<R>(src_data[3 * i]) / static_cast<R>(scale);
+                    dst_1[i] = static_cast<R>(src_data[3 * i + 1]) / static_cast<R>(scale);
+                    dst_2[i] = static_cast<R>(src_data[3 * i + 2]) / static_cast<R>(scale);
+                }
+                return;
+            }
+            constexpr std::size_t tile_size = 32;
+            for (std::size_t a0 = 0; a0 < shape_a; a0 += tile_size)
+            {
+                for (std::size_t b0 = 0; b0 < shape_b; b0 += tile_size)
+                {
+                    const std::size_t a_end = std::min(a0 + tile_size, shape_a);
+                    const std::size_t b_end = std::min(b0 + tile_size, shape_b);
+                    for (std::size_t a = a0; a < a_end; ++a)
+                    {
+                        for (std::size_t b = b0; b < b_end; ++b)
+                        {
+                            for (std::size_t c = 0; c < shape_c; ++c)
+                            {
+                                const auto src_offset = a * src_stride_a + b * src_stride_b + c * src_stride_c;
+                                const auto dst_offset = a * dst_stride_a + b * dst_stride_b + c * dst_stride_c;
+                                dst_data[dst_offset] = static_cast<R>(src_data[src_offset])
+                                                       / static_cast<R>(scale);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        template <class E1, class V, class R, class S>
+        inline bool try_3d_permutation_assign(E1& dst, const V& src, S scale)
+        {
+            if (dst.dimension() != 3 || src.dimension() != 3 || dst.shape() != src.shape()
+                || !dst.is_contiguous() || dst.layout() != layout_type::row_major)
+            {
+                return false;
+            }
+
+            std::array<std::size_t, 3> axes = {0, 1, 2};
+            std::sort(
+                axes.begin(),
+                axes.end(),
+                [&](auto lhs, auto rhs)
+                {
+                    return src.strides()[lhs] > src.strides()[rhs];
+                }
+            );
+            if (src.strides()[axes[2]] != 1
+                || static_cast<std::size_t>(src.strides()[axes[1]]) != src.shape()[axes[2]]
+                || static_cast<std::size_t>(src.strides()[axes[0]])
+                       != src.shape()[axes[2]] * src.shape()[axes[1]])
+            {
+                return false;
+            }
+
+#define XTENSOR_RUN_PERMUTATION(A, B, C)                            \
+    if (axes == std::array<std::size_t, 3>{A, B, C})                \
+    {                                                               \
+        run_permutation_assign<A, B, C, E1, V, R>(dst, src, scale); \
+        return true;                                                \
+    }
+            XTENSOR_RUN_PERMUTATION(0, 1, 2)
+            XTENSOR_RUN_PERMUTATION(0, 2, 1)
+            XTENSOR_RUN_PERMUTATION(1, 0, 2)
+            XTENSOR_RUN_PERMUTATION(1, 2, 0)
+            XTENSOR_RUN_PERMUTATION(2, 0, 1)
+            XTENSOR_RUN_PERMUTATION(2, 1, 0)
+#undef XTENSOR_RUN_PERMUTATION
+            return false;
+        }
 
         template <class Tag, class F, class... E>
         struct select_xfunction_expression;
@@ -206,6 +318,28 @@ namespace xt
         template <class F, class... E>
         using xfunction_type_t = typename std::
             enable_if_t<has_xexpression<std::decay_t<E>...>::value, xfunction_type<F, E...>>::type;
+    }
+
+    template <class E1, class CT1, class CT2>
+    inline bool try_permutation_assign(E1& dst, const xfunction<detail::divides, CT1, CT2>& expression)
+    {
+        using cast_expression_type = std::decay_t<decltype(std::get<0>(expression.arguments()))>;
+        if constexpr (detail::cast_expression<cast_expression_type>::value && is_xscalar<std::decay_t<CT2>>::value)
+        {
+            const auto& cast_expression = std::get<0>(expression.arguments());
+            const auto& view = std::get<0>(cast_expression.arguments());
+            using view_type = std::decay_t<decltype(view)>;
+            using cast_result_type = typename detail::cast_expression<cast_expression_type>::result_type;
+            if constexpr (detail::permutation_view<view_type>::value && std::is_same<cast_result_type, typename E1::value_type>::value && std::is_floating_point<cast_result_type>::value)
+            {
+                return detail::try_3d_permutation_assign<E1, view_type, cast_result_type>(
+                    dst,
+                    view,
+                    std::get<1>(expression.arguments())()
+                );
+            }
+        }
+        return false;
     }
 
 #undef UNARY_OPERATOR_FUNCTOR
