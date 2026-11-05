@@ -10,6 +10,12 @@
 #ifndef XTENSOR_PAD_HPP
 #define XTENSOR_PAD_HPP
 
+#include <cstddef>
+#include <limits>
+#include <stdexcept>
+#include <type_traits>
+#include <vector>
+
 #include "../containers/xarray.hpp"
 #include "../containers/xtensor.hpp"
 #include "../views/xstrided_view.hpp"
@@ -47,15 +53,67 @@ namespace xt
 
     namespace detail
     {
+        template <class S>
+        inline std::size_t checked_count(S value, const char* error)
+        {
+            if constexpr (std::is_signed_v<S>)
+            {
+                if (value < S(0))
+                {
+                    XTENSOR_THROW(std::runtime_error, error);
+                }
+            }
+            return static_cast<std::size_t>(value);
+        }
+
+        // pad_width is indexed by axis, and the modes other than constant read the
+        // padding back from the values of the array: without these checks, invalid
+        // widths read past the end of pad_width or return uninitialized values.
         template <class S, class T>
-        inline bool check_pad_width(const std::vector<std::vector<S>>& pad_width, const T& shape)
+        inline void check_pad_width(const std::vector<std::vector<S>>& pad_width, const T& shape, pad_mode mode)
         {
             if (pad_width.size() != shape.size())
             {
-                return false;
+                XTENSOR_THROW(std::runtime_error, "pad: pad_width must have one {before, after} pair per axis.");
             }
-
-            return true;
+            for (std::size_t axis = 0; axis < shape.size(); ++axis)
+            {
+                if (pad_width[axis].size() != 2)
+                {
+                    XTENSOR_THROW(
+                        std::runtime_error,
+                        "pad: pad_width must have one {before, after} pair per axis."
+                    );
+                }
+                const char* negative = "pad: pad widths must not be negative.";
+                const std::size_t before = checked_count(pad_width[axis][0], negative);
+                const std::size_t after = checked_count(pad_width[axis][1], negative);
+                const std::size_t size = static_cast<std::size_t>(shape[axis]);
+                std::size_t max_width = (std::numeric_limits<std::size_t>::max)();
+                switch (mode)
+                {
+                    case pad_mode::constant:
+                        break;
+                    case pad_mode::symmetric:
+                    case pad_mode::wrap:
+                    case pad_mode::periodic:
+                        max_width = size;
+                        break;
+                    case pad_mode::reflect:
+                        max_width = size == 0 ? 0 : size - 1;
+                        break;
+                    case pad_mode::edge:
+                        max_width = size == 0 ? 0 : max_width;
+                        break;
+                }
+                if (before > max_width || after > max_width)
+                {
+                    XTENSOR_THROW(
+                        std::runtime_error,
+                        "pad: pad width too large for the size of the axis in this mode."
+                    );
+                }
+            }
         }
     }
 
@@ -77,7 +135,7 @@ namespace xt
         pad_mode mode = pad_mode::constant,
         V constant_value = 0)
     {
-        XTENSOR_ASSERT(detail::check_pad_width(pad_width, e.shape()));
+        detail::check_pad_width(pad_width, e.shape(), mode);
 
         using size_type = typename std::decay_t<E>::size_type;
         using return_type = temporary_type_t<E>;
@@ -122,19 +180,16 @@ namespace xt
 
                 if (mode == pad_mode::wrap || mode == pad_mode::periodic)
                 {
-                    XTENSOR_ASSERT(nb <= e.shape(axis));
                     svs[axis] = xt::range(e.shape(axis), nb + e.shape(axis));
                     xt::strided_view(out, svt) = xt::strided_view(out, svs);
                 }
                 else if (mode == pad_mode::symmetric)
                 {
-                    XTENSOR_ASSERT(nb <= e.shape(axis));
                     svs[axis] = xt::range(2 * nb - 1, nb - 1, -1);
                     xt::strided_view(out, svt) = xt::strided_view(out, svs);
                 }
                 else if (mode == pad_mode::reflect)
                 {
-                    XTENSOR_ASSERT(nb <= e.shape(axis) - 1);
                     svs[axis] = xt::range(2 * nb, nb, -1);
                     xt::strided_view(out, svt) = xt::strided_view(out, svs);
                 }
@@ -154,13 +209,11 @@ namespace xt
 
                 if (mode == pad_mode::wrap || mode == pad_mode::periodic)
                 {
-                    XTENSOR_ASSERT(ne <= e.shape(axis));
                     svs[axis] = xt::range(nb, nb + ne);
                     xt::strided_view(out, svt) = xt::strided_view(out, svs);
                 }
                 else if (mode == pad_mode::symmetric)
                 {
-                    XTENSOR_ASSERT(ne <= e.shape(axis));
                     if (ne == nb + e.shape(axis))
                     {
                         svs[axis] = xt::range(nb + e.shape(axis) - 1, _, -1);
@@ -173,7 +226,6 @@ namespace xt
                 }
                 else if (mode == pad_mode::reflect)
                 {
-                    XTENSOR_ASSERT(ne <= e.shape(axis) - 1);
                     if (ne == nb + e.shape(axis) - 1)
                     {
                         svs[axis] = xt::range(nb + e.shape(axis) - 2, _, -1);
@@ -249,26 +301,31 @@ namespace xt
 
             using return_type = temporary_type_t<E>;
 
-            XTENSOR_ASSERT(e.shape().size() == reps.size());
+            const size_type dim = e.dimension();
+            if (reps.size() != dim)
+            {
+                XTENSOR_THROW(std::runtime_error, "tile: reps must have one value per axis.");
+            }
 
             using new_shape_type = typename return_type::shape_type;
-            auto new_shape = xtl::make_sequence<new_shape_type>(e.shape().size());
+            auto new_shape = xtl::make_sequence<new_shape_type>(dim);
 
-            xt::xstrided_slice_vector sv(reps.size());
+            xt::xstrided_slice_vector sv(dim);
 
-            for (size_type axis = 0; axis < reps.size(); ++axis)
+            for (size_type axis = 0; axis < dim; ++axis)
             {
-                new_shape[axis] = e.shape(axis) * reps[axis];
+                const size_type n = checked_count(reps[axis], "tile: reps must not be negative.");
+                new_shape[axis] = e.shape(axis) * n;
                 sv[axis] = xt::range(0, e.shape(axis));
             }
             return_type out(new_shape);
 
             xt::strided_view(out, sv) = e;
 
-            xt::xstrided_slice_vector svs(e.shape().size(), xt::all());
-            xt::xstrided_slice_vector svt(e.shape().size(), xt::all());
+            xt::xstrided_slice_vector svs(dim, xt::all());
+            xt::xstrided_slice_vector svt(dim, xt::all());
 
-            for (size_type axis = 0; axis < e.shape().size(); ++axis)
+            for (size_type axis = 0; axis < dim; ++axis)
             {
                 for (size_type i = 1; i < static_cast<size_type>(reps[axis]); ++i)
                 {
@@ -314,7 +371,11 @@ namespace xt
     template <class E, class S = typename std::decay_t<E>::size_type, XTL_REQUIRES(xtl::is_integral<S>)>
     inline auto tile(E&& e, S reps)
     {
-        std::vector<S> tw(e.shape().size(), static_cast<S>(1));
+        if (e.dimension() == 0)
+        {
+            XTENSOR_THROW(std::runtime_error, "tile: a 0-D expression has no first axis to repeat along.");
+        }
+        std::vector<S> tw(e.dimension(), static_cast<S>(1));
         tw[0] = reps;
         return detail::tile(std::forward<E>(e), tw);
     }
