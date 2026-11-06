@@ -12,9 +12,11 @@
 
 #include "xtensor/containers/xadapt.hpp"
 #include "xtensor/containers/xarray.hpp"
+#include "xtensor/containers/xscalar.hpp"
 #include "xtensor/core/xmath.hpp"
 #include "xtensor/generators/xrandom.hpp"
 #include "xtensor/optional/xoptional_assembly.hpp"
+#include "xtensor/views/xview.hpp"
 
 #include "test_common_macros.hpp"
 
@@ -538,6 +540,109 @@ namespace xt
         shape_type shape = {3, 2};
         xarray<double> a(shape, 3.7);
         EXPECT_EQ(sin(a)(0, 0), std::sin(a(0, 0)));
+    }
+
+    TEST(xmath, sinc)
+    {
+        xarray<double> input = {{-1.5, -0.5, -1e-8}, {0.0, 0.5, 1.5}};
+        const auto original = input;
+        const xarray<double> expected = {
+            {-0.2122065907891938, 0.6366197723675814, 0.9999999999999999},
+            {1.0, 0.6366197723675814, -0.2122065907891938}
+        };
+        const xarray<double> result = sinc(input);
+        EXPECT_EQ(result.shape(), input.shape());
+        EXPECT_TRUE(allclose(result, expected, 1e-14, 1e-15));
+        EXPECT_EQ(input, original);
+
+        // Rounded NumPy reference values reported in issue1608.
+        xarray<double> reference_input = {-4.0, -3.8, -3.6, -0.2, 0.0, 0.2, 3.6, 3.8, 4.0};
+        xarray<double> reference = {-3.89804309e-17, -4.92362781e-02, -8.40918587e-02,
+                                   9.35489284e-01, 1.0, 9.35489284e-01,
+                                   -8.40918587e-02, -4.92362781e-02, -3.89804309e-17};
+        EXPECT_TRUE(allclose(sinc(reference_input), reference, 1e-8, 1e-9));
+
+        xarray<float> values = {-0.0f, 0.5f};
+        auto expression = sinc(xt::view(values, xt::all()));
+        static_assert(std::is_same_v<typename decltype(expression)::value_type, float>);
+        EXPECT_EQ(expression(0), 1.0f);
+        values(0) = -0.5f;
+        EXPECT_LE(std::abs(expression(0) - 0.63661977f), 1e-7f);
+
+        xarray<int> integers = {0, 1};
+        static_assert(std::is_same_v<typename decltype(sinc(integers))::value_type, double>);
+        EXPECT_EQ(sinc(integers)(0), 1.0);
+        EXPECT_LE(std::abs(sinc(integers)(1)), 1e-15);
+    }
+
+    TEST(xmath, sinc_expressions)
+    {
+        xscalar<int> scalar_integer(0);
+        xscalar<double> scalar_double(0.5);
+        xscalar<float> scalar_float(0.0f);
+        EXPECT_EQ(sinc(scalar_integer)(), 1.0);
+        EXPECT_LE(std::abs(sinc(scalar_double)() - 2.0 / numeric_constants<double>::PI), 1e-15);
+        static_assert(std::is_same_v<typename decltype(sinc(scalar_integer))::value_type, double>);
+        static_assert(std::is_same_v<typename decltype(sinc(scalar_float))::value_type, float>);
+
+        xarray<double> input = {{-1.5, -0.5}, {0.5, 1.5}};
+        const auto original = input;
+        auto expression = sinc(input + 0.0);
+        EXPECT_EQ(expression.shape(), input.shape());
+        EXPECT_TRUE(allclose(expression, sinc(-input), 1e-14, 1e-15));
+        input(0, 0) = 0.0;
+        EXPECT_EQ(expression(0, 0), 1.0);
+        EXPECT_LE(std::abs(expression(0, 1) - 2.0 / numeric_constants<double>::PI), 1e-15);
+
+        xarray<float> small = {-1e-8f, -0.0f, 0.0f, 1e-8f};
+        const xarray<float> near_zero = sinc(small);
+        EXPECT_TRUE(allclose(near_zero, ones<float>({4}), 1e-6f, 1e-7f));
+        EXPECT_EQ(small(1), -0.0f);
+        EXPECT_EQ(original(0, 0), -1.5);
+
+        xarray<double> empty = xarray<double>::from_shape({0, 2});
+        const xarray<double> empty_result = sinc(empty);
+        EXPECT_EQ(empty_result.shape(), empty.shape());
+        EXPECT_EQ(empty_result.size(), 0u);
+    }
+
+    TEST(xmath, sinc_complex)
+    {
+        using complex_type = std::complex<double>;
+        xarray<complex_type> input = {complex_type(0.0, 0.0), complex_type(0.0, 0.5),
+                                     complex_type(0.5, 0.5)};
+        const auto original = input;
+        const xarray<complex_type> result = sinc(input);
+        static_assert(std::is_same_v<typename decltype(sinc(input))::value_type, complex_type>);
+        EXPECT_EQ(result(0), complex_type(1.0, 0.0));
+        EXPECT_LE(std::abs(result(1).real() - std::sinh(numeric_constants<double>::PI_2)
+                                                / numeric_constants<double>::PI_2), 1e-14);
+        EXPECT_LE(std::abs(result(1).imag()), 1e-15);
+        const double expected = std::cosh(numeric_constants<double>::PI_2)
+                                / numeric_constants<double>::PI;
+        EXPECT_LE(std::abs(result(2).real() - expected), 1e-14);
+        EXPECT_LE(std::abs(result(2).imag() + expected), 1e-14);
+        EXPECT_EQ(input, original);
+    }
+
+    TEST(xmath, sinc_optional)
+    {
+        using opt_type = xoptional_assembly<xarray<double>, xarray<bool>>;
+        opt_type input = {0.0, 0.5, xtl::missing<double>()};
+        auto expression = sinc(input);
+        // Direct access exercises reference-backed optional proxies as well as
+        // the split value/missing-mask path used by assignment.
+        EXPECT_TRUE(expression(0).has_value());
+        EXPECT_EQ(expression(0).value(), 1.0);
+        EXPECT_TRUE(expression(1).has_value());
+        EXPECT_LE(std::abs(expression(1).value() - 2.0 / numeric_constants<double>::PI), 1e-15);
+        EXPECT_FALSE(expression(2).has_value());
+        const opt_type result = expression;
+        EXPECT_EQ(result(0).value(), 1.0);
+        EXPECT_LE(std::abs(result(1).value() - 2.0 / numeric_constants<double>::PI), 1e-15);
+        EXPECT_FALSE(result(2).has_value());
+        input(0) = 0.5;
+        EXPECT_LE(std::abs(expression(0).value() - 2.0 / numeric_constants<double>::PI), 1e-15);
     }
 
     TEST(xmath, cos)
