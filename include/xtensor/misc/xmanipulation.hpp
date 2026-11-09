@@ -319,8 +319,8 @@ namespace xt
         check_axis_in_dim(axis1, dim, "Parameter axis1");
         check_axis_in_dim(axis2, dim, "Parameter axis2");
 
-        using strides_t = get_strides_t<typename std::decay_t<E>::shape_type>;
-        return transpose(std::forward<E>(e), detail::swapaxes_perm<strides_t>(dim, axis1, axis2));
+        using permutation_t = xindex_type_t<typename std::decay_t<E>::shape_type>;
+        return transpose(std::forward<E>(e), detail::swapaxes_perm<permutation_t>(dim, axis1, axis2));
     }
 
     /*****************************
@@ -373,8 +373,8 @@ namespace xt
         check_axis_in_dim(src, dim, "Parameter src");
         check_axis_in_dim(dest, dim, "Parameter dest");
 
-        using strides_t = get_strides_t<typename std::decay_t<E>::shape_type>;
-        return xt::transpose(std::forward<E>(e), detail::moveaxis_perm<strides_t>(e.dimension(), src, dest));
+        using permutation_t = xindex_type_t<typename std::decay_t<E>::shape_type>;
+        return xt::transpose(std::forward<E>(e), detail::moveaxis_perm<permutation_t>(e.dimension(), src, dest));
     }
 
     /************************************

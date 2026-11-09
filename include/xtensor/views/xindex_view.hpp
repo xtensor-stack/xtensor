@@ -511,7 +511,9 @@ namespace xt
     template <class It>
     inline auto xindex_view<CT, I>::element(It first, It /*last*/) -> reference
     {
-        return m_e[m_indices[(*first)]];
+        // The index may be signed (strided views unravel flat indices into signed
+        // indices) but it is never negative.
+        return m_e[m_indices[static_cast<size_type>(*first)]];
     }
 
     /**
@@ -524,7 +526,9 @@ namespace xt
     template <class It>
     inline auto xindex_view<CT, I>::element(It first, It /*last*/) const -> const_reference
     {
-        return m_e[m_indices[(*first)]];
+        // The index may be signed (strided views unravel flat indices into signed
+        // indices) but it is never negative.
+        return m_e[m_indices[static_cast<size_type>(*first)]];
     }
 
     /**
