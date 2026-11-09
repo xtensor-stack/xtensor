@@ -84,6 +84,24 @@ namespace xt
         ASSERT_EQ(stor[3], stor.back());
     }
 
+    TEST(xoptional_assembly_storage, data)
+    {
+        storage_type v = {56, 2, 3, 5};
+        flag_storage_type f = {false, true, true, true};
+        auto stor = optional_assembly_storage(v, f);
+
+        auto ptr = stor.data();
+        ASSERT_EQ(*ptr, stor.front());
+        ptr->value() = 12;
+        ptr->has_value() = true;
+        ASSERT_EQ(stor[0], 12);
+
+        const auto& cstor = stor;
+        auto cptr = cstor.data();
+        ASSERT_EQ(*cptr, cstor.front());
+        ASSERT_EQ(cptr->value(), 12);
+    }
+
     TEST(xoptional_assembly_storage, iterator)
     {
         storage_type v = {56, 2, 3, 5};

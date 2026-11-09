@@ -320,13 +320,13 @@ namespace xt
     template <class VE, class FE>
     inline auto xoptional_assembly_storage<VE, FE>::data() noexcept -> pointer
     {
-        pointer(front());
+        return pointer(front());
     }
 
     template <class VE, class FE>
     inline auto xoptional_assembly_storage<VE, FE>::data() const noexcept -> const_pointer
     {
-        const_pointer(front());
+        return const_pointer(front());
     }
 
     template <class VE, class FE>
