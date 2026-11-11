@@ -1316,14 +1316,10 @@ namespace xt
         );
 
         std::ptrdiff_t result = 0;
-        std::size_t i = 0;
-        for (; i < std::min(sizeof...(S), m_e.strides().size()); ++i)
+        for (std::size_t i = 0; i < sizeof...(S); ++i)
         {
-            result += temp[i] * m_e.strides()[i - newaxis_count_before<S...>(i)];
-        }
-        for (; i < sizeof...(S); ++i)
-        {
-            result += temp[i];
+            std::size_t index = i - newaxis_count_before<S...>(i);
+            result += temp[i] * (index < m_e.strides().size() ? m_e.strides()[index] : 1);
         }
         return static_cast<std::size_t>(result) + m_e.data_offset();
     }
