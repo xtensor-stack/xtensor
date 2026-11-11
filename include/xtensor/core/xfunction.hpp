@@ -710,7 +710,9 @@ namespace xt
     template <class S>
     inline bool xfunction<F, CT...>::broadcast_shape(S& shape, bool reuse_cache) const
     {
-        if (m_cache.is_initialized && reuse_cache)
+        // The cached shape can only be copied into a shape of the same rank; any other
+        // rank goes through the full broadcast, which also reports incompatible ranks.
+        if (m_cache.is_initialized && reuse_cache && shape.size() == m_cache.shape.size())
         {
             std::copy_n(m_cache.shape.cbegin(), m_cache.shape.size(), shape.begin());
             return m_cache.is_trivial;

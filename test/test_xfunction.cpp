@@ -110,6 +110,31 @@ namespace xt
         XT_EXPECT_ANY_THROW(xt::xarray<double> res = arr1 * arr2);
     }
 
+    TEST(xfunction, broadcast_shape_cached_other_rank)
+    {
+        xt::xarray<double> a = {{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}};
+        auto f = a + 1.0;
+        // Fills the shape cache of f
+        EXPECT_EQ(f.shape().size(), 2u);
+
+        SUBCASE("higher rank")
+        {
+            using shape_type = xt::dynamic_shape<std::size_t>;
+            shape_type cached = uninitialized_shape<shape_type>(3);
+            shape_type computed = uninitialized_shape<shape_type>(3);
+            bool cached_trivial = f.broadcast_shape(cached, true);
+            bool computed_trivial = f.broadcast_shape(computed, false);
+            EXPECT_EQ(cached, computed);
+            EXPECT_EQ(cached_trivial, computed_trivial);
+        }
+
+        SUBCASE("lower rank")
+        {
+            xt::xtensor<double, 1> res;
+            XT_EXPECT_ANY_THROW(res = f);
+        }
+    }
+
     TEST(xfunction, shape)
     {
         xfunction_features f;
