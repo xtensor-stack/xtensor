@@ -1707,7 +1707,7 @@ namespace xt
 
             // need to advance captured `first`
             first = first_copy;
-            std::advance(first, static_cast<diff_type>(k - xt::integral_count_before<S...>(i)));
+            std::advance(first, static_cast<diff_type>(k - xt::integral_count_before<S...>(k)));
 
             if (first < last)
             {
