@@ -7,6 +7,11 @@
 Changelog
 =========
 
+0.27.2
+------
+
+- Fixed xexpression_holder generic constructor
+
 0.27.1
 ------
 
