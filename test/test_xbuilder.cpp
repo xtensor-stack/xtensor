@@ -532,6 +532,39 @@ namespace xt
         EXPECT_EQ(c2, e2);
     }
 
+    // Like containers, builders accept fewer indices than dimensions (missing
+    // leading ones are 0) or more (extra leading ones are ignored).
+    TEST(xbuilder, concatenate_stack_index_count)
+    {
+        xarray<int> a = {{1, 2, 3}, {4, 5, 6}};
+        xarray<int> b = {{7, 8, 9}};
+
+        auto c = concatenate(xtuple(a, b), 0);
+        xarray<int> ec = c;
+        EXPECT_EQ(c(1), ec(1));
+        EXPECT_EQ(c(5, 2, 1), ec(5, 2, 1));
+
+        auto h = hstack(xtuple(a, a));
+        xarray<int> eh = h;
+        EXPECT_EQ(h(4), eh(4));
+        EXPECT_EQ(h(5, 1, 4), eh(5, 1, 4));
+
+        auto s = stack(xtuple(a, a), 1);
+        xarray<int> es = s;
+        EXPECT_EQ(s(2), es(2));
+        EXPECT_EQ(s(1, 2), es(1, 2));
+        EXPECT_EQ(s(5, 1, 1, 2), es(5, 1, 1, 2));
+
+        auto v = vstack(xtuple(xarray<int>{1, 2, 3}, xarray<int>{4, 5, 6}));
+        xarray<int> ev = v;
+        EXPECT_EQ(v(2), ev(2));
+        EXPECT_EQ(v(5, 1, 2), ev(5, 1, 2));
+
+        // Signed indices, as passed by flat_expression_adaptor
+        const std::array<std::ptrdiff_t, 2> idx = {2, 1};
+        EXPECT_EQ(c.element(idx.cbegin(), idx.cend()), ec(2, 1));
+    }
+
     TEST(xbuilder, meshgrid)
     {
         auto mesh = meshgrid(linspace<double>(0.0, 1.0, 3), linspace<double>(0.0, 1.0, 2));
