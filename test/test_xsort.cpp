@@ -7,6 +7,13 @@
  * The full license is in the file LICENSE, distributed with this software. *
  ****************************************************************************/
 
+#include <array>
+#include <cstdint>
+#include <initializer_list>
+#include <limits>
+#include <type_traits>
+#include <vector>
+
 #include "xtensor/containers/xadapt.hpp"
 #include "xtensor/containers/xarray.hpp"
 #include "xtensor/containers/xfixed.hpp"
@@ -23,6 +30,72 @@
 
 namespace xt
 {
+    namespace
+    {
+        struct median_axes_range
+        {
+            std::array<int, 2> axes;
+        };
+
+        const int* begin(const median_axes_range& range)
+        {
+            return range.axes.data();
+        }
+
+        const int* end(const median_axes_range& range)
+        {
+            return range.axes.data() + range.axes.size();
+        }
+
+        // Enumerate logical coordinates and fully sort each output lane. This
+        // oracle does not transpose, reshape, partition, or call xt::median.
+        template <class E>
+        xarray<double, layout_type::row_major>
+        grouped_median_reference(const E& e, const std::vector<std::size_t>& axes)
+        {
+            std::vector<std::size_t> shape;
+            std::size_t lane_count = 1;
+            for (std::size_t ax = 0; ax < e.dimension(); ++ax)
+            {
+                if (std::find(axes.begin(), axes.end(), ax) == axes.end())
+                {
+                    shape.push_back(e.shape()[ax]);
+                    lane_count *= e.shape()[ax];
+                }
+            }
+            std::vector<std::vector<double>> lanes(lane_count);
+            std::vector<std::size_t> index(e.dimension());
+            for (std::size_t linear = 0; linear < e.size(); ++linear)
+            {
+                auto remainder = linear;
+                for (std::size_t ax = e.dimension(); ax != 0; --ax)
+                {
+                    index[ax - 1] = remainder % e.shape()[ax - 1];
+                    remainder /= e.shape()[ax - 1];
+                }
+                std::size_t lane = 0;
+                for (std::size_t ax = 0; ax < e.dimension(); ++ax)
+                {
+                    if (std::find(axes.begin(), axes.end(), ax) == axes.end())
+                    {
+                        lane = lane * e.shape()[ax] + index[ax];
+                    }
+                }
+                lanes[lane].push_back(static_cast<double>(e.element(index.begin(), index.end())));
+            }
+            auto result = xarray<double, layout_type::row_major>::from_shape(shape);
+            for (std::size_t lane = 0; lane < lane_count; ++lane)
+            {
+                auto& values = lanes[lane];
+                std::sort(values.begin(), values.end());
+                auto middle = values.size() / 2;
+                result.flat(lane) = values.size() % 2 == 0 ? (values[middle - 1] + values[middle]) / 2.
+                                                           : values[middle];
+            }
+            return result;
+        }
+    }
+
     TEST(xsort, argsort)
     {
         xarray<double> a1 = {2, 3, 1};
@@ -563,5 +636,156 @@ namespace xt
         xt::xtensor<float, 1> ma1_exp = {2.5, 1.5, 9., 12., 5.};
         EXPECT_EQ(ma0, ma0_exp);
         EXPECT_EQ(ma1, ma1_exp);
+    }
+
+    TEST(xsort, median_grouped_axes)
+    {
+        const xtensor<double, 3> a = {
+            {{0., 0., 0., 100.}, {1., 2., 99., 100.}, {-9., -8., -7., -6.}},
+            {{10., 10., 10., 10.}, {3., 4., 5., 6.}, {-5., 30., 40., 50.}}
+        };
+        const auto original = a;
+        const xarray<double> expected = {10., 4.5, -5.5};
+        EXPECT_EQ(grouped_median_reference(a, {0, 2}), expected);
+        EXPECT_EQ(median(a, {0, 2}), expected);
+        EXPECT_EQ(median(a, {2, 0}), expected);
+        EXPECT_EQ(median(a, {-1, -3}), expected);
+        const int array_axes[] = {0, 2};
+        EXPECT_EQ(median(a, array_axes), expected);
+        const std::initializer_list<int> list_axes = {0, 2};
+        EXPECT_EQ(median(a, list_axes), expected);
+        xarray<double> last_axis = median(a, 2);
+        xarray<double> first_axis = median(a, 0);
+        EXPECT_NE(median(last_axis, 0), expected);
+        EXPECT_NE(median(first_axis, 1), expected);
+
+        const std::vector<std::size_t> axes = {0, 2};
+        const std::array<int, 2> reversed = {2, 0};
+        const int raw_axes[] = {0, 2};
+        EXPECT_EQ(median(a, axes), expected);
+        EXPECT_EQ(median(a, reversed), expected);
+        EXPECT_EQ(median(a, raw_axes), expected);
+        EXPECT_EQ(median(a, {0, 1}), grouped_median_reference(a, {0, 1}));
+        EXPECT_EQ(median(a, {1, 2}), grouped_median_reference(a, {1, 2}));
+        auto all_axes = median(a, {2, 0, 1});
+        EXPECT_EQ(all_axes.dimension(), 0);
+        EXPECT_EQ(all_axes(), median(a));
+        EXPECT_EQ(a, original);
+    }
+
+    TEST(xsort, median_grouped_axes_layouts_and_views)
+    {
+        xtensor<int, 3> a = xtensor<int, 3>::from_shape({3, 2, 3});
+        for (std::size_t i = 0; i < a.size(); ++i)
+        {
+            a.flat(i) = static_cast<int>((i * 11) % 29) - 14;
+        }
+        const auto original = a;
+        const auto expected = grouped_median_reference(a, {0, 2});
+        xarray<int, layout_type::column_major> column_major = a;
+        EXPECT_EQ(median(a, {0, 2}), expected);
+        EXPECT_EQ(median(column_major, {2, 0}), expected);
+        auto lazy = a + 2;
+        static_assert(!strided_expression<decltype(lazy)>);
+        EXPECT_EQ(median(lazy, {0, 2}), expected + 2);
+        EXPECT_EQ(median(a + 2, {0, 2}), expected + 2);
+
+        auto transposed = transpose(a, {2, 0, 1});
+        EXPECT_EQ(median(transposed, {0, 1}), expected);
+        auto strided = view(a, range(0, 3, 2), all(), range(0, 3, 2));
+        EXPECT_EQ(median(strided, {0, 2}), grouped_median_reference(strided, {0, 2}));
+        auto reversed = view(a, all(), all(), range(placeholders::_, placeholders::_, -1));
+        EXPECT_EQ(median(reversed, {0, 2}), expected);
+        auto broadcasted = broadcast(a, {2, 3, 2, 3});
+        static_assert(!strided_expression<decltype(broadcasted)>);
+        EXPECT_EQ(median(broadcasted, {0, 1, 3}), grouped_median_reference(broadcasted, {0, 1, 3}));
+        EXPECT_EQ(median(broadcast(a, {2, 3, 2, 3}), {3, 1, 0}), grouped_median_reference(broadcasted, {0, 1, 3}));
+        EXPECT_EQ(a, original);
+        EXPECT_EQ(column_major, original);
+    }
+
+    TEST(xsort, median_grouped_axes_types_and_legacy)
+    {
+        xarray<int> integers = {{1, 2}, {5, 8}};
+        auto grouped = median(integers, {0, 1});
+        auto single = median(integers, 0);
+        static_assert(std::is_same<decltype(grouped)::value_type, decltype(single)::value_type>::value, "");
+        EXPECT_EQ(grouped(), 3.5);
+        EXPECT_EQ(median(integers), 3);  // The existing scalar API keeps its input type.
+        EXPECT_EQ(median(integers, {0}), single);
+        EXPECT_EQ(median(integers, {1}), median(integers, 1));
+        EXPECT_EQ(median(integers, {-1}), median(integers, -1));
+
+        enum axis
+        {
+            rows = 0
+        };
+
+        EXPECT_EQ(median(integers, rows), single);
+        EXPECT_EQ(median(integers, std::integral_constant<int, 1>{}), median(integers, 1));
+        static_assert(std::ranges::range<const median_axes_range>);
+        EXPECT_EQ(median(integers, median_axes_range{{0, 1}}), grouped);
+        EXPECT_EQ(median(integers, std::vector<int>{}), integers);
+
+        xarray<float> floats = {{1.f, 2.f}, {5.f, 8.f}};
+        auto grouped_float = median(floats, {0, 1});
+        auto single_float = median(floats, 0);
+        static_assert(
+            std::is_same<decltype(grouped_float)::value_type, decltype(single_float)::value_type>::value,
+            ""
+        );
+        EXPECT_EQ(grouped_float(), 3.5f);
+        EXPECT_EQ(median(floats, std::array<int, 0>{}), floats);
+        xarray<std::uint64_t> large_integers = {9007199254740993ULL};
+        auto empty_axes = median(large_integers, std::vector<int>{});
+        auto one_axis = median(large_integers, 0);
+        static_assert(std::is_same<decltype(empty_axes)::value_type, decltype(one_axis)::value_type>::value, "");
+        static_assert(std::is_same<decltype(empty_axes)::value_type, double>::value, "");
+        EXPECT_EQ(empty_axes.dimension(), 1);
+        EXPECT_EQ(empty_axes.shape()[0], 1);
+        EXPECT_EQ(empty_axes(0), 9007199254740992.);
+        EXPECT_EQ(one_axis(), empty_axes(0));
+        EXPECT_EQ(large_integers(0), 9007199254740993ULL);
+        xarray<double> scalar = 7.;
+        auto scalar_result = median(scalar, std::vector<int>{});
+        EXPECT_EQ(scalar_result.dimension(), 0);
+        EXPECT_EQ(scalar_result(), 7.);
+
+        auto empty_lanes = xarray<double>::from_shape({0, 3, 2});
+        auto empty_result = median(empty_lanes, {1, 2});
+        EXPECT_EQ(empty_result.dimension(), 1);
+        EXPECT_EQ(empty_result.shape()[0], 0);
+    }
+
+    TEST(xsort, median_grouped_axes_invalid)
+    {
+        xarray<double> a = {{1., 2.}, {3., 4.}};
+        EXPECT_THROW(median(a, {0, 0}), std::runtime_error);
+        EXPECT_THROW(median(a, {0, -2}), std::runtime_error);
+        EXPECT_THROW(median(a, {2}), std::runtime_error);
+        EXPECT_THROW(median(a, {-3}), std::runtime_error);
+        EXPECT_THROW(median(a, {std::numeric_limits<std::ptrdiff_t>::min()}), std::runtime_error);
+        EXPECT_THROW(median(a, {std::numeric_limits<std::size_t>::max()}), std::runtime_error);
+        EXPECT_THROW(median(a, {std::numeric_limits<long long>::min()}), std::runtime_error);
+        if constexpr (sizeof(std::size_t) < sizeof(long long))
+        {
+            EXPECT_THROW(median(a, {4294967296LL}), std::runtime_error);
+            EXPECT_THROW(median(a, {-4294967297LL}), std::runtime_error);
+            EXPECT_THROW(median(a, {4294967296ULL}), std::runtime_error);
+        }
+        EXPECT_EQ(median(a, std::array<signed char, 1>{-1}), (xarray<double>{1.5, 3.5}));
+        EXPECT_EQ(median(a, std::array<unsigned char, 1>{0}), (xarray<double>{2., 3.}));
+        EXPECT_EQ(median(a, std::array<bool, 1>{true}), (xarray<double>{1.5, 3.5}));
+        EXPECT_THROW(median(a, {std::numeric_limits<signed char>::min()}), std::runtime_error);
+        auto high_rank = xarray<double>::from_shape(std::vector<std::size_t>(130, 1));
+        high_rank.fill(7.);
+        xarray<double> narrow_axis = median(high_rank, {std::numeric_limits<signed char>::min()});
+        EXPECT_EQ(narrow_axis.dimension(), 129);
+        EXPECT_EQ(narrow_axis.size(), 1);
+        EXPECT_EQ(narrow_axis.flat(0), 7.);
+        auto empty = xarray<double>::from_shape({2, 0, 3});
+        EXPECT_THROW(median(empty, {0, 1}), std::runtime_error);
+        xarray<double> scalar = 1.;
+        EXPECT_THROW(median(scalar, {0}), std::runtime_error);
     }
 }

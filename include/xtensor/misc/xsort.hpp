@@ -12,7 +12,11 @@
 
 #include <algorithm>
 #include <cmath>
+#include <initializer_list>
 #include <iterator>
+#include <limits>
+#include <ranges>
+#include <type_traits>
 #include <utility>
 
 #include <xtl/xcompare.hpp>
@@ -1140,6 +1144,120 @@ namespace xt
             sv[ax] = xt::range(szh, szh + 1);
             return xt::mean(xt::strided_view(std::move(values), std::move(sv)), {ax});
         }
+    }
+
+    /**
+     * Find the median over a group of axes.
+     *
+     * All elements along the selected axes form one group for each index of the
+     * remaining axes. The median is computed once per group, not successively
+     * along each axis. The order of the axes does not affect the result.
+     * The input is not modified. The result has the same value type as the
+     * single-axis overload, including its promotion of integral input.
+     *
+     * @ingroup xt_xsort
+     * @param e input xexpression
+     * @param axes sequence of distinct axes, with negative axes counted from the end.
+     *             An empty sequence retains the shape, with the same value-type
+     *             promotion as a single-axis median (which can round large integers).
+     * @return expression with the selected axes removed, in the original order
+     *         of the remaining axes. Selecting all axes gives a scalar expression.
+     * @throw std::runtime_error if an axis is invalid or repeated, or a selected
+     *                           axis has length zero.
+     */
+    template <class E, class X>
+        requires std::ranges::range<const X>
+    inline auto median(E&& e, const X& axes)
+    {
+        dynamic_shape<std::size_t> reduced_axes;
+        for (auto axis : axes)
+        {
+            using axis_type = std::decay_t<decltype(axis)>;
+            static_assert(xtl::is_integral<axis_type>::value, "Median axes must be integral.");
+            // Keep the full axis width until after validating its range. The
+            // axis type can be wider than size_t, or narrower than the rank.
+            using unsigned_axis_type = std::make_unsigned_t<
+                std::conditional_t<std::is_same<axis_type, bool>::value, unsigned char, axis_type>>;
+            using comparison_type = std::common_type_t<std::size_t, unsigned_axis_type>;
+            auto dimension = static_cast<comparison_type>(e.dimension());
+            auto ax = static_cast<comparison_type>(axis);
+            if constexpr (std::is_signed<axis_type>::value)
+            {
+                if (axis < 0)
+                {
+                    // Avoid negating the minimum signed value.
+                    auto from_end = static_cast<comparison_type>(-(axis + 1));
+                    if (from_end >= dimension)
+                    {
+                        XTENSOR_THROW(std::runtime_error, "Median axis is out of bounds.");
+                    }
+                    ax = dimension - from_end - 1;
+                }
+            }
+            if (ax >= dimension)
+            {
+                XTENSOR_THROW(std::runtime_error, "Median axis is out of bounds.");
+            }
+            reduced_axes.push_back(static_cast<std::size_t>(ax));
+        }
+        std::sort(reduced_axes.begin(), reduced_axes.end());
+        if (std::adjacent_find(reduced_axes.begin(), reduced_axes.end()) != reduced_axes.end())
+        {
+            XTENSOR_THROW(std::runtime_error, "Median axes should not contain duplicates.");
+        }
+
+        dynamic_shape<std::size_t> permutation;
+        dynamic_shape<std::size_t> grouped_shape;
+        std::size_t group_size = 1;
+        for (std::size_t ax = 0; ax < e.dimension(); ++ax)
+        {
+            if (std::binary_search(reduced_axes.begin(), reduced_axes.end(), ax))
+            {
+                auto extent = e.shape()[ax];
+                if (extent == 0)
+                {
+                    XTENSOR_THROW(std::runtime_error, "Cannot take a median over an empty axis.");
+                }
+                if (extent > (std::numeric_limits<std::size_t>::max)() / group_size)
+                {
+                    XTENSOR_THROW(std::runtime_error, "Median group is too large.");
+                }
+                group_size *= extent;
+            }
+            else
+            {
+                permutation.push_back(ax);
+                grouped_shape.push_back(e.shape()[ax]);
+            }
+        }
+        permutation.insert(permutation.end(), reduced_axes.begin(), reduced_axes.end());
+        grouped_shape.push_back(group_size);
+
+        // Materialize logical groups in row-major order, even for strided input
+        // or an arbitrary input layout. The existing single-axis median owns its
+        // partitioned copy and preserves its usual result-type rules.
+        using buffer_type = xarray<typename std::decay_t<E>::value_type, layout_type::row_major>;
+        buffer_type grouped;
+        if constexpr (strided_expression<std::decay_t<E>>)
+        {
+            grouped = transpose(std::forward<E>(e), permutation);
+        }
+        else
+        {
+            // Lazy functions and broadcasts do not expose strides to transpose.
+            // Evaluate them before permuting, without adding this copy for views
+            // and containers that already have a usable stride interface.
+            buffer_type evaluated = std::forward<E>(e);
+            grouped = transpose(evaluated, permutation);
+        }
+        grouped.reshape(grouped_shape);
+        return median(std::move(grouped), static_cast<std::ptrdiff_t>(grouped_shape.size() - 1));
+    }
+
+    template <class E, class I>
+    inline auto median(E&& e, std::initializer_list<I> axes)
+    {
+        return median(std::forward<E>(e), dynamic_shape<I>(axes));
     }
 
     namespace detail
