@@ -10,7 +10,9 @@
 #ifndef XTENSOR_XEXPRESSION_HOLDER_HPP
 #define XTENSOR_XEXPRESSION_HOLDER_HPP
 
+#include <concepts>
 #include <memory>
+#include <type_traits>
 
 #include <nlohmann/json.hpp>
 
@@ -38,6 +40,7 @@ namespace xt
         xexpression_holder() = default;
 
         template <class E>
+            requires(!std::same_as<std::decay_t<E>, xexpression_holder>)
         xexpression_holder(E&& expr);
 
         xexpression_holder(implementation_type* holder);
@@ -118,6 +121,7 @@ namespace xt
     }
 
     template <class E>
+        requires(!std::same_as<std::decay_t<E>, xexpression_holder>)
     inline xexpression_holder::xexpression_holder(E&& expr)
         : p_holder(new detail::xexpression_wrapper<E>(std::forward<E>(expr)))
     {
@@ -181,30 +185,29 @@ namespace xt
 
     inline void xexpression_holder::init_pointer_from_json(const nlohmann::json& j)
     {
-        if (j.is_array())
+        if (j.is_array() && !j.empty())
         {
-            return init_pointer_from_json(j[0]);
+            init_pointer_from_json(j[0]);
         }
-
-        if (j.is_number())
+        else if (j.is_number())
         {
             xt::xarray<double> empty_arr;
             p_holder.reset(new detail::xexpression_wrapper<xt::xarray<double>>(std::move(empty_arr)));
         }
-
-        if (j.is_boolean())
+        else if (j.is_boolean())
         {
             xt::xarray<bool> empty_arr;
             p_holder.reset(new detail::xexpression_wrapper<xt::xarray<bool>>(std::move(empty_arr)));
         }
-
-        if (j.is_string())
+        else if (j.is_string())
         {
             xt::xarray<std::string> empty_arr;
             p_holder.reset(new detail::xexpression_wrapper<xt::xarray<std::string>>(std::move(empty_arr)));
         }
-
-        XTENSOR_THROW(std::runtime_error, "Received a JSON with a tensor that contains unsupported data type");
+        else
+        {
+            XTENSOR_THROW(std::runtime_error, "Received a JSON with a tensor that contains unsupported data type");
+        }
     }
 
     inline void xexpression_holder::check_holder() const
