@@ -340,6 +340,22 @@ namespace xt
         XTENSOR_UNARY_MATH_FUNCTOR(isinf);
         XTENSOR_UNARY_MATH_FUNCTOR(isnan);
         XTENSOR_UNARY_MATH_FUNCTOR(conj);
+
+        struct sinc_fun
+        {
+            template <class T>
+            auto operator()(const T& x) const
+            {
+                using math::sin;
+                using result_type = decltype(sin(x));
+                if (x == result_type(0))
+                {
+                    return result_type(1);
+                }
+                const auto angle = numeric_constants<result_type>::PI * result_type(x);
+                return sin(angle) / angle;
+            }
+        };
     }
 
 #undef XTENSOR_UNARY_MATH_FUNCTOR
@@ -1258,6 +1274,21 @@ namespace xt
     inline auto sin(E&& e) noexcept -> detail::xfunction_type_t<math::sin_fun, E>
     {
         return detail::make_xfunction<math::sin_fun>(std::forward<E>(e));
+    }
+
+    /**
+     * @ingroup trigo_functions
+     * @brief Normalized sinc function.
+     *
+     * Computes \f$\sin(\pi x)/(\pi x)\f$ element-wise, with value 1 at zero.
+     * This is the normalized convention used by NumPy.
+     * @param e an \ref xexpression
+     * @return an \ref xfunction
+     */
+    template <class E>
+    inline auto sinc(E&& e) noexcept -> detail::xfunction_type_t<math::sinc_fun, E>
+    {
+        return detail::make_xfunction<math::sinc_fun>(std::forward<E>(e));
     }
 
     /**
