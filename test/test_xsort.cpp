@@ -17,6 +17,7 @@
 #include "xtensor/io/xio.hpp"
 #include "xtensor/misc/xsort.hpp"
 #include "xtensor/views/xslice.hpp"
+#include "xtensor/views/xstrided_view.hpp"
 #include "xtensor/views/xview.hpp"
 
 #include "test_common_macros.hpp"
@@ -67,6 +68,27 @@ namespace xt
         {
             xtensor_fixed<double, xt::xshape<2, 3>> tf1 = a2_c;
             EXPECT_EQ(ex2_1, argsort(tf1));
+        }
+    }
+
+    TEST(xsort, argsort_view_offset)
+    {
+        xarray<int, layout_type::row_major> a = {{1, 2, 3}, {3, 2, 1}};
+        auto row = view(a, range(1, 2), all());
+        auto strided_row = strided_view(a, {range(1, 2), all()});
+        xarray<std::size_t> expected_row = {{2, 1, 0}};
+
+        xarray<int, layout_type::column_major> b = {{1, 3}, {2, 2}, {3, 1}};
+        auto column = view(b, all(), range(1, 2));
+        auto strided_column = strided_view(b, {all(), range(1, 2)});
+        xtensor<std::size_t, 2> expected_column = {{2}, {1}, {0}};
+
+        for (auto method : {sorting_method::quick, sorting_method::stable})
+        {
+            EXPECT_EQ(expected_row, argsort(row, 1, method));
+            EXPECT_EQ(expected_row, argsort(strided_row, 1, method));
+            EXPECT_EQ(expected_column, argsort(column, 0, method));
+            EXPECT_EQ(expected_column, argsort(strided_column, 0, method));
         }
     }
 
