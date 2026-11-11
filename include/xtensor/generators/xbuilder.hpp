@@ -993,7 +993,7 @@ namespace xt
     {
 
         template <std::size_t... I, class... E>
-        inline auto meshgrid_impl(std::index_sequence<I...>, E&&... e) noexcept
+        inline auto meshgrid_impl(std::index_sequence<I...>, E&&... e)
         {
             return std::make_tuple(detail::make_xgenerator(
                 detail::repeat_impl<xclosure_t<E>>(std::forward<E>(e), I),
@@ -1011,7 +1011,7 @@ namespace xt
      * @returns tuple of xgenerator expressions.
      */
     template <class... E>
-    inline auto meshgrid(E&&... e) noexcept
+    inline auto meshgrid(E&&... e)
     {
         return detail::meshgrid_impl(std::make_index_sequence<sizeof...(E)>(), std::forward<E>(e)...);
     }

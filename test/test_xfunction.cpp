@@ -515,4 +515,15 @@ namespace xt
         xtensor<Point3, 1> res{r1, r2, r3};
         EXPECT_EQ(c, res);
     }
+
+    TEST(xfunction, iterator_broadcast_error)
+    {
+        xarray<int> a = {1, 2, 3};
+        xarray<int> b = {1, 2};
+        auto f = a + b;
+        XT_EXPECT_THROW(f.begin(), broadcast_error);
+        XT_EXPECT_THROW(f.cend(), broadcast_error);
+        XT_EXPECT_THROW(f.rbegin(), broadcast_error);
+    }
+
 }

@@ -42,7 +42,7 @@ namespace xt
     }
 
     template <class E>
-    auto transpose(E&& e) noexcept;
+    auto transpose(E&& e);
 
     template <class E, class S, class Tag = check_policy::none>
     auto transpose(E&& e, S&& permutation, Tag check_policy = Tag());
@@ -236,7 +236,7 @@ namespace xt
      * @param e the input expression
      */
     template <class E>
-    inline auto transpose(E&& e) noexcept
+    inline auto transpose(E&& e)
     {
         using shape_type = xindex_type_t<typename std::decay_t<E>::shape_type>;
         shape_type shape;

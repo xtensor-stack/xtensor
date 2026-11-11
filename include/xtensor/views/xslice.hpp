@@ -327,12 +327,12 @@ namespace xt
         xkeep_slice(std::initializer_list<S> t);
 
         template <std::convertible_to<T> S>
-        operator xkeep_slice<S>() const noexcept;
+        operator xkeep_slice<S>() const;
 
         // Same as implicit conversion operator but more convenient to call
         // from a variant visitor
         template <std::convertible_to<T> S>
-        xkeep_slice<S> convert() const noexcept;
+        xkeep_slice<S> convert() const;
 
         size_type operator()(size_type i) const noexcept;
         size_type size() const noexcept;
@@ -435,12 +435,12 @@ namespace xt
         xdrop_slice(std::initializer_list<S> t);
 
         template <std::convertible_to<T> S>
-        operator xdrop_slice<S>() const noexcept;
+        operator xdrop_slice<S>() const;
 
         // Same as implicit conversion operator but more convenient to call
         // from a variant visitor
         template <std::convertible_to<T> S>
-        xdrop_slice<S> convert() const noexcept;
+        xdrop_slice<S> convert() const;
 
         size_type operator()(size_type i) const noexcept;
         size_type size() const noexcept;
@@ -1310,7 +1310,7 @@ namespace xt
 
     template <class T>
     template <std::convertible_to<T> S>
-    inline xkeep_slice<T>::operator xkeep_slice<S>() const noexcept
+    inline xkeep_slice<T>::operator xkeep_slice<S>() const
     {
         xkeep_slice<S> ret;
         using us_type = typename container_type::size_type;
@@ -1340,7 +1340,7 @@ namespace xt
 
     template <class T>
     template <std::convertible_to<T> S>
-    inline xkeep_slice<S> xkeep_slice<T>::convert() const noexcept
+    inline xkeep_slice<S> xkeep_slice<T>::convert() const
     {
         return xkeep_slice<S>(*this);
     }
@@ -1454,7 +1454,7 @@ namespace xt
 
     template <class T>
     template <std::convertible_to<T> S>
-    inline xdrop_slice<T>::operator xdrop_slice<S>() const noexcept
+    inline xdrop_slice<T>::operator xdrop_slice<S>() const
     {
         xdrop_slice<S> ret;
         ret.m_raw_indices.resize(m_raw_indices.size());
@@ -1492,7 +1492,7 @@ namespace xt
 
     template <class T>
     template <std::convertible_to<T> S>
-    inline xdrop_slice<S> xdrop_slice<T>::convert() const noexcept
+    inline xdrop_slice<S> xdrop_slice<T>::convert() const
     {
         return xdrop_slice<S>(*this);
     }

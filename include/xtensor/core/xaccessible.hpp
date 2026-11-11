@@ -37,7 +37,7 @@ namespace xt
         using size_type = typename inner_types::size_type;
 
         size_type size() const noexcept(noexcept(derived_cast().shape()));
-        size_type dimension() const noexcept;
+        size_type dimension() const noexcept(noexcept(derived_cast().shape()));
         size_type shape(size_type index) const;
 
         template <class... Args>
@@ -147,7 +147,7 @@ namespace xt
      * Returns the number of dimensions of the expression.
      */
     template <class D>
-    inline auto xconst_accessible<D>::dimension() const noexcept -> size_type
+    inline auto xconst_accessible<D>::dimension() const noexcept(noexcept(derived_cast().shape())) -> size_type
     {
         return derived_cast().shape().size();
     }

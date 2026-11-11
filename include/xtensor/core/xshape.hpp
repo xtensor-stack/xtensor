@@ -124,7 +124,7 @@ namespace xt
      * @return bool
      */
     template <class E, class S>
-    inline bool has_shape(const E& e, std::initializer_list<S> shape) noexcept
+    inline bool has_shape(const E& e, std::initializer_list<S> shape)
     {
         return e.shape().size() == shape.size()
                && std::equal(e.shape().cbegin(), e.shape().cend(), shape.begin());

@@ -74,40 +74,40 @@ namespace xt
         using const_reverse_iterator = const_reverse_layout_iterator<XTENSOR_DEFAULT_TRAVERSAL>;
 
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        const_layout_iterator<L> begin() const noexcept;
+        const_layout_iterator<L> begin() const;
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        const_layout_iterator<L> end() const noexcept;
+        const_layout_iterator<L> end() const;
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        const_layout_iterator<L> cbegin() const noexcept;
+        const_layout_iterator<L> cbegin() const;
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        const_layout_iterator<L> cend() const noexcept;
+        const_layout_iterator<L> cend() const;
 
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        const_reverse_layout_iterator<L> rbegin() const noexcept;
+        const_reverse_layout_iterator<L> rbegin() const;
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        const_reverse_layout_iterator<L> rend() const noexcept;
+        const_reverse_layout_iterator<L> rend() const;
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        const_reverse_layout_iterator<L> crbegin() const noexcept;
+        const_reverse_layout_iterator<L> crbegin() const;
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        const_reverse_layout_iterator<L> crend() const noexcept;
+        const_reverse_layout_iterator<L> crend() const;
 
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
-        const_broadcast_iterator<S, L> begin(const S& shape) const noexcept;
+        const_broadcast_iterator<S, L> begin(const S& shape) const;
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
-        const_broadcast_iterator<S, L> end(const S& shape) const noexcept;
+        const_broadcast_iterator<S, L> end(const S& shape) const;
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
-        const_broadcast_iterator<S, L> cbegin(const S& shape) const noexcept;
+        const_broadcast_iterator<S, L> cbegin(const S& shape) const;
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
-        const_broadcast_iterator<S, L> cend(const S& shape) const noexcept;
+        const_broadcast_iterator<S, L> cend(const S& shape) const;
 
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
-        const_reverse_broadcast_iterator<S, L> rbegin(const S& shape) const noexcept;
+        const_reverse_broadcast_iterator<S, L> rbegin(const S& shape) const;
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
-        const_reverse_broadcast_iterator<S, L> rend(const S& shape) const noexcept;
+        const_reverse_broadcast_iterator<S, L> rend(const S& shape) const;
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
-        const_reverse_broadcast_iterator<S, L> crbegin(const S& shape) const noexcept;
+        const_reverse_broadcast_iterator<S, L> crbegin(const S& shape) const;
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
-        const_reverse_broadcast_iterator<S, L> crend(const S& shape) const noexcept;
+        const_reverse_broadcast_iterator<S, L> crend(const S& shape) const;
 
     protected:
 
@@ -116,19 +116,19 @@ namespace xt
     private:
 
         template <layout_type L>
-        const_layout_iterator<L> get_cbegin(bool end_index) const noexcept;
+        const_layout_iterator<L> get_cbegin(bool end_index) const;
         template <layout_type L>
-        const_layout_iterator<L> get_cend(bool end_index) const noexcept;
+        const_layout_iterator<L> get_cend(bool end_index) const;
 
         template <layout_type L, class S>
-        const_broadcast_iterator<S, L> get_cbegin(const S& shape, bool end_index) const noexcept;
+        const_broadcast_iterator<S, L> get_cbegin(const S& shape, bool end_index) const;
         template <layout_type L, class S>
-        const_broadcast_iterator<S, L> get_cend(const S& shape, bool end_index) const noexcept;
+        const_broadcast_iterator<S, L> get_cend(const S& shape, bool end_index) const;
 
         template <class S>
-        const_stepper get_stepper_begin(const S& shape) const noexcept;
+        const_stepper get_stepper_begin(const S& shape) const;
         template <class S>
-        const_stepper get_stepper_end(const S& shape, layout_type l) const noexcept;
+        const_stepper get_stepper_end(const S& shape, layout_type l) const;
 
         const derived_type& derived_cast() const;
     };
@@ -192,46 +192,46 @@ namespace xt
         using base_type::rend;
 
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        layout_iterator<L> begin() noexcept;
+        layout_iterator<L> begin();
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        layout_iterator<L> end() noexcept;
+        layout_iterator<L> end();
 
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        reverse_layout_iterator<L> rbegin() noexcept;
+        reverse_layout_iterator<L> rbegin();
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        reverse_layout_iterator<L> rend() noexcept;
+        reverse_layout_iterator<L> rend();
 
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
-        broadcast_iterator<S, L> begin(const S& shape) noexcept;
+        broadcast_iterator<S, L> begin(const S& shape);
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
-        broadcast_iterator<S, L> end(const S& shape) noexcept;
+        broadcast_iterator<S, L> end(const S& shape);
 
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
-        reverse_broadcast_iterator<S, L> rbegin(const S& shape) noexcept;
+        reverse_broadcast_iterator<S, L> rbegin(const S& shape);
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
-        reverse_broadcast_iterator<S, L> rend(const S& shape) noexcept;
+        reverse_broadcast_iterator<S, L> rend(const S& shape);
 
     private:
 
         template <layout_type L>
-        layout_iterator<L> get_begin(bool end_index) noexcept;
+        layout_iterator<L> get_begin(bool end_index);
         template <layout_type L>
-        layout_iterator<L> get_end(bool end_index) noexcept;
+        layout_iterator<L> get_end(bool end_index);
 
         template <layout_type L, class S>
-        broadcast_iterator<S, L> get_begin(const S& shape, bool end_index) noexcept;
+        broadcast_iterator<S, L> get_begin(const S& shape, bool end_index);
         template <layout_type L, class S>
-        broadcast_iterator<S, L> get_end(const S& shape, bool end_index) noexcept;
+        broadcast_iterator<S, L> get_end(const S& shape, bool end_index);
 
         template <class S>
-        stepper get_stepper_begin(const S& shape) noexcept;
+        stepper get_stepper_begin(const S& shape);
         template <class S>
-        stepper get_stepper_end(const S& shape, layout_type l) noexcept;
+        stepper get_stepper_end(const S& shape, layout_type l);
 
         template <class S>
-        const_stepper get_stepper_begin(const S& shape) const noexcept;
+        const_stepper get_stepper_begin(const S& shape) const;
         template <class S>
-        const_stepper get_stepper_end(const S& shape, layout_type l) const noexcept;
+        const_stepper get_stepper_end(const S& shape, layout_type l) const;
 
         derived_type& derived_cast();
     };
@@ -367,60 +367,60 @@ namespace xt
         using const_reverse_iterator = select_const_reverse_iterator<XTENSOR_DEFAULT_TRAVERSAL>;
 
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        select_iterator<L> begin() noexcept;
+        select_iterator<L> begin() noexcept(L == static_layout);
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        select_iterator<L> end() noexcept;
+        select_iterator<L> end() noexcept(L == static_layout);
 
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        select_const_iterator<L> begin() const noexcept;
+        select_const_iterator<L> begin() const noexcept(L == static_layout);
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        select_const_iterator<L> end() const noexcept;
+        select_const_iterator<L> end() const noexcept(L == static_layout);
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        select_const_iterator<L> cbegin() const noexcept;
+        select_const_iterator<L> cbegin() const noexcept(L == static_layout);
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        select_const_iterator<L> cend() const noexcept;
+        select_const_iterator<L> cend() const noexcept(L == static_layout);
 
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        select_reverse_iterator<L> rbegin() noexcept;
+        select_reverse_iterator<L> rbegin() noexcept(L == static_layout);
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        select_reverse_iterator<L> rend() noexcept;
+        select_reverse_iterator<L> rend() noexcept(L == static_layout);
 
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        select_const_reverse_iterator<L> rbegin() const noexcept;
+        select_const_reverse_iterator<L> rbegin() const noexcept(L == static_layout);
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        select_const_reverse_iterator<L> rend() const noexcept;
+        select_const_reverse_iterator<L> rend() const noexcept(L == static_layout);
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        select_const_reverse_iterator<L> crbegin() const noexcept;
+        select_const_reverse_iterator<L> crbegin() const noexcept(L == static_layout);
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        select_const_reverse_iterator<L> crend() const noexcept;
+        select_const_reverse_iterator<L> crend() const noexcept(L == static_layout);
 
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
-        broadcast_iterator<S, L> begin(const S& shape) noexcept;
+        broadcast_iterator<S, L> begin(const S& shape);
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
-        broadcast_iterator<S, L> end(const S& shape) noexcept;
+        broadcast_iterator<S, L> end(const S& shape);
 
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
-        const_broadcast_iterator<S, L> begin(const S& shape) const noexcept;
+        const_broadcast_iterator<S, L> begin(const S& shape) const;
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
-        const_broadcast_iterator<S, L> end(const S& shape) const noexcept;
+        const_broadcast_iterator<S, L> end(const S& shape) const;
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
-        const_broadcast_iterator<S, L> cbegin(const S& shape) const noexcept;
+        const_broadcast_iterator<S, L> cbegin(const S& shape) const;
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
-        const_broadcast_iterator<S, L> cend(const S& shape) const noexcept;
+        const_broadcast_iterator<S, L> cend(const S& shape) const;
 
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
-        reverse_broadcast_iterator<S, L> rbegin(const S& shape) noexcept;
+        reverse_broadcast_iterator<S, L> rbegin(const S& shape);
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
-        reverse_broadcast_iterator<S, L> rend(const S& shape) noexcept;
+        reverse_broadcast_iterator<S, L> rend(const S& shape);
 
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
-        const_reverse_broadcast_iterator<S, L> rbegin(const S& shape) const noexcept;
+        const_reverse_broadcast_iterator<S, L> rbegin(const S& shape) const;
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
-        const_reverse_broadcast_iterator<S, L> rend(const S& shape) const noexcept;
+        const_reverse_broadcast_iterator<S, L> rend(const S& shape) const;
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
-        const_reverse_broadcast_iterator<S, L> crbegin(const S& shape) const noexcept;
+        const_reverse_broadcast_iterator<S, L> crbegin(const S& shape) const;
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
-        const_reverse_broadcast_iterator<S, L> crend(const S& shape) const noexcept;
+        const_reverse_broadcast_iterator<S, L> crend(const S& shape) const;
 
     private:
 
@@ -445,7 +445,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xconst_iterable<D>::begin() const noexcept -> const_layout_iterator<L>
+    inline auto xconst_iterable<D>::begin() const -> const_layout_iterator<L>
     {
         return this->template cbegin<L>();
     }
@@ -457,7 +457,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xconst_iterable<D>::end() const noexcept -> const_layout_iterator<L>
+    inline auto xconst_iterable<D>::end() const -> const_layout_iterator<L>
     {
         return this->template cend<L>();
     }
@@ -468,7 +468,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xconst_iterable<D>::cbegin() const noexcept -> const_layout_iterator<L>
+    inline auto xconst_iterable<D>::cbegin() const -> const_layout_iterator<L>
     {
         return this->template get_cbegin<L>(false);
     }
@@ -480,7 +480,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xconst_iterable<D>::cend() const noexcept -> const_layout_iterator<L>
+    inline auto xconst_iterable<D>::cend() const -> const_layout_iterator<L>
     {
         return this->template get_cend<L>(true);
     }
@@ -497,7 +497,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xconst_iterable<D>::rbegin() const noexcept -> const_reverse_layout_iterator<L>
+    inline auto xconst_iterable<D>::rbegin() const -> const_reverse_layout_iterator<L>
     {
         return this->template crbegin<L>();
     }
@@ -509,7 +509,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xconst_iterable<D>::rend() const noexcept -> const_reverse_layout_iterator<L>
+    inline auto xconst_iterable<D>::rend() const -> const_reverse_layout_iterator<L>
     {
         return this->template crend<L>();
     }
@@ -520,7 +520,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xconst_iterable<D>::crbegin() const noexcept -> const_reverse_layout_iterator<L>
+    inline auto xconst_iterable<D>::crbegin() const -> const_reverse_layout_iterator<L>
     {
         return const_reverse_layout_iterator<L>(get_cend<L>(true));
     }
@@ -532,7 +532,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xconst_iterable<D>::crend() const noexcept -> const_reverse_layout_iterator<L>
+    inline auto xconst_iterable<D>::crend() const -> const_reverse_layout_iterator<L>
     {
         return const_reverse_layout_iterator<L>(get_cbegin<L>(false));
     }
@@ -552,7 +552,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L, class S>
-    inline auto xconst_iterable<D>::begin(const S& shape) const noexcept -> const_broadcast_iterator<S, L>
+    inline auto xconst_iterable<D>::begin(const S& shape) const -> const_broadcast_iterator<S, L>
     {
         return cbegin<L>(shape);
     }
@@ -566,7 +566,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L, class S>
-    inline auto xconst_iterable<D>::end(const S& shape) const noexcept -> const_broadcast_iterator<S, L>
+    inline auto xconst_iterable<D>::end(const S& shape) const -> const_broadcast_iterator<S, L>
     {
         return cend<L>(shape);
     }
@@ -580,7 +580,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L, class S>
-    inline auto xconst_iterable<D>::cbegin(const S& shape) const noexcept -> const_broadcast_iterator<S, L>
+    inline auto xconst_iterable<D>::cbegin(const S& shape) const -> const_broadcast_iterator<S, L>
     {
         return get_cbegin<L, S>(shape, false);
     }
@@ -594,7 +594,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L, class S>
-    inline auto xconst_iterable<D>::cend(const S& shape) const noexcept -> const_broadcast_iterator<S, L>
+    inline auto xconst_iterable<D>::cend(const S& shape) const -> const_broadcast_iterator<S, L>
     {
         return get_cend<L, S>(shape, true);
     }
@@ -614,8 +614,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L, class S>
-    inline auto xconst_iterable<D>::rbegin(const S& shape) const noexcept
-        -> const_reverse_broadcast_iterator<S, L>
+    inline auto xconst_iterable<D>::rbegin(const S& shape) const -> const_reverse_broadcast_iterator<S, L>
     {
         return crbegin<L, S>(shape);
     }
@@ -629,8 +628,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L, class S>
-    inline auto xconst_iterable<D>::rend(const S& shape) const noexcept
-        -> const_reverse_broadcast_iterator<S, L>
+    inline auto xconst_iterable<D>::rend(const S& shape) const -> const_reverse_broadcast_iterator<S, L>
     {
         return crend<L, S>(shape);
     }
@@ -644,8 +642,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L, class S>
-    inline auto xconst_iterable<D>::crbegin(const S& shape) const noexcept
-        -> const_reverse_broadcast_iterator<S, L>
+    inline auto xconst_iterable<D>::crbegin(const S& shape) const -> const_reverse_broadcast_iterator<S, L>
     {
         return const_reverse_broadcast_iterator<S, L>(get_cend<L, S>(shape, true));
     }
@@ -659,8 +656,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L, class S>
-    inline auto xconst_iterable<D>::crend(const S& shape) const noexcept
-        -> const_reverse_broadcast_iterator<S, L>
+    inline auto xconst_iterable<D>::crend(const S& shape) const -> const_reverse_broadcast_iterator<S, L>
     {
         return const_reverse_broadcast_iterator<S, L>(get_cbegin<L, S>(shape, false));
     }
@@ -669,21 +665,21 @@ namespace xt
 
     template <class D>
     template <layout_type L>
-    inline auto xconst_iterable<D>::get_cbegin(bool end_index) const noexcept -> const_layout_iterator<L>
+    inline auto xconst_iterable<D>::get_cbegin(bool end_index) const -> const_layout_iterator<L>
     {
         return const_layout_iterator<L>(get_stepper_begin(get_shape()), &get_shape(), end_index);
     }
 
     template <class D>
     template <layout_type L>
-    inline auto xconst_iterable<D>::get_cend(bool end_index) const noexcept -> const_layout_iterator<L>
+    inline auto xconst_iterable<D>::get_cend(bool end_index) const -> const_layout_iterator<L>
     {
         return const_layout_iterator<L>(get_stepper_end(get_shape(), L), &get_shape(), end_index);
     }
 
     template <class D>
     template <layout_type L, class S>
-    inline auto xconst_iterable<D>::get_cbegin(const S& shape, bool end_index) const noexcept
+    inline auto xconst_iterable<D>::get_cbegin(const S& shape, bool end_index) const
         -> const_broadcast_iterator<S, L>
     {
         return const_broadcast_iterator<S, L>(get_stepper_begin(shape), shape, end_index);
@@ -691,7 +687,7 @@ namespace xt
 
     template <class D>
     template <layout_type L, class S>
-    inline auto xconst_iterable<D>::get_cend(const S& shape, bool end_index) const noexcept
+    inline auto xconst_iterable<D>::get_cend(const S& shape, bool end_index) const
         -> const_broadcast_iterator<S, L>
     {
         return const_broadcast_iterator<S, L>(get_stepper_end(shape, L), shape, end_index);
@@ -699,15 +695,14 @@ namespace xt
 
     template <class D>
     template <class S>
-    inline auto xconst_iterable<D>::get_stepper_begin(const S& shape) const noexcept -> const_stepper
+    inline auto xconst_iterable<D>::get_stepper_begin(const S& shape) const -> const_stepper
     {
         return derived_cast().stepper_begin(shape);
     }
 
     template <class D>
     template <class S>
-    inline auto xconst_iterable<D>::get_stepper_end(const S& shape, layout_type l) const noexcept
-        -> const_stepper
+    inline auto xconst_iterable<D>::get_stepper_end(const S& shape, layout_type l) const -> const_stepper
     {
         return derived_cast().stepper_end(shape, l);
     }
@@ -738,7 +733,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xiterable<D>::begin() noexcept -> layout_iterator<L>
+    inline auto xiterable<D>::begin() -> layout_iterator<L>
     {
         return get_begin<L>(false);
     }
@@ -750,7 +745,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xiterable<D>::end() noexcept -> layout_iterator<L>
+    inline auto xiterable<D>::end() -> layout_iterator<L>
     {
         return get_end<L>(true);
     }
@@ -767,7 +762,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xiterable<D>::rbegin() noexcept -> reverse_layout_iterator<L>
+    inline auto xiterable<D>::rbegin() -> reverse_layout_iterator<L>
     {
         return reverse_layout_iterator<L>(get_end<L>(true));
     }
@@ -779,7 +774,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xiterable<D>::rend() noexcept -> reverse_layout_iterator<L>
+    inline auto xiterable<D>::rend() -> reverse_layout_iterator<L>
     {
         return reverse_layout_iterator<L>(get_begin<L>(false));
     }
@@ -799,7 +794,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L, class S>
-    inline auto xiterable<D>::begin(const S& shape) noexcept -> broadcast_iterator<S, L>
+    inline auto xiterable<D>::begin(const S& shape) -> broadcast_iterator<S, L>
     {
         return get_begin<L, S>(shape, false);
     }
@@ -813,7 +808,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L, class S>
-    inline auto xiterable<D>::end(const S& shape) noexcept -> broadcast_iterator<S, L>
+    inline auto xiterable<D>::end(const S& shape) -> broadcast_iterator<S, L>
     {
         return get_end<L, S>(shape, true);
     }
@@ -833,7 +828,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L, class S>
-    inline auto xiterable<D>::rbegin(const S& shape) noexcept -> reverse_broadcast_iterator<S, L>
+    inline auto xiterable<D>::rbegin(const S& shape) -> reverse_broadcast_iterator<S, L>
     {
         return reverse_broadcast_iterator<S, L>(get_end<L, S>(shape, true));
     }
@@ -847,7 +842,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L, class S>
-    inline auto xiterable<D>::rend(const S& shape) noexcept -> reverse_broadcast_iterator<S, L>
+    inline auto xiterable<D>::rend(const S& shape) -> reverse_broadcast_iterator<S, L>
     {
         return reverse_broadcast_iterator<S, L>(get_begin<L, S>(shape, false));
     }
@@ -856,56 +851,56 @@ namespace xt
 
     template <class D>
     template <layout_type L>
-    inline auto xiterable<D>::get_begin(bool end_index) noexcept -> layout_iterator<L>
+    inline auto xiterable<D>::get_begin(bool end_index) -> layout_iterator<L>
     {
         return layout_iterator<L>(get_stepper_begin(this->get_shape()), &(this->get_shape()), end_index);
     }
 
     template <class D>
     template <layout_type L>
-    inline auto xiterable<D>::get_end(bool end_index) noexcept -> layout_iterator<L>
+    inline auto xiterable<D>::get_end(bool end_index) -> layout_iterator<L>
     {
         return layout_iterator<L>(get_stepper_end(this->get_shape(), L), &(this->get_shape()), end_index);
     }
 
     template <class D>
     template <layout_type L, class S>
-    inline auto xiterable<D>::get_begin(const S& shape, bool end_index) noexcept -> broadcast_iterator<S, L>
+    inline auto xiterable<D>::get_begin(const S& shape, bool end_index) -> broadcast_iterator<S, L>
     {
         return broadcast_iterator<S, L>(get_stepper_begin(shape), shape, end_index);
     }
 
     template <class D>
     template <layout_type L, class S>
-    inline auto xiterable<D>::get_end(const S& shape, bool end_index) noexcept -> broadcast_iterator<S, L>
+    inline auto xiterable<D>::get_end(const S& shape, bool end_index) -> broadcast_iterator<S, L>
     {
         return broadcast_iterator<S, L>(get_stepper_end(shape, L), shape, end_index);
     }
 
     template <class D>
     template <class S>
-    inline auto xiterable<D>::get_stepper_begin(const S& shape) noexcept -> stepper
+    inline auto xiterable<D>::get_stepper_begin(const S& shape) -> stepper
     {
         return derived_cast().stepper_begin(shape);
     }
 
     template <class D>
     template <class S>
-    inline auto xiterable<D>::get_stepper_end(const S& shape, layout_type l) noexcept -> stepper
+    inline auto xiterable<D>::get_stepper_end(const S& shape, layout_type l) -> stepper
     {
         return derived_cast().stepper_end(shape, l);
     }
 
     template <class D>
     template <class S>
-    inline auto xiterable<D>::get_stepper_begin(const S& shape) const noexcept -> const_stepper
+    inline auto xiterable<D>::get_stepper_begin(const S& shape) const -> const_stepper
     {
         return derived_cast().stepper_begin(shape);
     }
 
     template <class D>
     template <class S>
-    inline auto xiterable<D>::get_stepper_end(const S& shape, layout_type l) const noexcept -> const_stepper
+    inline auto xiterable<D>::get_stepper_end(const S& shape, layout_type l) const -> const_stepper
     {
         return derived_cast().stepper_end(shape, l);
     }
@@ -930,7 +925,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xcontiguous_iterable<D>::begin() noexcept -> select_iterator<L>
+    inline auto xcontiguous_iterable<D>::begin() noexcept(L == static_layout) -> select_iterator<L>
     {
         if constexpr (L == static_layout)
         {
@@ -949,7 +944,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xcontiguous_iterable<D>::end() noexcept -> select_iterator<L>
+    inline auto xcontiguous_iterable<D>::end() noexcept(L == static_layout) -> select_iterator<L>
     {
         if constexpr (L == static_layout)
         {
@@ -967,7 +962,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xcontiguous_iterable<D>::begin() const noexcept -> select_const_iterator<L>
+    inline auto xcontiguous_iterable<D>::begin() const noexcept(L == static_layout) -> select_const_iterator<L>
     {
         return this->template cbegin<L>();
     }
@@ -979,7 +974,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xcontiguous_iterable<D>::end() const noexcept -> select_const_iterator<L>
+    inline auto xcontiguous_iterable<D>::end() const noexcept(L == static_layout) -> select_const_iterator<L>
     {
         return this->template cend<L>();
     }
@@ -990,7 +985,8 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xcontiguous_iterable<D>::cbegin() const noexcept -> select_const_iterator<L>
+    inline auto xcontiguous_iterable<D>::cbegin() const noexcept(L == static_layout)
+        -> select_const_iterator<L>
     {
         if constexpr (L == static_layout)
         {
@@ -1009,7 +1005,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xcontiguous_iterable<D>::cend() const noexcept -> select_const_iterator<L>
+    inline auto xcontiguous_iterable<D>::cend() const noexcept(L == static_layout) -> select_const_iterator<L>
     {
         if constexpr (L == static_layout)
         {
@@ -1033,7 +1029,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xcontiguous_iterable<D>::rbegin() noexcept -> select_reverse_iterator<L>
+    inline auto xcontiguous_iterable<D>::rbegin() noexcept(L == static_layout) -> select_reverse_iterator<L>
     {
         if constexpr (L == static_layout)
         {
@@ -1052,7 +1048,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xcontiguous_iterable<D>::rend() noexcept -> select_reverse_iterator<L>
+    inline auto xcontiguous_iterable<D>::rend() noexcept(L == static_layout) -> select_reverse_iterator<L>
     {
         if constexpr (L == static_layout)
         {
@@ -1070,7 +1066,8 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xcontiguous_iterable<D>::rbegin() const noexcept -> select_const_reverse_iterator<L>
+    inline auto xcontiguous_iterable<D>::rbegin() const noexcept(L == static_layout)
+        -> select_const_reverse_iterator<L>
     {
         return this->template crbegin<L>();
     }
@@ -1082,7 +1079,8 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xcontiguous_iterable<D>::rend() const noexcept -> select_const_reverse_iterator<L>
+    inline auto xcontiguous_iterable<D>::rend() const noexcept(L == static_layout)
+        -> select_const_reverse_iterator<L>
     {
         return this->template crend<L>();
     }
@@ -1093,7 +1091,8 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xcontiguous_iterable<D>::crbegin() const noexcept -> select_const_reverse_iterator<L>
+    inline auto xcontiguous_iterable<D>::crbegin() const noexcept(L == static_layout)
+        -> select_const_reverse_iterator<L>
     {
         if constexpr (L == static_layout)
         {
@@ -1112,7 +1111,8 @@ namespace xt
      */
     template <class D>
     template <layout_type L>
-    inline auto xcontiguous_iterable<D>::crend() const noexcept -> select_const_reverse_iterator<L>
+    inline auto xcontiguous_iterable<D>::crend() const noexcept(L == static_layout)
+        -> select_const_reverse_iterator<L>
     {
         if constexpr (L == static_layout)
         {
@@ -1140,7 +1140,7 @@ namespace xt
     //@{
     template <class D>
     template <layout_type L, class S>
-    inline auto xcontiguous_iterable<D>::begin(const S& shape) noexcept -> broadcast_iterator<S, L>
+    inline auto xcontiguous_iterable<D>::begin(const S& shape) -> broadcast_iterator<S, L>
     {
         return iterable_base::template begin<L, S>(shape);
     }
@@ -1154,7 +1154,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L, class S>
-    inline auto xcontiguous_iterable<D>::end(const S& shape) noexcept -> broadcast_iterator<S, L>
+    inline auto xcontiguous_iterable<D>::end(const S& shape) -> broadcast_iterator<S, L>
     {
         return iterable_base::template end<L, S>(shape);
     }
@@ -1168,7 +1168,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L, class S>
-    inline auto xcontiguous_iterable<D>::begin(const S& shape) const noexcept -> const_broadcast_iterator<S, L>
+    inline auto xcontiguous_iterable<D>::begin(const S& shape) const -> const_broadcast_iterator<S, L>
     {
         return iterable_base::template begin<L, S>(shape);
     }
@@ -1182,7 +1182,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L, class S>
-    inline auto xcontiguous_iterable<D>::end(const S& shape) const noexcept -> const_broadcast_iterator<S, L>
+    inline auto xcontiguous_iterable<D>::end(const S& shape) const -> const_broadcast_iterator<S, L>
     {
         return iterable_base::template end<L, S>(shape);
     }
@@ -1196,8 +1196,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L, class S>
-    inline auto xcontiguous_iterable<D>::cbegin(const S& shape) const noexcept
-        -> const_broadcast_iterator<S, L>
+    inline auto xcontiguous_iterable<D>::cbegin(const S& shape) const -> const_broadcast_iterator<S, L>
     {
         return iterable_base::template cbegin<L, S>(shape);
     }
@@ -1211,7 +1210,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L, class S>
-    inline auto xcontiguous_iterable<D>::cend(const S& shape) const noexcept -> const_broadcast_iterator<S, L>
+    inline auto xcontiguous_iterable<D>::cend(const S& shape) const -> const_broadcast_iterator<S, L>
     {
         return iterable_base::template cend<L, S>(shape);
     }
@@ -1231,7 +1230,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L, class S>
-    inline auto xcontiguous_iterable<D>::rbegin(const S& shape) noexcept -> reverse_broadcast_iterator<S, L>
+    inline auto xcontiguous_iterable<D>::rbegin(const S& shape) -> reverse_broadcast_iterator<S, L>
     {
         return iterable_base::template rbegin<L, S>(shape);
     }
@@ -1245,7 +1244,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L, class S>
-    inline auto xcontiguous_iterable<D>::rend(const S& shape) noexcept -> reverse_broadcast_iterator<S, L>
+    inline auto xcontiguous_iterable<D>::rend(const S& shape) -> reverse_broadcast_iterator<S, L>
     {
         return iterable_base::template rend<L, S>(shape);
     }
@@ -1259,8 +1258,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L, class S>
-    inline auto xcontiguous_iterable<D>::rbegin(const S& shape) const noexcept
-        -> const_reverse_broadcast_iterator<S, L>
+    inline auto xcontiguous_iterable<D>::rbegin(const S& shape) const -> const_reverse_broadcast_iterator<S, L>
     {
         return iterable_base::template rbegin<L, S>(shape);
     }
@@ -1274,8 +1272,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L, class S>
-    inline auto xcontiguous_iterable<D>::rend(const S& shape) const noexcept
-        -> const_reverse_broadcast_iterator<S, L>
+    inline auto xcontiguous_iterable<D>::rend(const S& shape) const -> const_reverse_broadcast_iterator<S, L>
     {
         return iterable_base::template rend<L, S>(shape);
     }
@@ -1289,7 +1286,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L, class S>
-    inline auto xcontiguous_iterable<D>::crbegin(const S& shape) const noexcept
+    inline auto xcontiguous_iterable<D>::crbegin(const S& shape) const
         -> const_reverse_broadcast_iterator<S, L>
     {
         return iterable_base::template crbegin<L, S>(shape);
@@ -1304,8 +1301,7 @@ namespace xt
      */
     template <class D>
     template <layout_type L, class S>
-    inline auto xcontiguous_iterable<D>::crend(const S& shape) const noexcept
-        -> const_reverse_broadcast_iterator<S, L>
+    inline auto xcontiguous_iterable<D>::crend(const S& shape) const -> const_reverse_broadcast_iterator<S, L>
     {
         return iterable_base::template crend<L, S>(shape);
     }

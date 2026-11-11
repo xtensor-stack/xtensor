@@ -637,4 +637,12 @@ namespace xt
     TEST(xmanipulation, zzzzzz)
     {
     }
+
+    TEST(xmanipulation, transpose_broadcast_error)
+    {
+        xarray<int> a = {1, 2, 3};
+        xarray<int> b = {1, 2};
+        XT_EXPECT_THROW(transpose(a + b), broadcast_error);
+    }
+
 }
