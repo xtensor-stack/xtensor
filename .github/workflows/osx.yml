@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   pull_request:
   push:
-    branches: [master]
+    branches: [master, 0.27.x]
 concurrency:
   group: ${{ github.workflow }}-${{ github.job }}-${{ github.ref }}
   cancel-in-progress: true
@@ -18,9 +18,8 @@ jobs:
       fail-fast: false
       matrix:
         os:
-        - 13
-        - 14
         - 15
+        - 26
 
     steps:
 
