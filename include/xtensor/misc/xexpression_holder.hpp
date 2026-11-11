@@ -40,7 +40,7 @@ namespace xt
         xexpression_holder() = default;
 
         template <class E>
-            requires (!std::same_as<std::decay_t<E>, xexpression_holder>)
+            requires(!std::same_as<std::decay_t<E>, xexpression_holder>)
         xexpression_holder(E&& expr);
 
         xexpression_holder(implementation_type* holder);
@@ -121,7 +121,7 @@ namespace xt
     }
 
     template <class E>
-        requires (!std::same_as<std::decay_t<E>, xexpression_holder>)
+        requires(!std::same_as<std::decay_t<E>, xexpression_holder>)
     inline xexpression_holder::xexpression_holder(E&& expr)
         : p_holder(new detail::xexpression_wrapper<E>(std::forward<E>(expr)))
     {
