@@ -27,6 +27,59 @@ namespace xt
      * Basic operations *
      ********************/
 
+    TEST(xmath, logical_reduction_axes)
+    {
+        xarray<int> a = {{0, 0, 0}, {-1, 0, 2}};
+        static_assert(std::is_same_v<decltype(xt::any(a)), bool>);
+        static_assert(std::is_same_v<decltype(xt::all(a)), bool>);
+        auto rows = xt::any(a, -1);
+        static_assert(std::is_same_v<typename decltype(rows)::value_type, bool>);
+        EXPECT_EQ(rows.shape(), (shape_type{2}));
+        EXPECT_FALSE(rows(0));
+        EXPECT_TRUE(rows(1));
+        EXPECT_TRUE(xt::any(a, {0, 1})());
+        EXPECT_FALSE(xt::all(a, {0, 1})());
+
+        std::vector<int> axes = {0};
+        auto kept = xt::all(a + 1, axes, xt::keep_dims | xt::evaluation_strategy::immediate);
+        EXPECT_EQ(kept.shape(), (shape_type{1, 3}));
+        EXPECT_FALSE(kept(0, 0));
+        EXPECT_TRUE(kept(0, 1));
+        EXPECT_TRUE(kept(0, 2));
+
+        xarray<int> mixed = {{{0, 0}, {1, 2}}, {{0, 3}, {-1, 4}}};
+        auto columns = xt::all(mixed, {0, 2});
+        EXPECT_EQ(columns.shape(), (shape_type{2}));
+        EXPECT_FALSE(columns(0));
+        EXPECT_TRUE(columns(1));
+
+        std::vector<int> no_axes;
+        auto elementwise = xt::any(a, no_axes, xt::evaluation_strategy::immediate);
+        EXPECT_EQ(elementwise.shape(), a.shape());
+        EXPECT_FALSE(elementwise(0, 1));
+        EXPECT_TRUE(elementwise(1, 0));
+
+        const xarray<int> empty = xarray<int>::from_shape({2, 0});
+        auto none = xt::any(empty, 1);
+        auto every = xt::all(empty, 1);
+        EXPECT_FALSE(none(0));
+        EXPECT_FALSE(none(1));
+        EXPECT_TRUE(every(0));
+        EXPECT_TRUE(every(1));
+
+        auto empty_rows = xarray<int>::from_shape({0, 3});
+        auto by_column = xt::any(empty_rows, 0, xt::evaluation_strategy::immediate);
+        auto every_column = xt::all(empty_rows, 0, xt::evaluation_strategy::immediate);
+        EXPECT_EQ(by_column.shape(), (shape_type{3}));
+        EXPECT_FALSE(xt::any(by_column));
+        EXPECT_EQ(every_column.shape(), (shape_type{3}));
+        EXPECT_TRUE(xt::all(every_column));
+        EXPECT_EQ(xt::any(empty_rows, 1, xt::evaluation_strategy::immediate).size(), 0u);
+        EXPECT_EQ(xt::all(empty_rows, 1, xt::evaluation_strategy::immediate).size(), 0u);
+        auto seeded = xt::sum(empty_rows, 0, xt::initial(7) | xt::evaluation_strategy::immediate);
+        EXPECT_TRUE(xt::all(xt::equal(seeded, 7)));
+    }
+
     TEST(xmath, abs)
     {
         shape_type shape = {3, 2};

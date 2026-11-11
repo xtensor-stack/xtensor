@@ -1786,6 +1786,59 @@ namespace xt
      * @defgroup  red_functions reducing functions
      */
 
+    namespace detail
+    {
+        template <class F, class E, class X, class O>
+        inline auto logical_reduce(F f, bool identity, E&& e, X&& axes, O options)
+        {
+            auto functors = make_xreducer_functor(f, xt::const_value<bool>(identity));
+            if constexpr (xtl::is_integral<std::decay_t<X>>::value)
+            {
+                return xt::reduce(std::move(functors), std::forward<E>(e), {axes}, options);
+            }
+            else
+            {
+                return xt::reduce(std::move(functors), std::forward<E>(e), std::forward<X>(axes), options);
+            }
+        }
+    }
+
+    /**
+     * @ingroup red_functions
+     * @brief Test whether any element is true along the given axes.
+     * An empty reduction yields false. With no axes argument, the scalar
+     * overload returns a bool and stops as soon as the result is known.
+     */
+    template <class E, class X, class O = DEFAULT_STRATEGY_REDUCERS, XTL_REQUIRES(std::negation<is_reducer_options<X>>)>
+    inline auto any(E&& e, X&& axes, O options = O())
+    {
+        return detail::logical_reduce(detail::logical_or(), false, std::forward<E>(e), std::forward<X>(axes), options);
+    }
+
+    template <class E, class I, std::size_t N, class O = DEFAULT_STRATEGY_REDUCERS>
+    inline auto any(E&& e, const I (&axes)[N], O options = O())
+    {
+        return detail::logical_reduce(detail::logical_or(), false, std::forward<E>(e), axes, options);
+    }
+
+    /**
+     * @ingroup red_functions
+     * @brief Test whether all elements are true along the given axes.
+     * An empty reduction yields true. With no axes argument, the scalar
+     * overload returns a bool and stops as soon as the result is known.
+     */
+    template <class E, class X, class O = DEFAULT_STRATEGY_REDUCERS, XTL_REQUIRES(std::negation<is_reducer_options<X>>)>
+    inline auto all(E&& e, X&& axes, O options = O())
+    {
+        return detail::logical_reduce(detail::logical_and(), true, std::forward<E>(e), std::forward<X>(axes), options);
+    }
+
+    template <class E, class I, std::size_t N, class O = DEFAULT_STRATEGY_REDUCERS>
+    inline auto all(E&& e, const I (&axes)[N], O options = O())
+    {
+        return detail::logical_reduce(detail::logical_and(), true, std::forward<E>(e), axes, options);
+    }
+
     /**
      * @ingroup red_functions
      * @brief Sum of elements over given axes.

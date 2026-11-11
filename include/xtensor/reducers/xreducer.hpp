@@ -359,6 +359,16 @@ namespace xt
             return result;
         }
 
+        // Empty slices have no first element to initialize a partial reduction.
+        if (e.size() == 0)
+        {
+            if (result.size() != 0)
+            {
+                result.fill(options_t::has_initial_value ? options.initial_value : init_fct());
+            }
+            return result;
+        }
+
         std::size_t leading_ax = axes[(e.layout() == layout_type::row_major) ? axes.size() - 1 : 0];
         auto strides_finder = e.strides().begin() + static_cast<std::ptrdiff_t>(leading_ax);
         // The computed strides contain "0" where the shape is 1 -- therefore find the next none-zero number
