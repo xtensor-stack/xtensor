@@ -9,6 +9,8 @@
 
 #include <complex>
 #include <initializer_list>
+#include <stdexcept>
+#include <string>
 #include <tuple>
 #include <type_traits>
 
@@ -113,8 +115,43 @@ namespace xt
             return i;
         };
         auto t = std::make_tuple(1, 2, 3);
-        static_assert(noexcept(apply<int>(1, func_ne, t)));
+        // The bound check on the index throws when assertions are enabled.
+        static_assert(noexcept(apply<int>(1, func_ne, t)) == !detail::assert_can_throw);
     }
+
+    struct throw_on_string
+    {
+        int operator()(int i) const noexcept
+        {
+            return i;
+        }
+
+        int operator()(const std::string&) const
+        {
+            throw std::runtime_error("throw_on_string");
+        }
+    };
+
+    TEST(utils, apply_propagates_exception)
+    {
+        // Only the call on the first element is noexcept: apply must not be.
+        auto t = std::make_tuple(1, std::string("a"));
+        static_assert(!noexcept(apply<int>(1, throw_on_string{}, t)));
+        EXPECT_EQ(apply<int>(0, throw_on_string{}, t), 1);
+        XT_EXPECT_THROW(apply<int>(1, throw_on_string{}, t), std::runtime_error);
+    }
+
+#ifdef XTENSOR_ENABLE_ASSERT
+    TEST(utils, apply_out_of_range)
+    {
+        auto func_ne = [](int i) noexcept
+        {
+            return i;
+        };
+        auto t = std::make_tuple(1, 2, 3);
+        XT_EXPECT_THROW(apply<int>(3, func_ne, t), std::runtime_error);
+    }
+#endif
 
     TEST(utils, conditional_cast)
     {
