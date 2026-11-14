@@ -1328,21 +1328,12 @@ namespace xt
             new_capacity = min_capacity;
         }
 
-        T* new_alloc;
-        // is data stack allocated?
-        if (m_begin == &m_data[0])
+        T* new_alloc = m_allocator.allocate(new_capacity);
+        std::uninitialized_copy_n(m_begin, current_size, new_alloc);
+        if (!on_stack())
         {
-            new_alloc = m_allocator.allocate(new_capacity);
-            std::uninitialized_copy(m_begin, m_end, new_alloc);
-        }
-        else
-        {
-            // If this wasn't grown from the inline copy, grow the allocated space.
-            new_alloc = m_allocator.allocate(new_capacity);
-            std::uninitialized_copy(m_begin, m_end, new_alloc);
             m_allocator.deallocate(m_begin, std::size_t(m_capacity - m_begin));
         }
-        XTENSOR_ASSERT(new_alloc);
 
         m_end = new_alloc + current_size;
         m_begin = new_alloc;
