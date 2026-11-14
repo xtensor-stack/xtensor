@@ -171,10 +171,12 @@ namespace xt
 
     TEST(xtensor_fixed, buffer_adaptor)
     {
-        xtensor_fixed<double, xshape<3>> a;
-        xtensor<double, 2> b = zeros<double>({3, 3});
+        xtensor_fixed<double, xshape<3>> a = {1., 2., 3.};
+        xtensor<double, 2> b = ones<double>({3, 3});
         auto c = adapt(&b(0, 0), xshape<3>());
         c *= a;
+        xtensor<double, 2> expected = {{1., 2., 3.}, {1., 1., 1.}, {1., 1., 1.}};
+        EXPECT_EQ(b, expected);
     }
 
     TEST(xtensor_fixed, layout)
