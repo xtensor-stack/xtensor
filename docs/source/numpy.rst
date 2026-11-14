@@ -291,6 +291,8 @@ not modify the underlying xexpression.
      - :cpp:func:`xt::rot90\<2\>(a, {1, 2}) <xt::rot90>`
    * - :any:`np.roll(a, 2, axis=1) <numpy.roll>`
      - :cpp:func:`xt::roll(a, 2, 1) <xt::roll>`
+   * - :any:`np.roll(a, (1, 2), axis=(0, 1)) <numpy.roll>`
+     - :cpp:func:`xt::roll(a, {1, 2}, {0, 1}) <xt::roll>`
 
 Iteration
 ---------
