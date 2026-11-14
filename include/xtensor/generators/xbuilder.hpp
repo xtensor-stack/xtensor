@@ -390,6 +390,24 @@ namespace xt
         };
     }
 
+    template <class T, class R, class S>
+    struct is_memory_independent_generator<detail::arange_generator<T, R, S>>
+        : std::conjunction<std::is_arithmetic<T>, std::is_arithmetic<R>, std::is_arithmetic<S>>
+    {
+    };
+
+    template <class T>
+    struct is_memory_independent_generator<detail::eye_fn<T>> : std::true_type
+    {
+    };
+
+    // fn_impl only forwards to the wrapped functor, which may hold expressions
+    // (e.g. diagonal_fn, trilu_fn).
+    template <class F>
+    struct is_memory_independent_generator<detail::fn_impl<F>> : is_memory_independent_generator<F>
+    {
+    };
+
     /**
      * Generates an array with ones on the diagonal.
      * @param shape shape of the resulting expression

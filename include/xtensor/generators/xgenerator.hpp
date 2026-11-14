@@ -61,6 +61,38 @@ namespace xt
     template <typename T>
     concept xgenerator_concept = is_specialization_of<xgenerator, std::decay_t<T>>::value;
 
+    /**
+     * Trait telling whether a generator functor only produces values, or may
+     * read them from the memory of other expressions.
+     *
+     * An xgenerator whose functor is memory independent can never alias the
+     * destination of an assignment, so it is assigned without a temporary.
+     * The default is ``std::false_type``: unknown functors are assumed to read
+     * memory and keep the overlap protection. Specialize it to inherit from
+     * ``std::true_type`` only for functors that hold no reference to, and no
+     * copy of, an expression that can refer to the assignment destination.
+     *
+     * @tparam F the functor type
+     */
+    template <class F>
+    struct is_memory_independent_generator : std::false_type
+    {
+    };
+
+    namespace detail
+    {
+        template <class E>
+        struct xgenerator_is_memory_independent : std::false_type
+        {
+        };
+
+        template <class F, class R, class S>
+        struct xgenerator_is_memory_independent<xgenerator<F, R, S>>
+            : is_memory_independent_generator<std::decay_t<F>>
+        {
+        };
+    }
+
     template <class C, class R, class S>
     struct xiterable_inner_types<xgenerator<C, R, S>>
     {
@@ -87,7 +119,10 @@ namespace xt
     {
         static bool check_overlap(const E&, const memory_range&)
         {
-            return true;
+            // A functor that reads other expressions can alias the destination
+            // (e.g. a = concatenate(xtuple(a, a))), one that only produces
+            // values cannot.
+            return !detail::xgenerator_is_memory_independent<std::decay_t<E>>::value;
         }
     };
 
