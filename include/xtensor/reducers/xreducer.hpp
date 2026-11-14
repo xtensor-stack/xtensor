@@ -1123,8 +1123,7 @@ namespace xt
 
         reference initial_value() const;
         reference aggregate(size_type dim) const;
-        reference aggregate_impl(size_type dim, /*keep_dims=*/std::false_type) const;
-        reference aggregate_impl(size_type dim, /*keep_dims=*/std::true_type) const;
+        reference aggregate_impl(size_type dim) const;
 
         substepper_type get_substepper_begin() const;
         size_type get_dim(size_type dim) const noexcept;
@@ -1789,7 +1788,7 @@ namespace xt
         }
         else
         {
-            res = aggregate_impl(dim, typename O::keep_dims());
+            res = aggregate_impl(dim);
             if (O::has_initial_value && dim == 0)
             {
                 res = m_reducer->m_merge(m_reducer->m_options.initial_value, res);
@@ -1798,8 +1797,11 @@ namespace xt
         return res;
     }
 
+    // Reduces along the axes m_axes[dim], ..., m_axes.back() at the current position
+    // of the stepper, then moves the stepper back along m_axes[dim]. Dimensions that
+    // are not reduced are not visited, with or without keep_dims.
     template <class F, class CT, class X, class O>
-    inline auto xreducer_stepper<F, CT, X, O>::aggregate_impl(size_type dim, std::false_type) const -> reference
+    inline auto xreducer_stepper<F, CT, X, O>::aggregate_impl(size_type dim) const -> reference
     {
         // reference can be std::array, hence the {} initializer
         reference res = {};
@@ -1807,11 +1809,11 @@ namespace xt
         size_type size = shape(index);
         if (dim != m_reducer->m_axes.size() - 1)
         {
-            res = aggregate_impl(dim + 1, typename O::keep_dims());
+            res = aggregate_impl(dim + 1);
             for (size_type i = 1; i != size; ++i)
             {
                 m_stepper.step(index);
-                res = m_reducer->m_merge(res, aggregate_impl(dim + 1, typename O::keep_dims()));
+                res = m_reducer->m_merge(res, aggregate_impl(dim + 1));
             }
         }
         else
@@ -1824,46 +1826,6 @@ namespace xt
             }
         }
         m_stepper.reset(index);
-        return res;
-    }
-
-    template <class F, class CT, class X, class O>
-    inline auto xreducer_stepper<F, CT, X, O>::aggregate_impl(size_type dim, std::true_type) const -> reference
-    {
-        // reference can be std::array, hence the {} initializer
-        reference res = {};
-        auto ax_it = std::find(m_reducer->m_axes.begin(), m_reducer->m_axes.end(), dim);
-        if (ax_it != m_reducer->m_axes.end())
-        {
-            size_type index = dim;
-            size_type size = m_reducer->m_e.shape()[index];
-            if (ax_it != m_reducer->m_axes.end() - 1 && size != 0)
-            {
-                res = aggregate_impl(dim + 1, typename O::keep_dims());
-                for (size_type i = 1; i != size; ++i)
-                {
-                    m_stepper.step(index);
-                    res = m_reducer->m_merge(res, aggregate_impl(dim + 1, typename O::keep_dims()));
-                }
-            }
-            else
-            {
-                res = m_reducer->m_reduce(static_cast<reference>(m_reducer->m_init()), *m_stepper);
-                for (size_type i = 1; i != size; ++i)
-                {
-                    m_stepper.step(index);
-                    res = m_reducer->m_reduce(res, *m_stepper);
-                }
-            }
-            m_stepper.reset(index);
-        }
-        else
-        {
-            if (dim < m_reducer->m_e.dimension())
-            {
-                res = aggregate_impl(dim + 1, typename O::keep_dims());
-            }
-        }
         return res;
     }
 
