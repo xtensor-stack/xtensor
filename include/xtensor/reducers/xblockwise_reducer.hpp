@@ -270,12 +270,23 @@ namespace xt
     {
         using functor_type = std::decay_t<FF>;
         using closure_type = xtl::const_closure_type_t<E>;
-        using axes_type = std::decay_t<A>;
+
+        // The result shape is computed from the axes before any block is reduced,
+        // so they have to be valid and distinct here already.
+        decltype(auto) normalized_axes = normalize_axis(e, std::forward<A>(axes));
+        using axes_type = std::decay_t<decltype(normalized_axes)>;
+        for (auto it = normalized_axes.begin(); it != normalized_axes.end(); ++it)
+        {
+            if (std::find(normalized_axes.begin(), it, *it) != it)
+            {
+                XTENSOR_THROW(std::runtime_error, "Reducing axes should not contain duplicates.");
+            }
+        }
 
         return xblockwise_reducer<closure_type, functor_type, axes_type, O>(
             std::forward<E>(e),
             std::forward<CS>(chunk_shape),
-            std::forward<A>(axes),
+            std::forward<decltype(normalized_axes)>(normalized_axes),
             std::forward<O>(raw_options),
             std::forward<FF>(functor)
         );

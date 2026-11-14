@@ -314,6 +314,30 @@ namespace xt
                 }
             }
         }
+
+        TEST_CASE("invalid_axes")
+        {
+            dynamic_shape<std::size_t> shape({6, 4, 2});
+            dynamic_shape<std::size_t> chunk_shape({3, 2, 2});
+            xarray<int> input_exp(shape, 1);
+
+            XT_EXPECT_THROW(xt::blockwise::sum(input_exp, chunk_shape, 3), std::runtime_error);
+            XT_EXPECT_THROW(xt::blockwise::sum(input_exp, chunk_shape, -4), std::runtime_error);
+            XT_EXPECT_THROW(
+                xt::blockwise::sum(input_exp, chunk_shape, dynamic_shape<std::size_t>{0, 3}),
+                std::runtime_error
+            );
+            XT_EXPECT_THROW(
+                xt::blockwise::sum(input_exp, chunk_shape, dynamic_shape<std::size_t>{1, 1}),
+                std::runtime_error
+            );
+
+            // Negative axes count from the end, as for the non-blockwise reducers.
+            auto reducer = xt::blockwise::sum(input_exp, chunk_shape, -1);
+            auto res = xarray<int>::from_shape(reducer.shape());
+            reducer.assign_to(res);
+            EXPECT_EQ(res, xt::eval(xt::sum(input_exp, {2})));
+        }
     }
 
 }

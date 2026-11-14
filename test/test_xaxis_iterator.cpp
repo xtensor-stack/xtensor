@@ -209,4 +209,11 @@ namespace xt
         EXPECT_EQ(a(1, 1, 3), (*iter)(1, 1));
         EXPECT_EQ(a(1, 2, 3), (*iter)(1, 2));
     }
+
+    TEST(xaxis_iterator, invalid_axis)
+    {
+        xarray<int> a = get_test_array();
+        XT_EXPECT_THROW(axis_begin(a, 3), std::runtime_error);
+        XT_EXPECT_THROW(axis_end(a, 3), std::runtime_error);
+    }
 }

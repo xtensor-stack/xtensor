@@ -318,4 +318,11 @@ namespace xt
         EXPECT_EQ(a(1, 2, 2), (*iter)(2));
         EXPECT_EQ(a(1, 2, 3), (*iter)(3));
     }
+
+    TEST(xaxis_slice_iterator, invalid_axis)
+    {
+        xarray<int> a = get_slice_test_array();
+        XT_EXPECT_THROW(axis_slice_begin(a, 3), std::runtime_error);
+        XT_EXPECT_THROW(axis_slice_end(a, 3), std::runtime_error);
+    }
 }

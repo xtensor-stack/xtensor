@@ -637,4 +637,32 @@ namespace xt
     TEST(xmanipulation, zzzzzz)
     {
     }
+
+    TEST(xmanipulation, invalid_axis)
+    {
+        xarray<double> a = {{1., 2., 3.}, {4., 5., 6.}};
+
+        XT_EXPECT_THROW(expand_dims(a, 3), std::runtime_error);
+        EXPECT_EQ(expand_dims(a, 2).shape(), (dynamic_shape<std::size_t>{2, 3, 1}));
+
+        XT_EXPECT_THROW(flip(a, 2), std::runtime_error);
+        XT_EXPECT_THROW(split(a, 1, 2), std::runtime_error);
+        XT_EXPECT_THROW(repeat(a, 2, 2), std::runtime_error);
+        XT_EXPECT_THROW(repeat(a, std::vector<std::size_t>{1, 1}, 2), std::runtime_error);
+    }
+
+    TEST(xmanipulation, squeeze_invalid_axis)
+    {
+        auto b = xt::xarray<double>::from_shape({3, 1, 2});
+        using ds = xt::dynamic_shape<std::size_t>;
+
+        XT_EXPECT_THROW(squeeze(b, 3), std::runtime_error);
+        XT_EXPECT_THROW(squeeze(b, 3, check_policy::full()), std::runtime_error);
+        XT_EXPECT_THROW(squeeze(b, {1, 1}), std::runtime_error);
+        XT_EXPECT_THROW(squeeze(b, {1, -2}), std::runtime_error);
+        XT_EXPECT_THROW(squeeze(b, {-4}), std::runtime_error);
+
+        EXPECT_EQ(squeeze(b, {-2}).shape(), ds({3, 2}));
+        EXPECT_EQ(squeeze(b, {-2}, check_policy::full()).shape(), ds({3, 2}));
+    }
 }

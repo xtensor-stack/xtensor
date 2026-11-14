@@ -564,4 +564,30 @@ namespace xt
         EXPECT_EQ(ma0, ma0_exp);
         EXPECT_EQ(ma1, ma1_exp);
     }
+
+    TEST(xsort, invalid_axis)
+    {
+        xtensor<double, 2> t = {{1., 2.}, {3., 0.}};
+        xarray<double> a = t;
+        xarray<double> a1 = {3., 1., 2.};
+
+        // The fixed-size result shape of argmin / argmax used to overflow.
+        XT_EXPECT_THROW(argmax(t, 2), std::runtime_error);
+        XT_EXPECT_THROW(argmin(t, -3), std::runtime_error);
+        XT_EXPECT_THROW(argmax(a, 2), std::runtime_error);
+
+        XT_EXPECT_THROW(sort(a, 2), std::runtime_error);
+        XT_EXPECT_THROW(argsort(a, -3), std::runtime_error);
+        XT_EXPECT_THROW(partition(a, 0, 2), std::runtime_error);
+        XT_EXPECT_THROW(argpartition(a, 0, 2), std::runtime_error);
+        XT_EXPECT_THROW(median(a, 2), std::runtime_error);
+        XT_EXPECT_THROW(quantile(a, {0.5}, 2), std::runtime_error);
+
+        // 1-D inputs take a shortcut that used to ignore the axis.
+        XT_EXPECT_THROW(sort(a1, 1), std::runtime_error);
+        XT_EXPECT_THROW(partition(a1, 0, 1), std::runtime_error);
+        XT_EXPECT_THROW(argpartition(a1, 0, 1), std::runtime_error);
+        XT_EXPECT_THROW(argsort(a1, 1), std::runtime_error);
+        EXPECT_EQ(sort(a1, -1), (xarray<double>{1., 2., 3.}));
+    }
 }
