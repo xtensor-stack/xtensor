@@ -1091,6 +1091,10 @@ namespace xt
     template <class S>
     inline auto& xstrided_container<D>::reshape(S&& shape, layout_type layout) &
     {
+        XTENSOR_PRECONDITION(
+            detail::check_resize_dimension(m_shape, shape),
+            "cannot change the number of dimensions of xtensor"
+        );
         reshape_impl(
             std::forward<S>(shape),
             xtl::is_signed<std::decay_t<typename std::decay_t<S>::value_type>>(),
@@ -1103,6 +1107,10 @@ namespace xt
     template <class T>
     inline auto& xstrided_container<D>::reshape(std::initializer_list<T> shape, layout_type layout) &
     {
+        XTENSOR_PRECONDITION(
+            detail::check_resize_dimension(m_shape, shape),
+            "cannot change the number of dimensions of xtensor"
+        );
         using sh_type = rebind_container_t<T, shape_type>;
         sh_type sh = xtl::make_sequence<sh_type>(shape.size());
         std::copy(shape.begin(), shape.end(), sh.begin());
