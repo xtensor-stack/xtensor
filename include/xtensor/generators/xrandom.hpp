@@ -243,6 +243,12 @@ namespace xt
         };
     }
 
+    // Values come from the engine and the distribution, never from an expression.
+    template <class T, class E, class D>
+    struct is_memory_independent_generator<detail::random_impl<T, E, D>> : std::true_type
+    {
+    };
+
     namespace random
     {
         /**
