@@ -361,4 +361,55 @@ namespace xt
         };
         EXPECT_EQ(m, expected);
     }
+
+    TEST(xpad, invalid_pad_width)
+    {
+        xt::xtensor<int, 2> a = {{1, 2, 3}, {4, 5, 6}};
+        using widths = std::vector<std::vector<std::size_t>>;
+
+        XT_EXPECT_THROW(xt::pad(a, widths{{1, 1}}), std::runtime_error);
+        XT_EXPECT_THROW(xt::pad(a, widths{{1, 1}, {1, 1}, {1, 1}}), std::runtime_error);
+        XT_EXPECT_THROW(xt::pad(a, widths{{1}, {1}}), std::runtime_error);
+        XT_EXPECT_THROW(xt::pad(a, std::vector<std::size_t>{1}), std::runtime_error);
+        XT_EXPECT_THROW(xt::pad(a, std::vector<std::vector<int>>{{1, -1}, {0, 0}}), std::runtime_error);
+        XT_EXPECT_THROW(xt::pad(a, -1), std::runtime_error);
+
+        // The other modes read the padding from the array, which limits the widths.
+        XT_EXPECT_THROW(xt::pad(a, widths{{3, 0}, {0, 0}}, xt::pad_mode::wrap), std::runtime_error);
+        XT_EXPECT_THROW(xt::pad(a, widths{{0, 3}, {0, 0}}, xt::pad_mode::periodic), std::runtime_error);
+        XT_EXPECT_THROW(xt::pad(a, widths{{0, 0}, {4, 0}}, xt::pad_mode::symmetric), std::runtime_error);
+        XT_EXPECT_THROW(xt::pad(a, widths{{0, 0}, {0, 3}}, xt::pad_mode::reflect), std::runtime_error);
+
+        xt::xtensor<int, 2> empty = xt::xtensor<int, 2>::from_shape({0, 2});
+        XT_EXPECT_THROW(xt::pad(empty, widths{{1, 0}, {0, 0}}, xt::pad_mode::edge), std::runtime_error);
+        XT_EXPECT_THROW(xt::pad(empty, widths{{1, 0}, {0, 0}}, xt::pad_mode::reflect), std::runtime_error);
+        EXPECT_EQ(
+            xt::pad(empty, widths{{1, 0}, {0, 0}}, xt::pad_mode::constant, 7),
+            (xt::xtensor<int, 2>{{7, 7}})
+        );
+    }
+
+    TEST(xpad, largest_pad_width)
+    {
+        xt::xtensor<int, 1> a = {1, 2, 3};
+
+        EXPECT_EQ(xt::pad(a, 3, xt::pad_mode::wrap), (xt::xtensor<int, 1>{1, 2, 3, 1, 2, 3, 1, 2, 3}));
+        EXPECT_EQ(xt::pad(a, 3, xt::pad_mode::symmetric), (xt::xtensor<int, 1>{3, 2, 1, 1, 2, 3, 3, 2, 1}));
+        EXPECT_EQ(xt::pad(a, 2, xt::pad_mode::reflect), (xt::xtensor<int, 1>{3, 2, 1, 2, 3, 2, 1}));
+        EXPECT_EQ(xt::pad(a, 4, xt::pad_mode::edge), (xt::xtensor<int, 1>{1, 1, 1, 1, 1, 2, 3, 3, 3, 3, 3}));
+    }
+
+    TEST(xpad, tile_invalid_reps)
+    {
+        xt::xtensor<int, 1> a = {1, 2, 3};
+        xt::xarray<int> b = {{1, 2}, {3, 4}};
+        xt::xarray<int> scalar = 5;
+
+        XT_EXPECT_THROW(xt::tile(a, {2u, 3u}), std::runtime_error);
+        XT_EXPECT_THROW(xt::tile(b, {2u, 3u, 4u}), std::runtime_error);
+        XT_EXPECT_THROW(xt::tile(b, std::vector<std::size_t>{2}), std::runtime_error);
+        XT_EXPECT_THROW(xt::tile(b, std::vector<int>{2, -1}), std::runtime_error);
+        XT_EXPECT_THROW(xt::tile(scalar, 3u), std::runtime_error);
+        XT_EXPECT_THROW(xt::tile(a, -2), std::runtime_error);
+    }
 }
