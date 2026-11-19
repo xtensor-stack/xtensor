@@ -1825,12 +1825,21 @@ namespace xt
 
     namespace detail
     {
-        template <class T, class S, class ST>
-        inline auto mean_division(S&& s, ST e_size)
+        template <class T, class S, class ST, class D>
+        inline auto mean_division(S&& s, ST size, const D& ddof)
         {
             using value_type = typename std::conditional_t<std::is_same<T, void>::value, double, T>;
-            // Avoids floating point exception when s.size is 0
-            value_type div = s.size() != ST(0) ? static_cast<value_type>(e_size / s.size()) : value_type(0);
+            // Avoids floating point exception when s.size is 0. The ddof correction
+            // applies to the number of samples per output element, not to the total
+            // size before it is split into output elements.
+            value_type div = value_type(0);
+            if (s.size() != ST(0))
+            {
+                const ST sample_count = size / s.size();
+                const ST correction = static_cast<ST>(ddof);
+                div = sample_count > correction ? static_cast<value_type>(sample_count - correction)
+                                                : value_type(0);
+            }
             return std::move(s) / std::move(div);
         }
 
@@ -1849,7 +1858,7 @@ namespace xt
             const size_type size = e.size();
             XTENSOR_ASSERT(static_cast<size_type>(ddof) <= size);
             auto s = sum<T>(std::forward<E>(e), std::forward<X>(axes), es);
-            return mean_division<T>(std::move(s), size - static_cast<size_type>(ddof));
+            return mean_division<T>(std::move(s), size, ddof);
         }
 
         template <class T, class E, class I, std::size_t N, class D, class EVS>
@@ -1859,7 +1868,7 @@ namespace xt
             const size_type size = e.size();
             XTENSOR_ASSERT(static_cast<size_type>(ddof) <= size);
             auto s = sum<T>(std::forward<E>(e), axes, es);
-            return mean_division<T>(std::move(s), size - static_cast<size_type>(ddof));
+            return mean_division<T>(std::move(s), size, ddof);
         }
 
         template <class T, class E, class D, class EVS, XTL_REQUIRES(is_reducer_options<EVS>, xtl::is_integral<D>)>

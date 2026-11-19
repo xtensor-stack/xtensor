@@ -2832,4 +2832,20 @@ namespace xt
         EXPECT_TRUE(xt::allclose(vr_ddof_with_axes_arr, py_vr_ddof));
     }
 
+    TEST(xtest_extended_xmath, variance_axis_ddof)
+    {
+        // ddof is applied per output element, not to the total size before
+        // it is split into output elements (github issue #2937).
+        xarray<double> a = {{1., 3., 5.}, {2., 4., 6.}};
+
+        auto v = xt::variance(a, {1}, 2);
+        EXPECT_EQ(v(0), 8.);
+        EXPECT_EQ(v(1), 8.);
+
+        std::vector<std::size_t> axes = {1};
+        auto v_axes = xt::variance(a, axes, 2);
+        EXPECT_EQ(v_axes(0), 8.);
+        EXPECT_EQ(v_axes(1), 8.);
+    }
+
 }
